@@ -7,13 +7,13 @@
 <title>Сёма</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-:root{color-scheme:light;--bg:#f5f6fa;--card:#fff;--text:#20232c;--muted:#858b9b;--border:#eceef4;--input:#f6f7fb;--input-text:#252936;--accent:#6c63e8;--accent-light:#eeecff;--green:#21a67a;--green-light:#e5f7ef;--pink:#ed7099;--pink-light:#fff0f5;--shadow:0 5px 20px rgba(37,42,72,.045);--nav:#fff;--nav-active:#6c63e8;--nav-inactive:#9499a8;--overlay:rgba(22,25,39,.42)}
-[data-theme="dark"]{color-scheme:dark;--bg:#15161c;--card:#22232c;--text:#f2f3f8;--muted:#a1a5b5;--border:#343541;--input:#30313d;--input-text:#fff;--accent:#a39bff;--accent-light:#38344f;--green:#64d6aa;--green-light:#263f39;--pink:#ff9dbb;--pink-light:#442d39;--shadow:0 5px 20px rgba(0,0,0,.12);--nav:#20212a;--nav-active:#b0a9ff;--nav-inactive:#9296a7;--overlay:rgba(0,0,0,.65)}
+:root{color-scheme:light;--bg:#f5f6fa;--card:#fff;--text:#20232c;--muted:#858b9b;--border:#eceef4;--input:#f6f7fb;--input-text:#252936;--accent:#6c63e8;--accent-light:#eeecff;--green:#21a67a;--green-light:#e5f7ef;--pink:#ed7099;--pink-light:#fff0f5;--shadow:0 5px 20px rgba(37,42,72,.045);--nav-text:#777b8c;--glass-bg:rgba(255,255,255,.66);--glass-border:rgba(255,255,255,.78);--glass-shadow:0 8px 30px rgba(35,38,65,.13),inset 0 1px 0 rgba(255,255,255,.9);--glass-active:rgba(255,255,255,.82);--glass-highlight:rgba(255,255,255,.7);--overlay:rgba(22,25,39,.42)}
+[data-theme="dark"]{color-scheme:dark;--bg:#15161c;--card:#22232c;--text:#f2f3f8;--muted:#a1a5b5;--border:#343541;--input:#30313d;--input-text:#fff;--accent:#a39bff;--accent-light:#38344f;--green:#64d6aa;--green-light:#263f39;--pink:#ff9dbb;--pink-light:#442d39;--shadow:0 5px 20px rgba(0,0,0,.12);--nav-text:#a7a9b7;--glass-bg:rgba(38,39,51,.72);--glass-border:rgba(255,255,255,.12);--glass-shadow:0 8px 30px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.1);--glass-active:rgba(255,255,255,.12);--glass-highlight:rgba(255,255,255,.09);--overlay:rgba(0,0,0,.65)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:15px;transition:background .2s,color .2s}
 button,input{font:inherit}
 button{cursor:pointer}
-.app{max-width:520px;margin:0 auto;min-height:100dvh;padding:16px 16px calc(94px + env(safe-area-inset-bottom))}
+.app{max-width:520px;margin:0 auto;min-height:100dvh;padding:16px 16px calc(112px + env(safe-area-inset-bottom))}
 .page{display:none;animation:fadeIn .18s ease}
 .page.active{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
@@ -47,11 +47,17 @@ button{cursor:pointer}
 .quick-copy{min-width:0}
 .quick-name{font-size:13px;font-weight:750;line-height:1.3}
 .quick-desc{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.25}
-.bottom-nav{position:fixed;z-index:20;bottom:0;left:0;right:0;background:var(--nav);border-top:1px solid var(--border);padding:8px 10px calc(8px + env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(3,1fr);max-width:520px;margin:0 auto}
-.nav-btn{border:0;background:transparent;color:var(--nav-inactive);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:5px 4px;min-height:51px;border-radius:13px}
-.nav-btn.active{color:var(--nav-active)}
-.nav-icon{height:24px;font-size:22px;line-height:24px}
-.nav-label{font-size:11px;font-weight:650}
+/* Liquid Glass — плавающая нижняя панель */
+.bottom-nav{position:fixed;z-index:20;bottom:calc(10px + env(safe-area-inset-bottom));left:12px;right:12px;max-width:496px;margin:0 auto;padding:6px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));isolation:isolate;border:1px solid var(--glass-border);border-radius:28px;background:var(--glass-bg);box-shadow:var(--glass-shadow);-webkit-backdrop-filter:blur(28px) saturate(190%);backdrop-filter:blur(28px) saturate(190%)}
+.bottom-nav:before{content:"";position:absolute;z-index:-1;left:6px;top:6px;bottom:6px;width:calc((100% - 12px)/3);border-radius:23px;background:var(--glass-active);border:1px solid var(--glass-border);box-shadow:0 2px 9px rgba(30,32,55,.07),inset 0 1px 1px var(--glass-highlight);transform:translateX(calc(var(--nav-index,0)*100%));transition:transform .42s cubic-bezier(.22,1,.36,1),background .25s,border-color .25s;will-change:transform}
+.bottom-nav:after{content:"";position:absolute;z-index:2;top:7px;left:12px;width:calc((100% - 24px)/3);height:1px;border-radius:50%;background:var(--glass-highlight);pointer-events:none;transform:translateX(calc(var(--nav-index,0)*100%));transition:transform .42s cubic-bezier(.22,1,.36,1)}
+.nav-btn{position:relative;z-index:1;min-width:0;min-height:54px;border:0;border-radius:22px;background:transparent;color:var(--nav-text);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:5px 2px;transition:color .25s,transform .25s}
+.nav-btn:active{transform:scale(.92)}
+.nav-btn.active{color:var(--accent)}
+.nav-icon{height:25px;min-width:28px;display:flex;align-items:center;justify-content:center;font-size:23px;line-height:25px;transition:transform .35s cubic-bezier(.22,1,.36,1),filter .25s}
+.nav-btn.active .nav-icon{transform:translateY(-1px) scale(1.06);filter:drop-shadow(0 1px 3px rgba(108,99,232,.15))}
+.nav-label{font-size:11px;font-weight:700;line-height:14px;white-space:nowrap}
+@media(prefers-reduced-motion:reduce){.bottom-nav:before,.bottom-nav:after,.nav-btn,.nav-icon{transition:none}.page{animation:none}}
 .chart-intro{background:var(--card);border:1px solid var(--border);border-radius:22px;padding:20px;box-shadow:var(--shadow);margin-bottom:13px}
 .chart-illustration{width:56px;height:56px;border-radius:18px;background:var(--accent-light);display:flex;align-items:center;justify-content:center;font-size:27px;margin-bottom:14px}
 .chart-heading{font-size:17px;font-weight:750;margin-bottom:7px}
@@ -89,9 +95,9 @@ button{cursor:pointer}
 .spinner{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .modal-close-bottom{display:block;margin:20px auto 0;border:0;border-radius:14px;background:var(--input);color:var(--text);font-weight:700;padding:11px 28px;min-width:115px}
-.toast{position:fixed;z-index:70;bottom:calc(87px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);max-width:calc(100% - 36px);background:var(--text);color:var(--bg);padding:12px 17px;border-radius:14px;font-size:13px;font-weight:650;text-align:center;display:none;box-shadow:var(--shadow)}
+.toast{position:fixed;z-index:70;bottom:calc(98px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);max-width:calc(100% - 36px);background:var(--text);color:var(--bg);padding:12px 17px;border-radius:14px;font-size:13px;font-weight:650;text-align:center;display:none;box-shadow:var(--shadow)}
 .toast.show{display:block;animation:fadeIn .2s ease}
-@media(min-width:521px){.bottom-nav{left:50%;transform:translateX(-50%);width:100%}}
+@media(min-width:521px){.bottom-nav{left:50%;right:auto;transform:translateX(-50%);width:calc(100% - 24px)}}
 </style>
 </head>
 <body>
@@ -184,8 +190,8 @@ button{cursor:pointer}
 <div class="settings-footer">Сёма · Учёт показателей</div>
 </section>
 </div>
-<nav class="bottom-nav" aria-label="Основная навигация">
-<button class="nav-btn active" type="button" data-page="home"><span class="nav-icon">⌂</span><span class="nav-label">Главная</span></button>
+<nav class="bottom-nav" id="bottom-nav" aria-label="Основная навигация" style="--nav-index:0">
+<button class="nav-btn active" type="button" data-page="home" aria-current="page"><span class="nav-icon">⌂</span><span class="nav-label">Главная</span></button>
 <button class="nav-btn" type="button" data-page="charts"><span class="nav-icon">▥</span><span class="nav-label">Графики</span></button>
 <button class="nav-btn" type="button" data-page="settings"><span class="nav-icon">⚙</span><span class="nav-label">Настройки</span></button>
 </nav>
@@ -210,7 +216,7 @@ function showToast(message){const el=$("toast");el.textContent=message;el.classL
 function setTheme(theme,save=true){theme=theme==="dark"?"dark":"light";document.documentElement.dataset.theme=theme;document.querySelector('meta[name="theme-color"]').content=theme==="dark"?"#15161c":"#f5f6fa";$("theme-light").classList.toggle("active",theme==="light");$("theme-dark").classList.toggle("active",theme==="dark");if(save){try{localStorage.setItem("sema-theme",theme)}catch(e){}}if(tg){try{tg.setHeaderColor(theme==="dark"?"#15161c":"#f5f6fa");tg.setBackgroundColor(theme==="dark"?"#15161c":"#f5f6fa")}catch(e){}}}
 function initTheme(){let theme="light";try{theme=localStorage.getItem("sema-theme")||"light"}catch(e){}setTheme(theme,false)}
 document.querySelectorAll("[data-theme-choice]").forEach(button=>button.addEventListener("click",()=>setTheme(button.dataset.themeChoice)));
-function switchPage(page){document.querySelectorAll(".page").forEach(el=>el.classList.toggle("active",el.id==="page-"+page));document.querySelectorAll(".nav-btn").forEach(el=>el.classList.toggle("active",el.dataset.page===page));window.scrollTo({top:0,behavior:"instant"});if(tg){try{tg.HapticFeedback.selectionChanged()}catch(e){}}}
+function switchPage(page){document.querySelectorAll(".page").forEach(el=>el.classList.toggle("active",el.id==="page-"+page));document.querySelectorAll(".nav-btn").forEach(el=>{const active=el.dataset.page===page;el.classList.toggle("active",active);if(active)el.setAttribute("aria-current","page");else el.removeAttribute("aria-current")});const pages=["home","charts","settings"];const index=pages.indexOf(page);$("bottom-nav").style.setProperty("--nav-index",Math.max(0,index));window.scrollTo({top:0,behavior:"instant"});if(tg){try{tg.HapticFeedback.selectionChanged()}catch(e){}}}
 document.querySelectorAll(".nav-btn").forEach(button=>button.addEventListener("click",()=>switchPage(button.dataset.page)));
 function showModal(title,content,loading=false){$("modal-title").textContent=title;$("modal-content").innerHTML=loading?'<div class="loading"><div class="spinner"></div><div>Загружаем данные…</div></div>':"";$("modal-backdrop").classList.add("show");if(!loading)setModalText(content)}
 function setModalText(content){const el=$("modal-content");el.replaceChildren();if(content instanceof Node){el.appendChild(content);return}const pre=document.createElement("pre");pre.textContent=String(content??"Нет данных");el.appendChild(pre)}
