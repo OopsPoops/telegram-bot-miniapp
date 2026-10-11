@@ -371,13 +371,15 @@ document.getElementById('sugarAverage').innerHTML='— <small>ммоль/л</sma
 if(/доступ|пользовател|разреш|initdata|telegram/i.test(error.message))setAccess(false,error.message);
 }
 }
-async function loadInsulinTotal(){
-try{
-const result=await api('today');
-const text=String(result||'');
-const match=text.match(/(?:инсулин|insulin)[^\d]{0,30}(\d+(?:[.,]\d+)?)/i);
-if(match)document.getElementById('insulinTotal').innerHTML=escapeHtml(match[1])+' <small>ед.</small>';
-}catch(error){}
+async function loadInsulinTotal() {
+try {
+const data = await api('insulin_total');
+if (data.ok) {
+document.getElementById('insulinTotal').textContent = data.result;
+}
+} catch (error) {
+console.error('Ошибка загрузки суммы инсулина:', error);
+}
 }
 initUser();
 loadSugarAverage();
