@@ -2,64 +2,272 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Меню бота</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f7f8fc">
+<title>Сёма — учёт показателей</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-body{font-family:-apple-system,sans-serif;background:var(--tg-theme-bg-color,#f5f5f5);color:var(--tg-theme-text-color,#222);padding:20px;margin:0}
-h2{margin-top:12px}
-button{width:100%;padding:16px;margin:8px 0;border:0;border-radius:14px;background:var(--tg-theme-button-color,#2481cc);color:var(--tg-theme-button-text-color,#fff);font-size:16px}
-button:disabled{opacity:.6}
-#result{white-space:pre-wrap;overflow-wrap:anywhere;margin-top:16px}
+:root{--bg:#f5f6fb;--card:#fff;--text:#20243a;--muted:#81869a;--blue:#5267e8;--pink:#ed6f9b;--teal:#20a99b;--line:#edf0f6;--shadow:0 8px 24px rgba(36,47,92,.07)}
+*{box-sizing:border-box}
+body{margin:0;padding:0;background:var(--tg-theme-bg-color,var(--bg));color:var(--tg-theme-text-color,var(--text));font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+button,input{font:inherit}
+.app{max-width:520px;margin:0 auto;padding:22px 18px calc(30px + env(safe-area-inset-bottom))}
+.topline{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.brand{font-size:25px;font-weight:800;letter-spacing:-.8px}
+.brand span{color:var(--blue)}
+.subtitle{color:var(--muted);font-size:13px;margin-top:4px}
+.top-icon{width:44px;height:44px;border-radius:15px;background:#e9edff;display:grid;place-items:center;font-size:23px}
+.section-title{font-size:17px;font-weight:750;margin:23px 2px 12px}
+.metric{background:var(--card);border-radius:23px;padding:17px;margin-bottom:13px;box-shadow:var(--shadow);border:1px solid rgba(125,135,170,.07)}
+.metric-head{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.metric-icon{width:43px;height:43px;flex-shrink:0;border-radius:15px;display:grid;place-items:center;font-size:22px}
+.sugar .metric-icon{background:#fff0f5}
+.insulin .metric-icon{background:#e4faf6}
+.metric-name{font-size:17px;font-weight:750}
+.metric-description{font-size:12px;color:var(--muted);margin-top:4px}
+.metric-value{font-size:28px;font-weight:800;letter-spacing:-.7px;margin-left:auto;text-align:right}
+.metric-value small{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:0}
+.input-row{display:flex;gap:9px}
+.value-input{min-width:0;flex:1;border:1px solid var(--line);border-radius:13px;background:var(--tg-theme-secondary-bg-color,#f7f8fc);padding:13px 14px;color:var(--text);outline:none;font-size:16px}
+.value-input:focus{border-color:var(--blue)}
+.save-button{border:0;border-radius:13px;padding:0 17px;font-size:14px;font-weight:700;color:white;min-width:105px}
+.sugar .save-button{background:var(--pink)}
+.insulin .save-button{background:var(--teal)}
+.quick-title{display:flex;justify-content:space-between;align-items:center;margin-top:26px;margin-bottom:12px}
+.quick-title .section-title{margin:0}
+.quick-title span{font-size:12px;color:var(--muted)}
+.quick-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.quick-button{display:flex;align-items:center;gap:12px;text-align:left;background:var(--card);border:1px solid rgba(125,135,170,.07);border-radius:17px;padding:15px 13px;min-height:73px;box-shadow:var(--shadow);color:var(--text);cursor:pointer;transition:transform .12s,opacity .12s}
+.quick-button:active{transform:scale(.98)}
+.quick-icon{width:40px;height:40px;flex-shrink:0;border-radius:13px;display:grid;place-items:center;font-size:19px}
+.quick-label{font-weight:700;font-size:14px}
+.quick-hint{font-size:11px;color:var(--muted);margin-top:4px}
+.arrow{margin-left:auto;color:#a0a5b6;font-size:19px}
+.blue{background:#edf0ff}.orange{background:#fff1df}.purple{background:#f1eaff}.green{background:#e4f8ee}.yellow{background:#fff5d7}.gray{background:#edf0f5}
+.footer{text-align:center;font-size:11px;color:var(--muted);padding:22px 0 0}
+.toast{font-size:12px;color:var(--muted);min-height:16px;margin:8px 2px 0}
+.modal-backdrop{position:fixed;inset:0;background:rgba(18,24,45,.38);display:none;align-items:center;justify-content:center;padding:22px;z-index:10;backdrop-filter:blur(5px)}
+.modal-backdrop.visible{display:flex;animation:fade .18s ease}
+.modal{width:100%;max-width:420px;max-height:82vh;overflow:hidden;background:var(--tg-theme-bg-color,#fff);border-radius:25px;padding:23px 20px 17px;box-shadow:0 25px 80px rgba(0,0,0,.2);display:flex;flex-direction:column;animation:rise .22s ease}
+.modal-top{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.modal-icon{width:45px;height:45px;border-radius:15px;background:#edf0ff;display:grid;place-items:center;font-size:22px}
+.modal-title{font-size:19px;font-weight:800}
+.modal-subtitle{font-size:12px;color:var(--muted);margin-top:4px}
+.modal-content{overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:1.6;min-height:55px;max-height:48vh;padding:14px;border-radius:15px;background:var(--tg-theme-secondary-bg-color,#f7f8fc)}
+.modal-close{display:block;margin:16px auto 0;border:0;border-radius:50%;width:46px;height:46px;background:#edf0f5;color:#51566a;font-size:25px;cursor:pointer}
+.loader-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;min-height:145px;color:var(--muted);font-size:13px}
+.spinner{width:39px;height:39px;border:4px solid #e7eaff;border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite}
+.open-link{display:inline-block;margin-top:13px;color:var(--blue);font-weight:700;text-decoration:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes rise{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:360px){.app{padding-left:13px;padding-right:13px}.metric{padding:14px}.metric-value{font-size:24px}.save-button{min-width:88px;padding:0 11px}.quick-button{padding:12px 10px;gap:9px}.quick-icon{width:35px;height:35px}}
 </style>
 </head>
 <body>
-<h2>Меню бота</h2>
-<button id="todayButton" onclick="todayBot()">Сегодня</button>
-<div id="result"></div>
+<main class="app">
+<header class="topline">
+<div>
+<div class="brand">Сёма<span>.</span></div>
+<div class="subtitle">Учёт показателей</div>
+</div>
+<div class="top-icon">✦</div>
+</header>
+
+<section class="metric sugar">
+<div class="metric-head">
+<div class="metric-icon">🩷</div>
+<div>
+<div class="metric-name">Сахар</div>
+<div class="metric-description">Среднее значение</div>
+</div>
+<div class="metric-value" id="sugarAverage">— <small>ммоль/л</small></div>
+</div>
+<div class="input-row">
+<input class="value-input" id="sugarInput" type="text" inputmode="decimal" placeholder="Например, 5,6" aria-label="Новое значение сахара">
+<button class="save-button" onclick="saveValue('sugar')">Сохранить</button>
+</div>
+<div class="toast" id="sugarToast"></div>
+</section>
+
+<section class="metric insulin">
+<div class="metric-head">
+<div class="metric-icon">💉</div>
+<div>
+<div class="metric-name">Инсулин</div>
+<div class="metric-description">Сумма за сегодня</div>
+</div>
+<div class="metric-value" id="insulinTotal">— <small>ед.</small></div>
+</div>
+<div class="input-row">
+<input class="value-input" id="insulinInput" type="number" inputmode="numeric" step="1" min="0" max="15" placeholder="Целое число" aria-label="Новое значение инсулина">
+<button class="save-button" onclick="saveValue('insulin')">Сохранить</button>
+</div>
+<div class="toast" id="insulinToast"></div>
+</section>
+
+<div class="quick-title">
+<div class="section-title">Быстрый доступ</div>
+<span>Выбери раздел</span>
+</div>
+
+<section class="quick-grid">
+<button class="quick-button" onclick="openAction('today')">
+<span class="quick-icon blue">☀️</span><span><div class="quick-label">Сегодня</div><div class="quick-hint">За текущий день</div></span><span class="arrow">›</span>
+</button>
+<button class="quick-button" onclick="openAction('yesterday')">
+<span class="quick-icon orange">🌙</span><span><div class="quick-label">Вчера</div><div class="quick-hint">За прошлый день</div></span><span class="arrow">›</span>
+</button>
+<button class="quick-button" onclick="openAction('week')">
+<span class="quick-icon purple">📊</span><span><div class="quick-label">Неделя</div><div class="quick-hint">Итоги за неделю</div></span><span class="arrow">›</span>
+</button>
+<button class="quick-button" onclick="openAction('month')">
+<span class="quick-icon green">🗓️</span><span><div class="quick-label">Месяц</div><div class="quick-hint">Итоги за месяц</div></span><span class="arrow">›</span>
+</button>
+<button class="quick-button" onclick="openAction('excel')">
+<span class="quick-icon yellow">📗</span><span><div class="quick-label">Excel</div><div class="quick-hint">Открыть таблицу</div></span><span class="arrow">›</span>
+</button>
+<button class="quick-button" onclick="openAction('memory')">
+<span class="quick-icon gray">⚙️</span><span><div class="quick-label">Память</div><div class="quick-hint">Состояние бота</div></span><span class="arrow">›</span>
+</button>
+</section>
+<div class="footer">Данные доступны только разрешённым пользователям</div>
+</main>
+
+<div class="modal-backdrop" id="modalBackdrop" onclick="backdropClose(event)">
+<section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+<div class="modal-top">
+<div class="modal-icon" id="modalIcon">📊</div>
+<div>
+<div class="modal-title" id="modalTitle">Загрузка</div>
+<div class="modal-subtitle" id="modalSubtitle">Сёма получает данные</div>
+</div>
+</div>
+<div class="modal-content" id="modalContent">
+<div class="loader-wrap"><div class="spinner"></div><div>Загружаю данные…</div></div>
+</div>
+<div id="modalLink"></div>
+<button class="modal-close" onclick="closeModal()" aria-label="Закрыть">×</button>
+</section>
+</div>
+
 <script>
-const tg=window.Telegram.WebApp;
-tg.ready();
-tg.expand();
+const tg=window.Telegram?.WebApp;
+if(tg){tg.ready();tg.expand();}
 
-async function todayBot(){
-const button=document.getElementById('todayButton');
-const result=document.getElementById('result');
+const API_URL='https://telegram-daily-sum-bot.onrender.com/api/miniapp';
+const labels={
+today:{title:'Сегодня',subtitle:'Данные за текущий день',icon:'☀️',loading:'Собираю данные за сегодня…'},
+yesterday:{title:'Вчера',subtitle:'Данные за прошлый день',icon:'🌙',loading:'Загружаю данные за вчера…'},
+week:{title:'Неделя',subtitle:'Итоги за неделю',icon:'📊',loading:'Собираю статистику за неделю…'},
+month:{title:'Месяц',subtitle:'Итоги за месяц',icon:'🗓️',loading:'Собираю статистику за месяц…'},
+excel:{title:'Excel',subtitle:'Твоя таблица',icon:'📗',loading:'Получаю ссылку на таблицу…'},
+memory:{title:'Память',subtitle:'Состояние бота',icon:'⚙️',loading:'Проверяю состояние бота…'}
+};
 
-if(!tg.initData){
-result.textContent='Открой приложение через Telegram';
-return;
+function showModal(title,subtitle,icon,content){
+document.getElementById('modalTitle').textContent=title;
+document.getElementById('modalSubtitle').textContent=subtitle;
+document.getElementById('modalIcon').textContent=icon;
+document.getElementById('modalContent').innerHTML=content;
+document.getElementById('modalLink').innerHTML='';
+document.getElementById('modalBackdrop').classList.add('visible');
 }
 
-button.disabled=true;
-result.textContent='Загружаю данные за сегодня...';
+function loadingContent(message){
+return '<div class="loader-wrap"><div class="spinner"></div><div>'+escapeHtml(message)+'</div></div>';
+}
 
-try{
-const response=await fetch('https://telegram-daily-sum-bot.onrender.com/api/miniapp',{
+function closeModal(){
+document.getElementById('modalBackdrop').classList.remove('visible');
+}
+
+function backdropClose(event){
+if(event.target===document.getElementById('modalBackdrop'))closeModal();
+}
+
+function escapeHtml(value){
+return String(value).replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+}
+
+async function api(action,extra={}){
+if(!tg||!tg.initData)throw new Error('Открой Mini App через Telegram.');
+const response=await fetch(API_URL,{
 method:'POST',
 headers:{'Content-Type':'application/json'},
-body:JSON.stringify({
-initData:tg.initData,
-action:'today'
-})
+body:JSON.stringify({initData:tg.initData,action,...extra})
 });
-
 const data=await response.json();
-
-if(!response.ok){
-throw new Error(data.error||'Ошибка сервера');
+if(!response.ok||!data.ok)throw new Error(data.error||'Ошибка сервера');
+return data.result;
 }
 
-result.textContent=typeof data.result==='string'
-?data.result
-:JSON.stringify(data.result,null,2);
-
+async function openAction(action){
+const item=labels[action];
+showModal(item.title,item.subtitle,item.icon,loadingContent(item.loading));
+try{
+const result=await api(action);
+if(action==='excel'&&result){
+document.getElementById('modalContent').textContent='Ссылка на таблицу готова.';
+const link=document.createElement('a');
+link.href=result;
+link.target='_blank';
+link.rel='noopener noreferrer';
+link.className='open-link';
+link.textContent='Открыть Excel ↗';
+document.getElementById('modalLink').appendChild(link);
+}else{
+document.getElementById('modalContent').textContent=String(result||'Нет данных');
+}
 }catch(error){
-result.textContent='Ошибка: '+error.message;
+document.getElementById('modalContent').textContent=error.message;
+}
+}
+
+async function saveValue(type){
+const input=document.getElementById(type==='sugar'?'sugarInput':'insulinInput');
+const toast=document.getElementById(type==='sugar'?'sugarToast':'insulinToast');
+const button=input.parentElement.querySelector('button');
+const value=input.value.trim();
+if(!value){
+toast.textContent='Сначала введи значение.';
+return;
+}
+if(type==='sugar'&&!/^\d+([.,]\d{1,2})?$/.test(value)){
+toast.textContent='Введи число, например 5,6.';
+return;
+}
+if(type==='insulin'&&!/^\d+$/.test(value)){
+toast.textContent='Инсулин должен быть целым числом.';
+return;
+}
+button.disabled=true;
+button.textContent='Сохраняю…';
+toast.textContent='';
+try{
+const result=await api(type,{value});
+toast.textContent='✓ '+result;
+input.value='';
+if(tg)tg.HapticFeedback?.notificationOccurred('success');
+}catch(error){
+toast.textContent='Не удалось сохранить: '+error.message;
+if(tg)tg.HapticFeedback?.notificationOccurred('error');
 }finally{
 button.disabled=false;
+button.textContent='Сохранить';
 }
 }
+
+async function loadSugarAverage(){
+try{
+const result=await api('sugar_average');
+document.getElementById('sugarAverage').innerHTML=escapeHtml(result)+' <small>ммоль/л</small>';
+}catch(error){
+document.getElementById('sugarAverage').innerHTML='— <small>ммоль/л</small>';
+}
+}
+
+loadSugarAverage();
 </script>
 </body>
 </html>
