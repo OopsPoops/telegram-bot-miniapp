@@ -7,8 +7,8 @@
 <title>Сёма</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-:root{color-scheme:light;--bg:#f5f6fb;--card:#fff;--text:#20243a;--muted:#81869a;--blue:#5267e8;--pink:#ed6f9b;--teal:#20a99b;--line:#edf0f6;--input-bg:#f7f8fc;--input-text:#20243a;--shadow:0 8px 22px rgba(92,106,155,.08);--nav-highlight:#ebf1ff;--nav-border:rgba(125,135,170,.18);--nav-active:#edf3ff;--modal-bg:#fff;--modal-content:#f7f8fc;--close-bg:#edf0f7;--close-text:#1f2436;--icon-bg:#f5f7ff}
-:root[data-theme="dark"]{color-scheme:dark;--bg:#11131b;--card:#1c202c;--text:#f1f3fa;--muted:#a0a6bb;--blue:#8998ff;--pink:#ed7fa5;--teal:#40cbbb;--line:#3a4051;--input-bg:#292e3d;--input-text:#f1f3fa;--shadow:0 18px 36px rgba(0,0,0,.27);--nav-highlight:#1a2239;--nav-border:rgba(160,166,187,.16);--nav-active:#242c41;--modal-bg:#1c202c;--modal-content:#1b1f2b;--close-bg:#2d3343;--close-text:#f1f3fa;--icon-bg:#20283c}
+:root{color-scheme:light;--bg:#f5f6fb;--card:#fff;--text:#20243a;--muted:#81869a;--blue:#5267e8;--pink:#ed6f9b;--teal:#20a99b;--line:#edf0f6;--input-bg:#f7f8fc;--input-text:#20243a;--shadow:0 8px 26px rgba(37,47,82,.08),0 1px 2px rgba(37,47,82,.05);--nav-highlight:#edf3ff;--nav-border:rgba(128,136,158,.18);--nav-active:#dfe7ff;--icon-bg:#f1f4fb;--modal-bg:#fff;--modal-content:#f4f6fb;--close-bg:#eef2fb;--close-text:#3c4664}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#11131b;--card:#1c202c;--text:#f1f3fa;--muted:#a0a6bb;--blue:#8998ff;--pink:#ed7fa5;--teal:#40cbbb;--line:#3a4051;--input-bg:#292e3d;--input-text:#f1f3fa;--shadow:0 14px 34px rgba(0,0,0,.38),0 1px 2px rgba(0,0,0,.18);--nav-highlight:rgba(255,255,255,.07);--nav-border:rgba(151,160,182,.14);--nav-active:rgba(146,160,255,.14);--icon-bg:#2b313f;--modal-bg:#1a1f2c;--modal-content:#202737;--close-bg:#2d3446;--close-text:#eef2ff}
 *{box-sizing:border-box}
 body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;transition:background .2s,color .2s}
 button,input{font:inherit}
@@ -29,7 +29,7 @@ button{-webkit-tap-highlight-color:transparent}
 .metric-skeleton{height:13px;width:76px;border-radius:7px;background:linear-gradient(90deg,var(--line) 25%,var(--nav-highlight) 50%,var(--line) 75%);background-size:200% 100%;animation:metricShimmer 1.2s linear infinite}
 .metric-skeleton.short{width:48px;height:9px;opacity:.8}
 .input-row{display:flex;gap:9px}
-.value-input{min-width:0;flex:1;border:1px solid var(--line);border-radius:13px;background:var(--input-bg);padding:13px 14px;color:var(--input-text);-webkit-text-fill-color:var(--input-text);caret-color:var(--blue)}
+.value-input{min-width:0;flex:1;border:1px solid var(--line);border-radius:13px;background:var(--input-bg);padding:13px 14px;color:var(--input-text);-webkit-text-fill-color:var(--input-text);caret-color:var(--blue);font-size:15px}
 .value-input::placeholder{color:var(--muted);-webkit-text-fill-color:var(--muted);opacity:1}
 .value-input:focus{border-color:var(--blue)}
 .save-button{border:0;border-radius:13px;padding:0 17px;font-size:14px;font-weight:700;color:white;min-width:105px;cursor:pointer}
@@ -52,7 +52,7 @@ button{-webkit-tap-highlight-color:transparent}
 .section-title{font-size:17px;font-weight:750}
 .quick-title>span{font-size:12px;color:var(--muted)}
 .quick-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
-.quick-button{display:flex;align-items:center;gap:12px;text-align:left;background:var(--card);border:1px solid rgba(125,135,170,.12);border-radius:17px;padding:15px 13px;min-height:73px;box-shadow:var(--shadow)}
+.quick-button{display:flex;align-items:center;gap:12px;text-align:left;background:var(--card);border:1px solid rgba(125,135,170,.12);border-radius:17px;padding:15px 13px;min-height:73px;box-shadow:var(--shadow);cursor:pointer;color:var(--text)}
 .quick-button:active{transform:scale(.98)}
 .quick-icon{width:40px;height:40px;flex-shrink:0;border-radius:13px;display:grid;place-items:center;font-size:19px}
 .quick-label{font-weight:700;font-size:14px}
@@ -123,16 +123,18 @@ button{-webkit-tap-highlight-color:transparent}
 .heatmap-cell{height:23px;min-width:0;padding:0;border:1px solid rgba(125,135,170,.12);border-radius:5px;cursor:pointer}
 .heatmap-cell:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
 .bottom-nav-wrap{position:fixed;z-index:20;bottom:0;left:0;right:0;padding:6px 12px calc(6px + env(safe-area-inset-bottom));pointer-events:none;background:linear-gradient(to top,var(--bg) 55%,rgba(245,246,251,0));}
-.bottom-nav{pointer-events:auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;width:100%;max-width:484px;margin:0 auto;padding:4px;border:1px solid var(--nav-border);border-radius:21px;background:rgba(255,255,255,.8);backdrop-filter:blur(14px);box-shadow:0 10px 28px rgba(84,101,150,.08),inset 0 1px 0 rgba(255,255,255,.55)}
-.nav-button{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-height:52px;padding:3px 2px;border:1px solid transparent;border-radius:999px;background:transparent;color:var(--muted);cursor:pointer;transition:transform .15s ease,background .15s ease,color .15s ease}
+:root[data-theme="dark"] .bottom-nav-wrap{background:linear-gradient(to top,var(--bg) 55%,rgba(17,19,27,0));}
+.bottom-nav{pointer-events:auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;width:100%;max-width:484px;margin:0 auto;padding:4px;border:1px solid var(--nav-border);border-radius:22px;background:rgba(255,255,255,.65);backdrop-filter:blur(12px);box-shadow:0 12px 36px rgba(0,0,0,.08),inset 0 1px 0 rgba(255,255,255,.38)}
+:root[data-theme="dark"] .bottom-nav{background:rgba(22,26,36,.72)}
+.nav-button{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-height:52px;padding:3px 2px;border:1px solid transparent;border-radius:999px;color:var(--muted);background:transparent;cursor:pointer;transition:transform .22s,background .22s,border-color .22s}
 .nav-button .nav-icon{width:25px;height:25px;display:grid;place-items:center;transition:transform .22s}
 .nav-button .nav-icon svg{display:block;width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.nav-button.active{background:linear-gradient(150deg,rgba(255,255,255,.64),var(--nav-active) 58%);border-color:rgba(255,255,255,.46);color:var(--blue);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 10px 18px rgba(80,102,194,.08)}
+.nav-button.active{background:linear-gradient(150deg,rgba(255,255,255,.64),var(--nav-active) 58%);border-color:rgba(255,255,255,.46);color:var(--blue);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 8px 22px rgba(82,103,232,.06)}
 .nav-button.active .nav-icon{transform:translateY(-1px) scale(1.05)}
 .nav-button:active{transform:scale(.96)}
 .nav-button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 :root[data-theme="dark"] .bottom-nav{box-shadow:0 12px 36px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.2),inset 0 -1px 0 rgba(255,255,255,.06)}
-:root[data-theme="dark"] .nav-button.active{border-color:rgba(255,255,255,.16);background:linear-gradient(150deg,rgba(255,255,255,.12),var(--nav-active) 58%);box-shadow:inset 0 1px 0 rgba(255,255,255,.18)}
+:root[data-theme="dark"] .nav-button.active{border-color:rgba(255,255,255,.16);background:linear-gradient(150deg,rgba(255,255,255,.12),var(--nav-active) 58%);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 8px 22px rgba(82,103,232,.12)}
 .modal-backdrop{position:fixed;inset:0;background:rgba(18,24,45,.48);display:none;align-items:center;justify-content:center;padding:22px;z-index:30;backdrop-filter:blur(5px)}
 .modal-backdrop.visible{display:flex;animation:fade .18s ease}
 .modal{width:100%;max-width:420px;max-height:82vh;overflow:hidden;background:var(--modal-bg);color:var(--text);border-radius:25px;padding:23px 20px 17px;box-shadow:0 25px 80px rgba(0,0,0,.2);display:flex;flex-direction:column}
@@ -148,9 +150,9 @@ button{-webkit-tap-highlight-color:transparent}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes fade{from{opacity:0}to{opacity:1}}
 @keyframes rise{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
-@keyframes screenIn{from{opacity:.65;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+@keyframes screenIn{from{opacity:.65;transform:translateY(4px)}to{opacity:1;transform:translateY(0)} }
 @keyframes metricShimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-@media(max-width:360px){.app{padding-left:13px;padding-right:13px}.metric{padding:14px}.metric-value{font-size:24px}.save-button{min-width:88px;padding:0 11px}.quick-button{padding:12px 10px;gap:9px}.metric-figure .value{font-size:24px}}
+@media(max-width:360px){.app{padding-left:13px;padding-right:13px}.metric{padding:14px}.metric-value{font-size:24px}.save-button{min-width:88px;padding:0 11px}.quick-button{padding:12px 10px;gap:9px}} 
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
 </head>
@@ -200,9 +202,9 @@ button{-webkit-tap-highlight-color:transparent}
 <div class="metric-name">Ночной</div>
 <div class="metric-description">Факт за сегодня</div>
 </div>
-<div class="metric-figure" id="nightFact" aria-live="polite">
-<div class="value">—</div>
-<div class="unit">ед</div>
+<div class="metric-loading" id="nightFact" role="status" aria-live="polite" aria-label="Загрузка ночного значения">
+<div class="metric-skeleton"></div>
+<div class="metric-skeleton short"></div>
 </div>
 </div>
 <div class="input-row">
@@ -216,12 +218,12 @@ button{-webkit-tap-highlight-color:transparent}
 <span></span>
 </div>
 <section class="quick-grid">
-<button class="quick-button" onclick="openAction('today')"><span class="quick-icon blue">☀️</span><span><div class="quick-label">Сегодня</div><div class="quick-hint">За текущий день</div></span></button>
-<button class="quick-button" onclick="openAction('yesterday')"><span class="quick-icon orange">🌙</span><span><div class="quick-label">Вчера</div><div class="quick-hint">За прошлый день</div></span></button>
-<button class="quick-button" onclick="openAction('week')"><span class="quick-icon purple">📊</span><span><div class="quick-label">Среднее за неделю</div><div class="quick-hint">Сводка за 7 дней</div></span></button>
-<button class="quick-button" onclick="openAction('month')"><span class="quick-icon green">🗓️</span><span><div class="quick-label">Среднее за месяц</div><div class="quick-hint">Сводка за 30 дней</div></span></button>
-<button class="quick-button" onclick="openAction('excel')"><span class="quick-icon yellow">📗</span><span><div class="quick-label">Excel</div><div class="quick-hint">Открыть таблицу</div></span></button>
-<button class="quick-button" onclick="openAction('memory')"><span class="quick-icon gray">⚙️</span><span><div class="quick-label">Память</div><div class="quick-hint">Состояние бота</div></span></button>
+<button class="quick-button" onclick="openAction('today')"><span class="quick-icon blue">☀️</span><span><div class="quick-label">Сегодня</div><div class="quick-hint">За текущий день</div></span><span class="arrow">›</span></button>
+<button class="quick-button" onclick="openAction('yesterday')"><span class="quick-icon orange">🌙</span><span><div class="quick-label">Вчера</div><div class="quick-hint">За прошлый день</div></span><span class="arrow">›</span></button>
+<button class="quick-button" onclick="openAction('week')"><span class="quick-icon purple">📊</span><span><div class="quick-label">Среднее за неделю</div><div class="quick-hint">Лучшая динамика</div></span><span class="arrow">›</span></button>
+<button class="quick-button" onclick="openAction('month')"><span class="quick-icon green">🗓️</span><span><div class="quick-label">Среднее за месяц</div><div class="quick-hint">Больше данных</div></span><span class="arrow">›</span></button>
+<button class="quick-button" onclick="openAction('excel')"><span class="quick-icon yellow">📗</span><span><div class="quick-label">Excel</div><div class="quick-hint">Открыть таблицу</div></span><span class="arrow">›</span></button>
+<button class="quick-button" onclick="openAction('memory')"><span class="quick-icon gray">⚙️</span><span><div class="quick-label">Память</div><div class="quick-hint">Состояние бота</div></span><span class="arrow">›</span></button>
 </section>
 </section>
 <section class="screen" id="screen-graphs">
@@ -347,9 +349,9 @@ button{-webkit-tap-highlight-color:transparent}
 </main>
 <nav class="bottom-nav-wrap" aria-label="Основная навигация">
 <div class="bottom-nav">
-<button class="nav-button active" type="button" data-screen="home" onclick="switchTab('home')"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/></svg></span><span>Главная</span></button>
-<button class="nav-button" type="button" data-screen="graphs" onclick="switchTab('graphs')"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19.5h16"/><path d="M7 16V9"/><path d="M12 16V5"/><path d="M17 16v-7"/></svg></span><span>Графики</span></button>
-<button class="nav-button" type="button" data-screen="settings" onclick="switchTab('settings')"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2.5v3.3M12 18.2v3.3M4.8 4.8l2.3 2.3M16.9 16.9l2.3 2.3M2.5 12h3.3M18.2 12h3.3M4.8 19.2l2.3-2.3M16.9 7.1l2.3-2.3"/><circle cx="12" cy="12" r="4.2"/></svg></span><span>Настройки</span></button>
+<button class="nav-button active" type="button" data-screen="home" onclick="switchTab('home')"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/></svg></span></button>
+<button class="nav-button" type="button" data-screen="graphs" onclick="switchTab('graphs')"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19.5h16"/><path d="M7 16V9"/><path d="M12 16V5"/><path d="M17 16v-7"/></svg></span></button>
+<button class="nav-button" type="button" data-screen="settings" onclick="switchTab('settings')"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2.5v3.3M12 18.2v3.3M4.9 4.9l2.3 2.3M16.8 16.8l2.3 2.3M2.5 12h3.3M18.2 12h3.3M4.9 19.1l2.3-2.3M16.8 7.2l2.3-2.3"/><circle cx="12" cy="12" r="4"/></svg></span></button>
 </div>
 </nav>
 <div class="modal-backdrop" id="modalBackdrop" onclick="backdropClose(event)">
@@ -453,543 +455,543 @@ function setToast(element,message,state=''){
  element.textContent=message;
 }
 async function api(action,extra={}){
-if(!tg||!tg.initData)throw new Error('Открой Mini App через Telegram.');
-const response=await fetch(API_URL,{
- method:'POST',
- headers:{'Content-Type':'application/json'},
- body:JSON.stringify({initData:tg.initData,action,...extra})
-});
-const data=await response.json();
-if(!response.ok||!data.ok)throw new Error(data.error||'Ошибка сервера');
-return data.result;
+ if(!tg||!tg.initData)throw new Error('Открой Mini App через Telegram.');
+ const response=await fetch(API_URL,{
+  method:'POST',
+  headers:{'Content-Type':'application/json'},
+  body:JSON.stringify({initData:tg.initData,action,...extra})
+ });
+ const data=await response.json();
+ if(!response.ok||!data.ok)throw new Error(data.error||'Ошибка сервера');
+ return data.result;
 }
 async function openAction(action){
-const item=labels[action];
-showModal(item.title,item.subtitle,item.icon,loadingContent(item.loading));
-try{
- const result=await api(action);
- setAccess(true,'Сервер подтвердил доступ');
- if(action==='excel'&&result){
-   document.getElementById('modalContent').hidden=true;
-   const link=document.createElement('a');
-   link.href=result;
-   link.target='_blank';
-   link.rel='noopener noreferrer';
-   link.className='open-link';
-   link.textContent='Открыть Excel ↗';
-   document.getElementById('modalLink').appendChild(link);
- }else{
-   document.getElementById('modalContent').textContent=String(result||'Нет данных');
+ const item=labels[action];
+ showModal(item.title,item.subtitle,item.icon,loadingContent(item.loading));
+ try{
+  const result=await api(action);
+  setAccess(true,'Сервер подтвердил доступ');
+  if(action==='excel'&&result){
+    document.getElementById('modalContent').hidden=true;
+    const link=document.createElement('a');
+    link.href=result;
+    link.target='_blank';
+    link.rel='noopener noreferrer';
+    link.className='open-link';
+    link.textContent='Открыть Excel ↗';
+    document.getElementById('modalLink').appendChild(link);
+  }else{
+    document.getElementById('modalContent').textContent=String(result||'Нет данных');
+  }
+ }catch(error){
+  document.getElementById('modalContent').textContent=error.message;
+  if(/доступ|пользовател|разреш|initdata|telegram/i.test(error.message))setAccess(false,error.message);
  }
-}catch(error){
- document.getElementById('modalContent').textContent=error.message;
- if(/доступ|пользовател|разреш|initdata|telegram/i.test(error.message))setAccess(false,error.message);
-}
 }
 async function saveValue(type){
-const input=document.getElementById(type==='sugar'?'sugarInput':type==='fact'?'nightInput':'insulinInput');
-const toast=document.getElementById(type==='sugar'?'sugarToast':type==='fact'?'nightToast':'insulinToast');
-const button=input.parentElement.querySelector('button');
-const value=input.value.trim();
-if(!value){
- setToast(toast,'Сначала введи значение.','error');
- return;
-}
-if(type==='sugar'&&!/^\d+([.,]\d{1,2})?$/.test(value)){
- setToast(toast,'Введи число, например 5,6.','error');
- return;
-}
-if(type==='insulin'&&(!/^\d+$/.test(value)||Number(value)>15)){
- setToast(toast,'Введи целое число от 0 до 15.','error');
- return;
-}
-if(type==='fact'&&!/^\d+([.,]\d{1,2})?$/.test(value)){
- setToast(toast,'Введи число, например 11 или 2,5.','error');
- return;
-}
-button.disabled=true;
-button.textContent='Сохраняю…';
-setToast(toast,'');
-try{
- const result=await api(type,{value});
- setToast(toast,'✓ '+result,'success');
- input.value='';
- setAccess(true,'Сервер подтвердил доступ');
- if(tg)tg.HapticFeedback?.notificationOccurred('success');
- if(type==='sugar')await loadSugarAverage();
- if(type==='insulin')await loadInsulinTotal();
- if(type==='fact')await loadNightFact();
-}catch(error){
- setToast(toast,'Не удалось сохранить: '+error.message,'error');
- if(/доступ|пользовател|разреш|initdata|telegram/i.test(error.message))setAccess(false,error.message);
- if(tg)tg.HapticFeedback?.notificationOccurred('error');
-}finally{
- button.disabled=false;
- button.textContent='Сохранить';
-}
+ const input=document.getElementById(type==='sugar'?'sugarInput':type==='fact'?'nightInput':'insulinInput');
+ const toast=document.getElementById(type==='sugar'?'sugarToast':type==='fact'?'nightToast':'insulinToast');
+ const button=input.parentElement.querySelector('button');
+ const value=input.value.trim();
+ if(!value){
+  setToast(toast,'Сначала введи значение.','error');
+  return;
+ }
+ if(type==='sugar'&&!/^\d+([.,]\d{1,2})?$/.test(value)){
+  setToast(toast,'Введи число, например 5,6.','error');
+  return;
+ }
+ if(type==='insulin'&&(!/^\d+$/.test(value)||Number(value)>15)){
+  setToast(toast,'Введи целое число от 0 до 15.','error');
+  return;
+ }
+ if(type==='fact'&&!/^\d+([.,]\d{1,2})?$/.test(value)){
+  setToast(toast,'Введи число, например 11 или 2,5.','error');
+  return;
+ }
+ button.disabled=true;
+ button.textContent='Сохраняю…';
+ setToast(toast,'');
+ try{
+  const result=await api(type,{value});
+  setToast(toast,'✓ '+result,'success');
+  input.value='';
+  setAccess(true,'Сервер подтвердил доступ');
+  if(tg)tg.HapticFeedback?.notificationOccurred('success');
+  if(type==='sugar')await loadSugarAverage();
+  if(type==='insulin')await loadInsulinTotal();
+  if(type==='fact')await loadNightFact();
+ }catch(error){
+  setToast(toast,'Не удалось сохранить: '+error.message,'error');
+  if(/доступ|пользовател|разреш|initdata|telegram/i.test(error.message))setAccess(false,error.message);
+  if(tg)tg.HapticFeedback?.notificationOccurred('error');
+ }finally{
+  button.disabled=false;
+  button.textContent='Сохранить';
+ }
 }
 function showMetricLoading(element){
- element.className='metric-loading';
- element.setAttribute('role','status');
- element.innerHTML='<div class="metric-skeleton"></div><div class="metric-skeleton short"></div>';
+  element.className='metric-loading';
+  element.setAttribute('role','status');
+  element.innerHTML='<div class="metric-skeleton"></div><div class="metric-skeleton short"></div>';
 }
 function showMetricValue(element,value,unit){
- element.className='metric-value';
- element.removeAttribute('role');
- element.innerHTML=escapeHtml(String(value))+' <small>'+unit+'</small>';
+  element.className='metric-value';
+  element.removeAttribute('role');
+  element.innerHTML=escapeHtml(String(value))+' <small>'+unit+'</small>';
 }
 function formatNightFact(rawValue){
- const numericValue=Number(rawValue);
- if(!Number.isFinite(numericValue))return {text:'—',unit:'ед'};
- const fact=numericValue/2;
- const floored=Math.floor(fact);
- const hasFraction=fact % 1 !== 0;
- const value=hasFraction?`~${floored}`:String(floored);
- return {text:value,unit:'ед'};
+  const numericValue=Number(rawValue);
+  if(!Number.isFinite(numericValue))return {text:'—',unit:'ед'};
+  const fact=numericValue/2;
+  const floored=Math.floor(fact);
+  const hasFraction=fact % 1 !== 0;
+  const value=hasFraction?`~${floored}`:String(floored);
+  return {text:value,unit:'ед'};
 }
-function renderNightFact(rawValue){
- const container=document.getElementById('nightFact');
- const valueEl=container.querySelector('.value');
- const unitEl=container.querySelector('.unit');
- const result=formatNightFact(rawValue);
- valueEl.textContent=result.text;
- unitEl.textContent=result.unit;
+function renderNightFact(rawValue, loading = false){
+  const container=document.getElementById('nightFact');
+  if(!container)return;
+  if(loading || rawValue===undefined){
+    showMetricLoading(container);
+    return;
+  }
+  if(rawValue===null || rawValue==='' || !Number.isFinite(Number(rawValue))){
+    showMetricValue(container,'—','ед');
+    return;
+  }
+  const result=formatNightFact(rawValue);
+  container.className='metric-figure';
+  container.removeAttribute('role');
+  container.innerHTML='<div class="value">'+escapeHtml(result.text)+'</div><div class="unit">'+escapeHtml(result.unit)+'</div>';
 }
 async function loadNightFact(){
- try{
-  const total=await api('insulin_total');
-  renderNightFact(total);
-  setAccess(true,'Сервер подтвердил доступ');
- }catch(error){
-  renderNightFact(null);
-  console.error('Ошибка загрузки ночного факта:',error);
-  if(/доступ|пользовател|разреш|initdata|telegram/i.test(error.message))setAccess(false,error.message);
- }
+  const element=document.getElementById('nightFact');
+  renderNightFact(null,true);
+  try{
+   const total=await api('insulin_total');
+   renderNightFact(total);
+   setAccess(true,'Сервер подтвердил доступ');
+  }catch(error){
+   renderNightFact(null);
+   console.error('Ошибка загрузки ночного факта:',error);
+   if(/доступ|пользовател|разреш|initdata|telegram/i.test(error.message))setAccess(false,error.message);
+  }
 }
 async function loadSugarAverage(){
- const element=document.getElementById('sugarAverage');
- showMetricLoading(element);
- try{
-  const result=await api('sugar_average');
-  const value=result!==null&&result!==undefined&&String(result).trim()!==''?String(result):'—';
-  showMetricValue(element,value,'ммоль/л');
-  setAccess(true,'Сервер подтвердил доступ');
-  return true;
- }catch(error){
-  showMetricValue(element,'—','ммоль/л');
-  console.error('Ошибка загрузки среднего сахара:',error);
-  if(/доступ|пользовател|разреш|initdata|telegram/i.test(error.message))setAccess(false,error.message);
-  return false;
- }
+  const element=document.getElementById('sugarAverage');
+  showMetricLoading(element);
+  try{
+   const result=await api('sugar_average');
+   const value=result!==null&&result!==undefined&&String(result).trim()!==''?String(result):'—';
+   showMetricValue(element,value,'ммоль/л');
+   setAccess(true,'Сервер подтвердил доступ');
+   return true;
+  }catch(error){
+   showMetricValue(element,'—','ммоль/л');
+   console.error('Ошибка загрузки среднего сахара:',error);
+   if(/доступ|пользовател|разреш|initdata|telegram/i.test(error.message))setAccess(false,error.message);
+   return false;
+  }
 }
 async function loadInsulinTotal(){
- const element=document.getElementById('insulinTotal');
- showMetricLoading(element);
- try{
-  const result=await api('insulin_total');
-  const value=result!==null&&result!==undefined&&String(result).trim()!==''?String(result):'—';
-  showMetricValue(element,value,'ед.');
-  renderNightFact(result);
-  setAccess(true,'Сервер подтвердил доступ');
-  return true;
- }catch(error){
-  showMetricValue(element,'—','ед.');
-  renderNightFact(null);
-  console.error('Ошибка загрузки суммы инсулина:',error);
-  if(/доступ|пользовател|разреш|initdata|telegram/i.test(error.message))setAccess(false,error.message);
-  return false;
- }
+  const element=document.getElementById('insulinTotal');
+  showMetricLoading(element);
+  try{
+   const result=await api('insulin_total');
+   const value=result!==null&&result!==undefined&&String(result).trim()!==''?String(result):'—';
+   showMetricValue(element,value,'ед.');
+   renderNightFact(result);
+   setAccess(true,'Сервер подтвердил доступ');
+   return true;
+  }catch(error){
+   showMetricValue(element,'—','ед.');
+   renderNightFact(null);
+   console.error('Ошибка загрузки суммы инсулина:',error);
+   if(/доступ|пользовател|разреш|initdata|telegram/i.test(error.message))setAccess(false,error.message);
+   return false;
+  }
 }
 function parseHistoryDate(value){
- const text=String(value||'').trim();
- let parts;
- if((parts=text.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/))){
-  const date=new Date(Number(parts[3]),Number(parts[2])-1,Number(parts[1]));
-  return date.getFullYear()===Number(parts[3])&&date.getMonth()===Number(parts[2])-1&&date.getDate()===Number(parts[1])?date:null;
- }
- if((parts=text.match(/^(\d{4})-(\d{2})-(\d{2})$/))){
-  const date=new Date(Number(parts[1]),Number(parts[2])-1,Number(parts[3]));
-  return date.getFullYear()===Number(parts[1])&&date.getMonth()===Number(parts[2])-1&&date.getDate()===Number(parts[3])?date:null;
- }
- return null;
+  const text=String(value||'').trim();
+  let parts;
+  if((parts=text.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/))){
+   const date=new Date(Number(parts[3]),Number(parts[2])-1,Number(parts[1]));
+   return date.getFullYear()===Number(parts[3])&&date.getMonth()===Number(parts[2])-1&&date.getDate()===Number(parts[1])?date:null;
+  }
+  if((parts=text.match(/^(\d{4})-(\d{2})-(\d{2})$/))){
+   const date=new Date(Number(parts[1]),Number(parts[2])-1,Number(parts[3]));
+   return date.getFullYear()===Number(parts[1])&&date.getMonth()===Number(parts[2])-1&&date.getDate()===Number(parts[3])?date:null;
+  }
+  return null;
 }
 function dateKey(date){
- return [date.getFullYear(),String(date.getMonth()+1).padStart(2,'0'),String(date.getDate()).padStart(2,'0')].join('-');
+  return [date.getFullYear(),String(date.getMonth()+1).padStart(2,'0'),String(date.getDate()).padStart(2,'0')].join('-');
 }
 function parseHistoryTime(value){
- const match=String(value||'').trim().match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
- if(!match)return null;
- const hour=Number(match[1]),minute=Number(match[2]),second=Number(match[3]||0);
- if(hour>23||minute>59||second>59)return null;
- return {hour,minute,second,minutes:hour*60+minute+second/60,text:`${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}`};
+  const match=String(value||'').trim().match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
+  if(!match)return null;
+  const hour=Number(match[1]),minute=Number(match[2]),second=Number(match[3]||0);
+  if(hour>23||minute>59||second>59)return null;
+  return {hour,minute,second,minutes:hour*60+minute+second/60,text:`${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}`};
 }
 function normalizeHistory(result){
- const source=Array.isArray(result)?result:result?.measurements;
- if(!Array.isArray(source))throw new Error('Сервер вернул историю в неизвестном формате.');
- return source.map(row=>{
-  const date=parseHistoryDate(row.date),time=parseHistoryTime(row.time),value=Number(row.value);
-  const type=String(row.type||'').toLowerCase();
-  if(!date||Number.isNaN(date.getTime())||!time||!Number.isFinite(value)||!['sugar','insulin'].includes(type))return null;
-  return {...row,dateObj:date,dateKey:dateKey(date),timeObj:time,value,type};
- }).filter(Boolean).sort((a,b)=>a.dateObj-b.dateObj||a.timeObj.minutes-b.timeObj.minutes);
+  const source=Array.isArray(result)?result:result?.measurements;
+  if(!Array.isArray(source))throw new Error('Сервер вернул историю в неизвестном формате.');
+  return source.map(row=>{
+   const date=parseHistoryDate(row.date),time=parseHistoryTime(row.time),value=Number(row.value);
+   const type=String(row.type||'').toLowerCase();
+   if(!date||Number.isNaN(date.getTime())||!time||!Number.isFinite(value)||!['sugar','insulin'].includes(type))return null;
+   return {...row,dateObj:date,dateKey:dateKey(date),timeObj:time,value,type};
+  }).filter(Boolean).sort((a,b)=>a.dateObj-b.dateObj||a.timeObj.minutes-b.timeObj.minutes);
 }
 async function loadAnalytics(force=false){
- if(analyticsState.loading||analyticsState.loaded&&!force)return;
- analyticsState.loading=true;
- const loading=document.getElementById('analytics-loading');
- const content=document.getElementById('analytics-content');
- loading.hidden=false;
- loading.textContent='Загружаю измерения…';
- content.hidden=true;
- try{
-  const result=await api('history',{days:30});
-  analyticsState.measurements=normalizeHistory(result);
-  analyticsState.loaded=true;
-  analyticsState.selectedDates=null;
-  setAccess(true,'Сервер подтвердил доступ');
-  loading.hidden=true;
-  content.hidden=false;
-  renderAnalytics();
- }catch(error){
-  if(/доступ|пользовател|разреш|initdata|telegram/i.test(error.message))setAccess(false,error.message);
-  loading.innerHTML=escapeHtml(error.message)+'<br><button class="analytics-retry" type="button" onclick="loadAnalytics(true)">Повторить</button>';
+  if(analyticsState.loading||analyticsState.loaded&&!force)return;
+  analyticsState.loading=true;
+  const loading=document.getElementById('analytics-loading');
+  const content=document.getElementById('analytics-content');
   loading.hidden=false;
- }finally{
-  analyticsState.loading=false;
- }
+  loading.textContent='Загружаю измерения…';
+  content.hidden=true;
+  try{
+   const result=await api('history',{days:30});
+   analyticsState.measurements=normalizeHistory(result);
+   analyticsState.loaded=true;
+   analyticsState.selectedDates=null;
+   setAccess(true,'Сервер подтвердил доступ');
+   loading.hidden=true;
+   content.hidden=false;
+   renderAnalytics();
+  }catch(error){
+   if(/доступ|пользовател|разреш|initdata|telegram/i.test(error.message))setAccess(false,error.message);
+   loading.innerHTML=escapeHtml(error.message)+'<br><button class="analytics-retry" type="button" onclick="loadAnalytics(true)">Повторить</button>';
+   loading.hidden=false;
+  }finally{
+   analyticsState.loading=false;
+  }
 }
 function selectChart(name){
- analyticsState.chart=name;
- document.querySelectorAll('.analytics-tab').forEach(button=>{
-  const active=button.dataset.chart===name;
-  button.classList.toggle('active',active);
-  button.setAttribute('aria-selected',String(active));
- });
- document.querySelectorAll('.analytics-panel').forEach(panel=>panel.hidden=panel.dataset.panel!==name);
- renderAnalytics();
+  analyticsState.chart=name;
+  document.querySelectorAll('.analytics-tab').forEach(button=>{
+   const active=button.dataset.chart===name;
+   button.classList.toggle('active',active);
+   button.setAttribute('aria-selected',String(active));
+  });
+  document.querySelectorAll('.analytics-panel').forEach(panel=>panel.hidden=panel.dataset.panel!==name);
+  renderAnalytics();
 }
 function selectMetric(metric){
- analyticsState.metric=metric;
- analyticsState.selectedDates=null;
- document.querySelectorAll('[data-metric]').forEach(button=>button.classList.toggle('active',button.dataset.metric===metric));
- renderAnalytics();
+  analyticsState.metric=metric;
+  analyticsState.selectedDates=null;
+  document.querySelectorAll('[data-metric]').forEach(button=>button.classList.toggle('active',button.dataset.metric===metric));
+  renderAnalytics();
 }
 function renderAnalytics(){
- if(!analyticsState.loaded)return;
- if(analyticsState.chart==='trend')renderTrend();
- else if(analyticsState.chart==='compare')renderComparison();
- else if(analyticsState.chart==='distribution')renderDistribution();
- else if(analyticsState.chart==='daily')renderDailySummary();
- else renderActivityHeatmap();
+  if(!analyticsState.loaded)return;
+  if(analyticsState.chart==='trend')renderTrend();
+  else if(analyticsState.chart==='compare')renderComparison();
+  else if(analyticsState.chart==='distribution')renderDistribution();
+  else if(analyticsState.chart==='daily')renderDailySummary();
+  else renderActivityHeatmap();
 }
 function metricMeasurements(){
- return analyticsState.measurements.filter(row=>row.type===analyticsState.metric);
+  return analyticsState.measurements.filter(row=>row.type===analyticsState.metric);
 }
 function periodMeasurements(days){
- const end=new Date();end.setHours(23,59,59,999);
- const start=new Date();start.setHours(0,0,0,0);start.setDate(start.getDate()-days+1);
- return metricMeasurements().filter(row=>row.dateObj>=start&&row.dateObj<=end);
+  const end=new Date();end.setHours(23,59,59,999);
+  const start=new Date();start.setHours(0,0,0,0);start.setDate(start.getDate()-days+1);
+  return metricMeasurements().filter(row=>row.dateObj>=start&&row.dateObj<=end);
 }
 function formatShortDate(key){
- const [year,month,day]=key.split('-');
- return `${day}.${month}`;
+  const [year,month,day]=key.split('-');
+  return `${day}.${month}`;
 }
 function formatFullDate(key){
- const [year,month,day]=key.split('-');
- return `${day}.${month}.${year}`;
+  const [year,month,day]=key.split('-');
+  return `${day}.${month}.${year}`;
 }
 function renderTrendDays(rows){
- const host=document.getElementById('trend-days');
- const end=new Date();end.setHours(0,0,0,0);
- const dates=Array.from({length:analyticsState.trendDays},(_,index)=>{
-  const date=new Date(end);
-  date.setDate(date.getDate()-analyticsState.trendDays+1+index);
-  return dateKey(date);
- }).reverse();
- if(!analyticsState.selectedDates){
-  analyticsState.selectedDates=new Set(dates);
- }else{
-  analyticsState.selectedDates=new Set([...analyticsState.selectedDates].filter(key=>dates.includes(key)));
- }
- host.innerHTML='';
- dates.forEach((key,index)=>{
-  const id='trend-day-'+key;
-  const label=document.createElement('label');
-  label.className='analytics-day';
-  const input=document.createElement('input');
-  input.type='checkbox';input.id=id;input.checked=analyticsState.selectedDates.has(key);
-  input.addEventListener('change',()=>{
-   if(input.checked)analyticsState.selectedDates.add(key);else analyticsState.selectedDates.delete(key);
-   renderTrend();
+  const host=document.getElementById('trend-days');
+  const end=new Date();end.setHours(0,0,0,0);
+  const dates=Array.from({length:analyticsState.trendDays},(_,index)=>{
+   const date=new Date(end);
+   date.setDate(date.getDate()-analyticsState.trendDays+1+index);
+   return dateKey(date);
+  }).reverse();
+  if(!analyticsState.selectedDates){
+   analyticsState.selectedDates=new Set(dates);
+  }else{
+   analyticsState.selectedDates=new Set([...analyticsState.selectedDates].filter(key=>dates.includes(key)));
+  }
+  host.innerHTML='';
+  dates.forEach((key,index)=>{
+   const id='trend-day-'+key;
+   const label=document.createElement('label');
+   label.className='analytics-day';
+   const input=document.createElement('input');
+   input.type='checkbox';input.id=id;input.checked=analyticsState.selectedDates.has(key);
+   input.addEventListener('change',()=>{
+    if(input.checked)analyticsState.selectedDates.add(key);else analyticsState.selectedDates.delete(key);
+    renderTrend();
+   });
+   const swatch=document.createElement('span');
+   swatch.className='analytics-swatch';swatch.style.backgroundColor=dayColor(key,dates);
+   const text=document.createElement('span');text.textContent=formatShortDate(key);
+   label.append(input,swatch,text);host.appendChild(label);
   });
-  const swatch=document.createElement('span');
-  swatch.className='analytics-swatch';swatch.style.backgroundColor=dayColor(key,dates);
-  const text=document.createElement('span');text.textContent=formatShortDate(key);
-  label.append(input,swatch,text);host.appendChild(label);
- });
- return dates;
+  return dates;
 }
 function dayColor(key,dates){
- const index=Math.max(0,dates.indexOf(key));
- return `hsl(${(index*137.508+212)%360} 67% 52%)`;
+  const index=Math.max(0,dates.indexOf(key));
+  return `hsl(${(index*137.508+212)%360} 67% 52%)`;
 }
 function renderTrend(){
- const rows=periodMeasurements(analyticsState.trendDays);
- const dates=renderTrendDays(rows);
- const visible=rows.filter(row=>analyticsState.selectedDates.has(row.dateKey));
- const groups=dates.filter(key=>analyticsState.selectedDates.has(key)).map(key=>({
-  label:formatShortDate(key),color:dayColor(key,dates),points:visible.filter(row=>row.dateKey===key)
- }));
- renderTimeChart('trend-chart',groups,{metric:analyticsState.metric,tooltipId:'trend-tooltip',emptyText:'За этот период нет измерений.'});
- renderLegend('trend-legend',groups);
+  const rows=periodMeasurements(analyticsState.trendDays);
+  const dates=renderTrendDays(rows);
+  const visible=rows.filter(row=>analyticsState.selectedDates.has(row.dateKey));
+  const groups=dates.filter(key=>analyticsState.selectedDates.has(key)).map(key=>({
+   label:formatShortDate(key),color:dayColor(key,dates),points:visible.filter(row=>row.dateKey===key)
+  }));
+  renderTimeChart('trend-chart',groups,{metric:analyticsState.metric,tooltipId:'trend-tooltip',emptyText:'За этот период нет измерений.'});
+  renderLegend('trend-legend',groups);
 }
 function changeTrendPeriod(){
- analyticsState.trendDays=Number(document.getElementById('trend-period').value);
- analyticsState.selectedDates=null;
- renderTrend();
+  analyticsState.trendDays=Number(document.getElementById('trend-period').value);
+  analyticsState.selectedDates=null;
+  renderTrend();
 }
 function mondayOf(date){
- const monday=new Date(date.getFullYear(),date.getMonth(),date.getDate());
- monday.setDate(monday.getDate()-(monday.getDay()+6)%7);
- return monday;
+  const monday=new Date(date.getFullYear(),date.getMonth(),date.getDate());
+  monday.setDate(monday.getDate()-(monday.getDay()+6)%7);
+  return monday;
 }
 function addCalendarDays(date,days){
- const result=new Date(date.getFullYear(),date.getMonth(),date.getDate());
- result.setDate(result.getDate()+days);
- return result;
-}
-function isoWeekNumber(date){
- const thursday=new Date(Date.UTC(date.getFullYear(),date.getMonth(),date.getDate()));
- thursday.setUTCDate(thursday.getUTCDate()+4-(thursday.getUTCDay()||7));
- const yearStart=new Date(Date.UTC(thursday.getUTCFullYear(),0,1));
- return Math.ceil(((thursday-yearStart)/86400000+1)/7);
+  const result=new Date(date.getFullYear(),date.getMonth(),date.getDate());
+  result.setDate(result.getDate()+days);
+  return result;
 }
 function formatWeekRange(start){
- const end=addCalendarDays(start,6);
- return `${formatShortDate(dateKey(start))}–${formatShortDate(dateKey(end))}`;
+  const end=addCalendarDays(start,6);
+  return `${formatShortDate(dateKey(start))}–${formatShortDate(dateKey(end))}`;
 }
 function renderWeekToggles(starts){
- const host=document.getElementById('week-toggles');
- host.innerHTML='';
- starts.forEach((start,index)=>{
-  const label=document.createElement('label');label.className='week-toggle';
-  const input=document.createElement('input');input.type='checkbox';input.checked=analyticsState.visibleWeeks[index];
-  input.addEventListener('change',()=>{analyticsState.visibleWeeks[index]=input.checked;renderComparison();});
-  const color=document.createElement('span');color.className='analytics-swatch';color.style.backgroundColor=weekColors[index];
-  const title=document.createElement('span');title.textContent=`${['Текущая','Прошлая','2 недели назад'][index]} · ${formatWeekRange(start)}`;
-  label.append(input,color,title);host.appendChild(label);
- });
+  const host=document.getElementById('week-toggles');
+  host.innerHTML='';
+  starts.forEach((start,index)=>{
+   const label=document.createElement('label');label.className='week-toggle';
+   const input=document.createElement('input');input.type='checkbox';input.checked=analyticsState.visibleWeeks[index];
+   input.addEventListener('change',()=>{analyticsState.visibleWeeks[index]=input.checked;renderComparison();});
+   const color=document.createElement('span');color.className='analytics-swatch';color.style.backgroundColor=weekColors[index];
+   const title=document.createElement('span');title.textContent=`${['Текущая','Прошлая','2 недели назад'][index]} · ${formatWeekRange(start)}`;
+   label.append(input,color,title);host.appendChild(label);
+  });
 }
 function renderComparison(){
- const today=new Date(),monday=mondayOf(today),starts=[monday,addCalendarDays(monday,-7),addCalendarDays(monday,-14)];
- renderWeekToggles(starts);
- const selected=document.getElementById('compare-weekday').value;
- const rows=metricMeasurements();
- const groups=[];
- starts.forEach((start,weekIndex)=>{
-  if(!analyticsState.visibleWeeks[weekIndex])return;
-  for(let dayOffset=0;dayOffset<7;dayOffset++){
-   const date=addCalendarDays(start,dayOffset);
-   if(selected!=='all'&&date.getDay()!==Number(selected))continue;
-   const key=dateKey(date);
-   const points=rows.filter(row=>row.dateKey===key);
-   if(points.length)groups.push({label:`${['Текущая','Прошлая','2 недели назад'][weekIndex]}, ${weekdayNames[date.getDay()]}`,color:weekColors[weekIndex],points,weekIndex});
-  }
- });
- renderTimeChart('compare-chart',groups,{metric:analyticsState.metric,tooltipId:'compare-tooltip',emptyText:'В выбранных неделях пока нет измерений.',weekLabels:true});
- renderLegend('compare-legend',starts.map((start,index)=>({label:`${['Текущая неделя','Предыдущая неделя','2 недели назад'][index]} · ${formatWeekRange(start)}`,color:weekColors[index]})).filter((_,index)=>analyticsState.visibleWeeks[index]));
+  const today=new Date(),monday=mondayOf(today),starts=[monday,addCalendarDays(monday,-7),addCalendarDays(monday,-14)];
+  renderWeekToggles(starts);
+  const selected=document.getElementById('compare-weekday').value;
+  const rows=metricMeasurements();
+  const groups=[];
+  starts.forEach((start,weekIndex)=>{
+   if(!analyticsState.visibleWeeks[weekIndex])return;
+   for(let dayOffset=0;dayOffset<7;dayOffset++){
+    const date=addCalendarDays(start,dayOffset);
+    if(selected!=='all'&&date.getDay()!==Number(selected))continue;
+    const key=dateKey(date);
+    const points=rows.filter(row=>row.dateKey===key);
+    if(points.length){groups.push({label:`${['Текущая','Прошлая','2 недели назад'][weekIndex]}, ${weekdayNames[date.getDay()]}`,color:weekColors[weekIndex],points,weekIndex});}
+   }
+  });
+  renderTimeChart('compare-chart',groups,{metric:analyticsState.metric,tooltipId:'compare-tooltip',emptyText:'В выбранных неделях пока нет измерений.',weekLabels:true});
+  renderLegend('compare-legend',starts.map((start,index)=>({label:`${['Текущая неделя','Предыдущая неделя','2 недели назад'][index]} · ${formatWeekRange(start)}`,color:weekColors[index]})));
 }
 const weekdayNames=['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
 function renderDistribution(){
- const days=Number(document.getElementById('distribution-period').value);
- const rows=periodMeasurements(days);
- const dates=[...new Set(rows.map(row=>row.dateKey))].sort();
- const groups=dates.map(key=>({label:formatShortDate(key),color:dayColor(key,dates),points:rows.filter(row=>row.dateKey===key)}));
- renderTimeChart('distribution-chart',groups,{metric:analyticsState.metric,tooltipId:'distribution-tooltip',connect:false,emptyText:'За этот период нет измерений.'});
- renderLegend('distribution-legend',groups);
+  const days=Number(document.getElementById('distribution-period').value);
+  const rows=periodMeasurements(days);
+  const dates=[...new Set(rows.map(row=>row.dateKey))].sort();
+  const groups=dates.map(key=>({label:formatShortDate(key),color:dayColor(key,dates),points:rows.filter(row=>row.dateKey===key)}));
+  renderTimeChart('distribution-chart',groups,{metric:analyticsState.metric,tooltipId:'distribution-tooltip',connect:false,emptyText:'За этот период нет измерений.'});
+  renderLegend('distribution-legend',groups);
 }
 function dailySummary(days){
- const byDate=new Map();
- periodMeasurements(days).forEach(row=>{
-  if(!byDate.has(row.dateKey))byDate.set(row.dateKey,[]);
-  byDate.get(row.dateKey).push(row.value);
- });
- return [...byDate.entries()].sort(([a],[b])=>a.localeCompare(b)).map(([key,values])=>({
-  key,minimum:Math.min(...values),maximum:Math.max(...values),
-  average:values.reduce((sum,value)=>sum+value,0)/values.length,count:values.length
- }));
+  const byDate=new Map();
+  periodMeasurements(days).forEach(row=>{
+   if(!byDate.has(row.dateKey))byDate.set(row.dateKey,[]);
+   byDate.get(row.dateKey).push(row.value);
+  });
+  return [...byDate.entries()].sort(([a],[b])=>a.localeCompare(b)).map(([key,values])=>({
+   key,minimum:Math.min(...values),maximum:Math.max(...values),
+   average:values.reduce((sum,value)=>sum+value,0)/values.length,count:values.length
+  }));
 }
 function renderDailySummary(){
- const host=document.getElementById('daily-chart'),tooltip=document.getElementById('daily-tooltip');
- const days=Number(document.getElementById('daily-period').value),summaries=dailySummary(days);
- tooltip.textContent='Нажмите на день, чтобы увидеть сводку.';
- if(!summaries.length){host.innerHTML='<div class="analytics-message">За этот период нет измерений.</div>';return;}
- const width=Math.max(240,Math.floor(host.clientWidth||320)),height=250;
- const margin={left:49,right:10,top:14,bottom:36},plotW=width-margin.left-margin.right,plotH=height-margin.top-margin.bottom;
- let low=Math.min(...summaries.map(day=>day.minimum)),high=Math.max(...summaries.map(day=>day.maximum));
- if(low===high){const pad=Math.max(Math.abs(low)*.08,.5);low-=pad;high+=pad;}
- else{const pad=(high-low)*.12;low-=pad;high+=pad;}
- const rawStep=(high-low)/4,power=10**Math.floor(Math.log10(rawStep||1)),fraction=rawStep/power;
- const step=(fraction<=1?1:fraction<=2?2:fraction<=5?5:10)*power;
- const yMin=Math.floor(low/step)*step,yMax=Math.ceil(high/step)*step||yMin+step;
- const y=value=>margin.top+plotH-((value-yMin)/(yMax-yMin))*plotH;
- const slot=plotW/summaries.length;
- let svg=`<svg class="chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="Суточные минимум, среднее и максимум показателей">`;
- for(let value=yMin;value<=yMax+step*.01;value+=step){
-  const py=y(value);svg+=`<line class="chart-grid" x1="${margin.left}" y1="${py}" x2="${width-margin.right}" y2="${py}"/><text x="${margin.left-6}" y="${py+3}" text-anchor="end">${formatAxisValue(value)}</text>`;
- }
- summaries.forEach((day,index)=>{
-  const x=margin.left+slot*(index+.5);
-  const label=`${formatFullDate(day.key)} · мин ${formatAxisValue(day.minimum)} · среднее ${formatAxisValue(day.average)} · макс ${formatAxisValue(day.maximum)}`;
-  svg+=`<line x1="${x}" y1="${y(day.maximum)}" x2="${x}" y2="${y(day.minimum)}" stroke="#8998ff" stroke-width="${Math.min(12,Math.max(4,slot*.42))}" stroke-linecap="round"/><circle class="chart-point daily-point" cx="${x}" cy="${y(day.average)}" r="4.5" fill="#5267e8" tabindex="0" role="button" aria-label="${escapeHtml(label)}" data-label="${escapeHtml(label)}"/>`;
-  if(summaries.length<=14||index%Math.ceil(summaries.length/10)===0||index===summaries.length-1){
-   svg+=`<text x="${x}" y="${height-15}" text-anchor="middle">${formatShortDate(day.key)}</text>`;
+  const host=document.getElementById('daily-chart'),tooltip=document.getElementById('daily-tooltip');
+  const days=Number(document.getElementById('daily-period').value),summaries=dailySummary(days);
+  tooltip.textContent='Нажмите на день, чтобы увидеть сводку.';
+  if(!summaries.length){host.innerHTML='<div class="analytics-message">За этот период нет измерений.</div>';return;}
+  const width=Math.max(240,Math.floor(host.clientWidth||320)),height=250;
+  const margin={left:49,right:10,top:14,bottom:36},plotW=width-margin.left-margin.right,plotH=height-margin.top-margin.bottom;
+  let low=Math.min(...summaries.map(day=>day.minimum)),high=Math.max(...summaries.map(day=>day.maximum));
+  if(low===high){const pad=Math.max(Math.abs(low)*.08,.5);low-=pad;high+=pad;}
+  else{const pad=(high-low)*.12;low-=pad;high+=pad;}
+  const rawStep=(high-low)/4,power=10**Math.floor(Math.log10(rawStep||1)),fraction=rawStep/power;
+  const step=(fraction<=1?1:fraction<=2?2:fraction<=5?5:10)*power;
+  const yMin=Math.floor(low/step)*step,yMax=Math.ceil(high/step)*step||yMin+step;
+  const y=value=>margin.top+plotH-((value-yMin)/(yMax-yMin))*plotH;
+  const slot=plotW/summaries.length;
+  let svg=`<svg class="chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="Суточные минимум, среднее и максимум показателей">`;
+  for(let value=yMin;value<=yMax+step*.01;value+=step){
+   const py=y(value);svg+=`<line class="chart-grid" x1="${margin.left}" y1="${py}" x2="${width-margin.right}" y2="${py}"/><text x="${margin.left-6}" y="${py+3}" text-anchor="end">${formatAxisValue(value)}</text>`;
   }
- });
- svg+=`<line class="chart-axis" x1="${margin.left}" y1="${margin.top+plotH}" x2="${width-margin.right}" y2="${margin.top+plotH}"/><text x="${width/2}" y="${height-2}" text-anchor="middle">Дата</text>`;
- host.innerHTML=svg;
- host.querySelectorAll('.daily-point').forEach(point=>{
-  const activate=()=>{tooltip.textContent=point.getAttribute('aria-label');};
-  point.addEventListener('click',activate);
-  point.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();activate();}});
- });
+  summaries.forEach((day,index)=>{
+   const x=margin.left+slot*(index+.5);
+   svg+=`<line x1="${x}" y1="${y(day.maximum)}" x2="${x}" y2="${y(day.minimum)}" stroke="#8998ff" stroke-width="${Math.min(12,Math.max(4,slot*.42))}" stroke-linecap="round"/><circle class="chart-point daily-point" cx="${x}" cy="${y(day.average)}" r="5" fill="#5267e8" tabindex="0" aria-label="${formatFullDate(day.key)} · мин ${formatAxisValue(day.minimum)} · среднее ${formatAxisValue(day.average)} · макс ${formatAxisValue(day.maximum)}"/><text x="${x}" y="${height-15}" text-anchor="middle">${formatShortDate(day.key)}</text>`;
+  });
+  svg+=`<line class="chart-axis" x1="${margin.left}" y1="${margin.top+plotH}" x2="${width-margin.right}" y2="${margin.top+plotH}"/><text x="${width/2}" y="${height-2}" text-anchor="middle">Дата</text></svg>`;
+  host.innerHTML=svg;
+  host.querySelectorAll('.daily-point').forEach(point=>{
+   const activate=()=>{tooltip.textContent=point.getAttribute('aria-label');};
+   point.addEventListener('click',activate);
+   point.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();activate();}});
+  });
 }
 function renderActivityHeatmap(){
- const host=document.getElementById('activity-chart'),tooltip=document.getElementById('activity-tooltip');
- const days=Number(document.getElementById('activity-period').value),rows=periodMeasurements(days);
- const counts=Array.from({length:7},()=>Array(24).fill(0));
- rows.forEach(row=>counts[row.dateObj.getDay()][row.timeObj.hour]++);
- const max=Math.max(0,...counts.flat());
- tooltip.textContent='Нажмите на ячейку, чтобы увидеть число измерений.';
- if(!max){host.innerHTML='<div class="analytics-message">За этот период нет измерений.</div>';return;}
- const timeWindow=timeAxisWindow(rows);
- const startHour=Math.floor(timeWindow.start/60);
- const endHour=Math.ceil((timeWindow.start+timeWindow.duration)/60);
- const hours=Array.from({length:endHour-startHour},(_,index)=>(startHour+index)%24);
- const hourLabelStep=hours.length<=8?1:hours.length<=14?2:3;
- const labels=['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
- const gridColumns=`30px repeat(${hours.length},minmax(11px,1fr))`;
- let html=`<div class="heatmap-scroll"><div class="heatmap-grid" style="grid-template-columns:${gridColumns}" role="grid" aria-label="Количество измерений по дню недели и часу">`;
- html+='<span class="heatmap-corner"></span>';
- hours.forEach((hour,index)=>html+=`<span class="heatmap-hour">${index%hourLabelStep===0?String(hour).padStart(2,'0'):''}</span>`);
- html+='</div>';
- for(let day=0;day<7;day++){
-  html+=`<div class="heatmap-grid" style="grid-template-columns:${gridColumns}"><span class="heatmap-day">${labels[day]}</span>`;
-  hours.forEach(hour=>{
-   const count=counts[day][hour],intensity=count?Math.max(.12,count/max):0;
-   const background=count?`rgba(82,103,232,${.12+intensity*.78})`:'var(--input-bg)';
-   const color=count&&intensity>.55?'#fff':'var(--text)';
-   const label=`${weekdayNames[day]}, ${String(hour).padStart(2,'0')}:00–${String((hour+1)%24).padStart(2,'0')}:00 · ${count} ${measurementWord(count)}`;
-   html+=`<button class="heatmap-cell" type="button" role="gridcell" style="background:${background};color:${color}" aria-label="${escapeHtml(label)}" title="${escapeHtml(label)}" data-count="${count}"></button>`;
-  });
+  const host=document.getElementById('activity-chart'),tooltip=document.getElementById('activity-tooltip');
+  const days=Number(document.getElementById('activity-period').value),rows=periodMeasurements(days);
+  const counts=Array.from({length:7},()=>Array(24).fill(0));
+  rows.forEach(row=>counts[row.dateObj.getDay()][row.timeObj.hour]++);
+  const max=Math.max(0,...counts.flat());
+  tooltip.textContent='Нажмите на ячейку, чтобы увидеть число измерений.';
+  if(!max){host.innerHTML='<div class="analytics-message">За этот период нет измерений.</div>';return;}
+  const timeWindow=timeAxisWindow(rows);
+  const startHour=Math.floor(timeWindow.start/60);
+  const endHour=Math.ceil((timeWindow.start+timeWindow.duration)/60);
+  const hours=Array.from({length:endHour-startHour},(_,index)=>(startHour+index)%24);
+  const hourLabelStep=hours.length<=8?1:hours.length<=14?2:3;
+  const labels=['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+  const gridColumns=`30px repeat(${hours.length},minmax(11px,1fr))`;
+  let html=`<div class="heatmap-scroll"><div class="heatmap-grid" style="grid-template-columns:${gridColumns}" role="grid" aria-label="Количество измерений по дню недели и времени">`;
+  html+='<span class="heatmap-corner"></span>';
+  hours.forEach((hour,index)=>html+=`<span class="heatmap-hour">${index%hourLabelStep===0?String(hour).padStart(2,'0'):''}</span>`);
   html+='</div>';
- }
- html+='</div>';
- host.innerHTML=html;
- host.querySelectorAll('.heatmap-cell').forEach(cell=>cell.addEventListener('click',()=>{tooltip.textContent=cell.getAttribute('aria-label');}));
+  for(let day=0;day<7;day++){
+   html+=`<div class="heatmap-grid" style="grid-template-columns:${gridColumns}"><span class="heatmap-day">${labels[day]}</span>`;
+   hours.forEach(hour=>{
+    const count=counts[day][hour],intensity=count?Math.max(.12,count/max):0;
+    const background=count?`rgba(82,103,232,${.12+intensity*.78})`:'var(--input-bg)';
+    const color=count&&intensity>.55?'#fff':'var(--text)';
+    const label=`${weekdayNames[day]}, ${String(hour).padStart(2,'0')}:00–${String((hour+1)%24).padStart(2,'0')}:00 · ${count} ${measurementWord(count)}`;
+    html+=`<button class="heatmap-cell" type="button" role="gridcell" style="background:${background};color:${color}" aria-label="${escapeHtml(label)}" title="${escapeHtml(label)}" data-count="${count}">${count||''}</button>`;
+   });
+   html+='</div>';
+  }
+  html+='</div>';
+  host.innerHTML=html;
+  host.querySelectorAll('.heatmap-cell').forEach(cell=>cell.addEventListener('click',()=>{tooltip.textContent=cell.getAttribute('aria-label');}));
 }
 function measurementWord(count){
- const mod10=count%10,mod100=count%100;
- if(mod10===1&&mod100!==11)return 'измерение';
- if(mod10>=2&&mod10<=4&&(mod100<12||mod100>14))return 'измерения';
- return 'измерений';
+  const mod10=count%10,mod100=count%100;
+  if(mod10===1&&mod100!==11)return 'измерение';
+  if(mod10>=2&&mod10<=4&&(mod100<12||mod100>14))return 'измерения';
+  return 'измерений';
 }
 function timeAxisWindow(points){
- const minutes=[...new Set(points.map(row=>row.timeObj.minutes))].sort((a,b)=>a-b);
- if(!minutes.length)return {start:0,duration:1440};
- let largestGap=-1,gapIndex=0;
- for(let index=0;index<minutes.length;index++){
-  const next=index===minutes.length-1?minutes[0]+1440:minutes[index+1];
-  const gap=next-minutes[index];
-  if(gap>largestGap){largestGap=gap;gapIndex=index;}
- }
- let start=minutes[(gapIndex+1)%minutes.length]-60;
- let end=minutes[gapIndex]+60;
- if(end<=start)end+=1440;
- if(end-start>=1440)return {start:0,duration:1440};
- return {start:((start%1440)+1440)%1440,duration:end-start};
+  const minutes=[...new Set(points.map(row=>row.timeObj.minutes))].sort((a,b)=>a-b);
+  if(!minutes.length)return {start:0,duration:1440};
+  let largestGap=-1,gapIndex=0;
+  for(let index=0;index<minutes.length;index++){
+   const next=index===minutes.length-1?minutes[0]+1440:minutes[index+1];
+   const gap=next-minutes[index];
+   if(gap>largestGap){largestGap=gap;gapIndex=index;}
+  }
+  let start=minutes[(gapIndex+1)%minutes.length]-60;
+  let end=minutes[gapIndex]+60;
+  if(end<=start)end+=1440;
+  if(end-start>=1440)return {start:0,duration:1440};
+  return {start:((start%1440)+1440)%1440,duration:end-start};
 }
 function formatClockMinute(value){
- const minute=((Math.round(value)%1440)+1440)%1440;
- return `${String(Math.floor(minute/60)).padStart(2,'0')}:${String(minute%60).padStart(2,'0')}`;
+  const minute=((Math.round(value)%1440)+1440)%1440;
+  return `${String(Math.floor(minute/60)).padStart(2,'0')}:${String(minute%60).padStart(2,'0')}`;
 }
 function renderLegend(id,items){
- const host=document.getElementById(id);
- host.innerHTML='';
- items.forEach(item=>{
-  const label=document.createElement('span');label.className='analytics-legend-item';
-  const color=document.createElement('span');color.className='analytics-swatch';color.style.backgroundColor=item.color;
-  const text=document.createElement('span');text.textContent=item.label;
-  label.append(color,text);host.appendChild(label);
- });
+  const host=document.getElementById(id);
+  host.innerHTML='';
+  items.forEach(item=>{
+   const label=document.createElement('span');label.className='analytics-legend-item';
+   const color=document.createElement('span');color.className='analytics-swatch';color.style.backgroundColor=item.color;
+   const text=document.createElement('span');text.textContent=item.label;
+   label.append(color,text);host.appendChild(label);
+  });
 }
 function renderTimeChart(id,groups,{metric,tooltipId,connect=true,emptyText,weekLabels=false}){
- const host=document.getElementById(id),all=groups.flatMap(group=>group.points);
- const tooltip=document.getElementById(tooltipId);
- tooltip.textContent='Нажмите на точку, чтобы увидеть измерение.';
- if(!all.length){host.innerHTML=`<div class="analytics-message">${escapeHtml(emptyText)}</div>`;return;}
- const width=Math.max(240,Math.floor(host.clientWidth||320)),height=250;
- const margin={left:49,right:8,top:12,bottom:34},plotW=width-margin.left-margin.right,plotH=height-margin.top-margin.bottom;
- const timeWindow=timeAxisWindow(all);
- let low=Math.min(...all.map(row=>row.value)),high=Math.max(...all.map(row=>row.value));
- if(low===high){const pad=Math.max(Math.abs(low)*.08,metric==='sugar'?.5:.5);low-=pad;high+=pad;}
- else{const pad=(high-low)*.1;low-=pad;high+=pad;}
- const rawStep=(high-low)/4,power=10**Math.floor(Math.log10(rawStep||1)),fraction=rawStep/power;
- const step=(fraction<=1?1:fraction<=2?2:fraction<=5?5:10)*power;
- const yMin=Math.floor(low/step)*step,yMax=Math.ceil(high/step)*step||yMin+step;
- const timeOffset=value=>(((value-timeWindow.start)%1440)+1440)%1440;
- const x=value=>margin.left+(timeOffset(value)/timeWindow.duration)*plotW;
- const y=value=>margin.top+plotH-((value-yMin)/(yMax-yMin))*plotH;
- let svg=`<svg class="chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="${metric==='sugar'?'График сахара':'График инсулина'}">`;
- for(let value=yMin;value<=yMax+step*.01;value+=step){
-  const py=y(value);svg+=`<line class="chart-grid" x1="${margin.left}" y1="${py}" x2="${width-margin.right}" y2="${py}"/><text x="${margin.left-6}" y="${py+3}" text-anchor="end">${formatAxisValue(value)}</text>`;
- }
- const firstHour=Math.ceil(timeWindow.start/60)*60,lastMinute=timeWindow.start+timeWindow.duration;
- const tickStep=timeWindow.duration<=6*60?60:timeWindow.duration<=12*60?120:240;
- const ticks=[timeWindow.start];
- for(let minute=Math.ceil(firstHour/tickStep)*tickStep;minute<lastMinute;minute+=tickStep)ticks.push(minute);
- ticks.push(lastMinute);
- ticks.forEach((minute,index)=>{
-  const position=index===0?margin.left+1:index===ticks.length-1?width-margin.right-1:x(minute%1440);
-  const anchor=index===0?'start':index===ticks.length-1?'end':'middle';
-  const label=formatClockMinute(minute);
-  svg+=`<line class="chart-grid" x1="${position}" y1="${margin.top}" x2="${position}" y2="${margin.top+plotH}"/><text x="${position}" y="${height-17}" text-anchor="${anchor}">${label}</text>`;
- });
- svg+=`<line class="chart-axis" x1="${margin.left}" y1="${margin.top+plotH}" x2="${width-margin.right}" y2="${margin.top+plotH}"/><text x="${width/2}" y="${height-2}" text-anchor="middle">Время</text>`;
- groups.forEach(group=>{
-  const points=[...group.points].sort((a,b)=>a.timeObj.minutes-b.timeObj.minutes);
-  if(connect&&points.length>1){
-   let segment=[];
-   const drawSegment=()=>{
-    if(segment.length>1){
-     const path=segment.map((point,index)=>`${index?'L':'M'}${x(point.timeObj.minutes).toFixed(2)},${y(point.value).toFixed(2)}`).join(' ');
-     svg+=`<path d="${path}" fill="none" stroke="${group.color}" stroke-width="${weekLabels?1.35:1.7}" stroke-opacity="${weekLabels?.48:.72}" stroke-linecap="round" stroke-linejoin="round"/>`;
-    }
-   };
-   points.forEach(point=>{
-    if(segment.length&&timeOffset(point.timeObj.minutes)<timeOffset(segment[segment.length-1].timeObj.minutes)){
-     drawSegment();segment=[];
-    }
-    segment.push(point);
-   });
-   drawSegment();
+  const host=document.getElementById(id),all=groups.flatMap(group=>group.points);
+  const tooltip=document.getElementById(tooltipId);
+  tooltip.textContent='Нажмите на точку, чтобы увидеть измерение.';
+  if(!all.length){host.innerHTML=`<div class="analytics-message">${escapeHtml(emptyText)}</div>`;return;}
+  const width=Math.max(240,Math.floor(host.clientWidth||320)),height=250;
+  const margin={left:49,right:8,top:12,bottom:34},plotW=width-margin.left-margin.right,plotH=height-margin.top-margin.bottom;
+  const timeWindow=timeAxisWindow(all);
+  let low=Math.min(...all.map(row=>row.value)),high=Math.max(...all.map(row=>row.value));
+  if(low===high){const pad=Math.max(Math.abs(low)*.08,metric==='sugar'?0.5:0.5);low-=pad;high+=pad;}
+  else{const pad=(high-low)*.1;low-=pad;high+=pad;}
+  const rawStep=(high-low)/4,power=10**Math.floor(Math.log10(rawStep||1)),fraction=rawStep/power;
+  const step=(fraction<=1?1:fraction<=2?2:fraction<=5?5:10)*power;
+  const yMin=Math.floor(low/step)*step,yMax=Math.ceil(high/step)*step||yMin+step;
+  const timeOffset=value=>(((value-timeWindow.start)%1440)+1440)%1440;
+  const x=value=>margin.left+(timeOffset(value)/timeWindow.duration)*plotW;
+  const y=value=>margin.top+plotH-((value-yMin)/(yMax-yMin))*plotH;
+  let svg=`<svg class="chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="${metric==='sugar'?'График сахара':'График инсулина'}">`;
+  for(let value=yMin;value<=yMax+step*.01;value+=step){
+   const py=y(value);svg+=`<line class="chart-grid" x1="${margin.left}" y1="${py}" x2="${width-margin.right}" y2="${py}"/><text x="${margin.left-6}" y="${py+3}" text-anchor="end">${formatAxisValue(value)}</text>`;
   }
-  points.forEach(point=>{
-   const week=weekLabels?` · Неделя ${group.weekIndex+1} (№ ${isoWeekNumber(point.dateObj)})`:'';
-   const label=`${formatFullDate(point.dateKey)} ${point.timeObj.text} · ${formatAxisValue(point.value)}${metric==='sugar'?' ммоль/л':' ед.'}${week}`;
-   svg+=`<circle class="chart-point" cx="${x(point.timeObj.minutes).toFixed(2)}" cy="${y(point.value).toFixed(2)}" r="${weekLabels?3.2:4}" fill="${group.color}" tabindex="0" role="button" aria-label="${escapeHtml(label)}"/>`;
+  const firstHour=Math.ceil(timeWindow.start/60)*60,lastMinute=timeWindow.start+timeWindow.duration;
+  const tickStep=timeWindow.duration<=6*60?60:timeWindow.duration<=12*60?120:240;
+  const ticks=[timeWindow.start];
+  for(let minute=Math.ceil(firstHour/tickStep)*tickStep;minute<lastMinute;minute+=tickStep)ticks.push(minute);
+  ticks.push(lastMinute);
+  ticks.forEach((minute,index)=>{
+   const position=index===0?margin.left+1:index===ticks.length-1?width-margin.right-1:x(minute%1440);
+   const anchor=index===0?'start':index===ticks.length-1?'end':'middle';
+   const label=formatClockMinute(minute);
+   svg+=`<line class="chart-grid" x1="${position}" y1="${margin.top}" x2="${position}" y2="${margin.top+plotH}"/><text x="${position}" y="${height-17}" text-anchor="${anchor}">${label}</text>`;
   });
- });
- svg+='</svg>';
- host.innerHTML=svg;
- host.querySelectorAll('.chart-point').forEach(point=>{
-  const activate=()=>{tooltip.textContent=point.getAttribute('aria-label');};
-  point.addEventListener('click',activate);
-  point.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();activate();}});
- });
+  svg+=`<line class="chart-axis" x1="${margin.left}" y1="${margin.top+plotH}" x2="${width-margin.right}" y2="${margin.top+plotH}"/><text x="${width/2}" y="${height-2}" text-anchor="middle">Время</text>`;
+  groups.forEach(group=>{
+   const points=[...group.points].sort((a,b)=>a.timeObj.minutes-b.timeObj.minutes);
+   if(connect&&points.length>1){
+    let segment=[];
+    const drawSegment=()=>{
+     if(segment.length>1){
+      const path=segment.map((point,index)=>`${index?'L':'M'}${x(point.timeObj.minutes).toFixed(2)},${y(point.value).toFixed(2)}`).join(' ');
+      svg+=`<path d="${path}" fill="none" stroke="${group.color}" stroke-width="${weekLabels?1.35:1.7}" stroke-opacity="${weekLabels?.48:.72}" stroke-linecap="round" stroke-linejoin="round"/>`;
+     }
+    };
+    points.forEach(point=>{
+     if(segment.length&&timeOffset(point.timeObj.minutes)<timeOffset(segment[segment.length-1].timeObj.minutes)){
+      drawSegment();segment=[];
+     }
+     segment.push(point);
+    });
+    drawSegment();
+   }
+   points.forEach(point=>{
+    const week=weekLabels?` · Неделя ${group.weekIndex+1} (№ ${point.dateKey})`:'';
+    const label=`${formatFullDate(point.dateKey)} ${point.timeObj.text} · ${formatAxisValue(point.value)}${metric==='sugar'?' ммоль/л':' ед.'}${week}`;
+    svg+=`<circle class="chart-point" cx="${x(point.timeObj.minutes).toFixed(2)}" cy="${y(point.value).toFixed(2)}" r="${weekLabels?3.2:4}" fill="${group.color}" tabindex="0" role="button" aria-label="${escapeHtml(label)}"/>`;
+   });
+  });
+  svg+='</svg>';
+  host.innerHTML=svg;
+  host.querySelectorAll('.chart-point').forEach(point=>{
+   const activate=()=>{tooltip.textContent=point.getAttribute('aria-label');};
+   point.addEventListener('click',activate);
+   point.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();activate();}});
+  });
 }
 function formatAxisValue(value){
- return Number(value).toFixed(Number.isInteger(value)?0:1);
+  return Number(value).toFixed(Number.isInteger(value)?0:1);
 }
 initUser();
 loadSugarAverage();
