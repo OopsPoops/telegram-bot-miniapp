@@ -26,6 +26,9 @@ button{-webkit-tap-highlight-color:transparent}
 .metric-description{font-size:12px;color:var(--muted);margin-top:4px}
 .metric-value{font-size:28px;font-weight:800;letter-spacing:-.7px;margin-left:auto;text-align:right;white-space:nowrap}
 .metric-value small{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:0}
+.metric-loading{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:7px;min-width:76px;margin-left:auto}
+.metric-skeleton{height:13px;width:76px;border-radius:7px;background:linear-gradient(90deg,var(--line) 25%,var(--nav-highlight) 50%,var(--line) 75%);background-size:200% 100%;animation:metricShimmer 1.2s ease-in-out infinite}
+.metric-skeleton.short{width:48px;height:9px;opacity:.8}
 .input-row{display:flex;gap:9px}
 .value-input{min-width:0;flex:1;border:1px solid var(--line);border-radius:13px;background:var(--input-bg);padding:13px 14px;color:var(--input-text);-webkit-text-fill-color:var(--input-text);caret-color:var(--blue);outline:none;font-size:16px;opacity:1}
 .value-input::placeholder{color:var(--muted);-webkit-text-fill-color:var(--muted);opacity:1}
@@ -101,6 +104,7 @@ button{-webkit-tap-highlight-color:transparent}
 @keyframes fade{from{opacity:0}to{opacity:1}}
 @keyframes rise{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes screenIn{from{opacity:.65;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+@keyframes metricShimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 @media(max-width:360px){.app{padding-left:13px;padding-right:13px}.metric{padding:14px}.metric-value{font-size:24px}.save-button{min-width:88px;padding:0 11px}.quick-button{padding:12px 10px;gap:9px}.quick-icon{width:35px;height:35px}.nav-button{font-size:11px;min-height:48px;gap:0}.nav-button .nav-icon{width:22px;height:22px}.nav-button .nav-icon svg{width:21px;height:21px}.metric-head{gap:9px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
@@ -115,7 +119,10 @@ button{-webkit-tap-highlight-color:transparent}
 <div class="metric-name">Сахар</div>
 <div class="metric-description">Среднее значение за сегодня</div>
 </div>
-<div class="metric-value" id="sugarAverage">— <small>ммоль/л</small></div>
+<div class="metric-loading" id="sugarAverage" role="status" aria-label="Загрузка среднего сахара">
+<div class="metric-skeleton"></div>
+<div class="metric-skeleton short"></div>
+</div>
 </div>
 <div class="input-row">
 <input class="value-input" id="sugarInput" type="text" inputmode="decimal" placeholder="Например, 5,6" aria-label="Новое значение сахара">
@@ -130,10 +137,13 @@ button{-webkit-tap-highlight-color:transparent}
 <div class="metric-name">Инсулин</div>
 <div class="metric-description">Сумма за сегодня</div>
 </div>
-<div class="metric-value" id="insulinTotal">— <small>ед.</small></div>
+<div class="metric-loading" id="insulinTotal" role="status" aria-label="Загрузка суммы инсулина">
+<div class="metric-skeleton"></div>
+<div class="metric-skeleton short"></div>
+</div>
 </div>
 <div class="input-row">
-<input class="value-input" id="insulinInput" type="number" inputmode="numeric" step="1" min="0" max="15" placeholder="Целое число" aria-label="Новое значение инсулина">
+<input class="value-input" id="insulinInput" type="number" inputmode="numeric" step="1" min="0" max="15" placeholder="Например, 11" aria-label="Новое значение инсулина">
 <button class="save-button" onclick="saveValue('insulin')">Сохранить</button>
 </div>
 <div class="toast" id="insulinToast"></div>
@@ -362,30 +372,44 @@ button.disabled=false;
 button.textContent='Сохранить';
 }
 }
+function showMetricLoading(element){
+element.className='metric-loading';
+element.setAttribute('role','status');
+element.innerHTML='<div class="metric-skeleton"></div><div class="metric-skeleton short"></div>';
+}
+function showMetricValue(element,value,unit){
+element.className='metric-value';
+element.removeAttribute('role');
+element.innerHTML=escapeHtml(String(value))+' <small>'+unit+'</small>';
+}
 async function loadSugarAverage(){
 const element=document.getElementById('sugarAverage');
+showMetricLoading(element);
 try{
 const result=await api('sugar_average');
-element.innerHTML=result!==null&&result!==undefined&&String(result).trim()!==''&&String(result)!=='—'?escapeHtml(result)+' <small>ммоль/л</small>':'— <small>ммоль/л</small>';
+const value=result!==null&&result!==undefined&&String(result).trim()!==''?String(result):'—';
+showMetricValue(element,value,'ммоль/л');
 setAccess(true,'Сервер подтвердил доступ');
 return true;
 }catch(error){
-element.innerHTML='— <small>ммоль/л</small>';
-console.error('❌',error);
+showMetricValue(element,'—','ммоль/л');
+console.error('Ошибка загрузки среднего сахара:',error);
 if(/доступ|пользовател|разреш|initdata|telegram/i.test(error.message))setAccess(false,error.message);
 return false;
 }
 }
 async function loadInsulinTotal(){
 const element=document.getElementById('insulinTotal');
+showMetricLoading(element);
 try{
 const result=await api('insulin_total');
-element.innerHTML=escapeHtml(String(result))+' <small>ед.</small>';
+const value=result!==null&&result!==undefined&&String(result).trim()!==''?String(result):'—';
+showMetricValue(element,value,'ед.');
 setAccess(true,'Сервер подтвердил доступ');
 return true;
 }catch(error){
-element.innerHTML='— <small>ед.</small>';
-console.error('❌',error);
+showMetricValue(element,'—','ед.');
+console.error('Ошибка загрузки суммы инсулина:',error);
 if(/доступ|пользовател|разреш|initdata|telegram/i.test(error.message))setAccess(false,error.message);
 return false;
 }
