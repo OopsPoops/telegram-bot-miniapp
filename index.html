@@ -371,7 +371,7 @@ setAccess(true,'Сервер подтвердил доступ');
 return true;
 }catch(error){
 element.innerHTML='— <small>ммоль/л</small>';
-console.error('Ошибка загрузки среднего сахара:',error);
+console.error('❌',error);
 if(/доступ|пользовател|разреш|initdata|telegram/i.test(error.message))setAccess(false,error.message);
 return false;
 }
@@ -385,7 +385,7 @@ setAccess(true,'Сервер подтвердил доступ');
 return true;
 }catch(error){
 element.innerHTML='— <small>ед.</small>';
-console.error('Ошибка загрузки суммы инсулина:',error);
+console.error('❌',error);
 if(/доступ|пользовател|разреш|initdata|telegram/i.test(error.message))setAccess(false,error.message);
 return false;
 }
