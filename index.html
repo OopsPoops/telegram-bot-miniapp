@@ -233,7 +233,7 @@ button{-webkit-tap-highlight-color:transparent}
 </div>
 <div class="analytics-toolbar-label">Дни на графике</div>
 <div id="trend-days" class="analytics-days" aria-label="Выберите отображаемые дни"></div>
-<div class="analytics-note">Для читаемости сначала показаны последние 7 дат с измерениями; остальные можно включить выше.</div>
+<div class="analytics-note">Даты выбранного периода включены по умолчанию; снимите галочки, чтобы скрыть отдельные дни.</div>
 <div id="trend-chart" class="chart-wrap"></div>
 <div id="trend-tooltip" class="chart-tooltip" role="status">Нажмите на точку, чтобы увидеть измерение.</div>
 <div id="trend-legend" class="analytics-legend"></div>
@@ -617,9 +617,14 @@ return `${day}.${month}.${year}`;
 }
 function renderTrendDays(rows){
 const host=document.getElementById('trend-days');
-const dates=[...new Set(rows.map(row=>row.dateKey))].sort().reverse();
+const end=new Date();end.setHours(0,0,0,0);
+const dates=Array.from({length:analyticsState.trendDays},(_,index)=>{
+const date=new Date(end);
+date.setDate(date.getDate()-analyticsState.trendDays+1+index);
+return dateKey(date);
+}).reverse();
 if(!analyticsState.selectedDates){
-analyticsState.selectedDates=new Set(dates.slice(0,7));
+analyticsState.selectedDates=new Set(dates);
 }else{
 analyticsState.selectedDates=new Set([...analyticsState.selectedDates].filter(key=>dates.includes(key)));
 }
