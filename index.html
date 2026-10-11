@@ -112,6 +112,12 @@ button{-webkit-tap-highlight-color:transparent}
 .analytics-retry{margin-top:11px;border:0;border-radius:11px;padding:9px 13px;background:var(--blue);color:white;font-weight:700;cursor:pointer}
 .metric-switch{display:flex;gap:7px;margin-bottom:10px}
 .metric-switch .analytics-choice{flex:1}
+.heatmap-scroll{overflow-x:auto;padding-bottom:5px}
+.heatmap-grid{display:grid;grid-template-columns:30px repeat(24,minmax(11px,1fr));gap:3px;align-items:center;min-width:390px;margin-bottom:4px}
+.heatmap-corner,.heatmap-hour{height:15px;text-align:center;color:var(--muted);font-size:9px}
+.heatmap-day{font-size:10px;color:var(--muted)}
+.heatmap-cell{height:23px;min-width:0;padding:0;border:1px solid rgba(125,135,170,.12);border-radius:5px;cursor:pointer}
+.heatmap-cell:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
 .bottom-nav-wrap{position:fixed;z-index:20;bottom:0;left:0;right:0;padding:6px 12px calc(6px + env(safe-area-inset-bottom));pointer-events:none;background:linear-gradient(to top,var(--bg) 55%,transparent)}
 .bottom-nav{pointer-events:auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;width:100%;max-width:484px;margin:0 auto;padding:4px;border:1px solid var(--nav-border);border-radius:999px;background:linear-gradient(150deg,var(--nav-highlight),var(--nav-bg) 48%,var(--nav-bg));backdrop-filter:blur(28px) saturate(190%);-webkit-backdrop-filter:blur(28px) saturate(190%);box-shadow:0 12px 36px rgba(25,35,75,.16),inset 0 1px 0 rgba(255,255,255,.58),inset 0 -1px 0 rgba(255,255,255,.12)}
 .nav-button{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-height:52px;padding:3px 2px;border:1px solid transparent;border-radius:999px;background:transparent;color:var(--muted);font-size:12px;font-weight:600;white-space:nowrap;cursor:pointer;transition:background .22s,color .22s,transform .22s,border-color .22s,box-shadow .22s}
@@ -217,6 +223,8 @@ button{-webkit-tap-highlight-color:transparent}
 <button class="analytics-tab active" type="button" role="tab" aria-selected="true" data-chart="trend" onclick="selectChart('trend')">Динамика</button>
 <button class="analytics-tab" type="button" role="tab" aria-selected="false" data-chart="compare" onclick="selectChart('compare')">Три недели</button>
 <button class="analytics-tab" type="button" role="tab" aria-selected="false" data-chart="distribution" onclick="selectChart('distribution')">Распределение</button>
+<button class="analytics-tab" type="button" role="tab" aria-selected="false" data-chart="daily" onclick="selectChart('daily')">Сводка по дням</button>
+<button class="analytics-tab" type="button" role="tab" aria-selected="false" data-chart="activity" onclick="selectChart('activity')">Активность</button>
 </div>
 <div class="metric-switch" role="group" aria-label="Показатель">
 <button class="analytics-choice active" type="button" data-metric="sugar" onclick="selectMetric('sugar')">Сахар</button>
@@ -263,6 +271,36 @@ button{-webkit-tap-highlight-color:transparent}
 <div id="distribution-tooltip" class="chart-tooltip" role="status">Нажмите на точку, чтобы увидеть измерение.</div>
 <div id="distribution-legend" class="analytics-legend"></div>
 <div class="analytics-note">Каждая точка — отдельное измерение; линии не проводятся.</div>
+</section>
+<section class="analytics-card analytics-panel" data-panel="daily" hidden>
+<div class="analytics-toolbar">
+<span class="analytics-toolbar-label">Сводка за период</span>
+<select id="daily-period" aria-label="Период суточной сводки" onchange="renderDailySummary()">
+<option value="7">7 дней</option><option value="14">14 дней</option><option value="30">30 дней</option>
+</select>
+</div>
+<div id="daily-chart" class="chart-wrap"></div>
+<div id="daily-tooltip" class="chart-tooltip" role="status">Нажмите на день, чтобы увидеть сводку.</div>
+<div class="analytics-legend">
+<span class="analytics-legend-item"><span class="analytics-swatch" style="background:#8998ff"></span>Минимум — максимум</span>
+<span class="analytics-legend-item"><span class="analytics-swatch" style="background:#5267e8"></span>Среднее</span>
+</div>
+<div class="analytics-note">Минимум, максимум и среднее рассчитаны по всем измерениям выбранного дня.</div>
+</section>
+<section class="analytics-card analytics-panel" data-panel="activity" hidden>
+<div class="analytics-toolbar">
+<span class="analytics-toolbar-label">Активность за период</span>
+<select id="activity-period" aria-label="Период тепловой карты" onchange="renderActivityHeatmap()">
+<option value="7">7 дней</option><option value="14">14 дней</option><option value="30">30 дней</option>
+</select>
+</div>
+<div id="activity-chart" class="chart-wrap"></div>
+<div id="activity-tooltip" class="chart-tooltip" role="status">Нажмите на ячейку, чтобы увидеть число измерений.</div>
+<div class="analytics-legend">
+<span class="analytics-legend-item">Редкие измерения</span>
+<span class="analytics-legend-item"><span class="analytics-swatch" style="background:#dfe3ff"></span><span class="analytics-swatch" style="background:#5267e8"></span>Частые измерения</span>
+</div>
+<div class="analytics-note">Цвет ячейки показывает количество отдельных измерений в этот час.</div>
 </section>
 </div>
 </section>
@@ -597,7 +635,9 @@ function renderAnalytics(){
 if(!analyticsState.loaded)return;
 if(analyticsState.chart==='trend')renderTrend();
 else if(analyticsState.chart==='compare')renderComparison();
-else renderDistribution();
+else if(analyticsState.chart==='distribution')renderDistribution();
+else if(analyticsState.chart==='daily')renderDailySummary();
+else renderActivityHeatmap();
 }
 function metricMeasurements(){
 return analyticsState.measurements.filter(row=>row.type===analyticsState.metric);
@@ -724,6 +764,84 @@ const dates=[...new Set(rows.map(row=>row.dateKey))].sort();
 const groups=dates.map(key=>({label:formatShortDate(key),color:dayColor(key,dates),points:rows.filter(row=>row.dateKey===key)}));
 renderTimeChart('distribution-chart',groups,{metric:analyticsState.metric,tooltipId:'distribution-tooltip',connect:false,emptyText:'За этот период нет измерений.'});
 renderLegend('distribution-legend',groups);
+}
+function dailySummary(days){
+const byDate=new Map();
+periodMeasurements(days).forEach(row=>{
+if(!byDate.has(row.dateKey))byDate.set(row.dateKey,[]);
+byDate.get(row.dateKey).push(row.value);
+});
+return [...byDate.entries()].sort(([a],[b])=>a.localeCompare(b)).map(([key,values])=>({
+key,minimum:Math.min(...values),maximum:Math.max(...values),
+average:values.reduce((sum,value)=>sum+value,0)/values.length,count:values.length
+}));
+}
+function renderDailySummary(){
+const host=document.getElementById('daily-chart'),tooltip=document.getElementById('daily-tooltip');
+const days=Number(document.getElementById('daily-period').value),summaries=dailySummary(days);
+tooltip.textContent='Нажмите на день, чтобы увидеть сводку.';
+if(!summaries.length){host.innerHTML='<div class="analytics-message">За этот период нет измерений.</div>';return;}
+const width=Math.max(240,Math.floor(host.clientWidth||320)),height=250;
+const margin={left:49,right:10,top:14,bottom:36},plotW=width-margin.left-margin.right,plotH=height-margin.top-margin.bottom;
+let low=Math.min(...summaries.map(day=>day.minimum)),high=Math.max(...summaries.map(day=>day.maximum));
+if(low===high){const pad=Math.max(Math.abs(low)*.08,.5);low-=pad;high+=pad;}
+else{const pad=(high-low)*.12;low-=pad;high+=pad;}
+const rawStep=(high-low)/4,power=10**Math.floor(Math.log10(rawStep||1)),fraction=rawStep/power;
+const step=(fraction<=1?1:fraction<=2?2:fraction<=5?5:10)*power;
+const yMin=Math.floor(low/step)*step,yMax=Math.ceil(high/step)*step||yMin+step;
+const y=value=>margin.top+plotH-((value-yMin)/(yMax-yMin))*plotH;
+const slot=plotW/summaries.length;
+let svg=`<svg class="chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="Суточные минимум, среднее и максимум показателя">`;
+for(let value=yMin;value<=yMax+step*.01;value+=step){
+const py=y(value);svg+=`<line class="chart-grid" x1="${margin.left}" y1="${py}" x2="${width-margin.right}" y2="${py}"/><text x="${margin.left-6}" y="${py+3}" text-anchor="end">${formatAxisValue(value)}</text>`;
+}
+summaries.forEach((day,index)=>{
+const x=margin.left+slot*(index+.5),label=`${formatFullDate(day.key)} · мин ${formatAxisValue(day.minimum)} · среднее ${formatAxisValue(day.average)} · макс ${formatAxisValue(day.maximum)} · ${day.count} изм.`;
+svg+=`<line x1="${x}" y1="${y(day.maximum)}" x2="${x}" y2="${y(day.minimum)}" stroke="#8998ff" stroke-width="${Math.min(12,Math.max(4,slot*.42))}" stroke-linecap="round"/><circle class="chart-point daily-point" cx="${x}" cy="${y(day.average)}" r="5" fill="#5267e8" tabindex="0" role="button" aria-label="${escapeHtml(label)}"><title>${escapeHtml(label)}</title></circle>`;
+if(summaries.length<=14||index%Math.ceil(summaries.length/10)===0||index===summaries.length-1){
+svg+=`<text x="${x}" y="${height-15}" text-anchor="middle">${formatShortDate(day.key)}</text>`;
+}
+});
+svg+=`<line class="chart-axis" x1="${margin.left}" y1="${margin.top+plotH}" x2="${width-margin.right}" y2="${margin.top+plotH}"/><text x="${width/2}" y="${height-2}" text-anchor="middle">Дата</text><text x="10" y="${margin.top+plotH/2}" text-anchor="middle" transform="rotate(-90 10 ${margin.top+plotH/2})">${analyticsState.metric==='sugar'?'Значение, ммоль/л':'Значение, ед.'}</text></svg>`;
+host.innerHTML=svg;
+host.querySelectorAll('.daily-point').forEach(point=>{
+const activate=()=>{tooltip.textContent=point.getAttribute('aria-label');};
+point.addEventListener('click',activate);
+point.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();activate();}});
+});
+}
+function renderActivityHeatmap(){
+const host=document.getElementById('activity-chart'),tooltip=document.getElementById('activity-tooltip');
+const days=Number(document.getElementById('activity-period').value),rows=periodMeasurements(days);
+const counts=Array.from({length:7},()=>Array(24).fill(0));
+rows.forEach(row=>counts[row.dateObj.getDay()][row.timeObj.hour]++);
+const max=Math.max(0,...counts.flat());
+tooltip.textContent='Нажмите на ячейку, чтобы увидеть число измерений.';
+if(!max){host.innerHTML='<div class="analytics-message">За этот период нет измерений.</div>';return;}
+const labels=['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+let html='<div class="heatmap-scroll"><div class="heatmap-grid" role="grid" aria-label="Количество измерений по дню недели и часу"><span class="heatmap-corner"></span>';
+for(let hour=0;hour<24;hour++)html+=`<span class="heatmap-hour">${hour%3===0?String(hour).padStart(2,'0'):''}</span>`;
+html+='</div>';
+for(let day=0;day<7;day++){
+html+='<div class="heatmap-grid"><span class="heatmap-day">'+labels[day]+'</span>';
+for(let hour=0;hour<24;hour++){
+const count=counts[day][hour],intensity=count?Math.max(.12,count/max):0;
+const background=count?`rgba(82,103,232,${.12+intensity*.78})`:'var(--input-bg)';
+const color=count&&intensity>.55?'#fff':'var(--text)';
+const label=`${weekdayNames[day]}, ${String(hour).padStart(2,'0')}:00–${String(hour+1).padStart(2,'0')}:00 · ${count} ${measurementWord(count)}`;
+html+=`<button class="heatmap-cell" type="button" role="gridcell" style="background:${background};color:${color}" aria-label="${escapeHtml(label)}" title="${escapeHtml(label)}" data-count="${count}"></button>`;
+}
+html+='</div>';
+}
+html+='</div>';
+host.innerHTML=html;
+host.querySelectorAll('.heatmap-cell').forEach(cell=>cell.addEventListener('click',()=>{tooltip.textContent=cell.getAttribute('aria-label');}));
+}
+function measurementWord(count){
+const mod10=count%10,mod100=count%100;
+if(mod10===1&&mod100!==11)return 'измерение';
+if(mod10>=2&&mod10<=4&&(mod100<12||mod100>14))return 'измерения';
+return 'измерений';
 }
 function renderLegend(id,items){
 const host=document.getElementById(id);
