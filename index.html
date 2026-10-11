@@ -83,6 +83,35 @@ button{-webkit-tap-highlight-color:transparent}
 .graph-placeholder-icon{width:65px;height:65px;border-radius:22px;background:var(--icon-bg);display:grid;place-items:center;font-size:30px;margin:0 auto 16px}
 .graph-placeholder-title{font-size:17px;font-weight:750}
 .graph-placeholder-text{font-size:13px;line-height:1.55;color:var(--muted);margin-top:8px}
+.analytics-switches{display:flex;gap:7px;overflow-x:auto;padding:2px 1px 8px;margin:0 -1px 10px;scrollbar-width:none}
+.analytics-switches::-webkit-scrollbar{display:none}
+.analytics-tab,.analytics-choice{flex:0 0 auto;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--muted);padding:9px 12px;font-size:12px;font-weight:700;cursor:pointer}
+.analytics-tab.active,.analytics-choice.active{background:var(--blue);border-color:var(--blue);color:#fff}
+.analytics-card{background:var(--card);border:1px solid rgba(125,135,170,.12);border-radius:20px;padding:14px;margin-bottom:13px;box-shadow:var(--shadow)}
+.analytics-toolbar{display:flex;align-items:center;justify-content:space-between;gap:9px;flex-wrap:wrap;margin-bottom:12px}
+.analytics-toolbar-label{font-size:12px;font-weight:700;color:var(--muted)}
+.analytics-toolbar select{max-width:100%;border:1px solid var(--line);border-radius:11px;padding:8px 10px;background:var(--input-bg);color:var(--text);font-size:13px}
+.analytics-days{display:flex;gap:6px;overflow-x:auto;padding:1px 1px 9px;margin-bottom:5px;scrollbar-width:thin}
+.analytics-day{display:flex;align-items:center;gap:5px;flex:0 0 auto;border:1px solid var(--line);border-radius:10px;padding:6px 8px;color:var(--muted);font-size:11px;white-space:nowrap}
+.analytics-day input,.week-toggle input{accent-color:var(--blue)}
+.analytics-legend{display:flex;gap:8px 13px;flex-wrap:wrap;font-size:11px;color:var(--muted)}
+.analytics-legend-item{display:inline-flex;align-items:center;gap:5px}
+.analytics-swatch{width:10px;height:10px;border-radius:50%;display:inline-block;flex:0 0 auto}
+.week-toggles{display:flex;gap:7px;flex-wrap:wrap;margin:4px 0 11px}
+.week-toggle{display:flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:10px;padding:7px 8px;font-size:10px;color:var(--muted)}
+.chart-wrap{width:100%;min-height:220px;overflow:hidden}
+.chart-svg{display:block;width:100%;height:250px;overflow:visible}
+.chart-svg text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:var(--muted);font-size:10px}
+.chart-grid{stroke:var(--line);stroke-width:1}
+.chart-axis{stroke:var(--muted);stroke-width:1;opacity:.6}
+.chart-point{cursor:pointer;stroke:var(--card);stroke-width:1.5}
+.chart-point:focus{outline:none;stroke:var(--text);stroke-width:2.5}
+.chart-tooltip{min-height:18px;margin-top:6px;color:var(--muted);font-size:12px;line-height:1.45}
+.analytics-note{font-size:11px;line-height:1.45;color:var(--muted);margin:8px 1px 0}
+.analytics-message{padding:28px 14px;text-align:center;color:var(--muted);font-size:13px;line-height:1.5}
+.analytics-retry{margin-top:11px;border:0;border-radius:11px;padding:9px 13px;background:var(--blue);color:white;font-weight:700;cursor:pointer}
+.metric-switch{display:flex;gap:7px;margin-bottom:10px}
+.metric-switch .analytics-choice{flex:1}
 .bottom-nav-wrap{position:fixed;z-index:20;bottom:0;left:0;right:0;padding:6px 12px calc(6px + env(safe-area-inset-bottom));pointer-events:none;background:linear-gradient(to top,var(--bg) 55%,transparent)}
 .bottom-nav{pointer-events:auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;width:100%;max-width:484px;margin:0 auto;padding:4px;border:1px solid var(--nav-border);border-radius:999px;background:linear-gradient(150deg,var(--nav-highlight),var(--nav-bg) 48%,var(--nav-bg));backdrop-filter:blur(28px) saturate(190%);-webkit-backdrop-filter:blur(28px) saturate(190%);box-shadow:0 12px 36px rgba(25,35,75,.16),inset 0 1px 0 rgba(255,255,255,.58),inset 0 -1px 0 rgba(255,255,255,.12)}
 .nav-button{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-height:52px;padding:3px 2px;border:1px solid transparent;border-radius:999px;background:transparent;color:var(--muted);font-size:12px;font-weight:600;white-space:nowrap;cursor:pointer;transition:background .22s,color .22s,transform .22s,border-color .22s,box-shadow .22s}
@@ -184,10 +213,57 @@ button{-webkit-tap-highlight-color:transparent}
 <section class="screen" id="screen-graphs">
 <div class="page-heading">Графики</div>
 <div class="page-description">История показателей и динамика</div>
-<div class="graph-placeholder">
-<div class="graph-placeholder-icon">📈</div>
-<div class="graph-placeholder-title">Здесь будут графики</div>
-<div class="graph-placeholder-text">Добавим графики сахара и инсулина, выбор периода и просмотр динамики показателей.</div>
+<div class="analytics-switches" role="tablist" aria-label="Тип графика">
+<button class="analytics-tab active" type="button" role="tab" aria-selected="true" data-chart="trend" onclick="selectChart('trend')">Динамика</button>
+<button class="analytics-tab" type="button" role="tab" aria-selected="false" data-chart="compare" onclick="selectChart('compare')">Три недели</button>
+<button class="analytics-tab" type="button" role="tab" aria-selected="false" data-chart="distribution" onclick="selectChart('distribution')">Распределение</button>
+</div>
+<div class="metric-switch" role="group" aria-label="Показатель">
+<button class="analytics-choice active" type="button" data-metric="sugar" onclick="selectMetric('sugar')">Сахар</button>
+<button class="analytics-choice" type="button" data-metric="insulin" onclick="selectMetric('insulin')">Инсулин</button>
+</div>
+<div id="analytics-loading" class="analytics-card analytics-message" role="status">Загружаю измерения…</div>
+<div id="analytics-content" hidden>
+<section class="analytics-card analytics-panel" data-panel="trend">
+<div class="analytics-toolbar">
+<span class="analytics-toolbar-label">Период</span>
+<select id="trend-period" aria-label="Период графика динамики" onchange="changeTrendPeriod()">
+<option value="7">7 дней</option><option value="14">14 дней</option><option value="30">30 дней</option>
+</select>
+</div>
+<div class="analytics-toolbar-label">Дни на графике</div>
+<div id="trend-days" class="analytics-days" aria-label="Выберите отображаемые дни"></div>
+<div class="analytics-note">Для читаемости сначала показаны последние 7 дат с измерениями; остальные можно включить выше.</div>
+<div id="trend-chart" class="chart-wrap"></div>
+<div id="trend-tooltip" class="chart-tooltip" role="status">Нажмите на точку, чтобы увидеть измерение.</div>
+<div id="trend-legend" class="analytics-legend"></div>
+<div class="analytics-note">Каждый отрезок соединяет измерения только внутри одного дня.</div>
+</section>
+<section class="analytics-card analytics-panel" data-panel="compare" hidden>
+<div class="analytics-toolbar">
+<span class="analytics-toolbar-label">День недели</span>
+<select id="compare-weekday" aria-label="День недели для сравнения" onchange="renderComparison()">
+<option value="all">Все дни</option><option value="1">Понедельник</option><option value="2">Вторник</option><option value="3">Среда</option><option value="4">Четверг</option><option value="5">Пятница</option><option value="6">Суббота</option><option value="0">Воскресенье</option>
+</select>
+</div>
+<div id="week-toggles" class="week-toggles"></div>
+<div id="compare-chart" class="chart-wrap"></div>
+<div id="compare-tooltip" class="chart-tooltip" role="status">Нажмите на точку, чтобы увидеть измерение.</div>
+<div id="compare-legend" class="analytics-legend"></div>
+<div class="analytics-note">Точки показаны по фактическому времени. Линии не соединяют разные дни недели.</div>
+</section>
+<section class="analytics-card analytics-panel" data-panel="distribution" hidden>
+<div class="analytics-toolbar">
+<span class="analytics-toolbar-label">Период</span>
+<select id="distribution-period" aria-label="Период графика распределения" onchange="renderDistribution()">
+<option value="7">7 дней</option><option value="14">14 дней</option><option value="30">30 дней</option>
+</select>
+</div>
+<div id="distribution-chart" class="chart-wrap"></div>
+<div id="distribution-tooltip" class="chart-tooltip" role="status">Нажмите на точку, чтобы увидеть измерение.</div>
+<div id="distribution-legend" class="analytics-legend"></div>
+<div class="analytics-note">Каждая точка — отдельное измерение; линии не проводятся.</div>
+</section>
 </div>
 </section>
 <section class="screen" id="screen-settings">
@@ -245,6 +321,8 @@ button{-webkit-tap-highlight-color:transparent}
 const tg=window.Telegram?.WebApp;
 if(tg){tg.ready();tg.expand();}
 const API_URL='https://telegram-daily-sum-bot.onrender.com/api/miniapp';
+const analyticsState={loaded:false,loading:false,measurements:[],chart:'trend',metric:'sugar',trendDays:7,selectedDates:null,visibleWeeks:[true,true,true]};
+const weekColors=['#5267e8','#ec9438','#31a66d'];
 const labels={
 today:{title:'Сегодня',subtitle:'Данные за текущий день',icon:'☀️',loading:'Собираю данные за сегодня…'},
 yesterday:{title:'Вчера',subtitle:'Данные за прошлый день',icon:'🌙',loading:'Загружаю данные за вчера…'},
@@ -258,6 +336,7 @@ document.querySelectorAll('.screen').forEach(screen=>screen.classList.toggle('ac
 document.querySelectorAll('.nav-button').forEach(button=>button.classList.toggle('active',button.dataset.screen===name));
 window.scrollTo({top:0,behavior:'smooth'});
 if(tg)tg.HapticFeedback?.selectionChanged();
+if(name==='graphs')loadAnalytics(true);
 }
 function applyTheme(theme){
 const dark=theme==='dark';
@@ -439,6 +518,263 @@ console.error('Ошибка загрузки суммы инсулина:',error
 if(/доступ|пользовател|разреш|initdata|telegram/i.test(error.message))setAccess(false,error.message);
 return false;
 }
+}
+function parseHistoryDate(value){
+const text=String(value||'').trim();
+let parts;
+if((parts=text.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/))){
+const date=new Date(Number(parts[3]),Number(parts[2])-1,Number(parts[1]));
+return date.getFullYear()===Number(parts[3])&&date.getMonth()===Number(parts[2])-1&&date.getDate()===Number(parts[1])?date:null;
+}
+if((parts=text.match(/^(\d{4})-(\d{2})-(\d{2})$/))){
+const date=new Date(Number(parts[1]),Number(parts[2])-1,Number(parts[3]));
+return date.getFullYear()===Number(parts[1])&&date.getMonth()===Number(parts[2])-1&&date.getDate()===Number(parts[3])?date:null;
+}
+return null;
+}
+function dateKey(date){
+return [date.getFullYear(),String(date.getMonth()+1).padStart(2,'0'),String(date.getDate()).padStart(2,'0')].join('-');
+}
+function parseHistoryTime(value){
+const match=String(value||'').trim().match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
+if(!match)return null;
+const hour=Number(match[1]),minute=Number(match[2]),second=Number(match[3]||0);
+if(hour>23||minute>59||second>59)return null;
+return {hour,minute,second,minutes:hour*60+minute+second/60,text:`${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}`};
+}
+function normalizeHistory(result){
+const source=Array.isArray(result)?result:result?.measurements;
+if(!Array.isArray(source))throw new Error('Сервер вернул историю в неизвестном формате.');
+return source.map(row=>{
+const date=parseHistoryDate(row.date),time=parseHistoryTime(row.time),value=Number(row.value);
+const type=String(row.type||'').toLowerCase();
+if(!date||Number.isNaN(date.getTime())||!time||!Number.isFinite(value)||!['sugar','insulin'].includes(type))return null;
+return {...row,dateObj:date,dateKey:dateKey(date),timeObj:time,value,type};
+}).filter(Boolean).sort((a,b)=>a.dateObj-b.dateObj||a.timeObj.minutes-b.timeObj.minutes);
+}
+async function loadAnalytics(force=false){
+if(analyticsState.loading||analyticsState.loaded&&!force)return;
+analyticsState.loading=true;
+const loading=document.getElementById('analytics-loading');
+const content=document.getElementById('analytics-content');
+loading.hidden=false;
+loading.textContent='Загружаю измерения…';
+content.hidden=true;
+try{
+const result=await api('history',{days:30});
+analyticsState.measurements=normalizeHistory(result);
+analyticsState.loaded=true;
+analyticsState.selectedDates=null;
+setAccess(true,'Сервер подтвердил доступ');
+loading.hidden=true;
+content.hidden=false;
+renderAnalytics();
+}catch(error){
+if(/доступ|пользовател|разреш|initdata|telegram/i.test(error.message))setAccess(false,error.message);
+loading.innerHTML=escapeHtml(error.message)+'<br><button class="analytics-retry" type="button" onclick="loadAnalytics(true)">Повторить</button>';
+loading.hidden=false;
+}finally{
+analyticsState.loading=false;
+}
+}
+function selectChart(name){
+analyticsState.chart=name;
+document.querySelectorAll('.analytics-tab').forEach(button=>{
+const active=button.dataset.chart===name;
+button.classList.toggle('active',active);
+button.setAttribute('aria-selected',String(active));
+});
+document.querySelectorAll('.analytics-panel').forEach(panel=>panel.hidden=panel.dataset.panel!==name);
+renderAnalytics();
+}
+function selectMetric(metric){
+analyticsState.metric=metric;
+analyticsState.selectedDates=null;
+document.querySelectorAll('[data-metric]').forEach(button=>button.classList.toggle('active',button.dataset.metric===metric));
+renderAnalytics();
+}
+function renderAnalytics(){
+if(!analyticsState.loaded)return;
+if(analyticsState.chart==='trend')renderTrend();
+else if(analyticsState.chart==='compare')renderComparison();
+else renderDistribution();
+}
+function metricMeasurements(){
+return analyticsState.measurements.filter(row=>row.type===analyticsState.metric);
+}
+function periodMeasurements(days){
+const end=new Date();end.setHours(23,59,59,999);
+const start=new Date();start.setHours(0,0,0,0);start.setDate(start.getDate()-days+1);
+return metricMeasurements().filter(row=>row.dateObj>=start&&row.dateObj<=end);
+}
+function formatShortDate(key){
+const [year,month,day]=key.split('-');
+return `${day}.${month}`;
+}
+function formatFullDate(key){
+const [year,month,day]=key.split('-');
+return `${day}.${month}.${year}`;
+}
+function renderTrendDays(rows){
+const host=document.getElementById('trend-days');
+const dates=[...new Set(rows.map(row=>row.dateKey))].sort().reverse();
+if(!analyticsState.selectedDates){
+analyticsState.selectedDates=new Set(dates.slice(0,7));
+}else{
+analyticsState.selectedDates=new Set([...analyticsState.selectedDates].filter(key=>dates.includes(key)));
+}
+host.innerHTML='';
+dates.forEach((key,index)=>{
+const id='trend-day-'+key;
+const label=document.createElement('label');
+label.className='analytics-day';
+const input=document.createElement('input');
+input.type='checkbox';input.id=id;input.checked=analyticsState.selectedDates.has(key);
+input.addEventListener('change',()=>{
+if(input.checked)analyticsState.selectedDates.add(key);else analyticsState.selectedDates.delete(key);
+renderTrend();
+});
+const swatch=document.createElement('span');
+swatch.className='analytics-swatch';swatch.style.backgroundColor=dayColor(key,dates);
+const text=document.createElement('span');text.textContent=formatShortDate(key);
+label.append(input,swatch,text);host.appendChild(label);
+});
+return dates;
+}
+function dayColor(key,dates){
+const index=Math.max(0,dates.indexOf(key));
+return `hsl(${(index*137.508+212)%360} 67% 52%)`;
+}
+function renderTrend(){
+const rows=periodMeasurements(analyticsState.trendDays);
+const dates=renderTrendDays(rows);
+const visible=rows.filter(row=>analyticsState.selectedDates.has(row.dateKey));
+const groups=dates.filter(key=>analyticsState.selectedDates.has(key)).map(key=>({
+label:formatShortDate(key),color:dayColor(key,dates),points:visible.filter(row=>row.dateKey===key)
+}));
+renderTimeChart('trend-chart',groups,{metric:analyticsState.metric,tooltipId:'trend-tooltip',emptyText:'За этот период нет измерений.'});
+renderLegend('trend-legend',groups);
+}
+function changeTrendPeriod(){
+analyticsState.trendDays=Number(document.getElementById('trend-period').value);
+analyticsState.selectedDates=null;
+renderTrend();
+}
+function mondayOf(date){
+const monday=new Date(date.getFullYear(),date.getMonth(),date.getDate());
+monday.setDate(monday.getDate()-(monday.getDay()+6)%7);
+return monday;
+}
+function addCalendarDays(date,days){
+const result=new Date(date.getFullYear(),date.getMonth(),date.getDate());
+result.setDate(result.getDate()+days);
+return result;
+}
+function isoWeekNumber(date){
+const thursday=new Date(Date.UTC(date.getFullYear(),date.getMonth(),date.getDate()));
+thursday.setUTCDate(thursday.getUTCDate()+4-(thursday.getUTCDay()||7));
+const yearStart=new Date(Date.UTC(thursday.getUTCFullYear(),0,1));
+return Math.ceil(((thursday-yearStart)/86400000+1)/7);
+}
+function formatWeekRange(start){
+const end=addCalendarDays(start,6);
+return `${formatShortDate(dateKey(start))}–${formatShortDate(dateKey(end))}`;
+}
+function renderWeekToggles(starts){
+const host=document.getElementById('week-toggles');
+host.innerHTML='';
+starts.forEach((start,index)=>{
+const label=document.createElement('label');label.className='week-toggle';
+const input=document.createElement('input');input.type='checkbox';input.checked=analyticsState.visibleWeeks[index];
+input.addEventListener('change',()=>{analyticsState.visibleWeeks[index]=input.checked;renderComparison();});
+const color=document.createElement('span');color.className='analytics-swatch';color.style.backgroundColor=weekColors[index];
+const title=document.createElement('span');title.textContent=`${['Текущая','Прошлая','2 недели назад'][index]} · ${formatWeekRange(start)}`;
+label.append(input,color,title);host.appendChild(label);
+});
+}
+function renderComparison(){
+const today=new Date(),monday=mondayOf(today),starts=[monday,addCalendarDays(monday,-7),addCalendarDays(monday,-14)];
+renderWeekToggles(starts);
+const selected=document.getElementById('compare-weekday').value;
+const rows=metricMeasurements();
+const groups=[];
+starts.forEach((start,weekIndex)=>{
+if(!analyticsState.visibleWeeks[weekIndex])return;
+for(let dayOffset=0;dayOffset<7;dayOffset++){
+const date=addCalendarDays(start,dayOffset);
+if(selected!=='all'&&date.getDay()!==Number(selected))continue;
+const key=dateKey(date);
+const points=rows.filter(row=>row.dateKey===key);
+if(points.length)groups.push({label:`${['Текущая','Прошлая','2 недели назад'][weekIndex]}, ${weekdayNames[date.getDay()]}`,color:weekColors[weekIndex],points,weekIndex,dateKey:key});
+}
+});
+renderTimeChart('compare-chart',groups,{metric:analyticsState.metric,tooltipId:'compare-tooltip',emptyText:'В выбранных неделях пока нет измерений.',weekLabels:true});
+renderLegend('compare-legend',starts.map((start,index)=>({label:`${['Текущая неделя','Предыдущая неделя','2 недели назад'][index]} · ${formatWeekRange(start)}`,color:weekColors[index]})));
+}
+const weekdayNames=['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
+function renderDistribution(){
+const days=Number(document.getElementById('distribution-period').value);
+const rows=periodMeasurements(days);
+const dates=[...new Set(rows.map(row=>row.dateKey))].sort();
+const groups=dates.map(key=>({label:formatShortDate(key),color:dayColor(key,dates),points:rows.filter(row=>row.dateKey===key)}));
+renderTimeChart('distribution-chart',groups,{metric:analyticsState.metric,tooltipId:'distribution-tooltip',connect:false,emptyText:'За этот период нет измерений.'});
+renderLegend('distribution-legend',groups);
+}
+function renderLegend(id,items){
+const host=document.getElementById(id);
+host.innerHTML='';
+items.forEach(item=>{
+const label=document.createElement('span');label.className='analytics-legend-item';
+const color=document.createElement('span');color.className='analytics-swatch';color.style.backgroundColor=item.color;
+const text=document.createElement('span');text.textContent=item.label;
+label.append(color,text);host.appendChild(label);
+});
+}
+function renderTimeChart(id,groups,{metric,tooltipId,connect=true,emptyText,weekLabels=false}){
+const host=document.getElementById(id),all=groups.flatMap(group=>group.points);
+const tooltip=document.getElementById(tooltipId);
+tooltip.textContent='Нажмите на точку, чтобы увидеть измерение.';
+if(!all.length){host.innerHTML=`<div class="analytics-message">${escapeHtml(emptyText)}</div>`;return;}
+const width=Math.max(240,Math.floor(host.clientWidth||320)),height=250;
+const margin={left:49,right:8,top:12,bottom:34},plotW=width-margin.left-margin.right,plotH=height-margin.top-margin.bottom;
+let low=Math.min(...all.map(row=>row.value)),high=Math.max(...all.map(row=>row.value));
+if(low===high){const pad=Math.max(Math.abs(low)*.08,metric==='sugar'?.5:.5);low-=pad;high+=pad;}
+else{const pad=(high-low)*.1;low-=pad;high+=pad;}
+const rawStep=(high-low)/4,power=10**Math.floor(Math.log10(rawStep||1)),fraction=rawStep/power;
+const step=(fraction<=1?1:fraction<=2?2:fraction<=5?5:10)*power;
+const yMin=Math.floor(low/step)*step,yMax=Math.ceil(high/step)*step||yMin+step;
+const x=value=>margin.left+(value/1440)*plotW;
+const y=value=>margin.top+plotH-((value-yMin)/(yMax-yMin))*plotH;
+let svg=`<svg class="chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="${metric==='sugar'?'График сахара':'График инсулина'} по времени суток">`;
+for(let value=yMin;value<=yMax+step*.01;value+=step){
+const py=y(value);svg+=`<line class="chart-grid" x1="${margin.left}" y1="${py}" x2="${width-margin.right}" y2="${py}"/><text x="${margin.left-6}" y="${py+3}" text-anchor="end">${formatAxisValue(value)}</text>`;
+}
+for(const hour of [0,6,12,18,24]){
+const px=x(hour*60);svg+=`<line class="chart-grid" x1="${px}" y1="${margin.top}" x2="${px}" y2="${margin.top+plotH}"/><text x="${px}" y="${height-17}" text-anchor="middle">${String(hour).padStart(2,'0')}:00</text>`;
+}
+svg+=`<line class="chart-axis" x1="${margin.left}" y1="${margin.top+plotH}" x2="${width-margin.right}" y2="${margin.top+plotH}"/><text x="${width/2}" y="${height-2}" text-anchor="middle">Время суток</text><text x="10" y="${margin.top+plotH/2}" text-anchor="middle" transform="rotate(-90 10 ${margin.top+plotH/2})">${metric==='sugar'?'Сахар, ммоль/л':'Инсулин, ед.'}</text>`;
+groups.forEach(group=>{
+const points=[...group.points].sort((a,b)=>a.timeObj.minutes-b.timeObj.minutes);
+if(connect&&points.length>1){
+const path=points.map((point,index)=>`${index?'L':'M'}${x(point.timeObj.minutes).toFixed(2)},${y(point.value).toFixed(2)}`).join(' ');
+svg+=`<path d="${path}" fill="none" stroke="${group.color}" stroke-width="${weekLabels?1.35:1.7}" stroke-opacity="${weekLabels?.48:.72}" stroke-linecap="round" stroke-linejoin="round"/>`;
+}
+points.forEach(point=>{
+const week=weekLabels?` · Неделя ${group.weekIndex+1} (№ ${isoWeekNumber(point.dateObj)})`:'';
+const label=`${formatFullDate(point.dateKey)} ${point.timeObj.text} · ${formatAxisValue(point.value)}${metric==='sugar'?' ммоль/л':' ед.'}${week}`;
+svg+=`<circle class="chart-point" cx="${x(point.timeObj.minutes).toFixed(2)}" cy="${y(point.value).toFixed(2)}" r="${weekLabels?3.2:4}" fill="${group.color}" tabindex="0" role="button" aria-label="${escapeHtml(label)}"><title>${escapeHtml(label)}</title></circle>`;
+});
+});
+svg+='</svg>';
+host.innerHTML=svg;
+host.querySelectorAll('.chart-point').forEach((point,index)=>{
+const activate=()=>{tooltip.textContent=point.getAttribute('aria-label');};
+point.addEventListener('click',activate);
+point.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();activate();}});
+});
+}
+function formatAxisValue(value){
+return analyticsState.metric==='sugar'?Number(value).toFixed(1):Number(value).toFixed(Number.isInteger(value)?0:1);
 }
 initUser();
 loadSugarAverage();
