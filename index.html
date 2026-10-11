@@ -220,11 +220,11 @@ button{-webkit-tap-highlight-color:transparent}
 <div class="page-heading">Графики</div>
 <div class="page-description">История показателей и динамика</div>
 <div class="analytics-switches" role="tablist" aria-label="Тип графика">
-<button class="analytics-tab active" type="button" role="tab" aria-selected="true" data-chart="trend" onclick="selectChart('trend')">Динамика</button>
-<button class="analytics-tab" type="button" role="tab" aria-selected="false" data-chart="compare" onclick="selectChart('compare')">Три недели</button>
-<button class="analytics-tab" type="button" role="tab" aria-selected="false" data-chart="distribution" onclick="selectChart('distribution')">Распределение</button>
-<button class="analytics-tab" type="button" role="tab" aria-selected="false" data-chart="daily" onclick="selectChart('daily')">Сводка по дням</button>
-<button class="analytics-tab" type="button" role="tab" aria-selected="false" data-chart="activity" onclick="selectChart('activity')">Активность</button>
+<button class="analytics-tab active" type="button" role="tab" aria-label="Динамика по дням" title="Динамика по дням" aria-selected="true" data-chart="trend" onclick="selectChart('trend')">Дни</button>
+<button class="analytics-tab" type="button" role="tab" aria-label="Сравнение трёх недель" title="Сравнение трёх недель" aria-selected="false" data-chart="compare" onclick="selectChart('compare')">3 нед.</button>
+<button class="analytics-tab" type="button" role="tab" aria-label="Распределение измерений" title="Распределение измерений" aria-selected="false" data-chart="distribution" onclick="selectChart('distribution')">Точки</button>
+<button class="analytics-tab" type="button" role="tab" aria-label="Суточная сводка" title="Суточная сводка" aria-selected="false" data-chart="daily" onclick="selectChart('daily')">Сводка</button>
+<button class="analytics-tab" type="button" role="tab" aria-label="Активность по времени" title="Активность по времени" aria-selected="false" data-chart="activity" onclick="selectChart('activity')">Часы</button>
 </div>
 <div class="metric-switch" role="group" aria-label="Показатель">
 <button class="analytics-choice active" type="button" data-metric="sugar" onclick="selectMetric('sugar')">Сахар</button>
