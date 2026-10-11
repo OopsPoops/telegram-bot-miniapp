@@ -285,7 +285,9 @@ function showModal(title,subtitle,icon,content){
 document.getElementById('modalTitle').textContent=title;
 document.getElementById('modalSubtitle').textContent=subtitle;
 document.getElementById('modalIcon').textContent=icon;
-document.getElementById('modalContent').innerHTML=content;
+const modalContent=document.getElementById('modalContent');
+modalContent.hidden=false;
+modalContent.innerHTML=content;
 document.getElementById('modalLink').innerHTML='';
 document.getElementById('modalBackdrop').classList.add('visible');
 }
@@ -319,7 +321,7 @@ try{
 const result=await api(action);
 setAccess(true,'Сервер подтвердил доступ');
 if(action==='excel'&&result){
-document.getElementById('modalContent').textContent='Ссылка на таблицу готова.';
+document.getElementById('modalContent').hidden=true;
 const link=document.createElement('a');
 link.href=result;
 link.target='_blank';
