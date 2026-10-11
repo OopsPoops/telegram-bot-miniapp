@@ -372,16 +372,14 @@ if(/доступ|пользовател|разреш|initdata|telegram/i.test(er
 }
 }
 async function loadInsulinTotal() {
-try {
-const data = await api('insulin_total');
-if (data.ok) {
-document.getElementById('insulinTotal').textContent = data.result;
+  try {
+    const result = await api('insulin_total');
+    document.getElementById('insulinTotal').innerHTML = escapeHtml(String(result)) + ' <small>ед.</small>';
+    setAccess(true, 'Сервер подтвердил доступ');
+  } catch (error) {
+    console.error('Ошибка загрузки суммы инсулина:', error);
+  }
 }
-} catch (error) {
-console.error('Ошибка загрузки суммы инсулина:', error);
-}
-}
-initUser();
 loadSugarAverage();
 loadInsulinTotal();
 </script>
