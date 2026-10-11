@@ -149,6 +149,20 @@ button{-webkit-tap-highlight-color:transparent}
 </div>
 <div class="toast" id="insulinToast"></div>
 </section>
+<section class="metric insulin night">
+<div class="metric-head">
+<div class="metric-icon">🌙</div>
+<div>
+<div class="metric-name">Ночной</div>
+<div class="metric-description">Факт за сегодня</div>
+</div>
+</div>
+<div class="input-row">
+<input class="value-input" id="nightInput" type="text" inputmode="decimal" placeholder="Например, 11" aria-label="Новое ночное значение">
+<button class="save-button" onclick="saveValue('fact')">Сохранить</button>
+</div>
+<div class="toast" id="nightToast"></div>
+</section>
 <div class="quick-title">
 <div class="section-title">Быстрый доступ</div>
 <span></span>
@@ -339,8 +353,8 @@ if(/доступ|пользовател|разреш|initdata|telegram/i.test(er
 }
 }
 async function saveValue(type){
-const input=document.getElementById(type==='sugar'?'sugarInput':'insulinInput');
-const toast=document.getElementById(type==='sugar'?'sugarToast':'insulinToast');
+const input=document.getElementById(type==='sugar'?'sugarInput':type==='fact'?'nightInput':'insulinInput');
+const toast=document.getElementById(type==='sugar'?'sugarToast':type==='fact'?'nightToast':'insulinToast');
 const button=input.parentElement.querySelector('button');
 const value=input.value.trim();
 if(!value){
