@@ -113,7 +113,7 @@ button{-webkit-tap-highlight-color:transparent}
 .metric-switch{display:flex;gap:7px;margin-bottom:10px}
 .metric-switch .analytics-choice{flex:1}
 .heatmap-scroll{overflow-x:auto;padding-bottom:5px}
-.heatmap-grid{display:grid;grid-template-columns:30px repeat(24,minmax(11px,1fr));gap:3px;align-items:center;min-width:390px;margin-bottom:4px}
+.heatmap-grid{display:grid;gap:3px;align-items:center;min-width:100%;margin-bottom:4px}
 .heatmap-corner,.heatmap-hour{height:15px;text-align:center;color:var(--muted);font-size:9px}
 .heatmap-day{font-size:10px;color:var(--muted)}
 .heatmap-cell{height:23px;min-width:0;padding:0;border:1px solid rgba(125,135,170,.12);border-radius:5px;cursor:pointer}
@@ -818,19 +818,25 @@ rows.forEach(row=>counts[row.dateObj.getDay()][row.timeObj.hour]++);
 const max=Math.max(0,...counts.flat());
 tooltip.textContent='Нажмите на ячейку, чтобы увидеть число измерений.';
 if(!max){host.innerHTML='<div class="analytics-message">За этот период нет измерений.</div>';return;}
+const timeWindow=timeAxisWindow(rows);
+const startHour=Math.floor(timeWindow.start/60);
+const endHour=Math.ceil((timeWindow.start+timeWindow.duration)/60);
+const hours=Array.from({length:endHour-startHour},(_,index)=>(startHour+index)%24);
+const hourLabelStep=hours.length<=8?1:hours.length<=14?2:3;
 const labels=['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
-let html='<div class="heatmap-scroll"><div class="heatmap-grid" role="grid" aria-label="Количество измерений по дню недели и часу"><span class="heatmap-corner"></span>';
-for(let hour=0;hour<24;hour++)html+=`<span class="heatmap-hour">${hour%3===0?String(hour).padStart(2,'0'):''}</span>`;
+const gridColumns=`30px repeat(${hours.length},minmax(11px,1fr))`;
+let html=`<div class="heatmap-scroll"><div class="heatmap-grid" style="grid-template-columns:${gridColumns}" role="grid" aria-label="Количество измерений по дню недели и часу"><span class="heatmap-corner"></span>`;
+hours.forEach((hour,index)=>html+=`<span class="heatmap-hour">${index%hourLabelStep===0?String(hour).padStart(2,'0'):''}</span>`);
 html+='</div>';
 for(let day=0;day<7;day++){
-html+='<div class="heatmap-grid"><span class="heatmap-day">'+labels[day]+'</span>';
-for(let hour=0;hour<24;hour++){
+html+=`<div class="heatmap-grid" style="grid-template-columns:${gridColumns}"><span class="heatmap-day">${labels[day]}</span>`;
+hours.forEach(hour=>{
 const count=counts[day][hour],intensity=count?Math.max(.12,count/max):0;
 const background=count?`rgba(82,103,232,${.12+intensity*.78})`:'var(--input-bg)';
 const color=count&&intensity>.55?'#fff':'var(--text)';
-const label=`${weekdayNames[day]}, ${String(hour).padStart(2,'0')}:00–${String(hour+1).padStart(2,'0')}:00 · ${count} ${measurementWord(count)}`;
+const label=`${weekdayNames[day]}, ${String(hour).padStart(2,'0')}:00–${String((hour+1)%24).padStart(2,'0')}:00 · ${count} ${measurementWord(count)}`;
 html+=`<button class="heatmap-cell" type="button" role="gridcell" style="background:${background};color:${color}" aria-label="${escapeHtml(label)}" title="${escapeHtml(label)}" data-count="${count}"></button>`;
-}
+});
 html+='</div>';
 }
 html+='</div>';
@@ -842,6 +848,25 @@ const mod10=count%10,mod100=count%100;
 if(mod10===1&&mod100!==11)return 'измерение';
 if(mod10>=2&&mod10<=4&&(mod100<12||mod100>14))return 'измерения';
 return 'измерений';
+}
+function timeAxisWindow(points){
+const minutes=[...new Set(points.map(row=>row.timeObj.minutes))].sort((a,b)=>a-b);
+if(!minutes.length)return {start:0,duration:1440};
+let largestGap=-1,gapIndex=0;
+for(let index=0;index<minutes.length;index++){
+const next=index===minutes.length-1?minutes[0]+1440:minutes[index+1];
+const gap=next-minutes[index];
+if(gap>largestGap){largestGap=gap;gapIndex=index;}
+}
+let start=minutes[(gapIndex+1)%minutes.length]-60;
+let end=minutes[gapIndex]+60;
+if(end<=start)end+=1440;
+if(end-start>=1440)return {start:0,duration:1440};
+return {start:((start%1440)+1440)%1440,duration:end-start};
+}
+function formatClockMinute(value){
+const minute=((Math.round(value)%1440)+1440)%1440;
+return `${String(Math.floor(minute/60)).padStart(2,'0')}:${String(minute%60).padStart(2,'0')}`;
 }
 function renderLegend(id,items){
 const host=document.getElementById(id);
@@ -860,27 +885,49 @@ tooltip.textContent='Нажмите на точку, чтобы увидеть �
 if(!all.length){host.innerHTML=`<div class="analytics-message">${escapeHtml(emptyText)}</div>`;return;}
 const width=Math.max(240,Math.floor(host.clientWidth||320)),height=250;
 const margin={left:49,right:8,top:12,bottom:34},plotW=width-margin.left-margin.right,plotH=height-margin.top-margin.bottom;
+const timeWindow=timeAxisWindow(all);
 let low=Math.min(...all.map(row=>row.value)),high=Math.max(...all.map(row=>row.value));
 if(low===high){const pad=Math.max(Math.abs(low)*.08,metric==='sugar'?.5:.5);low-=pad;high+=pad;}
 else{const pad=(high-low)*.1;low-=pad;high+=pad;}
 const rawStep=(high-low)/4,power=10**Math.floor(Math.log10(rawStep||1)),fraction=rawStep/power;
 const step=(fraction<=1?1:fraction<=2?2:fraction<=5?5:10)*power;
 const yMin=Math.floor(low/step)*step,yMax=Math.ceil(high/step)*step||yMin+step;
-const x=value=>margin.left+(value/1440)*plotW;
+const timeOffset=value=>(((value-timeWindow.start)%1440)+1440)%1440;
+const x=value=>margin.left+(timeOffset(value)/timeWindow.duration)*plotW;
 const y=value=>margin.top+plotH-((value-yMin)/(yMax-yMin))*plotH;
 let svg=`<svg class="chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="${metric==='sugar'?'График сахара':'График инсулина'} по времени суток">`;
 for(let value=yMin;value<=yMax+step*.01;value+=step){
 const py=y(value);svg+=`<line class="chart-grid" x1="${margin.left}" y1="${py}" x2="${width-margin.right}" y2="${py}"/><text x="${margin.left-6}" y="${py+3}" text-anchor="end">${formatAxisValue(value)}</text>`;
 }
-for(const hour of [0,6,12,18,24]){
-const px=x(hour*60);svg+=`<line class="chart-grid" x1="${px}" y1="${margin.top}" x2="${px}" y2="${margin.top+plotH}"/><text x="${px}" y="${height-17}" text-anchor="middle">${String(hour).padStart(2,'0')}:00</text>`;
-}
+const firstHour=Math.ceil(timeWindow.start/60)*60,lastMinute=timeWindow.start+timeWindow.duration;
+const tickStep=timeWindow.duration<=6*60?60:timeWindow.duration<=12*60?120:240;
+const ticks=[timeWindow.start];
+for(let minute=Math.ceil(firstHour/tickStep)*tickStep;minute<lastMinute;minute+=tickStep)ticks.push(minute);
+ticks.push(lastMinute);
+ticks.forEach((minute,index)=>{
+const position=index===0?margin.left+1:index===ticks.length-1?width-margin.right-1:x(minute%1440);
+const anchor=index===0?'start':index===ticks.length-1?'end':'middle';
+const label=formatClockMinute(minute);
+svg+=`<line class="chart-grid" x1="${position}" y1="${margin.top}" x2="${position}" y2="${margin.top+plotH}"/><text x="${position}" y="${height-17}" text-anchor="${anchor}">${label}</text>`;
+});
 svg+=`<line class="chart-axis" x1="${margin.left}" y1="${margin.top+plotH}" x2="${width-margin.right}" y2="${margin.top+plotH}"/><text x="${width/2}" y="${height-2}" text-anchor="middle">Время суток</text><text x="10" y="${margin.top+plotH/2}" text-anchor="middle" transform="rotate(-90 10 ${margin.top+plotH/2})">${metric==='sugar'?'Сахар, ммоль/л':'Инсулин, ед.'}</text>`;
 groups.forEach(group=>{
 const points=[...group.points].sort((a,b)=>a.timeObj.minutes-b.timeObj.minutes);
 if(connect&&points.length>1){
-const path=points.map((point,index)=>`${index?'L':'M'}${x(point.timeObj.minutes).toFixed(2)},${y(point.value).toFixed(2)}`).join(' ');
+let segment=[];
+const drawSegment=()=>{
+if(segment.length>1){
+const path=segment.map((point,index)=>`${index?'L':'M'}${x(point.timeObj.minutes).toFixed(2)},${y(point.value).toFixed(2)}`).join(' ');
 svg+=`<path d="${path}" fill="none" stroke="${group.color}" stroke-width="${weekLabels?1.35:1.7}" stroke-opacity="${weekLabels?.48:.72}" stroke-linecap="round" stroke-linejoin="round"/>`;
+}
+};
+points.forEach(point=>{
+if(segment.length&&timeOffset(point.timeObj.minutes)<timeOffset(segment[segment.length-1].timeObj.minutes)){
+drawSegment();segment=[];
+}
+segment.push(point);
+});
+drawSegment();
 }
 points.forEach(point=>{
 const week=weekLabels?` · Неделя ${group.weekIndex+1} (№ ${isoWeekNumber(point.dateObj)})`:'';
