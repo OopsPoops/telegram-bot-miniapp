@@ -138,24 +138,12 @@ button{-webkit-tap-highlight-color:transparent}
 <span>Выбери раздел</span>
 </div>
 <section class="quick-grid">
-<button class="quick-button" onclick="openAction('today')">
-<span class="quick-icon blue">☀️</span><span><div class="quick-label">Сегодня</div><div class="quick-hint">За текущий день</div></span><span class="arrow">›</span>
-</button>
-<button class="quick-button" onclick="openAction('yesterday')">
-<span class="quick-icon orange">🌙</span><span><div class="quick-label">Вчера</div><div class="quick-hint">За прошлый день</div></span><span class="arrow">›</span>
-</button>
-<button class="quick-button" onclick="openAction('week')">
-<span class="quick-icon purple">📊</span><span><div class="quick-label">Среднее за неделю</div><div class="quick-hint">Средние показатели за неделю</div></span><span class="arrow">›</span>
-</button>
-<button class="quick-button" onclick="openAction('month')">
-<span class="quick-icon green">🗓️</span><span><div class="quick-label">Среднее за месяц</div><div class="quick-hint">Средние показатели за месяц</div></span><span class="arrow">›</span>
-</button>
-<button class="quick-button" onclick="openAction('excel')">
-<span class="quick-icon yellow">📗</span><span><div class="quick-label">Excel</div><div class="quick-hint">Открыть таблицу</div></span><span class="arrow">›</span>
-</button>
-<button class="quick-button" onclick="openAction('memory')">
-<span class="quick-icon gray">⚙️</span><span><div class="quick-label">Память</div><div class="quick-hint">Состояние бота</div></span><span class="arrow">›</span>
-</button>
+<button class="quick-button" onclick="openAction('today')"><span class="quick-icon blue">☀️</span><span><div class="quick-label">Сегодня</div><div class="quick-hint">За текущий день</div></span><span class="arrow">›</span></button>
+<button class="quick-button" onclick="openAction('yesterday')"><span class="quick-icon orange">🌙</span><span><div class="quick-label">Вчера</div><div class="quick-hint">За прошлый день</div></span><span class="arrow">›</span></button>
+<button class="quick-button" onclick="openAction('week')"><span class="quick-icon purple">📊</span><span><div class="quick-label">Среднее за неделю</div><div class="quick-hint">Средние показатели за неделю</div></span><span class="arrow">›</span></button>
+<button class="quick-button" onclick="openAction('month')"><span class="quick-icon green">🗓️</span><span><div class="quick-label">Среднее за месяц</div><div class="quick-hint">Средние показатели за месяц</div></span><span class="arrow">›</span></button>
+<button class="quick-button" onclick="openAction('excel')"><span class="quick-icon yellow">📗</span><span><div class="quick-label">Excel</div><div class="quick-hint">Открыть таблицу</div></span><span class="arrow">›</span></button>
+<button class="quick-button" onclick="openAction('memory')"><span class="quick-icon gray">⚙️</span><span><div class="quick-label">Память</div><div class="quick-hint">Состояние бота</div></span><span class="arrow">›</span></button>
 </section>
 </section>
 <section class="screen" id="screen-graphs">
@@ -211,14 +199,9 @@ button{-webkit-tap-highlight-color:transparent}
 <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
 <div class="modal-top">
 <div class="modal-icon" id="modalIcon">📊</div>
-<div>
-<div class="modal-title" id="modalTitle">Загрузка</div>
-<div class="modal-subtitle" id="modalSubtitle">Сёма получает данные</div>
+<div><div class="modal-title" id="modalTitle">Загрузка</div><div class="modal-subtitle" id="modalSubtitle">Сёма получает данные</div></div>
 </div>
-</div>
-<div class="modal-content" id="modalContent">
-<div class="loader-wrap"><div class="spinner"></div><div>Загружаю данные…</div></div>
-</div>
+<div class="modal-content" id="modalContent"><div class="loader-wrap"><div class="spinner"></div><div>Загружаю данные…</div></div></div>
 <div id="modalLink"></div>
 <button class="modal-close" onclick="closeModal()" aria-label="Закрыть">×</button>
 </section>
@@ -261,16 +244,6 @@ let theme='light';
 try{theme=localStorage.getItem('sema-theme')||'light'}catch(e){}
 applyTheme(theme);
 })();
-function initUser(){
-const user=tg?.initDataUnsafe?.user;
-const name=user?[user.first_name,user.last_name].filter(Boolean).join(' '):'Не удалось получить имя';
-document.getElementById('userName').textContent=name;
-if(!tg||!tg.initData){
-setAccess(false,'Открой Mini App через Telegram');
-return;
-}
-setAccess(null,'Проверяется при обращении к серверу');
-}
 function setAccess(allowed,message){
 const status=document.getElementById('accessStatus');
 const text=document.getElementById('accessText');
@@ -286,6 +259,12 @@ description.textContent=message||'Проверь настройки доступ
 text.textContent='Ожидает проверки';
 description.textContent=message||'Статус будет уточнён сервером';
 }
+}
+function initUser(){
+const user=tg?.initDataUnsafe?.user;
+document.getElementById('userName').textContent=user?[user.first_name,user.last_name].filter(Boolean).join(' '):'Не удалось получить имя';
+if(!tg||!tg.initData)setAccess(false,'Открой Mini App через Telegram');
+else setAccess(null,'Статус проверяется при обращении к серверу');
 }
 function showModal(title,subtitle,icon,content){
 document.getElementById('modalTitle').textContent=title;
@@ -338,9 +317,7 @@ document.getElementById('modalContent').textContent=String(result||'Нет да�
 }
 }catch(error){
 document.getElementById('modalContent').textContent=error.message;
-if(/доступ|пользовател|разреш|initdata|telegram/i.test(error.message)){
-setAccess(false,error.message);
-}
+if(/доступ|пользовател|разреш|initdata|telegram/i.test(error.message))setAccess(false,error.message);
 }
 }
 async function saveValue(type){
@@ -370,6 +347,7 @@ input.value='';
 setAccess(true,'Сервер подтвердил доступ');
 if(tg)tg.HapticFeedback?.notificationOccurred('success');
 if(type==='sugar')loadSugarAverage();
+if(type==='insulin')loadInsulinTotal();
 }catch(error){
 toast.textContent='Не удалось сохранить: '+error.message;
 if(/доступ|пользовател|разреш|initdata|telegram/i.test(error.message))setAccess(false,error.message);
@@ -389,8 +367,17 @@ document.getElementById('sugarAverage').innerHTML='— <small>ммоль/л</sma
 if(/доступ|пользовател|разреш|initdata|telegram/i.test(error.message))setAccess(false,error.message);
 }
 }
+async function loadInsulinTotal(){
+try{
+const result=await api('today');
+const text=String(result||'');
+const match=text.match(/(?:инсулин|insulin)[^\d]{0,30}(\d+(?:[.,]\d+)?)/i);
+if(match)document.getElementById('insulinTotal').innerHTML=escapeHtml(match[1])+' <small>ед.</small>';
+}catch(error){}
+}
 initUser();
 loadSugarAverage();
+loadInsulinTotal();
 </script>
 </body>
 </html>
