@@ -3,22 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#f7f8fc">
+<meta name="theme-color" content="#f5f6fb" id="themeColor">
 <title>Сёма — учёт показателей</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-:root{--bg:#f5f6fb;--card:#fff;--text:#20243a;--muted:#81869a;--blue:#5267e8;--pink:#ed6f9b;--teal:#20a99b;--line:#edf0f6;--shadow:0 8px 24px rgba(36,47,92,.07)}
+:root{color-scheme:light;--bg:#f5f6fb;--card:#fff;--text:#20243a;--muted:#81869a;--blue:#5267e8;--pink:#ed6f9b;--teal:#20a99b;--line:#edf0f6;--input-bg:#f7f8fc;--input-text:#20243a;--shadow:0 8px 24px rgba(36,47,92,.07);--modal-bg:#fff;--modal-content:#f7f8fc;--close-bg:#edf0f5;--close-text:#51566a;--icon-bg:#e9edff}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#11131b;--card:#1c202c;--text:#f1f3fa;--muted:#a0a6bb;--blue:#8998ff;--pink:#ed7fa5;--teal:#40cbbb;--line:#3a4051;--input-bg:#292e3d;--input-text:#fff;--shadow:0 8px 24px rgba(0,0,0,.16);--modal-bg:#1c202c;--modal-content:#292e3d;--close-bg:#343a4a;--close-text:#f1f3fa;--icon-bg:#292f4a}
 *{box-sizing:border-box}
-body{margin:0;padding:0;background:var(--tg-theme-bg-color,var(--bg));color:var(--tg-theme-text-color,var(--text));font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;transition:background .2s,color .2s}
 button,input{font:inherit}
 .app{max-width:520px;margin:0 auto;padding:22px 18px calc(30px + env(safe-area-inset-bottom))}
 .topline{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
 .brand{font-size:25px;font-weight:800;letter-spacing:-.8px}
 .brand span{color:var(--blue)}
 .subtitle{color:var(--muted);font-size:13px;margin-top:4px}
-.top-icon{width:44px;height:44px;border-radius:15px;background:#e9edff;display:grid;place-items:center;font-size:23px}
+.theme-toggle{width:44px;height:44px;border:1px solid var(--line);border-radius:15px;background:var(--card);color:var(--text);display:grid;place-items:center;font-size:22px;cursor:pointer;box-shadow:var(--shadow)}
 .section-title{font-size:17px;font-weight:750;margin:23px 2px 12px}
-.metric{background:var(--card);border-radius:23px;padding:17px;margin-bottom:13px;box-shadow:var(--shadow);border:1px solid rgba(125,135,170,.07)}
+.metric{background:var(--card);border-radius:23px;padding:17px;margin-bottom:13px;box-shadow:var(--shadow);border:1px solid rgba(125,135,170,.12)}
 .metric-head{display:flex;align-items:center;gap:12px;margin-bottom:16px}
 .metric-icon{width:43px;height:43px;flex-shrink:0;border-radius:15px;display:grid;place-items:center;font-size:22px}
 .sugar .metric-icon{background:#fff0f5}
@@ -28,35 +29,45 @@ button,input{font:inherit}
 .metric-value{font-size:28px;font-weight:800;letter-spacing:-.7px;margin-left:auto;text-align:right}
 .metric-value small{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:0}
 .input-row{display:flex;gap:9px}
-.value-input{min-width:0;flex:1;border:1px solid var(--line);border-radius:13px;background:var(--tg-theme-secondary-bg-color,#f7f8fc);padding:13px 14px;color:var(--text);outline:none;font-size:16px}
+.value-input{min-width:0;flex:1;border:1px solid var(--line);border-radius:13px;background:var(--input-bg);padding:13px 14px;color:var(--input-text);-webkit-text-fill-color:var(--input-text);caret-color:var(--blue);outline:none;font-size:16px;opacity:1}
+.value-input::placeholder{color:var(--muted);-webkit-text-fill-color:var(--muted);opacity:1}
 .value-input:focus{border-color:var(--blue)}
-.save-button{border:0;border-radius:13px;padding:0 17px;font-size:14px;font-weight:700;color:white;min-width:105px}
+.save-button{border:0;border-radius:13px;padding:0 17px;font-size:14px;font-weight:700;color:white;min-width:105px;cursor:pointer}
+.save-button:disabled{opacity:.65}
 .sugar .save-button{background:var(--pink)}
-.insulin .save-button{background:var(--teal)}
+.insulin .save-button{background:var(--teal);color:#082b28}
 .quick-title{display:flex;justify-content:space-between;align-items:center;margin-top:26px;margin-bottom:12px}
 .quick-title .section-title{margin:0}
-.quick-title span{font-size:12px;color:var(--muted)}
+.quick-title>span{font-size:12px;color:var(--muted)}
 .quick-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
-.quick-button{display:flex;align-items:center;gap:12px;text-align:left;background:var(--card);border:1px solid rgba(125,135,170,.07);border-radius:17px;padding:15px 13px;min-height:73px;box-shadow:var(--shadow);color:var(--text);cursor:pointer;transition:transform .12s,opacity .12s}
+.quick-button{display:flex;align-items:center;gap:12px;text-align:left;background:var(--card);border:1px solid rgba(125,135,170,.12);border-radius:17px;padding:15px 13px;min-height:73px;box-shadow:var(--shadow);color:var(--text);cursor:pointer;transition:transform .12s,opacity .12s}
 .quick-button:active{transform:scale(.98)}
 .quick-icon{width:40px;height:40px;flex-shrink:0;border-radius:13px;display:grid;place-items:center;font-size:19px}
 .quick-label{font-weight:700;font-size:14px}
 .quick-hint{font-size:11px;color:var(--muted);margin-top:4px}
-.arrow{margin-left:auto;color:#a0a5b6;font-size:19px}
+.arrow{margin-left:auto;color:var(--muted);font-size:19px}
 .blue{background:#edf0ff}.orange{background:#fff1df}.purple{background:#f1eaff}.green{background:#e4f8ee}.yellow{background:#fff5d7}.gray{background:#edf0f5}
+:root[data-theme="dark"] .blue{background:#2c3457}
+:root[data-theme="dark"] .orange{background:#493725}
+:root[data-theme="dark"] .purple{background:#3a2d51}
+:root[data-theme="dark"] .green{background:#244238}
+:root[data-theme="dark"] .yellow{background:#493f25}
+:root[data-theme="dark"] .gray{background:#303544}
+:root[data-theme="dark"] .sugar .metric-icon{background:#482a3a}
+:root[data-theme="dark"] .insulin .metric-icon{background:#20413e}
 .footer{text-align:center;font-size:11px;color:var(--muted);padding:22px 0 0}
 .toast{font-size:12px;color:var(--muted);min-height:16px;margin:8px 2px 0}
-.modal-backdrop{position:fixed;inset:0;background:rgba(18,24,45,.38);display:none;align-items:center;justify-content:center;padding:22px;z-index:10;backdrop-filter:blur(5px)}
+.modal-backdrop{position:fixed;inset:0;background:rgba(18,24,45,.48);display:none;align-items:center;justify-content:center;padding:22px;z-index:10;backdrop-filter:blur(5px)}
 .modal-backdrop.visible{display:flex;animation:fade .18s ease}
-.modal{width:100%;max-width:420px;max-height:82vh;overflow:hidden;background:var(--tg-theme-bg-color,#fff);border-radius:25px;padding:23px 20px 17px;box-shadow:0 25px 80px rgba(0,0,0,.2);display:flex;flex-direction:column;animation:rise .22s ease}
+.modal{width:100%;max-width:420px;max-height:82vh;overflow:hidden;background:var(--modal-bg);color:var(--text);border-radius:25px;padding:23px 20px 17px;box-shadow:0 25px 80px rgba(0,0,0,.2);display:flex;flex-direction:column;animation:rise .22s ease}
 .modal-top{display:flex;align-items:center;gap:12px;margin-bottom:16px}
-.modal-icon{width:45px;height:45px;border-radius:15px;background:#edf0ff;display:grid;place-items:center;font-size:22px}
+.modal-icon{width:45px;height:45px;border-radius:15px;background:var(--icon-bg);display:grid;place-items:center;font-size:22px}
 .modal-title{font-size:19px;font-weight:800}
 .modal-subtitle{font-size:12px;color:var(--muted);margin-top:4px}
-.modal-content{overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:1.6;min-height:55px;max-height:48vh;padding:14px;border-radius:15px;background:var(--tg-theme-secondary-bg-color,#f7f8fc)}
-.modal-close{display:block;margin:16px auto 0;border:0;border-radius:50%;width:46px;height:46px;background:#edf0f5;color:#51566a;font-size:25px;cursor:pointer}
+.modal-content{overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:1.6;min-height:55px;max-height:48vh;padding:14px;border-radius:15px;background:var(--modal-content);color:var(--text)}
+.modal-close{display:block;margin:16px auto 0;border:0;border-radius:50%;width:46px;height:46px;background:var(--close-bg);color:var(--close-text);font-size:25px;cursor:pointer}
 .loader-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;min-height:145px;color:var(--muted);font-size:13px}
-.spinner{width:39px;height:39px;border:4px solid #e7eaff;border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite}
+.spinner{width:39px;height:39px;border:4px solid var(--line);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite}
 .open-link{display:inline-block;margin-top:13px;color:var(--blue);font-weight:700;text-decoration:none}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes fade{from{opacity:0}to{opacity:1}}
@@ -71,12 +82,12 @@ button,input{font:inherit}
 <div class="brand">Сёма<span>.</span></div>
 <div class="subtitle">Учёт показателей</div>
 </div>
-<div class="top-icon">✦</div>
+<button class="theme-toggle" id="themeToggle" type="button" onclick="toggleTheme()" aria-label="Включить тёмную тему" title="Сменить тему">🌙</button>
 </header>
 
 <section class="metric sugar">
 <div class="metric-head">
-<div class="metric-icon">🩷</div>
+<div class="metric-icon">🩸</div>
 <div>
 <div class="metric-name">Сахар</div>
 <div class="metric-description">Среднее значение</div>
@@ -119,10 +130,10 @@ button,input{font:inherit}
 <span class="quick-icon orange">🌙</span><span><div class="quick-label">Вчера</div><div class="quick-hint">За прошлый день</div></span><span class="arrow">›</span>
 </button>
 <button class="quick-button" onclick="openAction('week')">
-<span class="quick-icon purple">📊</span><span><div class="quick-label">Неделя</div><div class="quick-hint">Итоги за неделю</div></span><span class="arrow">›</span>
+<span class="quick-icon purple">📊</span><span><div class="quick-label">Среднее за неделю</div><div class="quick-hint">Средние показатели за неделю</div></span><span class="arrow">›</span>
 </button>
 <button class="quick-button" onclick="openAction('month')">
-<span class="quick-icon green">🗓️</span><span><div class="quick-label">Месяц</div><div class="quick-hint">Итоги за месяц</div></span><span class="arrow">›</span>
+<span class="quick-icon green">🗓️</span><span><div class="quick-label">Среднее за месяц</div><div class="quick-hint">Средние показатели за месяц</div></span><span class="arrow">›</span>
 </button>
 <button class="quick-button" onclick="openAction('excel')">
 <span class="quick-icon yellow">📗</span><span><div class="quick-label">Excel</div><div class="quick-hint">Открыть таблицу</div></span><span class="arrow">›</span>
@@ -159,11 +170,32 @@ const API_URL='https://telegram-daily-sum-bot.onrender.com/api/miniapp';
 const labels={
 today:{title:'Сегодня',subtitle:'Данные за текущий день',icon:'☀️',loading:'Собираю данные за сегодня…'},
 yesterday:{title:'Вчера',subtitle:'Данные за прошлый день',icon:'🌙',loading:'Загружаю данные за вчера…'},
-week:{title:'Неделя',subtitle:'Итоги за неделю',icon:'📊',loading:'Собираю статистику за неделю…'},
-month:{title:'Месяц',subtitle:'Итоги за месяц',icon:'🗓️',loading:'Собираю статистику за месяц…'},
+week:{title:'Среднее за неделю',subtitle:'Средние показатели за неделю',icon:'📊',loading:'Собираю статистику за неделю…'},
+month:{title:'Среднее за месяц',subtitle:'Средние показатели за месяц',icon:'🗓️',loading:'Собираю статистику за месяц…'},
 excel:{title:'Excel',subtitle:'Твоя таблица',icon:'📗',loading:'Получаю ссылку на таблицу…'},
 memory:{title:'Память',subtitle:'Состояние бота',icon:'⚙️',loading:'Проверяю состояние бота…'}
 };
+
+function applyTheme(theme){
+const dark=theme==='dark';
+document.documentElement.dataset.theme=dark?'dark':'light';
+const button=document.getElementById('themeToggle');
+button.textContent=dark?'☀️':'🌙';
+button.setAttribute('aria-label',dark?'Включить светлую тему':'Включить тёмную тему');
+document.getElementById('themeColor').content=dark?'#11131b':'#f5f6fb';
+try{localStorage.setItem('sema-theme',dark?'dark':'light')}catch(e){}
+}
+
+function toggleTheme(){
+const current=document.documentElement.dataset.theme||'light';
+applyTheme(current==='dark'?'light':'dark');
+}
+
+(function initTheme(){
+let theme='light';
+try{theme=localStorage.getItem('sema-theme')||'light'}catch(e){}
+applyTheme(theme);
+})();
 
 function showModal(title,subtitle,icon,content){
 document.getElementById('modalTitle').textContent=title;
@@ -261,7 +293,11 @@ button.textContent='Сохранить';
 async function loadSugarAverage(){
 try{
 const result=await api('sugar_average');
+if(result&&result!=='—'){
 document.getElementById('sugarAverage').innerHTML=escapeHtml(result)+' <small>ммоль/л</small>';
+}else{
+document.getElementById('sugarAverage').innerHTML='— <small>ммоль/л</small>';
+}
 }catch(error){
 document.getElementById('sugarAverage').innerHTML='— <small>ммоль/л</small>';
 }
