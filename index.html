@@ -40,6 +40,10 @@ button{-webkit-tap-highlight-color:transparent}
 .night .save-button{background:#e8e9ed;color:#51566a}
 .toast{font-size:12px;color:var(--muted);min-height:16px;margin:8px 2px 0}
 .toast:empty{display:none}
+.toast.success{color:#168653}
+.toast.error{color:#cf3434}
+:root[data-theme="dark"] .toast.success{color:#48cc83}
+:root[data-theme="dark"] .toast.error{color:#ff7474}
 .quick-title{display:flex;justify-content:space-between;align-items:center;margin:23px 2px 12px}
 .section-title{font-size:17px;font-weight:750}
 .quick-title>span{font-size:12px;color:var(--muted)}
@@ -319,6 +323,10 @@ if(event.target===document.getElementById('modalBackdrop'))closeModal();
 function escapeHtml(value){
 return String(value).replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 }
+function setToast(element,message,state=''){
+element.className='toast'+(state?' '+state:'');
+element.textContent=message;
+}
 async function api(action,extra={}){
 if(!tg||!tg.initData)throw new Error('Открой Mini App через Telegram.');
 const response=await fetch(API_URL,{
@@ -359,30 +367,30 @@ const toast=document.getElementById(type==='sugar'?'sugarToast':type==='fact'?'n
 const button=input.parentElement.querySelector('button');
 const value=input.value.trim();
 if(!value){
-toast.textContent='Сначала введи значение.';
+setToast(toast,'Сначала введи значение.','error');
 return;
 }
 if(type==='sugar'&&!/^\d+([.,]\d{1,2})?$/.test(value)){
-toast.textContent='Введи число, например 5,6.';
+setToast(toast,'Введи число, например 5,6.','error');
 return;
 }
 if(type==='insulin'&&(!/^\d+$/.test(value)||Number(value)>15)){
-toast.textContent='Введи целое число от 0 до 15.';
+setToast(toast,'Введи целое число от 0 до 15.','error');
 return;
 }
 button.disabled=true;
 button.textContent='Сохраняю…';
-toast.textContent='';
+setToast(toast,'');
 try{
 const result=await api(type,{value});
-toast.textContent='✓ '+result;
+setToast(toast,'✓ '+result,'success');
 input.value='';
 setAccess(true,'Сервер подтвердил доступ');
 if(tg)tg.HapticFeedback?.notificationOccurred('success');
 if(type==='sugar')await loadSugarAverage();
 if(type==='insulin')await loadInsulinTotal();
 }catch(error){
-toast.textContent='Не удалось сохранить: '+error.message;
+setToast(toast,'Не удалось сохранить: '+error.message,'error');
 if(/доступ|пользовател|разреш|initdata|telegram/i.test(error.message))setAccess(false,error.message);
 if(tg)tg.HapticFeedback?.notificationOccurred('error');
 }finally{
