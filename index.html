@@ -2,249 +2,395 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#f5f6fa">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f5f6fb" id="themeColor">
 <title>Сёма</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-:root{color-scheme:light;--bg:#f5f6fa;--card:#fff;--text:#20232c;--muted:#858b9b;--border:#eceef4;--input:#f6f7fb;--input-text:#252936;--accent:#6c63e8;--accent-light:#eeecff;--green:#21a67a;--green-light:#e5f7ef;--pink:#ed7099;--pink-light:#fff0f5;--shadow:0 5px 20px rgba(37,42,72,.045);--nav-text:#777b8c;--overlay:rgba(22,25,39,.42)}
-[data-theme="dark"]{color-scheme:dark;--bg:#15161c;--card:#22232c;--text:#f2f3f8;--muted:#a1a5b5;--border:#343541;--input:#30313d;--input-text:#fff;--accent:#a39bff;--accent-light:#38344f;--green:#64d6aa;--green-light:#263f39;--pink:#ff9dbb;--pink-light:#442d39;--shadow:0 5px 20px rgba(0,0,0,.12);--nav-text:#a7a9b7;--overlay:rgba(0,0,0,.65)}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:15px;transition:background .2s,color .2s}
+:root{color-scheme:light;--bg:#f5f6fb;--card:#fff;--text:#20243a;--muted:#81869a;--blue:#5267e8;--pink:#ed6f9b;--teal:#20a99b;--line:#edf0f6;--input-bg:#f7f8fc;--input-text:#20243a;--shadow:0 8px 24px rgba(36,47,92,.07);--modal-bg:#fff;--modal-content:#f7f8fc;--close-bg:#edf0f5;--close-text:#51566a;--icon-bg:#e9edff;--nav-bg:rgba(255,255,255,.72);--nav-border:rgba(150,158,190,.2);--nav-active:rgba(82,103,232,.12)}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#11131b;--card:#1c202c;--text:#f1f3fa;--muted:#a0a6bb;--blue:#8998ff;--pink:#ed7fa5;--teal:#40cbbb;--line:#3a4051;--input-bg:#292e3d;--input-text:#fff;--shadow:0 8px 24px rgba(0,0,0,.16);--modal-bg:#1c202c;--modal-content:#292e3d;--close-bg:#343a4a;--close-text:#f1f3fa;--icon-bg:#292f4a;--nav-bg:rgba(28,32,44,.78);--nav-border:rgba(150,158,190,.17);--nav-active:rgba(137,152,255,.17)}
+*{box-sizing:border-box}
+body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;transition:background .2s,color .2s}
 button,input{font:inherit}
-button{cursor:pointer}
-.app{max-width:520px;margin:0 auto;min-height:100dvh;padding:16px 16px calc(120px + env(safe-area-inset-bottom))}
-.page{display:none;animation:fadeIn .18s ease}
-.page.active{display:block}
-@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
-.section-title{font-size:19px;font-weight:750;margin:8px 2px 15px;letter-spacing:-.35px}
-.metrics{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
-.metric{background:var(--card);border:1px solid var(--border);border-radius:22px;padding:16px 14px;box-shadow:var(--shadow);min-width:0}
-.metric-top{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);font-weight:600;margin-bottom:14px}
-.metric-icon{width:31px;height:31px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
-.metric-icon.sugar{background:var(--pink-light)}
-.metric-icon.insulin{background:var(--accent-light)}
-.metric-value{font-size:27px;font-weight:800;letter-spacing:-.8px;line-height:1.15;overflow-wrap:anywhere}
-.metric-unit{font-size:12px;color:var(--muted);margin-top:5px}
-.metric-note{font-size:11px;color:var(--muted);margin-top:10px;line-height:1.4}
-.entry-card{background:var(--card);border:1px solid var(--border);border-radius:22px;padding:17px;margin-bottom:13px;box-shadow:var(--shadow)}
-.entry-heading{display:flex;align-items:center;gap:10px;margin-bottom:13px}
-.entry-icon{width:38px;height:38px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-.entry-icon.sugar{background:var(--pink-light)}
-.entry-icon.insulin{background:var(--accent-light)}
-.entry-title{font-weight:750;font-size:15px}
-.entry-subtitle{font-size:12px;color:var(--muted);margin-top:3px}
-.entry-form{display:flex;gap:9px}
-.entry-input{min-width:0;flex:1;height:47px;border:1px solid var(--border);border-radius:14px;padding:0 13px;background:var(--input);color:var(--input-text);-webkit-text-fill-color:var(--input-text);outline:none;font-size:16px;font-weight:600}
-.entry-input::placeholder{color:var(--muted);-webkit-text-fill-color:var(--muted);font-weight:400}
-.entry-input:focus{border-color:var(--accent)}
-.save-btn{height:47px;padding:0 17px;border:0;border-radius:14px;background:var(--accent);color:#fff;font-weight:700;font-size:14px;white-space:nowrap}
-.save-btn:disabled{opacity:.55}
-.quick-title{font-size:16px;font-weight:750;margin:24px 2px 12px}
-.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.quick-btn{display:flex;align-items:center;gap:11px;text-align:left;padding:13px 12px;border:1px solid var(--border);border-radius:17px;background:var(--card);color:var(--text);box-shadow:var(--shadow);min-width:0;min-height:70px}
-.quick-icon{width:39px;height:39px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;background:var(--accent-light)}
-.quick-copy{min-width:0}
-.quick-name{font-size:13px;font-weight:750;line-height:1.3}
-.quick-desc{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.25}
-/* Liquid Glass bottom navigation */
-.bottom-nav{position:fixed;z-index:20;bottom:calc(12px + env(safe-area-inset-bottom));left:14px;right:14px;width:auto;max-width:492px;margin:0 auto;padding:7px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));isolation:isolate;overflow:hidden;border:1px solid rgba(255,255,255,.9);border-radius:30px;background:linear-gradient(135deg,rgba(255,255,255,.82) 0%,rgba(242,240,255,.68) 32%,rgba(255,255,255,.58) 60%,rgba(222,229,255,.72) 100%);box-shadow:0 14px 36px rgba(49,44,105,.18),0 3px 9px rgba(30,32,65,.09),inset 0 1.5px 1px rgba(255,255,255,.98),inset 0 -1px 1px rgba(130,120,190,.18);-webkit-backdrop-filter:blur(35px) saturate(220%);backdrop-filter:blur(35px) saturate(220%);transform:translateZ(0)}
-.bottom-nav:before{content:"";position:absolute;z-index:0;left:7px;top:7px;bottom:7px;width:calc((100% - 14px)/3);border-radius:24px;background:linear-gradient(145deg,rgba(255,255,255,.98) 0%,rgba(255,255,255,.82) 26%,rgba(231,227,255,.83) 65%,rgba(255,255,255,.96) 100%);border:1px solid rgba(255,255,255,.98);box-shadow:0 4px 14px rgba(78,68,150,.17),0 1px 3px rgba(60,55,110,.1),inset 0 1.5px 1px #fff,inset 0 -1px 2px rgba(130,120,200,.18);transform:translateX(calc(var(--nav-index,0)*100%));transition:transform .48s cubic-bezier(.22,1,.36,1);will-change:transform;pointer-events:none}
-.bottom-nav:after{content:"";position:absolute;z-index:2;pointer-events:none;top:8px;left:12px;width:calc((100% - 24px)/3);height:17px;border-radius:50%;background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(255,255,255,.52) 35%,rgba(255,255,255,0));filter:blur(2px);opacity:.95;transform:translateX(calc(var(--nav-index,0)*100%));transition:transform .48s cubic-bezier(.22,1,.36,1)}
-.nav-btn{position:relative;z-index:1;min-width:0;min-height:58px;border:1px solid transparent;border-radius:23px;background:transparent;color:#777b8c;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:5px 2px;transition:color .25s,transform .25s}
-.nav-btn:active{transform:scale(.92)}
-.nav-btn.active{color:#6255d9}
-.nav-icon{height:25px;min-width:28px;display:flex;align-items:center;justify-content:center;font-size:23px;line-height:25px;transition:transform .4s cubic-bezier(.22,1,.36,1),filter .25s}
-.nav-btn.active .nav-icon{transform:translateY(-1px) scale(1.1);filter:drop-shadow(0 1px 3px rgba(108,99,232,.2))}
-.nav-label{font-size:11px;font-weight:750;line-height:14px;white-space:nowrap}
-[data-theme="dark"] .bottom-nav{background:linear-gradient(135deg,rgba(72,73,94,.94),rgba(37,38,53,.92) 45%,rgba(63,64,83,.94));border-color:rgba(255,255,255,.22);box-shadow:0 14px 36px rgba(0,0,0,.42),inset 0 1px 1px rgba(255,255,255,.28),inset 0 -1px 1px rgba(0,0,0,.25)}
-[data-theme="dark"] .bottom-nav:before{background:linear-gradient(145deg,rgba(145,143,184,.92),rgba(92,89,134,.9) 50%,rgba(123,117,167,.92));border-color:rgba(255,255,255,.38);box-shadow:0 4px 14px rgba(0,0,0,.24),inset 0 1.5px 1px rgba(255,255,255,.62),inset 0 -1px 2px rgba(0,0,0,.2)}
-[data-theme="dark"] .bottom-nav:after{background:linear-gradient(180deg,rgba(255,255,255,.5),rgba(255,255,255,.15) 40%,rgba(255,255,255,0))}
-[data-theme="dark"] .nav-btn{color:#c0c0d0}
-[data-theme="dark"] .nav-btn.active{color:#fff}
-@media(prefers-reduced-motion:reduce){.bottom-nav:before,.bottom-nav:after,.nav-btn,.nav-icon{transition:none}.page{animation:none}}
-.chart-intro{background:var(--card);border:1px solid var(--border);border-radius:22px;padding:20px;box-shadow:var(--shadow);margin-bottom:13px}
-.chart-illustration{width:56px;height:56px;border-radius:18px;background:var(--accent-light);display:flex;align-items:center;justify-content:center;font-size:27px;margin-bottom:14px}
-.chart-heading{font-size:17px;font-weight:750;margin-bottom:7px}
-.chart-text{font-size:13px;color:var(--muted);line-height:1.55}
-.chart-placeholder{background:var(--card);border:1px solid var(--border);border-radius:22px;padding:17px;margin-bottom:12px}
-.chart-placeholder-title{font-weight:750;font-size:14px;margin-bottom:8px}
-.chart-placeholder-area{height:112px;border-radius:14px;background:var(--input);display:flex;align-items:center;justify-content:center;text-align:center;padding:15px;color:var(--muted);font-size:12px;line-height:1.5}
-.settings-card{background:var(--card);border:1px solid var(--border);border-radius:22px;padding:17px;margin-bottom:13px;box-shadow:var(--shadow)}
-.profile-row{display:flex;align-items:center;gap:13px}
-.avatar{width:49px;height:49px;border-radius:17px;background:var(--accent-light);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:23px;font-weight:800;flex-shrink:0}
-.profile-name{font-size:16px;font-weight:750;overflow-wrap:anywhere}
-.profile-subtitle{font-size:12px;color:var(--muted);margin-top:5px}
-.settings-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 0}
-.settings-row+.settings-row{border-top:1px solid var(--border)}
-.settings-row-title{font-size:14px;font-weight:650}
-.settings-row-subtitle{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.4}
-.status{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:7px 10px;border-radius:10px;white-space:nowrap}
-.status.allowed{color:var(--green);background:var(--green-light)}
-.status.denied{color:#d94c66;background:var(--pink-light)}
-.status-dot{width:7px;height:7px;border-radius:50%;background:currentColor}
-.theme-control{display:flex;align-items:center;gap:8px;background:var(--input);border:1px solid var(--border);border-radius:13px;padding:5px}
-.theme-option{border:0;border-radius:9px;background:transparent;color:var(--muted);padding:8px 10px;font-size:12px;font-weight:650;white-space:nowrap}
-.theme-option.active{background:var(--card);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.08)}
-.settings-footer{font-size:12px;color:var(--muted);text-align:center;padding:12px 5px}
-.modal-backdrop{position:fixed;z-index:50;inset:0;background:var(--overlay);display:none;align-items:center;justify-content:center;padding:22px}
-.modal-backdrop.show{display:flex}
-.modal{width:100%;max-width:460px;max-height:78dvh;overflow:auto;background:var(--card);border:1px solid var(--border);border-radius:25px;padding:22px 19px 17px;box-shadow:0 18px 60px rgba(0,0,0,.2);animation:modalIn .2s ease}
-@keyframes modalIn{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
-.modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
-.modal-title{font-size:18px;font-weight:800}
-.modal-x{width:34px;height:34px;border:0;border-radius:12px;background:var(--input);color:var(--text);font-size:20px;display:flex;align-items:center;justify-content:center}
-.modal-content{font-size:14px;line-height:1.6;overflow-wrap:anywhere;white-space:pre-wrap}
-.modal-content pre{white-space:pre-wrap;overflow-wrap:anywhere;font-family:inherit;margin:0}
-.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:15px;min-height:150px;color:var(--muted);font-size:13px}
-.spinner{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+button{-webkit-tap-highlight-color:transparent}
+.app{max-width:520px;margin:0 auto;padding:18px 18px calc(108px + env(safe-area-inset-bottom))}
+.screen{display:none}
+.screen.active{display:block;animation:screenIn .2s ease}
+.metric{background:var(--card);border-radius:23px;padding:17px;margin-bottom:13px;box-shadow:var(--shadow);border:1px solid rgba(125,135,170,.12)}
+.metric-head{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.metric-icon{width:43px;height:43px;flex-shrink:0;border-radius:15px;display:grid;place-items:center;font-size:22px}
+.sugar .metric-icon{background:#fff0f5}
+.insulin .metric-icon{background:#e4faf6}
+.metric-name{font-size:17px;font-weight:750}
+.metric-description{font-size:12px;color:var(--muted);margin-top:4px}
+.metric-value{font-size:28px;font-weight:800;letter-spacing:-.7px;margin-left:auto;text-align:right;white-space:nowrap}
+.metric-value small{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:0}
+.input-row{display:flex;gap:9px}
+.value-input{min-width:0;flex:1;border:1px solid var(--line);border-radius:13px;background:var(--input-bg);padding:13px 14px;color:var(--input-text);-webkit-text-fill-color:var(--input-text);caret-color:var(--blue);outline:none;font-size:16px;opacity:1}
+.value-input::placeholder{color:var(--muted);-webkit-text-fill-color:var(--muted);opacity:1}
+.value-input:focus{border-color:var(--blue)}
+.save-button{border:0;border-radius:13px;padding:0 17px;font-size:14px;font-weight:700;color:white;min-width:105px;cursor:pointer}
+.save-button:disabled{opacity:.65}
+.sugar .save-button{background:var(--pink)}
+.insulin .save-button{background:var(--teal);color:#082b28}
+.toast{font-size:12px;color:var(--muted);min-height:16px;margin:8px 2px 0}
+.quick-title{display:flex;justify-content:space-between;align-items:center;margin:23px 2px 12px}
+.section-title{font-size:17px;font-weight:750}
+.quick-title>span{font-size:12px;color:var(--muted)}
+.quick-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.quick-button{display:flex;align-items:center;gap:12px;text-align:left;background:var(--card);border:1px solid rgba(125,135,170,.12);border-radius:17px;padding:15px 13px;min-height:73px;box-shadow:var(--shadow);color:var(--text);cursor:pointer;transition:transform .12s,opacity .12s}
+.quick-button:active{transform:scale(.98)}
+.quick-icon{width:40px;height:40px;flex-shrink:0;border-radius:13px;display:grid;place-items:center;font-size:19px}
+.quick-label{font-weight:700;font-size:14px}
+.quick-hint{font-size:11px;color:var(--muted);margin-top:4px}
+.arrow{margin-left:auto;color:var(--muted);font-size:19px}
+.blue{background:#edf0ff}.orange{background:#fff1df}.purple{background:#f1eaff}.green{background:#e4f8ee}.yellow{background:#fff5d7}.gray{background:#edf0f5}
+:root[data-theme="dark"] .blue{background:#2c3457}
+:root[data-theme="dark"] .orange{background:#493725}
+:root[data-theme="dark"] .purple{background:#3a2d51}
+:root[data-theme="dark"] .green{background:#244238}
+:root[data-theme="dark"] .yellow{background:#493f25}
+:root[data-theme="dark"] .gray{background:#303544}
+:root[data-theme="dark"] .sugar .metric-icon{background:#482a3a}
+:root[data-theme="dark"] .insulin .metric-icon{background:#20413e}
+.page-heading{font-size:25px;font-weight:800;letter-spacing:-.7px;margin:8px 2px 5px}
+.page-description{font-size:13px;color:var(--muted);margin:0 2px 22px}
+.settings-card{background:var(--card);border:1px solid rgba(125,135,170,.12);border-radius:21px;padding:17px;margin-bottom:13px;box-shadow:var(--shadow)}
+.setting-row{display:flex;align-items:center;gap:13px;min-height:53px}
+.setting-icon{width:43px;height:43px;border-radius:15px;background:var(--icon-bg);display:grid;place-items:center;font-size:21px;flex-shrink:0}
+.setting-copy{flex:1;min-width:0}
+.setting-name{font-size:15px;font-weight:700}
+.setting-description{font-size:12px;color:var(--muted);margin-top:4px;overflow-wrap:anywhere}
+.setting-divider{height:1px;background:var(--line);margin:14px 0}
+.access-status{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;margin-top:6px}
+.status-dot{width:8px;height:8px;border-radius:50%;background:#20b981}
+.access-status.denied .status-dot{background:#ed6f6f}
+.theme-switch{width:54px;height:32px;border:0;border-radius:20px;background:#d7dbe6;padding:3px;cursor:pointer;flex-shrink:0;transition:background .2s}
+.theme-switch span{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 2px 5px #0002;transition:transform .2s;font-size:14px}
+:root[data-theme="dark"] .theme-switch{background:var(--blue)}
+:root[data-theme="dark"] .theme-switch span{transform:translateX(22px)}
+.graph-placeholder{background:var(--card);border:1px solid rgba(125,135,170,.12);border-radius:23px;padding:26px 18px;text-align:center;box-shadow:var(--shadow);margin-top:18px}
+.graph-placeholder-icon{width:65px;height:65px;border-radius:22px;background:var(--icon-bg);display:grid;place-items:center;font-size:30px;margin:0 auto 16px}
+.graph-placeholder-title{font-size:17px;font-weight:750}
+.graph-placeholder-text{font-size:13px;line-height:1.55;color:var(--muted);margin-top:8px}
+.bottom-nav-wrap{position:fixed;z-index:20;bottom:0;left:0;right:0;padding:10px 18px calc(10px + env(safe-area-inset-bottom));pointer-events:none;background:linear-gradient(to top,var(--bg) 55%,transparent)}
+.bottom-nav{pointer-events:auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;width:100%;max-width:484px;margin:0 auto;padding:6px;border:1px solid var(--nav-border);border-radius:25px;background:var(--nav-bg);backdrop-filter:blur(28px) saturate(180%);-webkit-backdrop-filter:blur(28px) saturate(180%);box-shadow:0 8px 30px rgba(25,35,75,.12),inset 0 1px 0 rgba(255,255,255,.35)}
+.nav-button{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:58px;padding:6px 4px;border:1px solid transparent;border-radius:19px;background:transparent;color:var(--muted);font-size:11px;font-weight:650;cursor:pointer;transition:background .22s,color .22s,transform .22s,border-color .22s}
+.nav-button .nav-icon{font-size:22px;line-height:24px;transition:transform .22s}
+.nav-button.active{background:var(--nav-active);border-color:var(--nav-border);color:var(--blue);box-shadow:inset 0 1px 0 rgba(255,255,255,.25)}
+.nav-button.active .nav-icon{transform:translateY(-1px) scale(1.06)}
+.nav-button:active{transform:scale(.96)}
+.modal-backdrop{position:fixed;inset:0;background:rgba(18,24,45,.48);display:none;align-items:center;justify-content:center;padding:22px;z-index:30;backdrop-filter:blur(5px)}
+.modal-backdrop.visible{display:flex;animation:fade .18s ease}
+.modal{width:100%;max-width:420px;max-height:82vh;overflow:hidden;background:var(--modal-bg);color:var(--text);border-radius:25px;padding:23px 20px 17px;box-shadow:0 25px 80px rgba(0,0,0,.2);display:flex;flex-direction:column;animation:rise .22s ease}
+.modal-top{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.modal-icon{width:45px;height:45px;border-radius:15px;background:var(--icon-bg);display:grid;place-items:center;font-size:22px}
+.modal-title{font-size:19px;font-weight:800}
+.modal-subtitle{font-size:12px;color:var(--muted);margin-top:4px}
+.modal-content{overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:1.6;min-height:55px;max-height:48vh;padding:14px;border-radius:15px;background:var(--modal-content);color:var(--text)}
+.modal-close{display:block;margin:16px auto 0;border:0;border-radius:50%;width:46px;height:46px;background:var(--close-bg);color:var(--close-text);font-size:25px;cursor:pointer}
+.loader-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;min-height:145px;color:var(--muted);font-size:13px}
+.spinner{width:39px;height:39px;border:4px solid var(--line);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite}
+.open-link{display:inline-block;margin-top:13px;color:var(--blue);font-weight:700;text-decoration:none}
 @keyframes spin{to{transform:rotate(360deg)}}
-.modal-close-bottom{display:block;margin:20px auto 0;border:0;border-radius:14px;background:var(--input);color:var(--text);font-weight:700;padding:11px 28px;min-width:115px}
-.toast{position:fixed;z-index:70;bottom:calc(106px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);max-width:calc(100% - 36px);background:var(--text);color:var(--bg);padding:12px 17px;border-radius:14px;font-size:13px;font-weight:650;text-align:center;display:none;box-shadow:var(--shadow)}
-.toast.show{display:block;animation:fadeIn .2s ease}
-@media(min-width:521px){.bottom-nav{left:50%;right:auto;transform:translateX(-50%);width:calc(100% - 28px)}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes rise{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes screenIn{from{opacity:.65;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:360px){.app{padding-left:13px;padding-right:13px}.metric{padding:14px}.metric-value{font-size:24px}.save-button{min-width:88px;padding:0 11px}.quick-button{padding:12px 10px;gap:9px}.quick-icon{width:35px;height:35px}.bottom-nav-wrap{padding-left:12px;padding-right:12px}.metric-head{gap:9px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
 </head>
 <body>
-<div class="app">
-<section class="page active" id="page-home">
-<div class="metrics">
-<div class="metric">
-<div class="metric-top"><span class="metric-icon sugar">🩸</span>Сахар</div>
-<div class="metric-value" id="sugar-average">—</div>
-<div class="metric-unit">ммоль/л</div>
-<div class="metric-note">Среднее значение</div>
-</div>
-<div class="metric">
-<div class="metric-top"><span class="metric-icon insulin">💉</span>Инсулин</div>
-<div class="metric-value" id="insulin-total">—</div>
-<div class="metric-unit">ед.</div>
-<div class="metric-note">Всего за сегодня</div>
-</div>
-</div>
-<div class="entry-card">
-<div class="entry-heading">
-<div class="entry-icon sugar">🩸</div>
-<div><div class="entry-title">Записать сахар</div><div class="entry-subtitle">Введи значение в ммоль/л</div></div>
-</div>
-<form class="entry-form" id="sugar-form">
-<input class="entry-input" id="sugar-input" type="number" inputmode="decimal" min="0.1" max="20" step="0.1" placeholder="Например, 5.6" required>
-<button class="save-btn" id="sugar-save" type="submit">Записать</button>
-</form>
-</div>
-<div class="entry-card">
-<div class="entry-heading">
-<div class="entry-icon insulin">💉</div>
-<div><div class="entry-title">Записать инсулин</div><div class="entry-subtitle">Введи количество единиц</div></div>
-</div>
-<form class="entry-form" id="insulin-form">
-<input class="entry-input" id="insulin-input" type="number" inputmode="numeric" min="0" max="15" step="1" placeholder="Количество единиц" required>
-<button class="save-btn" id="insulin-save" type="submit">Записать</button>
-</form>
-</div>
-<div class="quick-title">Быстрый доступ</div>
-<div class="quick-grid">
-<button class="quick-btn" data-action="today"><span class="quick-icon">📅</span><span class="quick-copy"><span class="quick-name">Сегодня</span><span class="quick-desc">Показатели за день</span></span></button>
-<button class="quick-btn" data-action="yesterday"><span class="quick-icon">🗓️</span><span class="quick-copy"><span class="quick-name">Вчера</span><span class="quick-desc">Показатели за день</span></span></button>
-<button class="quick-btn" data-action="week"><span class="quick-icon">📊</span><span class="quick-copy"><span class="quick-name">Среднее за неделю</span><span class="quick-desc">Средние показатели за неделю</span></span></button>
-<button class="quick-btn" data-action="month"><span class="quick-icon">📈</span><span class="quick-copy"><span class="quick-name">Среднее за месяц</span><span class="quick-desc">Средние показатели за месяц</span></span></button>
-<button class="quick-btn" data-action="excel"><span class="quick-icon">📗</span><span class="quick-copy"><span class="quick-name">Excel</span><span class="quick-desc">Открыть таблицу</span></span></button>
-<button class="quick-btn" data-action="memory"><span class="quick-icon">🧠</span><span class="quick-copy"><span class="quick-name">Память</span><span class="quick-desc">Состояние сервера</span></span></button>
-</div>
-</section>
-<section class="page" id="page-charts">
-<div class="section-title">Графики</div>
-<div class="chart-intro">
-<div class="chart-illustration">📈</div>
-<div class="chart-heading">История показателей</div>
-<div class="chart-text">Здесь будут графики сахара и инсулина, чтобы можно было отслеживать изменения по дням и сравнивать периоды.</div>
-</div>
-<div class="chart-placeholder">
-<div class="chart-placeholder-title">🩸 Сахар</div>
-<div class="chart-placeholder-area">График сахара появится здесь<br>После подключения истории измерений</div>
-</div>
-<div class="chart-placeholder">
-<div class="chart-placeholder-title">💉 Инсулин</div>
-<div class="chart-placeholder-area">График инсулина появится здесь<br>После подключения истории записей</div>
-</div>
-</section>
-<section class="page" id="page-settings">
-<div class="section-title">Настройки</div>
-<div class="settings-card">
-<div class="profile-row">
-<div class="avatar" id="user-avatar">?</div>
+<main class="app">
+<section class="screen active" id="screen-home">
+<section class="metric sugar">
+<div class="metric-head">
+<div class="metric-icon">🩸</div>
 <div>
-<div class="profile-name" id="user-name">Загрузка профиля…</div>
-<div class="profile-subtitle" id="user-detail">Telegram Mini App</div>
+<div class="metric-name">Сахар</div>
+<div class="metric-description">Среднее значение</div>
+</div>
+<div class="metric-value" id="sugarAverage">— <small>ммоль/л</small></div>
+</div>
+<div class="input-row">
+<input class="value-input" id="sugarInput" type="text" inputmode="decimal" placeholder="Например, 5,6" aria-label="Новое значение сахара">
+<button class="save-button" onclick="saveValue('sugar')">Сохранить</button>
+</div>
+<div class="toast" id="sugarToast"></div>
+</section>
+<section class="metric insulin">
+<div class="metric-head">
+<div class="metric-icon">💉</div>
+<div>
+<div class="metric-name">Инсулин</div>
+<div class="metric-description">Сумма за сегодня</div>
+</div>
+<div class="metric-value" id="insulinTotal">— <small>ед.</small></div>
+</div>
+<div class="input-row">
+<input class="value-input" id="insulinInput" type="number" inputmode="numeric" step="1" min="0" max="15" placeholder="Целое число" aria-label="Новое значение инсулина">
+<button class="save-button" onclick="saveValue('insulin')">Сохранить</button>
+</div>
+<div class="toast" id="insulinToast"></div>
+</section>
+<div class="quick-title">
+<div class="section-title">Быстрый доступ</div>
+<span>Выбери раздел</span>
+</div>
+<section class="quick-grid">
+<button class="quick-button" onclick="openAction('today')">
+<span class="quick-icon blue">☀️</span><span><div class="quick-label">Сегодня</div><div class="quick-hint">За текущий день</div></span><span class="arrow">›</span>
+</button>
+<button class="quick-button" onclick="openAction('yesterday')">
+<span class="quick-icon orange">🌙</span><span><div class="quick-label">Вчера</div><div class="quick-hint">За прошлый день</div></span><span class="arrow">›</span>
+</button>
+<button class="quick-button" onclick="openAction('week')">
+<span class="quick-icon purple">📊</span><span><div class="quick-label">Среднее за неделю</div><div class="quick-hint">Средние показатели за неделю</div></span><span class="arrow">›</span>
+</button>
+<button class="quick-button" onclick="openAction('month')">
+<span class="quick-icon green">🗓️</span><span><div class="quick-label">Среднее за месяц</div><div class="quick-hint">Средние показатели за месяц</div></span><span class="arrow">›</span>
+</button>
+<button class="quick-button" onclick="openAction('excel')">
+<span class="quick-icon yellow">📗</span><span><div class="quick-label">Excel</div><div class="quick-hint">Открыть таблицу</div></span><span class="arrow">›</span>
+</button>
+<button class="quick-button" onclick="openAction('memory')">
+<span class="quick-icon gray">⚙️</span><span><div class="quick-label">Память</div><div class="quick-hint">Состояние бота</div></span><span class="arrow">›</span>
+</button>
+</section>
+</section>
+<section class="screen" id="screen-graphs">
+<div class="page-heading">Графики</div>
+<div class="page-description">История показателей и динамика</div>
+<div class="graph-placeholder">
+<div class="graph-placeholder-icon">📈</div>
+<div class="graph-placeholder-title">Здесь будут графики</div>
+<div class="graph-placeholder-text">Добавим графики сахара и инсулина, выбор периода и просмотр динамики показателей.</div>
+</div>
+</section>
+<section class="screen" id="screen-settings">
+<div class="page-heading">Настройки</div>
+<div class="page-description">Профиль и оформление приложения</div>
+<div class="settings-card">
+<div class="setting-row">
+<div class="setting-icon">👤</div>
+<div class="setting-copy">
+<div class="setting-name">Пользователь</div>
+<div class="setting-description" id="userName">Получаю данные из Telegram…</div>
 </div>
 </div>
-<div class="settings-row" style="margin-top:14px">
-<div><div class="settings-row-title">Доступ к приложению</div><div class="settings-row-subtitle">Проверка разрешения на использование</div></div>
-<div class="status" id="access-status"><span class="status-dot"></span><span id="access-label">Проверяем</span></div>
+<div class="setting-divider"></div>
+<div class="setting-row">
+<div class="setting-icon">🛡️</div>
+<div class="setting-copy">
+<div class="setting-name">Доступ к боту</div>
+<div class="access-status" id="accessStatus"><span class="status-dot"></span><span id="accessText">Проверяется…</span></div>
+<div class="setting-description" id="accessDescription">Статус доступа к Mini App</div>
+</div>
 </div>
 </div>
 <div class="settings-card">
-<div class="settings-row">
-<div><div class="settings-row-title">Оформление</div><div class="settings-row-subtitle">Выбери светлую или тёмную тему</div></div>
+<div class="setting-row">
+<div class="setting-icon" id="themeIcon">🌙</div>
+<div class="setting-copy">
+<div class="setting-name">Тёмная тема</div>
+<div class="setting-description" id="themeDescription">Комфортное оформление в темноте</div>
 </div>
-<div class="theme-control">
-<button class="theme-option" id="theme-light" type="button" data-theme-choice="light">☀️ Светлая</button>
-<button class="theme-option" id="theme-dark" type="button" data-theme-choice="dark">🌙 Тёмная</button>
+<button class="theme-switch" id="themeSwitch" type="button" onclick="toggleTheme()" aria-label="Переключить тему"><span id="themeSwitchIcon">🌙</span></button>
 </div>
 </div>
-<div class="settings-footer">Сёма · Учёт показателей</div>
+</section>
+</main>
+<nav class="bottom-nav-wrap" aria-label="Основная навигация">
+<div class="bottom-nav">
+<button class="nav-button active" type="button" data-screen="home" onclick="switchTab('home')"><span class="nav-icon">⌂</span><span>Главная</span></button>
+<button class="nav-button" type="button" data-screen="graphs" onclick="switchTab('graphs')"><span class="nav-icon">▥</span><span>Графики</span></button>
+<button class="nav-button" type="button" data-screen="settings" onclick="switchTab('settings')"><span class="nav-icon">⚙</span><span>Настройки</span></button>
+</div>
+</nav>
+<div class="modal-backdrop" id="modalBackdrop" onclick="backdropClose(event)">
+<section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+<div class="modal-top">
+<div class="modal-icon" id="modalIcon">📊</div>
+<div>
+<div class="modal-title" id="modalTitle">Загрузка</div>
+<div class="modal-subtitle" id="modalSubtitle">Сёма получает данные</div>
+</div>
+</div>
+<div class="modal-content" id="modalContent">
+<div class="loader-wrap"><div class="spinner"></div><div>Загружаю данные…</div></div>
+</div>
+<div id="modalLink"></div>
+<button class="modal-close" onclick="closeModal()" aria-label="Закрыть">×</button>
 </section>
 </div>
-<nav class="bottom-nav" id="bottom-nav" aria-label="Основная навигация" style="--nav-index:0">
-<button class="nav-btn active" type="button" data-page="home" aria-current="page"><span class="nav-icon">⌂</span><span class="nav-label">Главная</span></button>
-<button class="nav-btn" type="button" data-page="charts"><span class="nav-icon">▥</span><span class="nav-label">Графики</span></button>
-<button class="nav-btn" type="button" data-page="settings"><span class="nav-icon">⚙</span><span class="nav-label">Настройки</span></button>
-</nav>
-<div class="modal-backdrop" id="modal-backdrop">
-<div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-<div class="modal-head"><div class="modal-title" id="modal-title">Загрузка</div><button class="modal-x" id="modal-x" type="button" aria-label="Закрыть">×</button></div>
-<div class="modal-content" id="modal-content"></div>
-<button class="modal-close-bottom" id="modal-close" type="button">Закрыть</button>
-</div>
-</div>
-<div class="toast" id="toast"></div>
 <script>
-const API_URL="https://telegram-daily-sum-bot.onrender.com/api/miniapp";
 const tg=window.Telegram?.WebApp;
-if(tg){tg.ready();tg.expand();try{tg.setHeaderColor("secondary_bg_color");tg.setBackgroundColor("#f5f6fa")}catch(e){}}
-const initData=tg?.initData||"";
-const telegramUser=tg?.initDataUnsafe?.user||null;
-const $=id=>document.getElementById(id);
-let toastTimer=null;
-const actionTitles={today:"Сегодня",yesterday:"Вчера",week:"Среднее за неделю",month:"Среднее за месяц",excel:"Excel",memory:"Память",status:"Статус"};
-function showToast(message){const el=$("toast");el.textContent=message;el.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove("show"),2600)}
-function setTheme(theme,save=true){theme=theme==="dark"?"dark":"light";document.documentElement.dataset.theme=theme;document.querySelector('meta[name="theme-color"]').content=theme==="dark"?"#15161c":"#f5f6fa";$("theme-light").classList.toggle("active",theme==="light");$("theme-dark").classList.toggle("active",theme==="dark");if(save){try{localStorage.setItem("sema-theme",theme)}catch(e){}}if(tg){try{tg.setHeaderColor(theme==="dark"?"#15161c":"#f5f6fa");tg.setBackgroundColor(theme==="dark"?"#15161c":"#f5f6fa")}catch(e){}}}
-function initTheme(){let theme="light";try{theme=localStorage.getItem("sema-theme")||"light"}catch(e){}setTheme(theme,false)}
-document.querySelectorAll("[data-theme-choice]").forEach(button=>button.addEventListener("click",()=>setTheme(button.dataset.themeChoice)));
-function switchPage(page){const pages=["home","charts","settings"];if(!pages.includes(page))return;document.querySelectorAll(".page").forEach(el=>el.classList.toggle("active",el.id==="page-"+page));document.querySelectorAll(".nav-btn").forEach(el=>{const active=el.dataset.page===page;el.classList.toggle("active",active);if(active)el.setAttribute("aria-current","page");else el.removeAttribute("aria-current")});$("bottom-nav").style.setProperty("--nav-index",pages.indexOf(page));window.scrollTo({top:0,behavior:"instant"});if(tg){try{tg.HapticFeedback.selectionChanged()}catch(e){}}}
-document.querySelectorAll(".nav-btn").forEach(button=>button.addEventListener("click",()=>switchPage(button.dataset.page)));
-function showModal(title,content,loading=false){$("modal-title").textContent=title;$("modal-content").innerHTML=loading?'<div class="loading"><div class="spinner"></div><div>Загружаем данные…</div></div>':"";$("modal-backdrop").classList.add("show");if(!loading)setModalText(content)}
-function setModalText(content){const el=$("modal-content");el.replaceChildren();if(content instanceof Node){el.appendChild(content);return}const pre=document.createElement("pre");pre.textContent=String(content??"Нет данных");el.appendChild(pre)}
-function closeModal(){$("modal-backdrop").classList.remove("show")}
-$("modal-x").addEventListener("click",closeModal);$("modal-close").addEventListener("click",closeModal);$("modal-backdrop").addEventListener("click",event=>{if(event.target===$("modal-backdrop"))closeModal()});
-async function api(action,extra={}){if(!initData)throw new Error("Открой приложение через Telegram, чтобы подтвердить доступ.");const response=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action,initData,...extra})});let data;try{data=await response.json()}catch(e){throw new Error("Сервер вернул некорректный ответ.")}if(!response.ok||data.ok===false)throw new Error(data.error||data.message||"Не удалось выполнить запрос.");return data}
-function responseText(data){if(typeof data==="string")return data;if(data.text!==undefined)return data.text;if(data.result!==undefined)return typeof data.result==="string"?data.result:JSON.stringify(data.result,null,2);if(data.message!==undefined)return data.message;return JSON.stringify(data,null,2)}
-async function runAction(action){if(action==="excel"){try{const data=await api("excel");const url=data.url||data.link||data.excel_url;if(url){if(tg)tg.openLink(url);else window.open(url,"_blank","noopener");return}showModal("Excel",responseText(data))}catch(error){showModal("Excel",error.message)}return}showModal(actionTitles[action]||"Результат","",true);try{const data=await api(action);setModalText(responseText(data))}catch(error){setModalText("Не удалось загрузить данные.\n\n"+error.message)}}
-document.querySelectorAll(".quick-btn").forEach(button=>button.addEventListener("click",()=>runAction(button.dataset.action)));
-function setAccess(allowed,label){const status=$("access-status");status.classList.toggle("allowed",allowed===true);status.classList.toggle("denied",allowed===false);$("access-label").textContent=label;status.querySelector(".status-dot").style.display=allowed===null?"none":"block"}
-function showUser(){if(telegramUser){const fullName=[telegramUser.first_name,telegramUser.last_name].filter(Boolean).join(" ");$("user-name").textContent=fullName||telegramUser.username||"Пользователь Telegram";$("user-detail").textContent=telegramUser.username?"@"+telegramUser.username:"Telegram ID: "+telegramUser.id;$("user-avatar").textContent=(telegramUser.first_name||telegramUser.username||"?").trim().charAt(0).toUpperCase()}else{$("user-name").textContent="Не удалось определить пользователя";$("user-detail").textContent="Открой приложение через Telegram";$("user-avatar").textContent="?"}}
-async function checkAccess(){if(!initData){setAccess(false,"Нет доступа");return}try{await api("start");setAccess(true,"Разрешён")}catch(error){setAccess(false,"Не разрешён");$("user-detail").textContent=error.message}}
-function formatNumber(value){const n=Number(value);return Number.isFinite(n)?String(n).replace(".",","):String(value)}
-async function loadSugarAverage(){try{const data=await api("sugar_average");const value=data.value??data.average??data.result;if(value!==undefined&&value!==null&&value!=="—"&&value!=="")$("sugar-average").textContent=formatNumber(value)}catch(e){}}
-async function loadInsulinTotal(){try{const data=await api("insulin_total");const value=data.value??data.total??data.result;if(value!==undefined&&value!==null&&value!=="—"&&value!=="")$("insulin-total").textContent=formatNumber(value)}catch(e){}}
-async function submitMeasurement(type){const isSugar=type==="sugar";const input=$(isSugar?"sugar-input":"insulin-input");const button=$(isSugar?"sugar-save":"insulin-save");const raw=input.value.trim().replace(",",".");const number=Number(raw);if(!raw||!Number.isFinite(number)||number<0||number>(isSugar?20:15)||(!isSugar&&!Number.isInteger(number))){showToast(isSugar?"Введи сахар от 0 до 20":"Введи целое число от 0 до 15");return}button.disabled=true;button.textContent="Сохраняем…";try{const data=await api(type,{value:isSugar?number.toFixed(1):String(number)});showToast(data.message||"Запись сохранена");input.value="";if(isSugar)loadSugarAverage();else loadInsulinTotal()}catch(error){showToast(error.message||"Не удалось сохранить запись")}finally{button.disabled=false;button.textContent="Записать"}}
-$("sugar-form").addEventListener("submit",event=>{event.preventDefault();submitMeasurement("sugar")});
-$("insulin-form").addEventListener("submit",event=>{event.preventDefault();submitMeasurement("insulin")});
-initTheme();
-showUser();
-checkAccess();
+if(tg){tg.ready();tg.expand();}
+const API_URL='https://telegram-daily-sum-bot.onrender.com/api/miniapp';
+const labels={
+today:{title:'Сегодня',subtitle:'Данные за текущий день',icon:'☀️',loading:'Собираю данные за сегодня…'},
+yesterday:{title:'Вчера',subtitle:'Данные за прошлый день',icon:'🌙',loading:'Загружаю данные за вчера…'},
+week:{title:'Среднее за неделю',subtitle:'Средние показатели за неделю',icon:'📊',loading:'Собираю статистику за неделю…'},
+month:{title:'Среднее за месяц',subtitle:'Средние показатели за месяц',icon:'🗓️',loading:'Собираю статистику за месяц…'},
+excel:{title:'Excel',subtitle:'Твоя таблица',icon:'📗',loading:'Получаю ссылку на таблицу…'},
+memory:{title:'Память',subtitle:'Состояние бота',icon:'⚙️',loading:'Проверяю состояние бота…'}
+};
+function switchTab(name){
+document.querySelectorAll('.screen').forEach(screen=>screen.classList.toggle('active',screen.id==='screen-'+name));
+document.querySelectorAll('.nav-button').forEach(button=>button.classList.toggle('active',button.dataset.screen===name));
+window.scrollTo({top:0,behavior:'smooth'});
+if(tg)tg.HapticFeedback?.selectionChanged();
+}
+function applyTheme(theme){
+const dark=theme==='dark';
+document.documentElement.dataset.theme=dark?'dark':'light';
+document.getElementById('themeColor').content=dark?'#11131b':'#f5f6fb';
+document.getElementById('themeIcon').textContent=dark?'☀️':'🌙';
+document.getElementById('themeSwitchIcon').textContent=dark?'☀️':'🌙';
+document.getElementById('themeDescription').textContent=dark?'Включена тёмная тема':'Комфортное оформление в темноте';
+document.getElementById('themeSwitch').setAttribute('aria-label',dark?'Включить светлую тему':'Включить тёмную тему');
+try{localStorage.setItem('sema-theme',dark?'dark':'light')}catch(e){}
+}
+function toggleTheme(){
+const current=document.documentElement.dataset.theme||'light';
+applyTheme(current==='dark'?'light':'dark');
+if(tg)tg.HapticFeedback?.selectionChanged();
+}
+(function initTheme(){
+let theme='light';
+try{theme=localStorage.getItem('sema-theme')||'light'}catch(e){}
+applyTheme(theme);
+})();
+function initUser(){
+const user=tg?.initDataUnsafe?.user;
+const name=user?[user.first_name,user.last_name].filter(Boolean).join(' '):'Не удалось получить имя';
+document.getElementById('userName').textContent=name;
+if(!tg||!tg.initData){
+setAccess(false,'Открой Mini App через Telegram');
+return;
+}
+setAccess(null,'Проверяется при обращении к серверу');
+}
+function setAccess(allowed,message){
+const status=document.getElementById('accessStatus');
+const text=document.getElementById('accessText');
+const description=document.getElementById('accessDescription');
+status.classList.toggle('denied',allowed===false);
+if(allowed===true){
+text.textContent='Доступ разрешён';
+description.textContent=message||'Ты можешь пользоваться Mini App';
+}else if(allowed===false){
+text.textContent='Доступ не подтверждён';
+description.textContent=message||'Проверь настройки доступа';
+}else{
+text.textContent='Ожидает проверки';
+description.textContent=message||'Статус будет уточнён сервером';
+}
+}
+function showModal(title,subtitle,icon,content){
+document.getElementById('modalTitle').textContent=title;
+document.getElementById('modalSubtitle').textContent=subtitle;
+document.getElementById('modalIcon').textContent=icon;
+document.getElementById('modalContent').innerHTML=content;
+document.getElementById('modalLink').innerHTML='';
+document.getElementById('modalBackdrop').classList.add('visible');
+}
+function loadingContent(message){
+return '<div class="loader-wrap"><div class="spinner"></div><div>'+escapeHtml(message)+'</div></div>';
+}
+function closeModal(){
+document.getElementById('modalBackdrop').classList.remove('visible');
+}
+function backdropClose(event){
+if(event.target===document.getElementById('modalBackdrop'))closeModal();
+}
+function escapeHtml(value){
+return String(value).replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+}
+async function api(action,extra={}){
+if(!tg||!tg.initData)throw new Error('Открой Mini App через Telegram.');
+const response=await fetch(API_URL,{
+method:'POST',
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify({initData:tg.initData,action,...extra})
+});
+const data=await response.json();
+if(!response.ok||!data.ok)throw new Error(data.error||'Ошибка сервера');
+return data.result;
+}
+async function openAction(action){
+const item=labels[action];
+showModal(item.title,item.subtitle,item.icon,loadingContent(item.loading));
+try{
+const result=await api(action);
+setAccess(true,'Сервер подтвердил доступ');
+if(action==='excel'&&result){
+document.getElementById('modalContent').textContent='Ссылка на таблицу готова.';
+const link=document.createElement('a');
+link.href=result;
+link.target='_blank';
+link.rel='noopener noreferrer';
+link.className='open-link';
+link.textContent='Открыть Excel ↗';
+document.getElementById('modalLink').appendChild(link);
+}else{
+document.getElementById('modalContent').textContent=String(result||'Нет данных');
+}
+}catch(error){
+document.getElementById('modalContent').textContent=error.message;
+if(/доступ|пользовател|разреш|initdata|telegram/i.test(error.message)){
+setAccess(false,error.message);
+}
+}
+}
+async function saveValue(type){
+const input=document.getElementById(type==='sugar'?'sugarInput':'insulinInput');
+const toast=document.getElementById(type==='sugar'?'sugarToast':'insulinToast');
+const button=input.parentElement.querySelector('button');
+const value=input.value.trim();
+if(!value){
+toast.textContent='Сначала введи значение.';
+return;
+}
+if(type==='sugar'&&!/^\d+([.,]\d{1,2})?$/.test(value)){
+toast.textContent='Введи число, например 5,6.';
+return;
+}
+if(type==='insulin'&&(!/^\d+$/.test(value)||Number(value)>15)){
+toast.textContent='Введи целое число от 0 до 15.';
+return;
+}
+button.disabled=true;
+button.textContent='Сохраняю…';
+toast.textContent='';
+try{
+const result=await api(type,{value});
+toast.textContent='✓ '+result;
+input.value='';
+setAccess(true,'Сервер подтвердил доступ');
+if(tg)tg.HapticFeedback?.notificationOccurred('success');
+if(type==='sugar')loadSugarAverage();
+}catch(error){
+toast.textContent='Не удалось сохранить: '+error.message;
+if(/доступ|пользовател|разреш|initdata|telegram/i.test(error.message))setAccess(false,error.message);
+if(tg)tg.HapticFeedback?.notificationOccurred('error');
+}finally{
+button.disabled=false;
+button.textContent='Сохранить';
+}
+}
+async function loadSugarAverage(){
+try{
+const result=await api('sugar_average');
+document.getElementById('sugarAverage').innerHTML=result&&result!=='—'?escapeHtml(result)+' <small>ммоль/л</small>':'— <small>ммоль/л</small>';
+setAccess(true,'Сервер подтвердил доступ');
+}catch(error){
+document.getElementById('sugarAverage').innerHTML='— <small>ммоль/л</small>';
+if(/доступ|пользовател|разреш|initdata|telegram/i.test(error.message))setAccess(false,error.message);
+}
+}
+initUser();
 loadSugarAverage();
-loadInsulinTotal();
 </script>
 </body>
 </html>
