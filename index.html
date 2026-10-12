@@ -542,12 +542,12 @@ function showMetricValue(element,value,unit){
 }
 function formatNightFact(rawValue){
   const numericValue=Number(rawValue);
-  if(!Number.isFinite(numericValue))return {text:'—',unit:'ед'};
+  if(!Number.isFinite(numericValue))return {text:'—',unit:'ед.'};
   const fact=numericValue/2;
   const floored=Math.floor(fact);
   const hasFraction=fact % 1 !== 0;
   const value=hasFraction?`~${floored}`:String(floored);
-  return {text:value,unit:'ед'};
+  return {text:value,unit:'ед.'};
 }
 function renderNightFact(rawValue, loading = false){
   const container=document.getElementById('nightFact');
@@ -557,7 +557,7 @@ function renderNightFact(rawValue, loading = false){
     return;
   }
   if(rawValue===null || rawValue==='' || !Number.isFinite(Number(rawValue))){
-    showMetricValue(container,'—','ед');
+    showMetricValue(container,'—','ед.');
     return;
   }
   const result=formatNightFact(rawValue);
