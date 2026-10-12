@@ -144,6 +144,16 @@ button{-webkit-tap-highlight-color:transparent}
 .modal-subtitle{font-size:12px;color:var(--muted);margin-top:4px}
 .modal-content{overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:1.6;min-height:55px;max-height:48vh;padding:14px;border-radius:15px;background:var(--modal-content)}
 .modal-close{display:block;margin:16px auto 0;border:0;border-radius:50%;width:46px;height:46px;background:var(--close-bg);color:var(--close-text);font-size:25px;cursor:pointer}
+.access-denied-backdrop{position:fixed;z-index:100;inset:0;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(18,24,45,.34);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px)}
+body.access-denied .access-denied-backdrop{display:flex}
+body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);pointer-events:none;user-select:none}
+.access-denied-dialog{width:100%;max-width:360px;padding:28px 22px 22px;border:1px solid rgba(125,135,170,.18);border-radius:25px;background:var(--card);color:var(--text);text-align:center;box-shadow:0 24px 70px rgba(0,0,0,.2)}
+.access-denied-icon{display:grid;place-items:center;width:62px;height:62px;margin:0 auto 17px;border-radius:21px;background:#fff0f0;font-size:30px}
+:root[data-theme="dark"] .access-denied-icon{background:#482a32}
+.access-denied-title{font-size:21px;font-weight:800}
+.access-denied-message{margin-top:9px;color:var(--muted);font-size:14px;line-height:1.5}
+.access-denied-close{width:100%;margin-top:22px;border:0;border-radius:14px;padding:14px 16px;background:var(--blue);color:#fff;font-size:15px;font-weight:750;cursor:pointer}
+.access-denied-close:focus-visible{outline:3px solid var(--text);outline-offset:3px}
 .loader-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;min-height:145px;color:var(--muted);font-size:13px}
 .spinner{width:39px;height:39px;border:4px solid var(--line);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite}
 .open-link{display:inline-block;margin-top:13px;color:var(--blue);font-weight:700;text-decoration:none}
@@ -365,6 +375,14 @@ button{-webkit-tap-highlight-color:transparent}
 <button class="modal-close" onclick="closeModal()" aria-label="Закрыть">×</button>
 </section>
 </div>
+<div class="access-denied-backdrop" id="accessDeniedBackdrop">
+<section class="access-denied-dialog" role="alertdialog" aria-modal="true" aria-labelledby="accessDeniedTitle" aria-describedby="accessDeniedMessage">
+<div class="access-denied-icon" aria-hidden="true">🔒</div>
+<div class="access-denied-title" id="accessDeniedTitle">Доступ к боту запрещён</div>
+<div class="access-denied-message" id="accessDeniedMessage">Обратитесь к администратору бота, чтобы запросить доступ.</div>
+<button class="access-denied-close" type="button" onclick="closeMiniApp()">Закрыть мини-приложение</button>
+</section>
+</div>
 <script>
 const tg=window.Telegram?.WebApp;
 if(tg){tg.ready();tg.expand();}
@@ -410,16 +428,30 @@ function setAccess(allowed,message){
 const status=document.getElementById('accessStatus');
 const text=document.getElementById('accessText');
 const description=document.getElementById('accessDescription');
-status.classList.toggle('denied',allowed===false);
+const denied=allowed===false;
+status.classList.toggle('denied',denied);
+document.body.classList.toggle('access-denied',denied);
+document.querySelector('.app').inert=denied;
+document.querySelector('.bottom-nav-wrap').inert=denied;
+document.getElementById('modalBackdrop').inert=denied;
 if(allowed===true){
 text.textContent='Доступ разрешён';
 description.textContent=message||'Ты можешь пользоваться Mini App';
 }else if(allowed===false){
-text.textContent='Доступ не подтверждён';
-description.textContent=message||'Проверь настройки доступа';
+text.textContent='Доступ запрещён';
+description.textContent=message||'Обратись к администратору бота';
 }else{
 text.textContent='Ожидает проверки';
 description.textContent=message||'Статус будет уточнён сервером';
+}
+}
+function closeMiniApp(){
+if(tg?.close)tg.close();
+else window.close();
+}
+function handleAccessError(error){
+if(error?.status===401||error?.status===403||/доступ|пользовател|разреш|initdata|telegram|access denied|no access|unauthori[sz]ed|forbidden|not allowed|permission denied/i.test(error?.message||'')){
+setAccess(false,error.message);
 }
 }
 function initUser(){
@@ -462,7 +494,11 @@ async function api(action,extra={}){
   body:JSON.stringify({initData:tg.initData,action,...extra})
  });
  const data=await response.json();
- if(!response.ok||!data.ok)throw new Error(data.error||'Ошибка сервера');
+ if(!response.ok||!data.ok){
+  const error=new Error(data.error||'Ошибка сервера');
+  error.status=response.status;
+  throw error;
+ }
  return data.result;
 }
 async function openAction(action){
@@ -485,7 +521,7 @@ async function openAction(action){
   }
  }catch(error){
   document.getElementById('modalContent').textContent=error.message;
-  if(/доступ|пользовател|разреш|initdata|telegram/i.test(error.message))setAccess(false,error.message);
+  handleAccessError(error);
  }
 }
 async function saveValue(type){
@@ -523,7 +559,7 @@ async function saveValue(type){
   if(type==='fact')await loadNightFact();
  }catch(error){
   setToast(toast,'Не удалось сохранить: '+error.message,'error');
-  if(/доступ|пользовател|разреш|initdata|telegram/i.test(error.message))setAccess(false,error.message);
+  handleAccessError(error);
   if(tg)tg.HapticFeedback?.notificationOccurred('error');
  }finally{
   button.disabled=false;
@@ -575,7 +611,7 @@ async function loadNightFact(){
   }catch(error){
    renderNightFact(null);
    console.error('Ошибка загрузки ночного факта:',error);
-   if(/доступ|пользовател|разреш|initdata|telegram/i.test(error.message))setAccess(false,error.message);
+   handleAccessError(error);
   }
 }
 async function loadSugarAverage(){
@@ -590,7 +626,7 @@ async function loadSugarAverage(){
   }catch(error){
    showMetricValue(element,'—','ммоль/л');
    console.error('Ошибка загрузки среднего сахара:',error);
-   if(/доступ|пользовател|разреш|initdata|telegram/i.test(error.message))setAccess(false,error.message);
+   handleAccessError(error);
    return false;
   }
 }
@@ -608,7 +644,7 @@ async function loadInsulinTotal(){
    showMetricValue(element,'—','ед.');
    renderNightFact(null);
    console.error('Ошибка загрузки суммы инсулина:',error);
-   if(/доступ|пользовател|разреш|initdata|telegram/i.test(error.message))setAccess(false,error.message);
+   handleAccessError(error);
    return false;
   }
 }
@@ -663,7 +699,7 @@ async function loadAnalytics(force=false){
    content.hidden=false;
    renderAnalytics();
   }catch(error){
-   if(/доступ|пользовател|разреш|initdata|telegram/i.test(error.message))setAccess(false,error.message);
+   handleAccessError(error);
    loading.innerHTML=escapeHtml(error.message)+'<br><button class="analytics-retry" type="button" onclick="loadAnalytics(true)">Повторить</button>';
    loading.hidden=false;
   }finally{
