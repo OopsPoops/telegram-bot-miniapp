@@ -256,7 +256,7 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 <div class="analytics-toolbar">
 <span class="analytics-toolbar-label">Период</span>
 <select id="trend-period" aria-label="Период графика динамики" onchange="changeTrendPeriod()">
-<option value="7">7 дней</option><option value="14">14 дней</option><option value="30">30 дней</option>
+<option value="3" selected>3 дня</option><option value="7">7 дней</option><option value="14">14 дней</option><option value="30">30 дней</option>
 </select>
 </div>
 <div class="analytics-toolbar-label">Дни на графике</div>
@@ -284,7 +284,7 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 <div class="analytics-toolbar">
 <span class="analytics-toolbar-label">Период</span>
 <select id="distribution-period" aria-label="Период графика распределения" onchange="renderDistribution()">
-<option value="7">7 дней</option><option value="14">14 дней</option><option value="30">30 дней</option>
+<option value="3" selected>3 дня</option><option value="7">7 дней</option><option value="14">14 дней</option><option value="30">30 дней</option>
 </select>
 </div>
 <div id="distribution-chart" class="chart-wrap"></div>
@@ -296,7 +296,7 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 <div class="analytics-toolbar">
 <span class="analytics-toolbar-label">Сводка за период</span>
 <select id="daily-period" aria-label="Период суточной сводки" onchange="renderDailySummary()">
-<option value="7">7 дней</option><option value="14">14 дней</option><option value="30">30 дней</option>
+<option value="3" selected>3 дня</option><option value="7">7 дней</option><option value="14">14 дней</option><option value="30">30 дней</option>
 </select>
 </div>
 <div id="daily-chart" class="chart-wrap"></div>
@@ -311,7 +311,7 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 <div class="analytics-toolbar">
 <span class="analytics-toolbar-label">Активность за период</span>
 <select id="activity-period" aria-label="Период тепловой карты" onchange="renderActivityHeatmap()">
-<option value="7">7 дней</option><option value="14">14 дней</option><option value="30">30 дней</option>
+<option value="3" selected>3 дня</option><option value="7">7 дней</option><option value="14">14 дней</option><option value="30">30 дней</option>
 </select>
 </div>
 <div id="activity-chart" class="chart-wrap"></div>
@@ -387,7 +387,7 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 const tg=window.Telegram?.WebApp;
 if(tg){tg.ready();tg.expand();}
 const API_URL='https://telegram-daily-sum-bot.onrender.com/api/miniapp';
-const analyticsState={loaded:false,loading:false,measurements:[],chart:'trend',metric:'sugar',trendDays:7,selectedDates:null,visibleWeeks:[true,true,true]};
+const analyticsState={loaded:false,loading:false,measurements:[],chart:'trend',metric:'sugar',trendDays:3,selectedDates:null,visibleWeeks:[true,true,true]};
 const weekColors=['#5267e8','#ec9438','#31a66d'];
 const labels={
 today:{title:'Сегодня',subtitle:'Данные за текущий день',icon:'☀️',loading:'Собираю данные за сегодня…'},
