@@ -576,6 +576,11 @@ function showMetricValue(element,value,unit){
   element.removeAttribute('role');
   element.innerHTML=escapeHtml(String(value))+' <small>'+unit+'</small>';
 }
+function showMetricError(element,figure=false){
+  element.className=figure?'metric-figure':'metric-value';
+  element.removeAttribute('role');
+  element.innerHTML=figure?'<div class="value" aria-label="Не удалось загрузить">❌</div>':'<span aria-label="Не удалось загрузить">❌</span>';
+}
 function formatNightFact(rawValue){
   const numericValue=Number(rawValue);
   if(!Number.isFinite(numericValue))return {text:'—',unit:'ед.'};
@@ -609,7 +614,7 @@ async function loadNightFact(){
    renderNightFact(total);
    setAccess(true,'Сервер подтвердил доступ');
   }catch(error){
-   renderNightFact(null);
+   showMetricError(element,true);
    console.error('Ошибка загрузки ночного факта:',error);
    handleAccessError(error);
   }
@@ -624,7 +629,7 @@ async function loadSugarAverage(){
    setAccess(true,'Сервер подтвердил доступ');
    return true;
   }catch(error){
-   showMetricValue(element,'—','ммоль/л');
+   showMetricError(element);
    console.error('Ошибка загрузки среднего сахара:',error);
    handleAccessError(error);
    return false;
@@ -641,8 +646,8 @@ async function loadInsulinTotal(){
    setAccess(true,'Сервер подтвердил доступ');
    return true;
   }catch(error){
-   showMetricValue(element,'—','ед.');
-   renderNightFact(null);
+   showMetricError(element);
+   showMetricError(document.getElementById('nightFact'),true);
    console.error('Ошибка загрузки суммы инсулина:',error);
    handleAccessError(error);
    return false;
