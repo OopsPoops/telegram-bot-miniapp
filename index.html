@@ -257,7 +257,7 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 <div class="analytics-toolbar">
 <span class="analytics-toolbar-label">Период</span>
 <select id="trend-period" aria-label="Период графика динамики" onchange="changeTrendPeriod()">
-<option value="3" selected>3 дня</option><option value="7">7 дней</option><option value="14">14 дней</option><option value="30">30 дней</option>
+<option value="3" selected>3 дня</option><option value="7">7 дней</option><option value="14">14 дней</option><option value="21">21 день</option><option value="30">30 дней</option><option value="45">45 дней</option>
 </select>
 </div>
 <div class="analytics-toolbar-label">Дни на графике</div>
@@ -285,7 +285,7 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 <div class="analytics-toolbar">
 <span class="analytics-toolbar-label">Период</span>
 <select id="distribution-period" aria-label="Период графика распределения" onchange="renderDistribution()">
-<option value="3" selected>3 дня</option><option value="7">7 дней</option><option value="14">14 дней</option><option value="30">30 дней</option>
+<option value="3" selected>3 дня</option><option value="7">7 дней</option><option value="14">14 дней</option><option value="21">21 день</option><option value="30">30 дней</option><option value="45">45 дней</option>
 </select>
 </div>
 <div id="distribution-chart" class="chart-wrap"></div>
@@ -297,7 +297,7 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 <div class="analytics-toolbar">
 <span class="analytics-toolbar-label">Сводка за период</span>
 <select id="daily-period" aria-label="Период суточной сводки" onchange="renderDailySummary()">
-<option value="3" selected>3 дня</option><option value="7">7 дней</option><option value="14">14 дней</option><option value="30">30 дней</option>
+<option value="3" selected>3 дня</option><option value="7">7 дней</option><option value="14">14 дней</option><option value="21">21 день</option><option value="30">30 дней</option><option value="45">45 дней</option>
 </select>
 </div>
 <div id="daily-chart" class="chart-wrap"></div>
@@ -312,7 +312,7 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 <div class="analytics-toolbar">
 <span class="analytics-toolbar-label">Активность за период</span>
 <select id="activity-period" aria-label="Период тепловой карты" onchange="renderActivityHeatmap()">
-<option value="3" selected>3 дня</option><option value="7">7 дней</option><option value="14">14 дней</option><option value="30">30 дней</option>
+<option value="3" selected>3 дня</option><option value="7">7 дней</option><option value="14">14 дней</option><option value="21">21 день</option><option value="30">30 дней</option><option value="45">45 дней</option>
 </select>
 </div>
 <div id="activity-chart" class="chart-wrap"></div>
@@ -698,7 +698,7 @@ async function loadAnalytics(force=false){
   loading.textContent='Загружаю измерения…';
   content.hidden=true;
   try{
-   const result=await api('history',{days:30});
+   const result=await api('history',{days:45});
    analyticsState.measurements=normalizeHistory(result);
    analyticsState.loaded=true;
    analyticsState.selectedDates=null;
@@ -879,8 +879,7 @@ function renderDailySummary(){
   let low=Math.min(...summaries.map(day=>day.minimum)),high=Math.max(...summaries.map(day=>day.maximum));
   if(low===high){const pad=Math.max(Math.abs(low)*.08,.5);low-=pad;high+=pad;}
   else{const pad=(high-low)*.12;low-=pad;high+=pad;}
-  const rawStep=(high-low)/4,power=10**Math.floor(Math.log10(rawStep||1)),fraction=rawStep/power;
-  const step=(fraction<=1?1:fraction<=2?2:fraction<=5?5:10)*power;
+  const step=1;
   const yMin=Math.floor(low/step)*step,yMax=Math.ceil(high/step)*step||yMin+step;
   const y=value=>margin.top+plotH-((value-yMin)/(yMax-yMin))*plotH;
   const slot=plotW/summaries.length;
@@ -912,12 +911,11 @@ function renderActivityHeatmap(){
   const startHour=Math.floor(timeWindow.start/60);
   const endHour=Math.ceil((timeWindow.start+timeWindow.duration)/60);
   const hours=Array.from({length:endHour-startHour},(_,index)=>(startHour+index)%24);
-  const hourLabelStep=hours.length<=8?1:hours.length<=14?2:3;
   const labels=['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
   const gridColumns=`30px repeat(${hours.length},minmax(11px,1fr))`;
   let html=`<div class="heatmap-scroll"><div class="heatmap-grid" style="grid-template-columns:${gridColumns}" role="grid" aria-label="Количество измерений по дню недели и времени">`;
   html+='<span class="heatmap-corner"></span>';
-  hours.forEach((hour,index)=>html+=`<span class="heatmap-hour">${index%hourLabelStep===0?String(hour).padStart(2,'0'):''}</span>`);
+  hours.forEach(hour=>html+=`<span class="heatmap-hour">${hour}</span>`);
   html+='</div>';
   for(let day=0;day<7;day++){
    html+=`<div class="heatmap-grid" style="grid-template-columns:${gridColumns}"><span class="heatmap-day">${labels[day]}</span>`;
@@ -955,9 +953,9 @@ function timeAxisWindow(points){
   if(end-start>=1440)return {start:0,duration:1440};
   return {start:((start%1440)+1440)%1440,duration:end-start};
 }
-function formatClockMinute(value){
-  const minute=((Math.round(value)%1440)+1440)%1440;
-  return `${String(Math.floor(minute/60)).padStart(2,'0')}:${String(minute%60).padStart(2,'0')}`;
+function formatClockHour(value){
+  const hour=((Math.floor(value/60)%24)+24)%24;
+  return String(hour);
 }
 function renderLegend(id,items){
   const host=document.getElementById(id);
@@ -980,8 +978,7 @@ function renderTimeChart(id,groups,{metric,tooltipId,connect=true,emptyText,week
   let low=Math.min(...all.map(row=>row.value)),high=Math.max(...all.map(row=>row.value));
   if(low===high){const pad=Math.max(Math.abs(low)*.08,metric==='sugar'?0.5:0.5);low-=pad;high+=pad;}
   else{const pad=(high-low)*.1;low-=pad;high+=pad;}
-  const rawStep=(high-low)/4,power=10**Math.floor(Math.log10(rawStep||1)),fraction=rawStep/power;
-  const step=(fraction<=1?1:fraction<=2?2:fraction<=5?5:10)*power;
+  const step=1;
   const yMin=Math.floor(low/step)*step,yMax=Math.ceil(high/step)*step||yMin+step;
   const timeOffset=value=>(((value-timeWindow.start)%1440)+1440)%1440;
   const x=value=>margin.left+(timeOffset(value)/timeWindow.duration)*plotW;
@@ -991,14 +988,12 @@ function renderTimeChart(id,groups,{metric,tooltipId,connect=true,emptyText,week
    const py=y(value);svg+=`<line class="chart-grid" x1="${margin.left}" y1="${py}" x2="${width-margin.right}" y2="${py}"/><text x="${margin.left-6}" y="${py+3}" text-anchor="end">${formatAxisValue(value)}</text>`;
   }
   const firstHour=Math.ceil(timeWindow.start/60)*60,lastMinute=timeWindow.start+timeWindow.duration;
-  const tickStep=timeWindow.duration<=6*60?60:timeWindow.duration<=12*60?120:240;
-  const ticks=[timeWindow.start];
-  for(let minute=Math.ceil(firstHour/tickStep)*tickStep;minute<lastMinute;minute+=tickStep)ticks.push(minute);
-  ticks.push(lastMinute);
-  ticks.forEach((minute,index)=>{
-   const position=index===0?margin.left+1:index===ticks.length-1?width-margin.right-1:x(minute%1440);
-   const anchor=index===0?'start':index===ticks.length-1?'end':'middle';
-   const label=formatClockMinute(minute);
+  const ticks=[];
+  for(let minute=firstHour;minute<=lastMinute;minute+=60)ticks.push(minute);
+  ticks.forEach(minute=>{
+   const position=x(minute%1440);
+   const anchor='middle';
+   const label=formatClockHour(minute);
    svg+=`<line class="chart-grid" x1="${position}" y1="${margin.top}" x2="${position}" y2="${margin.top+plotH}"/><text x="${position}" y="${height-17}" text-anchor="${anchor}">${label}</text>`;
   });
   svg+=`<line class="chart-axis" x1="${margin.left}" y1="${margin.top+plotH}" x2="${width-margin.right}" y2="${margin.top+plotH}"/><text x="${width/2}" y="${height-2}" text-anchor="middle">Время</text>`;
