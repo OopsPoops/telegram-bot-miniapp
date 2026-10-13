@@ -105,8 +105,8 @@ button{-webkit-tap-highlight-color:transparent}
 .analytics-swatch{width:10px;height:10px;border-radius:50%;display:inline-block;flex:0 0 auto}
 .week-toggles{display:flex;gap:7px;flex-wrap:wrap;margin:4px 0 11px}
 .week-toggle{display:flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:10px;padding:7px 8px;font-size:10px;color:var(--muted)}
-.chart-wrap{width:100%;min-height:220px;overflow:hidden}
-.chart-svg{display:block;width:100%;height:250px;overflow:visible}
+.chart-wrap{width:calc(100% + 8px);min-height:220px;margin-left:-8px;overflow:hidden}
+.chart-svg{display:block;width:100%;height:285px;overflow:visible}
 .chart-svg text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:var(--muted);font-size:10px}
 .chart-grid{stroke:var(--line);stroke-width:1}
 .chart-axis{stroke:var(--muted);stroke-width:1;opacity:.6}
@@ -122,7 +122,7 @@ button{-webkit-tap-highlight-color:transparent}
 .heatmap-grid{display:grid;gap:3px;align-items:center;min-width:100%;margin-bottom:4px}
 .heatmap-corner,.heatmap-hour{height:15px;text-align:center;color:var(--muted);font-size:9px}
 .heatmap-day{font-size:10px;color:var(--muted)}
-.heatmap-cell{height:23px;min-width:0;padding:0;border:1px solid rgba(125,135,170,.12);border-radius:5px;cursor:pointer}
+.heatmap-cell{height:27px;min-width:0;padding:0;border:1px solid rgba(125,135,170,.12);border-radius:5px;cursor:pointer}
 .heatmap-cell:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
 .bottom-nav-wrap{position:fixed;z-index:20;bottom:0;left:0;right:0;padding:6px 12px calc(6px + env(safe-area-inset-bottom));pointer-events:none;background:linear-gradient(to top,var(--bg) 55%,rgba(245,246,251,0));}
 :root[data-theme="dark"] .bottom-nav-wrap{background:linear-gradient(to top,var(--bg) 55%,rgba(17,19,27,0));}
@@ -865,7 +865,7 @@ function renderDailySummary(){
   const days=Number(document.getElementById('daily-period').value),summaries=dailySummary(days);
   tooltip.textContent='';
   if(!summaries.length){host.innerHTML='<div class="analytics-message">За этот период нет измерений.</div>';return;}
-  const width=Math.max(240,Math.floor(host.clientWidth||320)),height=250;
+  const width=Math.max(240,Math.floor(host.clientWidth||320)),height=285;
   const margin={left:43,right:16,top:14,bottom:36},plotW=width-margin.left-margin.right,plotH=height-margin.top-margin.bottom;
   let low=Math.min(...summaries.map(day=>day.minimum)),high=Math.max(...summaries.map(day=>day.maximum));
   if(low===high){const pad=Math.max(Math.abs(low)*.08,.5);low-=pad;high+=pad;}
@@ -963,7 +963,7 @@ function renderTimeChart(id,groups,{metric,tooltipId,connect=true,emptyText,week
   const tooltip=document.getElementById(tooltipId);
   tooltip.textContent='';
   if(!all.length){host.innerHTML=`<div class="analytics-message">${escapeHtml(emptyText)}</div>`;return;}
-  const width=Math.max(240,Math.floor(host.clientWidth||320)),height=250;
+  const width=Math.max(240,Math.floor(host.clientWidth||320)),height=285;
   const margin={left:43,right:14,top:12,bottom:34},plotW=width-margin.left-margin.right,plotH=height-margin.top-margin.bottom;
   const timeWindow=timeAxisWindow(all);
   let low=Math.min(...all.map(row=>row.value)),high=Math.max(...all.map(row=>row.value));
