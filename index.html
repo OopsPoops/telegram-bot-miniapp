@@ -220,7 +220,7 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 </div>
 </div>
 <div class="input-row">
-<input class="value-input" id="nightInput" type="text" inputmode="decimal" placeholder="Например, 11" aria-label="Новое ночное значение">
+<input class="value-input" id="nightInput" type="text" inputmode="decimal" placeholder="Еще не скоро" aria-label="Новое ночное значение">
 <button class="save-button" onclick="saveValue('fact')">Сохранить</button>
 </div>
 <div class="toast" id="nightToast"></div>
@@ -584,8 +584,19 @@ function formatNightFact(todayResult){
   if(!valueMatch)throw new Error('Не удалось прочитать ночное значение.');
   const value=valueMatch[1]==='-'?'—':valueMatch[1];
   if(value==='—')return {text:value,unit:'ед.'};
-  if(/ручной ввод/i.test(line[1]))return {text:`${value} ✍️`,unit:'ед.'};
+  if(/ручной ввод/i.test(line[1]))return {text:`✍️ ${value}`,unit:'ед.'};
   return {text:/⚠️/.test(line[1])?`~${value}`:value,unit:'ед.'};
+}
+function nightInputPlaceholder(date = new Date()){
+  const minutes=date.getHours()*60+date.getMinutes();
+  if(minutes>=21*60+30)return 'Надеюсь сделала...';
+  if(minutes>=20*60+51)return 'Пора делать';
+  if(minutes>=20*60)return 'Уже скоро';
+  return 'Еще не скоро';
+}
+function updateNightInputPlaceholder(){
+  const input=document.getElementById('nightInput');
+  if(input)input.placeholder=nightInputPlaceholder();
 }
 function renderNightFact(rawValue, loading = false){
   const container=document.getElementById('nightFact');
@@ -1024,6 +1035,8 @@ function formatAxisValue(value){
   return Number(value).toFixed(Number.isInteger(value)?0:1);
 }
 initUser();
+updateNightInputPlaceholder();
+setInterval(updateNightInputPlaceholder,60_000);
 loadSugarAverage();
 loadInsulinTotal();
 loadNightFact();
