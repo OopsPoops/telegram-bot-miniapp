@@ -551,7 +551,7 @@ async function saveValue(type){
   setAccess(true,'Сервер подтвердил доступ');
   if(tg)tg.HapticFeedback?.notificationOccurred('success');
   if(type==='sugar')await loadSugarAverage();
-  if(type==='insulin')await loadInsulinTotal();
+  if(type==='insulin')await Promise.all([loadInsulinTotal(),loadNightFact()]);
   if(type==='fact')await loadNightFact();
  }catch(error){
   setToast(toast,'Не удалось сохранить: '+error.message,'error');
@@ -577,14 +577,15 @@ function showMetricError(element,figure=false){
   element.removeAttribute('role');
   element.innerHTML=figure?'<div class="value" aria-label="Не удалось загрузить">❌</div>':'<span aria-label="Не удалось загрузить">❌</span>';
 }
-function formatNightFact(rawValue){
-  const numericValue=Number(rawValue);
-  if(!Number.isFinite(numericValue))return {text:'—',unit:'ед.'};
-  const fact=numericValue/2;
-  const floored=Math.floor(fact);
-  const hasFraction=fact % 1 !== 0;
-  const value=hasFraction?`~${floored}`:String(floored);
-  return {text:value,unit:'ед.'};
+function formatNightFact(todayResult){
+  const line=String(todayResult).match(/Ночной\s*=\s*([^\n]+)/i);
+  if(!line)throw new Error('В отчёте за сегодня нет ночного значения.');
+  const valueMatch=line[1].match(/^\s*(-?\d+(?:[.,]\d+)?|[-—])/);
+  if(!valueMatch)throw new Error('Не удалось прочитать ночное значение.');
+  const value=valueMatch[1]==='-'?'—':valueMatch[1];
+  if(value==='—')return {text:value,unit:'ед.'};
+  if(/ручной ввод/i.test(line[1]))return {text:`${value} ✍️`,unit:'ед.'};
+  return {text:/⚠️/.test(line[1])?`~${value}`:value,unit:'ед.'};
 }
 function renderNightFact(rawValue, loading = false){
   const container=document.getElementById('nightFact');
@@ -593,7 +594,7 @@ function renderNightFact(rawValue, loading = false){
     showMetricLoading(container);
     return;
   }
-  if(rawValue===null || rawValue==='' || !Number.isFinite(Number(rawValue))){
+  if(rawValue===null || rawValue===''){
     showMetricValue(container,'—','ед.');
     return;
   }
@@ -606,8 +607,8 @@ async function loadNightFact(){
   const element=document.getElementById('nightFact');
   renderNightFact(null,true);
   try{
-   const total=await api('insulin_total');
-   renderNightFact(total);
+   const today=await api('today');
+   renderNightFact(today);
    setAccess(true,'Сервер подтвердил доступ');
   }catch(error){
    showMetricError(element,true);
@@ -638,7 +639,6 @@ async function loadInsulinTotal(){
    const result=await api('insulin_total');
    const value=result!==null&&result!==undefined&&String(result).trim()!==''?String(result):'—';
    showMetricValue(element,value,'ед.');
-   renderNightFact(result);
    setAccess(true,'Сервер подтвердил доступ');
    return true;
   }catch(error){
