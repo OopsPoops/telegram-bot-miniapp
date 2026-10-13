@@ -260,13 +260,10 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 <option value="3" selected>3 дня</option><option value="7">7 дней</option><option value="14">14 дней</option><option value="21">21 день</option><option value="30">30 дней</option><option value="45">45 дней</option>
 </select>
 </div>
+<div id="trend-chart" class="chart-wrap"></div>
 <div class="analytics-toolbar-label">Дни на графике</div>
 <div id="trend-days" class="analytics-days" aria-label="Выберите отображаемые дни"></div>
-<div class="analytics-note">Даты выбранного периода включены по умолчанию; снимите галочки, чтобы скрыть отдельные дни.</div>
-<div id="trend-chart" class="chart-wrap"></div>
 <div id="trend-tooltip" class="chart-tooltip" role="status">Нажмите на точку, чтобы увидеть измерение.</div>
-<div id="trend-legend" class="analytics-legend"></div>
-<div class="analytics-note">Каждый отрезок соединяет измерения только внутри одного дня.</div>
 </section>
 <section class="analytics-card analytics-panel" data-panel="compare" hidden>
 <div class="analytics-toolbar">
@@ -278,8 +275,6 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 <div id="week-toggles" class="week-toggles"></div>
 <div id="compare-chart" class="chart-wrap"></div>
 <div id="compare-tooltip" class="chart-tooltip" role="status">Нажмите на точку, чтобы увидеть измерение.</div>
-<div id="compare-legend" class="analytics-legend"></div>
-<div class="analytics-note">Точки показаны по фактическому времени. Линии не соединяют разные дни недели.</div>
 </section>
 <section class="analytics-card analytics-panel" data-panel="distribution" hidden>
 <div class="analytics-toolbar">
@@ -291,7 +286,6 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 <div id="distribution-chart" class="chart-wrap"></div>
 <div id="distribution-tooltip" class="chart-tooltip" role="status">Нажмите на точку, чтобы увидеть измерение.</div>
 <div id="distribution-legend" class="analytics-legend"></div>
-<div class="analytics-note">Каждая точка — отдельное измерение; линии не проводятся.</div>
 </section>
 <section class="analytics-card analytics-panel" data-panel="daily" hidden>
 <div class="analytics-toolbar">
@@ -306,7 +300,6 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 <span class="analytics-legend-item"><span class="analytics-swatch" style="background:#8998ff"></span>Минимум — максимум</span>
 <span class="analytics-legend-item"><span class="analytics-swatch" style="background:#5267e8"></span>Среднее</span>
 </div>
-<div class="analytics-note">Минимум, максимум и среднее рассчитаны по всем измерениям выбранного дня.</div>
 </section>
 <section class="analytics-card analytics-panel" data-panel="activity" hidden>
 <div class="analytics-toolbar">
@@ -321,7 +314,6 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 <span class="analytics-legend-item">Редкие измерения</span>
 <span class="analytics-legend-item"><span class="analytics-swatch" style="background:#dfe3ff"></span><span class="analytics-swatch" style="background:#5267e8"></span>Частые измерения</span>
 </div>
-<div class="analytics-note">Цвет ячейки показывает количество отдельных измерений в этот час.</div>
 </section>
 </div>
 </section>
@@ -797,7 +789,6 @@ function renderTrend(){
    label:formatShortDate(key),color:dayColor(key,dates),points:visible.filter(row=>row.dateKey===key)
   }));
   renderTimeChart('trend-chart',groups,{metric:analyticsState.metric,tooltipId:'trend-tooltip',emptyText:'За этот период нет измерений.'});
-  renderLegend('trend-legend',groups);
 }
 function changeTrendPeriod(){
   analyticsState.trendDays=Number(document.getElementById('trend-period').value);
@@ -847,7 +838,6 @@ function renderComparison(){
    }
   });
   renderTimeChart('compare-chart',groups,{metric:analyticsState.metric,tooltipId:'compare-tooltip',emptyText:'В выбранных неделях пока нет измерений.',weekLabels:true});
-  renderLegend('compare-legend',starts.map((start,index)=>({label:`${['Текущая неделя','Предыдущая неделя','2 недели назад'][index]} · ${formatWeekRange(start)}`,color:weekColors[index]})));
 }
 const weekdayNames=['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
 function renderDistribution(){
