@@ -7,6 +7,7 @@
 <title>Сёма</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="night-fact.js"></script>
+<script src="entry-placeholders.js"></script>
 <style>
 :root{color-scheme:light;--bg:#f5f6fb;--status-bar-bg:#e6e7ec;--status-bar-fade:#eff0f5;--card:#fff;--text:#20243a;--muted:#81869a;--blue:#5267e8;--pink:#ed6f9b;--teal:#20a99b;--line:#edf0f6;--input-bg:#f7f8fc;--input-text:#20243a;--shadow:0 8px 26px rgba(37,47,82,.08),0 1px 2px rgba(37,47,82,.05);--nav-highlight:#edf3ff;--nav-border:rgba(128,136,158,.18);--nav-active:#dfe7ff;--icon-bg:#f1f4fb;--modal-bg:#fff;--modal-content:#f4f6fb;--close-bg:#eef2fb;--close-text:#3c4664}
 :root[data-theme="dark"]{color-scheme:dark;--bg:#11131b;--status-bar-bg:#11131b;--status-bar-fade:#11131b;--card:#1c202c;--text:#f1f3fa;--muted:#a0a6bb;--blue:#8998ff;--pink:#ed7fa5;--teal:#40cbbb;--line:#3a4051;--input-bg:#292e3d;--input-text:#f1f3fa;--shadow:0 14px 34px rgba(0,0,0,.38),0 1px 2px rgba(0,0,0,.18);--nav-highlight:rgba(255,255,255,.07);--nav-border:rgba(151,160,182,.14);--nav-active:rgba(146,160,255,.14);--icon-bg:#2b313f;--modal-bg:#1a1f2c;--modal-content:#202737;--close-bg:#2d3446;--close-text:#eef2ff}
@@ -185,7 +186,7 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 </div>
 </div>
 <div class="input-row">
-<input class="value-input" id="sugarInput" type="text" inputmode="decimal" placeholder="Например, 5,6" aria-label="Новое значение сахара">
+<input class="value-input" id="sugarInput" type="text" inputmode="decimal" placeholder="" aria-label="Новое значение сахара">
 <button class="save-button" onclick="saveValue('sugar')">Сохранить</button>
 </div>
 <div class="toast" id="sugarToast"></div>
@@ -203,7 +204,7 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 </div>
 </div>
 <div class="input-row">
-<input class="value-input" id="insulinInput" type="number" inputmode="numeric" step="1" min="0" max="15" placeholder="Например, 11" aria-label="Новое значение инсулина">
+<input class="value-input" id="insulinInput" type="number" inputmode="numeric" step="1" min="0" max="15" placeholder="" aria-label="Новое значение инсулина">
 <button class="save-button" onclick="saveValue('insulin')">Сохранить</button>
 </div>
 <div class="toast" id="insulinToast"></div>
@@ -588,6 +589,11 @@ function nightInputPlaceholder(date = new Date()){
 function updateNightInputPlaceholder(){
   const input=document.getElementById('nightInput');
   if(input)input.placeholder=nightInputPlaceholder();
+}
+function updateEntryPlaceholders(){
+ const placeholders=getEntryPlaceholders();
+ document.getElementById('sugarInput').placeholder=placeholders.sugar;
+ document.getElementById('insulinInput').placeholder=placeholders.insulin;
 }
 function renderNightFact(rawValue, loading = false){
   const container=document.getElementById('nightFact');
@@ -1026,6 +1032,10 @@ function formatAxisValue(value){
   return Number(value).toFixed(Number.isInteger(value)?0:1);
 }
 initUser();
+updateEntryPlaceholders();
+window.addEventListener('pageshow',updateEntryPlaceholders);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)updateEntryPlaceholders();});
+if(tg)tg.onEvent?.('activated',updateEntryPlaceholders);
 updateNightInputPlaceholder();
 setInterval(updateNightInputPlaceholder,60_000);
 loadSugarAverage();
