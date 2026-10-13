@@ -98,7 +98,8 @@ button{-webkit-tap-highlight-color:transparent}
 .analytics-toolbar select{max-width:100%;border:1px solid var(--line);border-radius:11px;padding:8px 10px;background:var(--input-bg);color:var(--text);font-size:13px}
 .analytics-days{display:flex;gap:6px;overflow-x:auto;padding:1px 1px 9px;margin-bottom:5px;scrollbar-width:thin}
 .analytics-day{display:flex;align-items:center;gap:5px;flex:0 0 auto;border:1px solid var(--line);border-radius:10px;padding:6px 8px;color:var(--muted);font-size:11px;white-space:nowrap}
-.analytics-day input,.week-toggle input{accent-color:var(--blue)}
+.analytics-day input,.week-toggle input{accent-color:#969baa}
+:root[data-theme="dark"] .analytics-day input,:root[data-theme="dark"] .week-toggle input{accent-color:#858b99}
 .analytics-legend{display:flex;gap:8px 13px;flex-wrap:wrap;font-size:11px;color:var(--muted)}
 .analytics-legend-item{display:inline-flex;align-items:center;gap:5px}
 .analytics-swatch{width:10px;height:10px;border-radius:50%;display:inline-block;flex:0 0 auto}
@@ -263,7 +264,7 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 <div id="trend-chart" class="chart-wrap"></div>
 <div class="analytics-toolbar-label">Дни на графике</div>
 <div id="trend-days" class="analytics-days" aria-label="Выберите отображаемые дни"></div>
-<div id="trend-tooltip" class="chart-tooltip" role="status">Нажмите на точку, чтобы увидеть измерение.</div>
+<div id="trend-tooltip" class="chart-tooltip" role="status"></div>
 </section>
 <section class="analytics-card analytics-panel" data-panel="compare" hidden>
 <div class="analytics-toolbar">
@@ -272,9 +273,9 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 <option value="all">Все дни</option><option value="1">Понедельник</option><option value="2">Вторник</option><option value="3">Среда</option><option value="4">Четверг</option><option value="5">Пятница</option><option value="6">Суббота</option><option value="0">Воскресенье</option>
 </select>
 </div>
-<div id="week-toggles" class="week-toggles"></div>
 <div id="compare-chart" class="chart-wrap"></div>
-<div id="compare-tooltip" class="chart-tooltip" role="status">Нажмите на точку, чтобы увидеть измерение.</div>
+<div id="week-toggles" class="week-toggles"></div>
+<div id="compare-tooltip" class="chart-tooltip" role="status"></div>
 </section>
 <section class="analytics-card analytics-panel" data-panel="distribution" hidden>
 <div class="analytics-toolbar">
@@ -284,7 +285,7 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 </select>
 </div>
 <div id="distribution-chart" class="chart-wrap"></div>
-<div id="distribution-tooltip" class="chart-tooltip" role="status">Нажмите на точку, чтобы увидеть измерение.</div>
+<div id="distribution-tooltip" class="chart-tooltip" role="status"></div>
 <div id="distribution-legend" class="analytics-legend"></div>
 </section>
 <section class="analytics-card analytics-panel" data-panel="daily" hidden>
@@ -295,7 +296,7 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 </select>
 </div>
 <div id="daily-chart" class="chart-wrap"></div>
-<div id="daily-tooltip" class="chart-tooltip" role="status">Нажмите на день, чтобы увидеть сводку.</div>
+<div id="daily-tooltip" class="chart-tooltip" role="status"></div>
 <div class="analytics-legend">
 <span class="analytics-legend-item"><span class="analytics-swatch" style="background:#8998ff"></span>Минимум — максимум</span>
 <span class="analytics-legend-item"><span class="analytics-swatch" style="background:#5267e8"></span>Среднее</span>
@@ -309,7 +310,7 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 </select>
 </div>
 <div id="activity-chart" class="chart-wrap"></div>
-<div id="activity-tooltip" class="chart-tooltip" role="status">Нажмите на ячейку, чтобы увидеть число измерений.</div>
+<div id="activity-tooltip" class="chart-tooltip" role="status"></div>
 <div class="analytics-legend">
 <span class="analytics-legend-item">Редкие измерения</span>
 <span class="analytics-legend-item"><span class="analytics-swatch" style="background:#dfe3ff"></span><span class="analytics-swatch" style="background:#5267e8"></span>Частые измерения</span>
@@ -862,10 +863,10 @@ function dailySummary(days){
 function renderDailySummary(){
   const host=document.getElementById('daily-chart'),tooltip=document.getElementById('daily-tooltip');
   const days=Number(document.getElementById('daily-period').value),summaries=dailySummary(days);
-  tooltip.textContent='Нажмите на день, чтобы увидеть сводку.';
+  tooltip.textContent='';
   if(!summaries.length){host.innerHTML='<div class="analytics-message">За этот период нет измерений.</div>';return;}
   const width=Math.max(240,Math.floor(host.clientWidth||320)),height=250;
-  const margin={left:49,right:10,top:14,bottom:36},plotW=width-margin.left-margin.right,plotH=height-margin.top-margin.bottom;
+  const margin={left:43,right:16,top:14,bottom:36},plotW=width-margin.left-margin.right,plotH=height-margin.top-margin.bottom;
   let low=Math.min(...summaries.map(day=>day.minimum)),high=Math.max(...summaries.map(day=>day.maximum));
   if(low===high){const pad=Math.max(Math.abs(low)*.08,.5);low-=pad;high+=pad;}
   else{const pad=(high-low)*.12;low-=pad;high+=pad;}
@@ -895,7 +896,7 @@ function renderActivityHeatmap(){
   const counts=Array.from({length:7},()=>Array(24).fill(0));
   rows.forEach(row=>counts[row.dateObj.getDay()][row.timeObj.hour]++);
   const max=Math.max(0,...counts.flat());
-  tooltip.textContent='Нажмите на ячейку, чтобы увидеть число измерений.';
+  tooltip.textContent='';
   if(!max){host.innerHTML='<div class="analytics-message">За этот период нет измерений.</div>';return;}
   const timeWindow=timeAxisWindow(rows);
   const startHour=Math.floor(timeWindow.start/60);
@@ -960,10 +961,10 @@ function renderLegend(id,items){
 function renderTimeChart(id,groups,{metric,tooltipId,connect=true,emptyText,weekLabels=false}){
   const host=document.getElementById(id),all=groups.flatMap(group=>group.points);
   const tooltip=document.getElementById(tooltipId);
-  tooltip.textContent='Нажмите на точку, чтобы увидеть измерение.';
+  tooltip.textContent='';
   if(!all.length){host.innerHTML=`<div class="analytics-message">${escapeHtml(emptyText)}</div>`;return;}
   const width=Math.max(240,Math.floor(host.clientWidth||320)),height=250;
-  const margin={left:49,right:8,top:12,bottom:34},plotW=width-margin.left-margin.right,plotH=height-margin.top-margin.bottom;
+  const margin={left:43,right:14,top:12,bottom:34},plotW=width-margin.left-margin.right,plotH=height-margin.top-margin.bottom;
   const timeWindow=timeAxisWindow(all);
   let low=Math.min(...all.map(row=>row.value)),high=Math.max(...all.map(row=>row.value));
   if(low===high){const pad=Math.max(Math.abs(low)*.08,metric==='sugar'?0.5:0.5);low-=pad;high+=pad;}
