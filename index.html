@@ -25,7 +25,6 @@ button{-webkit-tap-highlight-color:transparent}
 .sugar .metric-icon{background:#fff0f5}
 .insulin .metric-icon{background:#e4faf6}
 .metric-name{font-size:17px;font-weight:750}
-.metric-title-row{display:flex;align-items:center;gap:8px}
 .metric-description{font-size:12px;color:var(--muted);margin-top:4px}
 .metric-value{display:flex;flex-direction:column;align-items:flex-end;font-size:28px;font-weight:800;letter-spacing:-.7px;line-height:1.1;margin-left:auto;text-align:right;white-space:nowrap}
 .metric-value small{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:0}
@@ -52,9 +51,11 @@ button{-webkit-tap-highlight-color:transparent}
 .toast.error{color:#cf3434}
 :root[data-theme="dark"] .toast.success{color:#48cc83}
 :root[data-theme="dark"] .toast.error{color:#ff7474}
-.insulin-timer-countdown{border-radius:8px;background:#e4faf6;padding:4px 7px;color:#176d63;font-size:13px;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
-.insulin-timer-countdown[hidden]{display:none}
-:root[data-theme="dark"] .insulin-timer-countdown{background:#20413e;color:#9aeee2}
+.insulin-timer{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:13px 2px 2px;padding:11px 13px;border-radius:13px;background:#e4faf6;color:#176d63}
+.insulin-timer[hidden]{display:none}
+.insulin-timer-label{font-size:12px;font-weight:700}
+.insulin-timer-countdown{font-size:18px;font-weight:800;font-variant-numeric:tabular-nums}
+:root[data-theme="dark"] .insulin-timer{background:#20413e;color:#9aeee2}
 .quick-title{display:flex;justify-content:space-between;align-items:center;margin:23px 2px 12px}
 .section-title{font-size:17px;font-weight:750}
 .quick-title>span{font-size:12px;color:var(--muted)}
@@ -212,10 +213,7 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 <div class="metric-head">
 <div class="metric-icon">💉</div>
 <div>
-<div class="metric-title-row">
 <div class="metric-name">Инсулин</div>
-<span class="insulin-timer-countdown" id="insulinTimerCountdown" hidden role="timer" aria-live="off">00:00</span>
-</div>
 <div class="metric-description">Сумма за сегодня</div>
 </div>
 <div class="metric-loading" id="insulinTotal" role="status" aria-label="Загрузка суммы инсулина">
@@ -228,7 +226,10 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 <button class="save-button" onclick="saveValue('insulin')">Сохранить</button>
 </div>
 <div class="toast" id="insulinToast"></div>
-<div class="toast" id="timerSyncToast" role="status" aria-live="polite"></div>
+<div class="insulin-timer" id="insulinTimer" hidden role="timer" aria-live="off">
+<span class="insulin-timer-label">После инсулина</span>
+<span class="insulin-timer-countdown" id="insulinTimerCountdown">20:00</span>
+</div>
 </section>
 <section class="metric insulin night">
 <div class="metric-head">
@@ -380,7 +381,6 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 <input id="timerThresholdInput" type="number" inputmode="decimal" min="0" max="15" step="0.1" value="5" onchange="updateTimerThreshold()" aria-label="Минимальная доза инсулина для таймера">
 <span>ед.</span>
 </div>
-<div class="toast" id="timerSettingsToast" role="status" aria-live="polite"></div>
 <div class="setting-divider"></div>
 <div class="setting-row">
 <div class="setting-icon">🔔</div>
@@ -442,18 +442,19 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 const tg=window.Telegram?.WebApp;
 if(tg){tg.ready();tg.expand();}
 const API_URL='https://telegram-daily-sum-bot.onrender.com/api/miniapp';
+const TIMER_SETTINGS_KEY='sema-insulin-timer-settings';
+const TIMER_STATE_KEY_PREFIX='sema-insulin-timer-state';
 const TIMER_DURATION_MS=20*60*1000;
 const TIMER_REMINDERS_MS=[5*60*1000,10*60*1000];
-const TIMER_POLL_INTERVAL_MS=15*1000;
 const defaultTimerSettings={mode:'always',threshold:5,sound:true,vibration:true};
 let insulinTimerSettings={...defaultTimerSettings};
 let activeInsulinTimer=null;
 let insulinTimerInterval=null;
 let timerAudioContext=null;
-let timerStateLoaded=false;
-let timerSettingsSaving=false;
-let timerStateRequestVersion=0;
-let timerStateReadId=0;
+function timerStateStorageKey(){
+ const userId=tg?.initDataUnsafe?.user?.id;
+ return userId?`${TIMER_STATE_KEY_PREFIX}:${userId}`:TIMER_STATE_KEY_PREFIX;
+}
 const analyticsState={loaded:false,loading:false,measurements:[],chart:'trend',metric:'sugar',trendDays:3,selectedDates:null,visibleWeeks:[true,true,true]};
 const weekColors=['#5267e8','#ec9438','#31a66d'];
 const labels={
@@ -570,17 +571,51 @@ async function api(action,extra={}){
  }
  return data.result;
 }
+function persistTimerSettings(){
+ try{localStorage.setItem(TIMER_SETTINGS_KEY,JSON.stringify(insulinTimerSettings));}
+ catch(error){console.warn('Не удалось сохранить настройки таймера:',error);}
+}
+function loadTimerSettings(){
+ try{
+  const saved=JSON.parse(localStorage.getItem(TIMER_SETTINGS_KEY)||'null');
+  if(!saved||typeof saved!=='object')return;
+  insulinTimerSettings={
+   mode:['always','threshold','off'].includes(saved.mode)?saved.mode:defaultTimerSettings.mode,
+   threshold:Number.isFinite(Number(saved.threshold))?Math.min(15,Math.max(0,Number(saved.threshold))):defaultTimerSettings.threshold,
+   sound:typeof saved.sound==='boolean'?saved.sound:defaultTimerSettings.sound,
+   vibration:typeof saved.vibration==='boolean'?saved.vibration:defaultTimerSettings.vibration
+  };
+ }catch(error){console.warn('Не удалось загрузить настройки таймера:',error);}
+}
+function persistTimerState(){
+ try{
+  const key=timerStateStorageKey();
+  if(activeInsulinTimer)localStorage.setItem(key,JSON.stringify(activeInsulinTimer));
+  else localStorage.removeItem(key);
+ }catch(error){console.warn('Не удалось сохранить состояние таймера:',error);}
+}
+function shouldRunInsulinTimer(dose){
+ if(!Number.isFinite(dose)||dose<=0||insulinTimerSettings.mode==='off')return false;
+ return insulinTimerSettings.mode==='always'||dose>insulinTimerSettings.threshold;
+}
 function formatTimerElapsed(elapsedMs){
  const seconds=Math.min(20*60,Math.max(0,Math.floor(elapsedMs/1000)));
  return `${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`;
 }
 function renderInsulinTimer(){
+ const container=document.getElementById('insulinTimer');
  const countdown=document.getElementById('insulinTimerCountdown');
- if(!countdown)return;
- if(!activeInsulinTimer){countdown.hidden=true;return;}
+ if(!container||!countdown)return;
+ if(!activeInsulinTimer){
+  container.hidden=true;
+  return;
+ }
  const remaining=TIMER_DURATION_MS-(Date.now()-activeInsulinTimer.startedAt);
- if(remaining<=0){countdown.hidden=true;return;}
- countdown.hidden=false;
+ if(remaining<=0){
+  clearInsulinTimer();
+  return;
+ }
+ container.hidden=false;
  const elapsed=Math.min(TIMER_DURATION_MS,Math.max(0,Date.now()-activeInsulinTimer.startedAt));
  countdown.textContent=formatTimerElapsed(elapsed);
  countdown.setAttribute('aria-label',`${Math.floor(elapsed/60000)} минут прошло`);
@@ -626,69 +661,35 @@ function notifyTimerReminder(){
 function updateInsulinTimer(){
  if(!activeInsulinTimer)return;
  const elapsed=Date.now()-activeInsulinTimer.startedAt;
- if(elapsed>=TIMER_DURATION_MS){
-  renderInsulinTimer();
-  clearInterval(insulinTimerInterval);
-  insulinTimerInterval=null;
+ if(elapsed<0||elapsed>=TIMER_DURATION_MS){
+  clearInsulinTimer();
   return;
  }
- if(elapsed<0){renderInsulinTimer();return;}
  TIMER_REMINDERS_MS.forEach((reminder,index)=>{
   if(elapsed>=reminder&&!activeInsulinTimer.notified[index]){
    activeInsulinTimer.notified[index]=true;
+   persistTimerState();
    notifyTimerReminder();
   }
  });
  renderInsulinTimer();
 }
-function validateSharedTimerState(state){
- if(!state||typeof state!=='object'||!['always','threshold','off'].includes(state.mode)||
-  !Number.isFinite(state.threshold)||state.threshold<0||state.threshold>15||
-  typeof state.sound!=='boolean'||typeof state.vibration!=='boolean'||
-  !(state.startedAt===null||Number.isFinite(state.startedAt))||
-  !(state.dose===null||Number.isFinite(state.dose))||
-  !(state.timerId===null||typeof state.timerId==='string'||typeof state.timerId==='number')){
-  throw new Error('Сервер вернул некорректное состояние общего таймера.');
+function startInsulinTimer(dose){
+ if(!shouldRunInsulinTimer(dose)){
+  clearInsulinTimer();
+  return;
  }
- if(state.startedAt===null&&(state.dose!==null||state.timerId!==null)||
-  state.startedAt!==null&&state.dose===null){
-  throw new Error('Сервер вернул неполное состояние общего таймера.');
- }
- return state;
-}
-function setTimerControlsDisabled(){
- const disabled=!timerStateLoaded||timerSettingsSaving;
- document.querySelectorAll('input[name="insulinTimerMode"],#timerThresholdInput,#timerSoundSwitch,#timerVibrationSwitch')
-  .forEach(control=>{control.disabled=disabled;});
-}
-function applySharedTimerState(rawState){
- const state=validateSharedTimerState(rawState);
- const previousTimer=activeInsulinTimer;
- insulinTimerSettings={
-  mode:state.mode,
-  threshold:state.threshold,
-  sound:state.sound,
-  vibration:state.vibration
- };
- if(state.startedAt===null){
-  activeInsulinTimer=null;
- }else{
-  const sameTimer=previousTimer&&previousTimer.timerId===state.timerId&&
-   previousTimer.startedAt===state.startedAt&&previousTimer.dose===state.dose;
-  activeInsulinTimer={
-   timerId:state.timerId,
-   startedAt:state.startedAt,
-   dose:state.dose,
-   notified:sameTimer?previousTimer.notified:{}
-  };
- }
- timerStateLoaded=true;
- updateTimerSettingsUi();
+ activeInsulinTimer={startedAt:Date.now(),dose,notified:{}};
+ persistTimerState();
  renderInsulinTimer();
- if(activeInsulinTimer&&Date.now()-activeInsulinTimer.startedAt<TIMER_DURATION_MS){
-  if(!insulinTimerInterval)insulinTimerInterval=setInterval(updateInsulinTimer,1000);
-  updateInsulinTimer();
- }else if(insulinTimerInterval){
+ if(insulinTimerInterval)clearInterval(insulinTimerInterval);
+ insulinTimerInterval=setInterval(updateInsulinTimer,1000);
+}
+function clearInsulinTimer(){
+ activeInsulinTimer=null;
+ persistTimerState();
+ renderInsulinTimer();
+ if(insulinTimerInterval){
   clearInterval(insulinTimerInterval);
   insulinTimerInterval=null;
  }
@@ -703,12 +704,14 @@ function updateTimerSettingsUi(){
  const vibrationSwitch=document.getElementById('timerVibrationSwitch');
  vibrationSwitch.setAttribute('aria-pressed',String(insulinTimerSettings.vibration));
  vibrationSwitch.setAttribute('aria-label',insulinTimerSettings.vibration?'Выключить вибрацию напоминаний':'Включить вибрацию напоминаний');
- setTimerControlsDisabled();
 }
 function updateTimerMode(){
  const selected=document.querySelector('input[name="insulinTimerMode"]:checked');
  if(!selected)return;
- void saveTimerSettings({mode:selected.value});
+ insulinTimerSettings.mode=selected.value;
+ persistTimerSettings();
+ updateTimerSettingsUi();
+ if(activeInsulinTimer&&!shouldRunInsulinTimer(activeInsulinTimer.dose))clearInsulinTimer();
 }
 function updateTimerThreshold(){
  const input=document.getElementById('timerThresholdInput');
@@ -717,57 +720,29 @@ function updateTimerThreshold(){
   input.value=String(insulinTimerSettings.threshold);
   return;
  }
- void saveTimerSettings({threshold});
+ insulinTimerSettings.threshold=threshold;
+ persistTimerSettings();
+ if(activeInsulinTimer&&!shouldRunInsulinTimer(activeInsulinTimer.dose))clearInsulinTimer();
 }
 function toggleTimerSetting(setting){
- if(!['sound','vibration'].includes(setting))return;
- void saveTimerSettings({[setting]:!insulinTimerSettings[setting]});
-}
-async function saveTimerSettings(changes){
- if(!timerStateLoaded||timerSettingsSaving)return;
- timerSettingsSaving=true;
- const requestVersion=++timerStateRequestVersion;
- setTimerControlsDisabled();
- setToast(document.getElementById('timerSettingsToast'),'Сохраняю общие настройки таймера…');
- try{
-  const state=await api('timer_settings',changes);
-  if(requestVersion===timerStateRequestVersion)applySharedTimerState(state);
-  setToast(document.getElementById('timerSettingsToast'),'Настройки обновлены для всех пользователей.','success');
-  setToast(document.getElementById('timerSyncToast'),'');
-  setAccess(true,'Сервер подтвердил доступ');
- }catch(error){
-  updateTimerSettingsUi();
-  setToast(document.getElementById('timerSettingsToast'),'Не удалось обновить общие настройки: '+error.message,'error');
-  handleAccessError(error);
- }finally{
-  timerSettingsSaving=false;
-  setTimerControlsDisabled();
-  void refreshSharedTimerState();
- }
-}
-async function refreshSharedTimerState(force=false){
- if(timerSettingsSaving||(!force&&document.hidden))return true;
- const readId=++timerStateReadId;
- const requestVersion=timerStateRequestVersion;
- try{
-  const state=await api('timer_state');
-  if(readId!==timerStateReadId||requestVersion!==timerStateRequestVersion)return true;
-  applySharedTimerState(state);
-  setToast(document.getElementById('timerSyncToast'),'');
-  setAccess(true,'Сервер подтвердил доступ');
-  return true;
- }catch(error){
-  if(readId===timerStateReadId&&requestVersion===timerStateRequestVersion){
-   setToast(document.getElementById('timerSyncToast'),'Не удалось синхронизировать общий таймер: '+error.message,'error');
-   handleAccessError(error);
-  }
-  return false;
- }
+ insulinTimerSettings[setting]=!insulinTimerSettings[setting];
+ persistTimerSettings();
+ updateTimerSettingsUi();
 }
 function initInsulinTimer(){
+ loadTimerSettings();
  updateTimerSettingsUi();
- void refreshSharedTimerState();
- setInterval(()=>{void refreshSharedTimerState();},TIMER_POLL_INTERVAL_MS);
+ try{
+  const saved=JSON.parse(localStorage.getItem(timerStateStorageKey())||'null');
+  if(saved&&Number.isFinite(saved.startedAt)&&Number.isFinite(saved.dose)&&saved.notified&&typeof saved.notified==='object'){
+   activeInsulinTimer={startedAt:saved.startedAt,dose:saved.dose,notified:saved.notified};
+  }
+ }catch(error){console.warn('Не удалось загрузить состояние таймера:',error);}
+ if(activeInsulinTimer&&!shouldRunInsulinTimer(activeInsulinTimer.dose))clearInsulinTimer();
+ else if(activeInsulinTimer){
+  updateInsulinTimer();
+  if(activeInsulinTimer)insulinTimerInterval=setInterval(updateInsulinTimer,1000);
+ }
 }
 async function openAction(action){
  const item=labels[action];
@@ -816,9 +791,7 @@ async function saveValue(type){
  button.disabled=true;
  button.textContent='Сохраняю…';
  setToast(toast,'');
- if(type==='insulin')timerStateRequestVersion++;
- if(type==='insulin'&&insulinTimerSettings.mode!=='off'&&
-  (insulinTimerSettings.mode==='always'||Number(value)>insulinTimerSettings.threshold))ensureTimerAudio();
+ if(type==='insulin'&&shouldRunInsulinTimer(Number(value)))ensureTimerAudio();
  try{
   const result=await api(type,{value});
   setToast(toast,'✓ '+result,'success');
@@ -827,8 +800,7 @@ async function saveValue(type){
   if(tg)tg.HapticFeedback?.notificationOccurred('success');
   if(type==='sugar')await loadSugarAverage();
   if(type==='insulin'){
-   const timerSynced=await refreshSharedTimerState(true);
-   if(!timerSynced)setToast(toast,'Доза сохранена, но общий таймер не удалось обновить.','error');
+   startInsulinTimer(Number(value));
    await Promise.all([loadInsulinTotal(),loadNightFact()]);
   }
   if(type==='fact')await loadNightFact();
@@ -1311,9 +1283,9 @@ function formatAxisValue(value){
 initUser();
 initInsulinTimer();
 updateEntryPlaceholders();
-window.addEventListener('pageshow',()=>{updateEntryPlaceholders();updateInsulinTimer();void refreshSharedTimerState();});
-document.addEventListener('visibilitychange',()=>{if(!document.hidden){updateEntryPlaceholders();updateInsulinTimer();void refreshSharedTimerState();}});
-if(tg)tg.onEvent?.('activated',()=>{updateEntryPlaceholders();updateInsulinTimer();void refreshSharedTimerState();});
+window.addEventListener('pageshow',()=>{updateEntryPlaceholders();updateInsulinTimer();});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){updateEntryPlaceholders();updateInsulinTimer();}});
+if(tg)tg.onEvent?.('activated',()=>{updateEntryPlaceholders();updateInsulinTimer();});
 updateNightInputPlaceholder();
 setInterval(updateNightInputPlaceholder,60_000);
 loadSugarAverage();
