@@ -1293,67 +1293,22 @@ loadSugarAverage();
 loadInsulinTotal();
 loadNightFact();
 let wakeLock = null;
-let wakeLockTimer = null;
-let wakeLockStartedAt = 0;
-const WAKE_LOCK_DURATION = 15 * 60 * 1000;
+let wakeLockTimer;
 
 async function keepScreenAwake() {
-  if (!('wakeLock' in navigator)) return;
-  if (document.visibilityState !== 'visible') return;
-  if (wakeLock && wakeLockTimer) return;
-
+  if (!('wakeLock' in navigator) || document.visibilityState !== 'visible' || wakeLock) return;
   try {
     wakeLock = await navigator.wakeLock.request('screen');
-    wakeLockStartedAt = Date.now();
-
-    if (wakeLockTimer) clearTimeout(wakeLockTimer);
-
-    wakeLockTimer = setTimeout(async () => {
-      wakeLockTimer = null;
-      if (wakeLock) {
-        const lock = wakeLock;
-        wakeLock = null;
-        await lock.release().catch(() => {});
-      }
-    }, WAKE_LOCK_DURATION);
-
-    wakeLock.addEventListener('release', () => {
+    wakeLock.addEventListener('release', () => { wakeLock = null; }, { once: true });
+    wakeLockTimer = setTimeout(() => {
+      wakeLock?.release();
       wakeLock = null;
-    }, { once: true });
-  } catch (e) {
-    console.log('Не удалось удержать экран включённым:', e);
-  }
+    }, 15 * 60 * 1000);
+  } catch (e) {}
 }
 
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState !== 'visible') return;
-
-  if (wakeLockTimer) {
-    const remaining = WAKE_LOCK_DURATION - (Date.now() - wakeLockStartedAt);
-
-    if (remaining <= 0) {
-      clearTimeout(wakeLockTimer);
-      wakeLockTimer = null;
-      if (wakeLock) {
-        const lock = wakeLock;
-        wakeLock = null;
-        lock.release().catch(() => {});
-      }
-      return;
-    }
-
-    clearTimeout(wakeLockTimer);
-    wakeLockTimer = setTimeout(async () => {
-      wakeLockTimer = null;
-      if (wakeLock) {
-        const lock = wakeLock;
-        wakeLock = null;
-        await lock.release().catch(() => {});
-      }
-    }, remaining);
-  } else {
-    keepScreenAwake();
-  }
+  if (document.visibilityState === 'visible' && !wakeLock && wakeLockTimer) keepScreenAwake();
 });
 
 keepScreenAwake();
