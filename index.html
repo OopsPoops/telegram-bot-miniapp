@@ -144,19 +144,21 @@ button{-webkit-tap-highlight-color:transparent}
 .heatmap-day{font-size:10px;color:var(--muted)}
 .heatmap-cell{height:27px;min-width:0;padding:0;border:1px solid rgba(125,135,170,.12);border-radius:5px;cursor:pointer}
 .heatmap-cell:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
-.bottom-nav-wrap{position:fixed;z-index:20;bottom:0;left:0;right:0;padding:6px 12px calc(6px + env(safe-area-inset-bottom));pointer-events:none;background:linear-gradient(to top,var(--bg) 55%,rgba(245,246,251,0));}
-:root[data-theme="dark"] .bottom-nav-wrap{background:linear-gradient(to top,var(--bg) 55%,rgba(17,19,27,0));}
-.bottom-nav{pointer-events:auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;width:100%;max-width:484px;margin:0 auto;padding:4px;border:1px solid var(--nav-border);border-radius:22px;background:rgba(255,255,255,.65);backdrop-filter:blur(12px);box-shadow:0 12px 36px rgba(0,0,0,.08),inset 0 1px 0 rgba(255,255,255,.38)}
-:root[data-theme="dark"] .bottom-nav{background:rgba(22,26,36,.72)}
-.nav-button{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-height:52px;padding:3px 2px;border:1px solid transparent;border-radius:999px;color:var(--muted);background:transparent;cursor:pointer;transition:transform .22s,background .22s,border-color .22s}
-.nav-button .nav-icon{width:25px;height:25px;display:grid;place-items:center;transition:transform .22s}
-.nav-button .nav-icon svg{display:block;width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.nav-button.active{background:linear-gradient(150deg,rgba(255,255,255,.64),var(--nav-active) 58%);border-color:rgba(255,255,255,.46);color:var(--blue);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 8px 22px rgba(82,103,232,.06)}
-.nav-button.active .nav-icon{transform:translateY(-1px) scale(1.05)}
-.nav-button:active{transform:scale(.96)}
-.nav-button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
-:root[data-theme="dark"] .bottom-nav{box-shadow:0 12px 36px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.2),inset 0 -1px 0 rgba(255,255,255,.06)}
-:root[data-theme="dark"] .nav-button.active{border-color:rgba(255,255,255,.16);background:linear-gradient(150deg,rgba(255,255,255,.12),var(--nav-active) 58%);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 8px 22px rgba(82,103,232,.12)}
+
+.bottom-nav-wrap{position:fixed;z-index:20;bottom:0;left:0;right:0;padding:0 12px calc(10px + env(safe-area-inset-bottom));pointer-events:none;background:linear-gradient(to top,var(--bg) 15%,transparent 100%)}
+:root[data-theme="dark"] .bottom-nav-wrap{background:linear-gradient(to top,var(--bg) 15%,transparent 100%)}
+.bottom-nav{position:relative;isolation:isolate;pointer-events:auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;width:100%;max-width:484px;min-height:104px;margin:0 auto;padding:5px;border:1px solid rgba(255,255,255,.25);border-radius:999px;background:rgba(65,65,65,.68);-webkit-backdrop-filter:blur(35px) saturate(180%);backdrop-filter:blur(35px) saturate(180%);box-shadow:0 8px 30px rgba(0,0,0,.2),inset 0 1px 1px rgba(255,255,255,.24),inset 0 -1px 1px rgba(0,0,0,.12);overflow:hidden}
+:root[data-theme="dark"] .bottom-nav{background:rgba(38,38,40,.76);border-color:rgba(255,255,255,.16);box-shadow:0 8px 30px rgba(0,0,0,.3),inset 0 1px 1px rgba(255,255,255,.15)}
+.nav-button{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;min-width:0;min-height:92px;padding:8px 2px;border:0;border-radius:999px;color:rgba(255,255,255,.96);background:transparent;font-size:15px;font-weight:500;letter-spacing:.1px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:color .2s,transform .2s}
+.nav-button .nav-icon{width:39px;height:39px;display:grid;place-items:center;transition:transform .2s}
+.nav-button .nav-icon svg{display:block;width:36px;height:36px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.nav-button.active{background:rgba(220,220,220,.19);color:#fff;box-shadow:inset 0 1px 1px rgba(255,255,255,.09)}
+.nav-button.active .nav-icon{transform:scale(1.06)}
+.nav-button:active{transform:scale(.97)}
+.nav-button:focus-visible{outline:2px solid #fff;outline-offset:-4px}
+.nav-label{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:15px;line-height:1.2}
+@media(max-width:360px){.bottom-nav-wrap{padding-left:9px;padding-right:9px}.bottom-nav{min-height:94px}.nav-button{min-height:82px;gap:5px}.nav-button .nav-icon{width:32px;height:32px}.nav-button .nav-icon svg{width:30px;height:30px}.nav-label{font-size:13px}}
+@media(prefers-reduced-motion:reduce){.nav-button,.nav-button .nav-icon{transition:none}}
 .modal-backdrop{position:fixed;inset:0;background:rgba(18,24,45,.48);display:none;align-items:center;justify-content:center;padding:22px;z-index:30;backdrop-filter:blur(5px)}
 .modal-backdrop.visible{display:flex;animation:fade .18s ease}
 .modal{width:100%;max-width:420px;max-height:82vh;overflow:hidden;background:var(--modal-bg);color:var(--text);border-radius:25px;padding:23px 20px 17px;box-shadow:0 25px 80px rgba(0,0,0,.2);display:flex;flex-direction:column}
@@ -412,11 +414,27 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 </div>
 </section>
 </main>
+
 <nav class="bottom-nav-wrap" aria-label="Основная навигация">
 <div class="bottom-nav">
-<button class="nav-button active" type="button" data-screen="home" onclick="switchTab('home')"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/></svg></span></button>
-<button class="nav-button" type="button" data-screen="graphs" onclick="switchTab('graphs')"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19.5h16"/><path d="M7 16V9"/><path d="M12 16V5"/><path d="M17 16v-7"/></svg></span></button>
-<button class="nav-button" type="button" data-screen="settings" onclick="switchTab('settings')"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2.5v3.3M12 18.2v3.3M4.9 4.9l2.3 2.3M16.8 16.8l2.3 2.3M2.5 12h3.3M18.2 12h3.3M4.9 19.1l2.3-2.3M16.8 7.2l2.3-2.3"/><circle cx="12" cy="12" r="4"/></svg></span></button>
+<button class="nav-button active" type="button" data-screen="home" onclick="switchTab('home')">
+<span class="nav-icon" aria-hidden="true">
+<svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/><path d="M9 20v-6h6v6"/></svg>
+</span>
+<span class="nav-label">Главная</span>
+</button>
+<button class="nav-button" type="button" data-screen="graphs" onclick="switchTab('graphs')">
+<span class="nav-icon" aria-hidden="true">
+<svg viewBox="0 0 24 24"><path d="M4 19.5h16"/><path d="M7 16V9"/><path d="M12 16V5"/><path d="M17 16v-7"/></svg>
+</span>
+<span class="nav-label">Графики</span>
+</button>
+<button class="nav-button" type="button" data-screen="settings" onclick="switchTab('settings')">
+<span class="nav-icon" aria-hidden="true">
+<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3.5"/><path d="M12 3.5v5M12 15.5v5M3.5 12h5M15.5 12h5"/></svg>
+</span>
+<span class="nav-label">Настройки</span>
+</button>
 </div>
 </nav>
 <div class="modal-backdrop" id="modalBackdrop" onclick="backdropClose(event)">
