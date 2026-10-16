@@ -128,6 +128,17 @@ button{-webkit-tap-highlight-color:transparent}
 .timer-threshold label{font-size:12px;color:var(--muted);flex:1}
 .timer-threshold input{width:86px;border:1px solid var(--line);border-radius:10px;padding:9px;background:var(--input-bg);color:var(--input-text);font-size:14px}
 .timer-threshold[hidden]{display:none}
+.report-options{margin-top:12px;transition:opacity .2s}
+.report-options.off{opacity:.45}
+.report-field{display:flex;align-items:center;gap:10px;margin-top:12px}
+.report-field label{font-size:12px;color:var(--muted);flex:1}
+.report-field input{border:1px solid var(--line);border-radius:10px;padding:9px;background:var(--input-bg);color:var(--input-text);font-size:14px}
+.report-field input[type="time"]{width:110px}
+.report-field input[type="number"]{width:72px}
+.followup-presets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:10px}
+.followup-preset{border:1px solid var(--line);border-radius:11px;background:transparent;color:var(--muted);padding:11px 4px;font-size:12px;font-weight:700;cursor:pointer}
+.followup-preset.active{border-color:var(--blue);background:var(--nav-active);color:var(--text)}
+.report-options.off input,.report-options.off button{pointer-events:none}
 .graph-placeholder{background:var(--card);border:1px solid rgba(125,135,170,.12);border-radius:23px;padding:26px 18px;text-align:center;box-shadow:var(--shadow);margin-top:18px}
 .graph-placeholder-icon{width:65px;height:65px;border-radius:22px;background:var(--icon-bg);display:grid;place-items:center;font-size:30px;margin:0 auto 16px}
 .graph-placeholder-title{font-size:17px;font-weight:750}
@@ -457,6 +468,36 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 </div>
 <div class="settings-card">
 <div class="setting-row">
+<div class="setting-icon">📅</div>
+<div class="setting-copy">
+<div class="setting-name">Ежедневный отчёт</div>
+<div class="setting-description" id="reportDescription">Общая настройка для всех пользователей бота</div>
+</div>
+<button class="setting-switch" id="reportEnabledSwitch" type="button" onclick="toggleReportEnabled()" aria-label="Включить ежедневный отчёт" aria-pressed="true" disabled><span></span></button>
+</div>
+<div class="report-options" id="reportOptions">
+<div class="report-field">
+<label for="reportTimeInput">Время отправки (МСК)</label>
+<input id="reportTimeInput" type="time" value="21:00" onchange="saveReportTime()" aria-label="Время ежедневного отчёта по Москве">
+</div>
+<div class="setting-divider"></div>
+<div class="setting-name">Вопрос «Сделяля?»</div>
+<div class="setting-description">Приходит через выбранное время после отчёта</div>
+<div class="followup-presets" id="followupPresets">
+<button class="followup-preset" type="button" data-minutes="10" onclick="saveFollowupMinutes(10)">10 мин</button>
+<button class="followup-preset" type="button" data-minutes="20" onclick="saveFollowupMinutes(20)">20 мин</button>
+<button class="followup-preset" type="button" data-minutes="30" onclick="saveFollowupMinutes(30)">30 мин</button>
+</div>
+<div class="report-field">
+<label for="followupInput">Своё время (1–180 минут)</label>
+<input id="followupInput" type="number" inputmode="numeric" min="1" max="180" step="1" value="20" onchange="saveFollowupMinutes(Number(this.value))" aria-label="Через сколько минут после отчёта спросить Сделяля">
+<span>мин</span>
+</div>
+</div>
+<div class="toast" id="reportToast"></div>
+</div>
+<div class="settings-card">
+<div class="setting-row">
 <div class="setting-icon" id="themeIcon">🌙</div>
 <div class="setting-copy">
 <div class="setting-name">Тёмная тема</div>
@@ -469,9 +510,7 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 </main>
 <nav class="bottom-nav-wrap" aria-label="Основная навигация">
 <div class="bottom-nav">
-<button class="nav-button active" type="button" data-screen="home" onclick="switchTab('home')"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" style="fill:currentColor;stroke:none">
-<path d="M12 2.8 1.8 11.2a1 1 0 0 0 1.3 1.5L4.5 11v8.2A1.8 1.8 0 0 0 6.3 21h3.9v-6.2h3.6V21h3.9a1.8 1.8 0 0 0 1.8-1.8V11l1.4 1.7a1 1 0 0 0 1.5-1.3L12 2.8Z"/>
-</svg></span></button>
+<button class="nav-button active" type="button" data-screen="home" onclick="switchTab('home')"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/></svg></span></button>
 <button class="nav-button" type="button" data-screen="graphs" onclick="switchTab('graphs')"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19.5h16"/><path d="M7 16V9"/><path d="M12 16V5"/><path d="M17 16v-7"/></svg></span></button>
 <button class="nav-button" type="button" data-screen="settings" onclick="switchTab('settings')">
   <span class="nav-icon ios-settings-icon" aria-hidden="true">
@@ -615,6 +654,7 @@ document.querySelectorAll('.nav-button').forEach(button=>button.classList.toggle
 window.scrollTo({top:0,behavior:'smooth'});
 uiHaptic('selection');
 if(name==='graphs')loadAnalytics(true);
+if(name==='settings')loadReportSettings();
 }
 function applyTheme(theme){
 const dark=theme==='dark';
@@ -990,6 +1030,66 @@ async function saveValue(type){
   button.disabled=false;
   button.textContent='Сохранить';
  }
+}
+let reportSettings=null;
+function renderReportSettings(){
+ if(!reportSettings)return;
+ const sw=document.getElementById('reportEnabledSwitch');
+ sw.disabled=false;
+ sw.setAttribute('aria-pressed',String(reportSettings.enabled));
+ sw.setAttribute('aria-label',reportSettings.enabled?'Выключить ежедневный отчёт':'Включить ежедневный отчёт');
+ document.getElementById('reportOptions').classList.toggle('off',!reportSettings.enabled);
+ document.getElementById('reportDescription').textContent=reportSettings.enabled
+  ?'Включён для всех пользователей бота'
+  :'Выключен для всех: отчёт и вопрос «Сделяля?» не приходят';
+ const timeInput=document.getElementById('reportTimeInput');
+ if(document.activeElement!==timeInput)timeInput.value=reportSettings.time;
+ const followupInput=document.getElementById('followupInput');
+ if(document.activeElement!==followupInput)followupInput.value=reportSettings.followup_minutes;
+ document.querySelectorAll('.followup-preset').forEach(button=>button.classList.toggle('active',Number(button.dataset.minutes)===reportSettings.followup_minutes));
+}
+async function loadReportSettings(){
+ try{
+  reportSettings=await api('report_settings');
+  renderReportSettings();
+ }catch(error){
+  document.getElementById('reportDescription').textContent='Не удалось загрузить настройки';
+ }
+}
+async function saveReportSettings(change){
+ const toast=document.getElementById('reportToast');
+ setToast(toast,'');
+ try{
+  reportSettings=await api('report_settings_set',change);
+  renderReportSettings();
+  uiHaptic('success');
+  setToast(toast,'✓ Сохранено','success');
+ }catch(error){
+  setToast(toast,'Не удалось сохранить: '+error.message,'error');
+  uiHaptic('error');
+  await loadReportSettings();
+ }
+}
+function toggleReportEnabled(){
+ if(!reportSettings)return;
+ saveReportSettings({enabled:!reportSettings.enabled});
+}
+function saveReportTime(){
+ const value=document.getElementById('reportTimeInput').value;
+ if(!/^([01]\d|2[0-3]):[0-5]\d$/.test(value)){
+  setToast(document.getElementById('reportToast'),'Выбери время отправки.','error');
+  renderReportSettings();
+  return;
+ }
+ saveReportSettings({time:value});
+}
+function saveFollowupMinutes(minutes){
+ if(!Number.isInteger(minutes)||minutes<1||minutes>180){
+  setToast(document.getElementById('reportToast'),'Введи целое число минут от 1 до 180.','error');
+  renderReportSettings();
+  return;
+ }
+ saveReportSettings({followup_minutes:minutes});
 }
 async function undoValue(type){
  const ids={sugar:['sugarInput','sugarToast'],insulin:['insulinInput','insulinToast'],fact:['nightInput','nightToast']};
@@ -1547,10 +1647,11 @@ document.addEventListener('focusout',event=>{
  setTimeout(()=>{if(!isTextField(document.activeElement))document.body.classList.remove('keyboard-open');},60);
 });
 initUser();
+loadReportSettings();
 initInsulinTimer();
 updateEntryPlaceholders();
 window.addEventListener('pageshow',()=>{updateEntryPlaceholders();updateInsulinTimer();});
-document.addEventListener('visibilitychange',()=>{if(!document.hidden){updateEntryPlaceholders();updateInsulinTimer();loadNightYesterday();}});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){updateEntryPlaceholders();updateInsulinTimer();loadNightYesterday();loadReportSettings();}});
 if(tg)tg.onEvent?.('activated',()=>{updateEntryPlaceholders();updateInsulinTimer();});
 updateNightInputPlaceholder();
 setInterval(updateNightInputPlaceholder,60_000);
