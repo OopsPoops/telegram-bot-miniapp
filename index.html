@@ -398,8 +398,8 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 <div class="setting-row">
 <div class="setting-icon">🔊</div>
 <div class="setting-copy">
-<div class="setting-name">Звук приложения</div>
-<div class="setting-description">Все звуки сразу: вкл или выкл</div>
+<div class="setting-name">Звук</div>
+<div class="setting-description">Для всего приложения</div>
 </div>
 <button class="setting-switch" id="appSoundSwitch" type="button" onclick="toggleTimerSetting('appSound')" aria-label="Выключить звук приложения" aria-pressed="true"><span></span></button>
 </div>
@@ -407,7 +407,7 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 <div class="setting-row">
 <button class="setting-icon setting-icon-button" type="button" onclick="cycleAppVibrationLevel()" aria-label="Сменить силу вибрации приложения">📲</button>
 <div class="setting-copy">
-<div class="setting-name">Вибрация приложения</div>
+<div class="setting-name" id="appVibrationName">Вибрация (3)</div>
 <div class="setting-description">Для всего приложения<br>Нажми на 📲, чтобы сменить силу</div>
 </div>
 <button class="setting-switch" id="appVibrationSwitch" type="button" onclick="toggleTimerSetting('appVibration')" aria-label="Выключить вибрацию приложения" aria-pressed="true"><span></span></button>
@@ -433,10 +433,10 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 </div>
 <div class="setting-divider"></div>
 <div class="setting-row" id="timerSoundRow">
-<button class="setting-icon setting-icon-button" type="button" onclick="previewTimerSound()" aria-label="Проверить звук">🔔</button>
+<button class="setting-icon setting-icon-button" type="button" onclick="cycleTimerSound()" aria-label="Сменить звук напоминаний">🔔</button>
 <div class="setting-copy">
-<div class="setting-name">Звук напоминаний</div>
-<div class="setting-description">Через 5 и 10 минут. Нажми на 🔔, чтобы послушать</div>
+<div class="setting-name" id="timerSoundName">Звук напоминаний (1)</div>
+<div class="setting-description">Через 5 и 10 минут<br>Нажми на 🔔, чтобы сменить звук</div>
 </div>
 <button class="setting-switch" id="timerSoundSwitch" type="button" onclick="toggleTimerSetting('sound')" aria-label="Включить звук напоминаний" aria-pressed="true"><span></span></button>
 </div>
@@ -444,7 +444,7 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 <div class="setting-row" id="timerVibrationRow">
 <button class="setting-icon setting-icon-button" type="button" onclick="cycleVibrationLevel()" aria-label="Сменить силу вибрации">📳</button>
 <div class="setting-copy">
-<div class="setting-name">Вибрация</div>
+<div class="setting-name" id="timerVibrationName">Вибрация (3)</div>
 <div class="setting-description">Через 5 и 10 минут<br>Нажми на 📳, чтобы сменить силу</div>
 </div>
 <button class="setting-switch" id="timerVibrationSwitch" type="button" onclick="toggleTimerSetting('vibration')" aria-label="Включить вибрацию напоминаний" aria-pressed="true"><span></span></button>
@@ -496,7 +496,7 @@ const TIMER_SETTINGS_KEY='sema-insulin-timer-settings';
 const TIMER_STATE_KEY_PREFIX='sema-insulin-timer-state';
 const TIMER_DURATION_MS=20*60*1000;
 const TIMER_REMINDERS_MS=[5*60*1000,10*60*1000];
-const defaultTimerSettings={mode:'always',threshold:5,sound:true,vibration:true,appSound:true,appVibration:true,vibrationLevel:3,appVibrationLevel:3};
+const defaultTimerSettings={mode:'always',threshold:5,sound:true,vibration:true,appSound:true,appVibration:true,vibrationLevel:3,appVibrationLevel:3,soundChoice:1};
 const VIBRATION_LEVELS=[
  {steps:[['soft',0]],fallback:[40]},
  {steps:[['medium',0],['medium',140]],fallback:[90,90,90]},
@@ -531,6 +531,7 @@ function uiHaptic(kind){
 function cycleAppVibrationLevel(){
  insulinTimerSettings.appVibrationLevel=insulinTimerSettings.appVibrationLevel%5+1;
  persistTimerSettings();
+ updateTimerSettingsUi();
  playUiHaptic(insulinTimerSettings.appVibrationLevel,'error');
 }
 function runVibration(level){
@@ -557,7 +558,12 @@ function cycleVibrationLevel(){
  updateTimerSettingsUi();
  runVibration(insulinTimerSettings.vibrationLevel);
 }
-function previewTimerSound(){playTimerSound(true);}
+function cycleTimerSound(){
+ insulinTimerSettings.soundChoice=insulinTimerSettings.soundChoice%5+1;
+ persistTimerSettings();
+ updateTimerSettingsUi();
+ playTimerSound(true);
+}
 let insulinTimerSettings={...defaultTimerSettings};
 let activeInsulinTimer=null;
 let insulinTimerInterval=null;
@@ -710,7 +716,8 @@ function loadTimerSettings(){
    appSound:typeof saved.appSound==='boolean'?saved.appSound:defaultTimerSettings.appSound,
    appVibration:typeof saved.appVibration==='boolean'?saved.appVibration:defaultTimerSettings.appVibration,
    vibrationLevel:[1,2,3,4,5].includes(Number(saved.vibrationLevel))?Number(saved.vibrationLevel):defaultTimerSettings.vibrationLevel,
-   appVibrationLevel:[1,2,3,4,5].includes(Number(saved.appVibrationLevel))?Number(saved.appVibrationLevel):defaultTimerSettings.appVibrationLevel
+   appVibrationLevel:[1,2,3,4,5].includes(Number(saved.appVibrationLevel))?Number(saved.appVibrationLevel):defaultTimerSettings.appVibrationLevel,
+   soundChoice:[1,2,3,4,5].includes(Number(saved.soundChoice))?Number(saved.soundChoice):defaultTimerSettings.soundChoice
   };
  }catch(error){console.warn('Не удалось загрузить настройки таймера:',error);}
 }
@@ -756,22 +763,34 @@ function ensureTimerAudio(force=false){
   if(timerAudioContext.state==='suspended')timerAudioContext.resume().catch(error=>console.warn('Не удалось включить звук таймера:',error));
  }catch(error){console.warn('Не удалось подготовить звук таймера:',error);}
 }
+const TIMER_SOUNDS=[
+ [{f:880,t:0,d:.42,type:'sine',v:.18}],
+ [{f:660,t:0,d:.3,type:'sine',v:.18},{f:880,t:.32,d:.5,type:'sine',v:.18}],
+ [{f:1000,t:0,d:.12,type:'square',v:.07},{f:1000,t:.2,d:.12,type:'square',v:.07},{f:1000,t:.4,d:.12,type:'square',v:.07}],
+ [{f:523,t:0,d:.16,type:'triangle',v:.2},{f:659,t:.16,d:.16,type:'triangle',v:.2},{f:784,t:.32,d:.16,type:'triangle',v:.2},{f:1047,t:.48,d:.4,type:'triangle',v:.2}],
+ [{f:440,t:0,d:.25,type:'sawtooth',v:.07},{f:880,t:.28,d:.25,type:'sawtooth',v:.07},{f:440,t:.56,d:.25,type:'sawtooth',v:.07},{f:880,t:.84,d:.35,type:'sawtooth',v:.07}]
+];
 function playTimerSound(force=false){
  if(!force&&!timerSoundAllowed())return;
  try{
   ensureTimerAudio(force);
   if(!timerAudioContext)return;
-  const now=timerAudioContext.currentTime;
-  const oscillator=timerAudioContext.createOscillator();
-  const gain=timerAudioContext.createGain();
-  oscillator.frequency.value=880;
-  gain.gain.setValueAtTime(.0001,now);
-  gain.gain.exponentialRampToValueAtTime(.18,now+.03);
-  gain.gain.exponentialRampToValueAtTime(.0001,now+.42);
-  oscillator.connect(gain);
-  gain.connect(timerAudioContext.destination);
-  oscillator.start(now);
-  oscillator.stop(now+.43);
+  const base=timerAudioContext.currentTime;
+  const tones=TIMER_SOUNDS[Math.min(5,Math.max(1,Number(insulinTimerSettings.soundChoice)||1))-1];
+  tones.forEach(tone=>{
+   const start=base+tone.t;
+   const oscillator=timerAudioContext.createOscillator();
+   const gain=timerAudioContext.createGain();
+   oscillator.type=tone.type;
+   oscillator.frequency.value=tone.f;
+   gain.gain.setValueAtTime(.0001,start);
+   gain.gain.exponentialRampToValueAtTime(tone.v,start+.03);
+   gain.gain.exponentialRampToValueAtTime(.0001,start+tone.d);
+   oscillator.connect(gain);
+   gain.connect(timerAudioContext.destination);
+   oscillator.start(start);
+   oscillator.stop(start+tone.d+.02);
+  });
  }catch(error){console.warn('Не удалось воспроизвести звук таймера:',error);}
 }
 function vibrateForTimer(){
@@ -830,6 +849,10 @@ function updateTimerSettingsUi(){
  setSwitch('appVibrationSwitch',appVibrationOn(),'Включить вибрацию приложения','Выключить вибрацию приложения');
  document.getElementById('timerSoundRow')?.classList.toggle('muted-by-app',!appSoundOn());
  document.getElementById('timerVibrationRow')?.classList.toggle('muted-by-app',!appVibrationOn());
+ const setText=(id,text)=>{const el=document.getElementById(id);if(el)el.textContent=text;};
+ setText('timerSoundName',`Звук напоминаний (${insulinTimerSettings.soundChoice})`);
+ setText('timerVibrationName',`Вибрация (${insulinTimerSettings.vibrationLevel})`);
+ setText('appVibrationName',`Вибрация (${insulinTimerSettings.appVibrationLevel})`);
  document.querySelectorAll('input[name="insulinTimerMode"]').forEach(input=>{input.checked=input.value===insulinTimerSettings.mode;});
  document.getElementById('timerThresholdSetting').hidden=insulinTimerSettings.mode!=='threshold';
  document.getElementById('timerThresholdInput').value=String(insulinTimerSettings.threshold);
