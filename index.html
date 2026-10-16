@@ -830,10 +830,7 @@ async function saveValue(type){
    startInsulinTimer(Number(value));
    await Promise.all([loadInsulinTotal(),loadNightFact()]);
   }
-  if(type==='fact'){
-   saveNightEntry(value);
-   await loadNightFact();
-  }
+  if(type==='fact')await loadNightFact();
  }catch(error){
   setToast(toast,'Не удалось сохранить: '+error.message,'error');
   handleAccessError(error);
@@ -1317,36 +1314,22 @@ function renderLatestMeasurement(type,value,time){
  element.textContent=`Последнее: ${String(value).replace('.',',')} в ${time||formatLatestTime(new Date())}`;
  element.hidden=false;
 }
-const NIGHT_HISTORY_KEY_PREFIX='sema-night-history';
-function nightHistoryKey(){
- const id=tg?.initDataUnsafe?.user?.id;
- return id?`${NIGHT_HISTORY_KEY_PREFIX}:${id}`:NIGHT_HISTORY_KEY_PREFIX;
-}
-function readNightHistory(){
- try{
-  const data=JSON.parse(localStorage.getItem(nightHistoryKey())||'{}');
-  return data&&typeof data==='object'?data:{};
- }catch(error){return {};}
-}
-function saveNightEntry(value){
- const history=readNightHistory();
- const now=new Date();
- history[dateKey(now)]={value:String(value).replace(',','.'),time:formatLatestTime(now)};
- Object.keys(history).sort().slice(0,-7).forEach(key=>delete history[key]);
- try{localStorage.setItem(nightHistoryKey(),JSON.stringify(history));}catch(error){console.warn('Не удалось сохранить ночное значение:',error);}
-}
-function renderNightYesterday(){
+async function loadNightYesterday(){
  const element=document.getElementById('nightYesterday');
  if(!element)return;
- const yesterday=new Date();
- yesterday.setDate(yesterday.getDate()-1);
- const entry=readNightHistory()[dateKey(yesterday)];
- if(entry&&entry.value){
-  element.textContent=`Вчера: ${String(entry.value).replace('.',',')} в ${entry.time}`;
-  element.hidden=false;
- }else{
+ try{
+  const result=await api('night_yesterday');
+  if(result&&result.value){
+   element.textContent=`Вчера: ${result.value}${result.time?' в '+result.time:''}`;
+   element.hidden=false;
+  }else{
+   element.hidden=true;
+   element.textContent='';
+  }
+ }catch(error){
+  console.error('Ошибка загрузки вчерашнего ночного значения:',error);
   element.hidden=true;
-  element.textContent='';
+  handleAccessError(error);
  }
 }
 async function loadLatestMeasurements(){
@@ -1376,7 +1359,7 @@ initUser();
 initInsulinTimer();
 updateEntryPlaceholders();
 window.addEventListener('pageshow',()=>{updateEntryPlaceholders();updateInsulinTimer();});
-document.addEventListener('visibilitychange',()=>{if(!document.hidden){updateEntryPlaceholders();updateInsulinTimer();renderNightYesterday();}});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){updateEntryPlaceholders();updateInsulinTimer();loadNightYesterday();}});
 if(tg)tg.onEvent?.('activated',()=>{updateEntryPlaceholders();updateInsulinTimer();});
 updateNightInputPlaceholder();
 setInterval(updateNightInputPlaceholder,60_000);
@@ -1384,7 +1367,7 @@ loadSugarAverage();
 loadInsulinTotal();
 loadNightFact();
 loadLatestMeasurements();
-renderNightYesterday();
+loadNightYesterday();
 </script>
 </body>
 </html>
