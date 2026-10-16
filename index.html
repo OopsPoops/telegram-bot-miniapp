@@ -1319,7 +1319,15 @@ async function keepScreenAwake() {
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') keepScreenAwake();
 });
-keepScreenAwake();
+document.addEventListener('click', async () => {
+  try {
+    const lock = await navigator.wakeLock.request('screen');
+    alert('Блокировка получена: ' + !lock.released);
+    lock.addEventListener('release', () => alert('Блокировка снята'));
+  } catch (e) {
+    alert('Ошибка: ' + e.name + ' — ' + e.message);
+  }
+}, { once: true });
 </script>
 </body>
 </html>
