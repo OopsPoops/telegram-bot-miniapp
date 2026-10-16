@@ -251,9 +251,9 @@ button{-webkit-tap-highlight-color:transparent}
   transition:color .2s,transform .2s,background .2s;
 }
 .bottom-nav .nav-button.active{
-  background:rgba(255,255,255,.22);
+  background:transparent;
   color:var(--text);
-  box-shadow:inset 0 1px 1px rgba(255,255,255,.55),inset 0 -1px 1px rgba(0,0,0,.04);
+  box-shadow:none;
 }
 /* Тёмная тема */
 :root[data-theme="dark"] .bottom-nav{
@@ -269,9 +269,9 @@ button{-webkit-tap-highlight-color:transparent}
 }
 :root[data-theme="dark"] .bottom-nav .nav-button{color:rgba(255,255,255,.78)}
 :root[data-theme="dark"] .bottom-nav .nav-button.active{
-  background:rgba(255,255,255,.16);
+  background:transparent;
   color:#fff;
-  box-shadow:inset 0 1px 1px rgba(255,255,255,.18),inset 0 -1px 1px rgba(0,0,0,.10);
+  box-shadow:none;
 }
 /* Fallback без backdrop-filter */
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
@@ -281,6 +281,46 @@ button{-webkit-tap-highlight-color:transparent}
 .bottom-nav-wrap{transition:transform .22s ease,opacity .18s ease}
 body.keyboard-open .bottom-nav-wrap{transform:translateY(140%);opacity:0;pointer-events:none}
 @media(prefers-reduced-motion:reduce){.nav-button,.nav-button .nav-icon{transition:none}}
+/* ===== Скользящая стеклянная «пилюля» под активной кнопкой ===== */
+.bottom-nav .nav-pill{
+  position:absolute;
+  top:3px;
+  left:2px;
+  height:calc(100% - 6px);
+  width:calc(100% / 3 - 4px);
+  border-radius:999px;
+  z-index:0;
+  pointer-events:none;
+  transform:translateX(0);
+  background:rgba(255,255,255,.22);
+  box-shadow:
+    inset 0 1px 1px rgba(255,255,255,.55),
+    inset 0 -1px 1px rgba(0,0,0,.04),
+    0 2px 8px rgba(0,0,0,.08);
+  transition:
+    transform .45s cubic-bezier(.34,1.4,.4,1),
+    width .35s cubic-bezier(.4,0,.2,1);
+  will-change:transform,width;
+}
+:root[data-theme="dark"] .bottom-nav .nav-pill{
+  background:rgba(255,255,255,.16);
+  box-shadow:
+    inset 0 1px 1px rgba(255,255,255,.20),
+    inset 0 -1px 1px rgba(0,0,0,.12),
+    0 2px 8px rgba(0,0,0,.25);
+}
+/* Иконки — плавный liquid-отклик */
+.nav-button .nav-icon{
+  transition:transform .4s cubic-bezier(.34,1.5,.4,1),opacity .3s;
+}
+.nav-button:not(.active) .nav-icon{
+  transform:scale(.94);
+  opacity:.78;
+}
+.nav-button.active .nav-icon{
+  transform:scale(1.1) translateY(-1px);
+  opacity:1;
+}
 .modal-backdrop{position:fixed;inset:0;background:rgba(18,24,45,.48);display:none;align-items:center;justify-content:center;padding:22px;z-index:30;backdrop-filter:blur(5px)}
 .modal-backdrop.visible{display:flex;animation:fade .18s ease}
 .modal{width:100%;max-width:420px;max-height:82vh;overflow:hidden;background:var(--modal-bg);color:var(--text);border-radius:25px;padding:23px 20px 17px;box-shadow:0 25px 80px rgba(0,0,0,.2);display:flex;flex-direction:column}
@@ -596,6 +636,7 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 </main>
 <nav class="bottom-nav-wrap" aria-label="Основная навигация">
 <div class="bottom-nav">
+<span class="nav-pill" aria-hidden="true"></span>
 <button class="nav-button active" type="button" data-screen="home" onclick="switchTab('home')"><span class="nav-icon" aria-hidden="true">
 <svg viewBox="-5 -5 130 145" aria-hidden="true" style="fill:currentColor;stroke:none">
 <g transform="translate(0, 118) scale(1.35)">
@@ -749,12 +790,24 @@ document.addEventListener('keydown',event=>{
 });
 function switchTab(name){
  hideKeyboard();
-document.querySelectorAll('.screen').forEach(screen=>screen.classList.toggle('active',screen.id==='screen-'+name));
-document.querySelectorAll('.nav-button').forEach(button=>button.classList.toggle('active',button.dataset.screen===name));
-window.scrollTo({top:0,behavior:'smooth'});
-uiHaptic('selection');
-if(name==='graphs')loadAnalytics(true);
-if(name==='settings')loadReportSettings();
+ document.querySelectorAll('.screen').forEach(screen=>screen.classList.toggle('active',screen.id==='screen-'+name));
+ document.querySelectorAll('.nav-button').forEach(button=>button.classList.toggle('active',button.dataset.screen===name));
+ moveNavPill();
+ window.scrollTo({top:0,behavior:'smooth'});
+ uiHaptic('selection');
+ if(name==='graphs')loadAnalytics(true);
+ if(name==='settings')loadReportSettings();
+}
+function moveNavPill(){
+ const nav=document.querySelector('.bottom-nav');
+ const pill=nav?.querySelector('.nav-pill');
+ const active=nav?.querySelector('.nav-button.active');
+ if(!pill||!active)return;
+ const navRect=nav.getBoundingClientRect();
+ const btnRect=active.getBoundingClientRect();
+ const offsetX=btnRect.left-navRect.left;
+ pill.style.width=btnRect.width+'px';
+ pill.style.transform=`translateX(${offsetX}px)`;
 }
 function applyTheme(theme){
 const dark=theme==='dark';
@@ -1760,6 +1813,12 @@ loadInsulinTotal();
 loadNightFact();
 loadLatestMeasurements();
 loadNightYesterday();
+/* Инициализация пилюли навигации */
+requestAnimationFrame(()=>{
+  moveNavPill();
+  window.addEventListener('resize',moveNavPill);
+  window.addEventListener('orientationchange',()=>setTimeout(moveNavPill,150));
+});
 </script>
 </body>
 </html>
