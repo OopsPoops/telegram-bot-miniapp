@@ -1292,11 +1292,6 @@ setInterval(updateNightInputPlaceholder,60_000);
 loadSugarAverage();
 loadInsulinTotal();
 loadNightFact();
-window.addEventListener('pageshow', keepScreenAwake);
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible') keepScreenAwake();
-});
-keepScreenAwake();
 </script>
 </body>
 </html>
