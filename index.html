@@ -1292,42 +1292,11 @@ setInterval(updateNightInputPlaceholder,60_000);
 loadSugarAverage();
 loadInsulinTotal();
 loadNightFact();
-
-let wakeLock = null;
-let wakeLockTimer = null;
-const WAKE_LOCK_DURATION = 15 * 60 * 1000;
-const wakeLockDeadline = Date.now() + WAKE_LOCK_DURATION;
-async function keepScreenAwake() {
-  if (Date.now() >= wakeLockDeadline || document.visibilityState !== 'visible') return;
-  if (!('wakeLock' in navigator)) return;
-  try {
-    if (wakeLock) return;
-    wakeLock = await navigator.wakeLock.request('screen');
-    wakeLock.addEventListener('release', () => {
-      wakeLock = null;
-    }, { once: true });
-    if (!wakeLockTimer) {
-      wakeLockTimer = setTimeout(() => {
-        wakeLock?.release().catch(() => {});
-        wakeLock = null;
-      }, Math.max(0, wakeLockDeadline - Date.now()));
-    }
-  } catch (e) {
-    console.log('Wake Lock:', e);
-  }
-}
+window.addEventListener('pageshow', keepScreenAwake);
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') keepScreenAwake();
 });
-document.addEventListener('click', async () => {
-  try {
-    const lock = await navigator.wakeLock.request('screen');
-    alert('Блокировка получена: ' + !lock.released);
-    lock.addEventListener('release', () => alert('Блокировка снята'));
-  } catch (e) {
-    alert('Ошибка: ' + e.name + ' — ' + e.message);
-  }
-}, { once: true });
+keepScreenAwake();
 </script>
 </body>
 </html>
