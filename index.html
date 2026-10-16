@@ -28,6 +28,8 @@ button{-webkit-tap-highlight-color:transparent}
 .metric-description{font-size:12px;color:var(--muted);margin-top:4px}
 .metric-latest{display:flex;align-items:center;gap:5px;margin-top:6px;font-size:12px;font-weight:650;line-height:1.3;font-variant-numeric:tabular-nums}
 .metric-latest[hidden]{display:none}
+.metric-latest{min-height:16px}
+.metric-latest .metric-skeleton{width:54px;height:10px;display:inline-block}
 .sugar .metric-latest{color:var(--pink)}
 .insulin:not(.night) .metric-latest{color:#1a8f83}
 :root[data-theme="dark"] .insulin:not(.night) .metric-latest{color:#6fe0d0}
@@ -214,7 +216,7 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 <div class="metric-copy">
 <div class="metric-name">Сахар</div>
 <div class="metric-description">Среднее за сегодня</div>
-<div class="metric-latest" id="sugarLatest" hidden></div>
+<div class="metric-latest" id="sugarLatest">Последнее: <span class="metric-skeleton"></span></div>
 </div>
 <div class="metric-loading" id="sugarAverage" role="status" aria-label="Загрузка среднего сахара">
 <div class="metric-skeleton"></div>
@@ -233,7 +235,7 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 <div class="metric-copy">
 <div class="metric-name">Инсулин</div>
 <div class="metric-description">Сумма за сегодня</div>
-<div class="metric-latest" id="insulinLatest" hidden></div>
+<div class="metric-latest" id="insulinLatest">Последнее: <span class="metric-skeleton"></span></div>
 </div>
 <div class="metric-loading" id="insulinTotal" role="status" aria-label="Загрузка суммы инсулина">
 <div class="metric-skeleton"></div>
@@ -259,7 +261,7 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 <div class="metric-copy">
 <div class="metric-name">Ночной</div>
 <div class="metric-description">Факт за сегодня</div>
-<div class="metric-latest" id="nightYesterday" hidden></div>
+<div class="metric-latest" id="nightYesterday">Вчера: <span class="metric-skeleton"></span></div>
 </div>
 <div class="metric-loading" id="nightFact" role="status" aria-live="polite" aria-label="Загрузка ночного значения">
 <div class="metric-skeleton"></div>
@@ -488,7 +490,19 @@ month:{title:'Среднее за месяц',subtitle:'Средние пока�
 excel:{title:'Excel',subtitle:'Твоя таблица',icon:'📗',loading:'Получаю ссылку на таблицу…'},
 memory:{title:'Память',subtitle:'Состояние бота',icon:'⚙️',loading:'Проверяю состояние бота…'}
 };
+function hideKeyboard(){
+ const el=document.activeElement;
+ if(el&&el.matches&&el.matches('input,textarea'))el.blur();
+}
+document.addEventListener('pointerdown',event=>{
+ if(event.target.closest&&event.target.closest('input,button,label,select,textarea'))return;
+ hideKeyboard();
+});
+document.addEventListener('keydown',event=>{
+ if(event.key==='Enter'&&event.target.matches&&event.target.matches('input')&&!event.target.matches('[type=radio]'))event.target.blur();
+});
 function switchTab(name){
+ hideKeyboard();
 document.querySelectorAll('.screen').forEach(screen=>screen.classList.toggle('active',screen.id==='screen-'+name));
 document.querySelectorAll('.nav-button').forEach(button=>button.classList.toggle('active',button.dataset.screen===name));
 window.scrollTo({top:0,behavior:'smooth'});
@@ -768,6 +782,7 @@ function initInsulinTimer(){
  }
 }
 async function openAction(action){
+ hideKeyboard();
  const item=labels[action];
  showModal(item.title,item.subtitle,item.icon,loadingContent(item.loading));
  try{
@@ -1311,7 +1326,8 @@ function formatLatestTime(date,time){
 function renderLatestMeasurement(type,value,time){
  const element=document.getElementById(type==='sugar'?'sugarLatest':'insulinLatest');
  if(!element)return;
- element.textContent=`Последнее: ${String(value).replace('.',',')}ед. в ${time||formatLatestTime(new Date())}`;
+ const unit=type==='insulin'?' ед.':'';
+ element.textContent=`Последнее: ${String(value).replace('.',',')}${unit} в ${time||formatLatestTime(new Date())}`;
  element.hidden=false;
 }
 async function loadNightYesterday(){
@@ -1320,15 +1336,14 @@ async function loadNightYesterday(){
  try{
   const result=await api('night_yesterday');
   if(result&&result.value){
-   element.textContent=`Вчера: ${result.value}${result.time?'ед.'}`;
+   element.textContent=`Вчера: ${result.value} ед.`;
    element.hidden=false;
   }else{
-   element.hidden=true;
-   element.textContent='';
+   element.textContent='Вчера: —';
   }
  }catch(error){
   console.error('Ошибка загрузки вчерашнего ночного значения:',error);
-  element.hidden=true;
+  element.textContent='Вчера: —';
   handleAccessError(error);
  }
 }
@@ -1343,12 +1358,12 @@ async function loadLatestMeasurements(){
    if(latest){
     renderLatestMeasurement(type,latest.value,latest.timeObj.text);
    }else if(element){
-    element.hidden=true;
-    element.textContent='';
+    element.textContent='Последнее: —';
    }
   });
  }catch(error){
   console.error('Ошибка загрузки последних измерений:',error);
+  ['sugarLatest','insulinLatest'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='Последнее: —';});
   handleAccessError(error);
  }
 }
