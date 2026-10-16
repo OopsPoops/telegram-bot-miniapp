@@ -192,6 +192,30 @@ button{-webkit-tap-highlight-color:transparent}
 .nav-button:focus-visible{outline:2px solid #fff;outline-offset:-4px}
 .nav-label{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;line-height:1.2}
 @media(max-width:360px){.bottom-nav-wrap{padding-left:9px;padding-right:9px;padding-bottom:calc(6px + env(safe-area-inset-bottom))}.bottom-nav{height:52px;min-height:0}.nav-button{height:46px;min-height:0;gap:0}.nav-button .nav-icon{width:20px;height:20px}.nav-button .nav-icon svg{width:19px;height:19px}.nav-label{font-size:12px}}
+/* размер иконок навигации */
+.nav-button .nav-icon{width:38px;height:38px}
+.nav-button .nav-icon svg{width:38px;height:38px}
+/* прозрачная панель: без градиента под ней */
+.bottom-nav-wrap,:root[data-theme="dark"] .bottom-nav-wrap{background:none}
+/* панель: 5/6 ширины экрана, стеклянный эффект (светлая тема) */
+.bottom-nav{
+  width:min(83.333vw,484px);
+  background:rgba(255,255,255,.22);
+  border:1px solid rgba(255,255,255,.55);
+  -webkit-backdrop-filter:blur(22px) saturate(200%);
+  backdrop-filter:blur(22px) saturate(200%);
+  box-shadow:0 8px 32px rgba(31,38,135,.15),inset 0 1px 0 rgba(255,255,255,.8),inset 0 -1px 0 rgba(255,255,255,.2);
+}
+.bottom-nav .nav-button{color:rgba(17,19,27,.72)}
+.bottom-nav .nav-button.active{background:rgba(255,255,255,.5);color:var(--text);box-shadow:inset 0 1px 1px rgba(255,255,255,.7)}
+/* тёмная тема */
+:root[data-theme="dark"] .bottom-nav{
+  background:rgba(255,255,255,.07);
+  border-color:rgba(255,255,255,.18);
+  box-shadow:0 8px 32px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.2),inset 0 -1px 0 rgba(255,255,255,.05);
+}
+:root[data-theme="dark"] .bottom-nav .nav-button{color:rgba(255,255,255,.8)}
+:root[data-theme="dark"] .bottom-nav .nav-button.active{background:rgba(255,255,255,.16);color:#fff}
 .bottom-nav-wrap{transition:transform .22s ease,opacity .18s ease}
 body.keyboard-open .bottom-nav-wrap{transform:translateY(140%);opacity:0;pointer-events:none}
 @media(prefers-reduced-motion:reduce){.nav-button,.nav-button .nav-icon{transition:none}}
@@ -223,8 +247,6 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 @keyframes screenIn{from{opacity:.65;transform:translateY(4px)}to{opacity:1;transform:translateY(0)} }
 @keyframes metricShimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 @media(max-width:360px){.app{padding-left:13px;padding-right:13px}.metric{padding:14px}.metric-value{font-size:24px}.save-button{min-width:88px;padding:0 11px}.quick-button{padding:12px 10px;gap:9px}} 
-.nav-button .ios-settings-icon{width:38px;height:38px}
-.nav-button .ios-settings-icon svg{width:38px;height:38px}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
 </head>
@@ -512,8 +534,22 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 </main>
 <nav class="bottom-nav-wrap" aria-label="Основная навигация">
 <div class="bottom-nav">
-<button class="nav-button active" type="button" data-screen="home" onclick="switchTab('home')"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/></svg></span></button>
-<button class="nav-button" type="button" data-screen="graphs" onclick="switchTab('graphs')"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19.5h16"/><path d="M7 16V9"/><path d="M12 16V5"/><path d="M17 16v-7"/></svg></span></button>
+<button class="nav-button active" type="button" data-screen="home" onclick="switchTab('home')"><span class="nav-icon" aria-hidden="true">
+<svg viewBox="-5 -5 130 145" aria-hidden="true" style="fill:currentColor;stroke:none">
+<g transform="translate(0, 118) scale(1.35)">
+<path d="M46.0938-1.61133L46.0938-23.7305C46.0938-25.5859 47.3633-26.8066 49.2188-26.8066L63.5742-26.8066C65.4785-26.8066 66.6504-25.5859 66.6504-23.7305L66.6504-1.61133ZM22.3145-3.41797C22.3145 2.14844 25.6836 5.41992 31.3477 5.41992L81.4453 5.41992C87.1094 5.41992 90.4785 2.14844 90.4785-3.41797L90.4785-32.2754L58.6426-58.9355C57.2754-60.1074 55.4688-60.0586 54.1504-58.9355L22.3145-32.2754ZM13.5742-33.7891C14.7949-33.7891 15.8203-34.4727 16.6992-35.2051L55.127-67.4805C55.5176-67.8223 56.0059-67.9688 56.3965-67.9688C56.7871-67.9688 57.2266-67.8223 57.6172-67.4805L96.0938-35.2051C96.9727-34.4727 97.998-33.7891 99.2188-33.7891C101.611-33.7891 103.027-35.498 103.027-37.3047C103.027-38.2812 102.588-39.3555 101.66-40.1367L61.2793-74.0234C59.7168-75.293 58.0566-75.9277 56.3965-75.9277C54.7363-75.9277 53.0273-75.293 51.5137-74.0234L11.1328-40.1367C10.2051-39.3555 9.76562-38.2812 9.76562-37.3047C9.76562-35.498 11.1816-33.7891 13.5742-33.7891ZM80.8594-55.8105L91.4062-46.9238L91.4062-64.5996C91.4062-66.4551 90.1855-67.627 88.3301-67.627L83.9355-67.627C82.1289-67.627 80.8594-66.4551 80.8594-64.5996Z"/>
+</g>
+</svg>
+</span></button>
+<button class="nav-button" type="button" data-screen="graphs" onclick="switchTab('graphs')"><span class="nav-icon" aria-hidden="true">
+<svg viewBox="-5 -5 115 115" aria-hidden="true" style="fill:currentColor;stroke:none">
+<g transform="translate(0, 100) scale(1.15)">
+<path d="M33.7891-48.9746C31.8848-48.9746 30.127-48.1934 28.3203-46.2891L11.4746-29.0039C10.0098-27.5391 10.0098-25.1465 11.4746-23.6816C12.9395-22.2656 15.332-22.2168 16.7969-23.6816L33.0566-40.4297C33.3008-40.6738 33.5449-40.7715 33.7891-40.7715C34.0332-40.7715 34.2773-40.6738 34.5215-40.4297L48.0957-26.3184C49.8535-24.5117 51.6602-23.6328 53.5645-23.6328C55.5176-23.6328 57.2266-24.5117 59.0332-26.3184L77.7832-45.2148C79.248-46.6797 79.248-49.0723 77.7832-50.4883C76.3184-51.9531 73.9258-52.002 72.4609-50.4883L54.2969-32.1777C54.1016-31.9336 53.8086-31.8359 53.5645-31.8359C53.3691-31.8359 53.0762-31.9336 52.832-32.1777L39.2578-46.2891C37.5-48.0957 35.6934-48.9746 33.7891-48.9746Z"/>
+<path d="M64.1602-56.7383C61.9629-56.1035 60.9863-54.1504 62.5488-52.5879L79.834-35.2539C81.3965-33.6914 83.3984-34.668 83.9844-36.8652L89.9902-59.6191C90.5273-61.5723 88.7695-63.2324 86.8164-62.6953Z"/>
+<path opacity=".5" d="M9.76562-2.88086C9.76562-0.878906 11.084 0.439453 13.0859 0.439453L88.8672 0.439453C90.8203 0.439453 92.3828-1.12305 92.3828-3.07617C92.3828-4.98047 90.8203-6.5918 88.8672-6.5918L18.0176-6.5918C17.0898-6.5918 16.7969-6.83594 16.7969-7.76367L16.7969-66.8457C16.7969-68.75 15.2344-70.3613 13.2812-70.3613C11.377-70.3613 9.76562-68.75 9.76562-66.8457Z"/>
+</g>
+</svg>
+</span></button>
 <button class="nav-button" type="button" data-screen="settings" onclick="switchTab('settings')">
   <span class="nav-icon ios-settings-icon" aria-hidden="true">
     <svg viewBox="-5 -5 130 145" aria-hidden="true" style="fill:currentColor;stroke:none">
