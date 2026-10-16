@@ -233,8 +233,8 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 </div>
 <div class="input-row">
 <input class="value-input" id="sugarInput" type="text" inputmode="decimal" placeholder="" aria-label="Новое значение сахара">
-<button class="save-button" onclick="saveValue('sugar')">Сохранить</button>
 <button class="undo-button" type="button" onclick="undoValue('sugar')" aria-label="Отменить последнюю запись сахара" title="Отменить последнюю запись">↩︎</button>
+<button class="save-button" onclick="saveValue('sugar')">Сохранить</button>
 </div>
 <div class="toast" id="sugarToast"></div>
 </section>
@@ -253,8 +253,8 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 </div>
 <div class="input-row">
 <input class="value-input" id="insulinInput" type="number" inputmode="numeric" step="1" min="0" max="15" placeholder="" aria-label="Новое значение инсулина">
-<button class="save-button" onclick="saveValue('insulin')">Сохранить</button>
 <button class="undo-button" type="button" onclick="undoValue('insulin')" aria-label="Отменить последнюю запись инсулина" title="Отменить последнюю запись">↩︎</button>
+<button class="save-button" onclick="saveValue('insulin')">Сохранить</button>
 </div>
 <div class="toast" id="insulinToast"></div>
 <div class="insulin-timer" id="insulinTimer" hidden role="timer" aria-live="off">
@@ -280,8 +280,8 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 </div>
 <div class="input-row">
 <input class="value-input" id="nightInput" type="text" inputmode="decimal" placeholder="Еще не скоро" aria-label="Новое ночное значение">
-<button class="save-button" onclick="saveValue('fact')">Сохранить</button>
 <button class="undo-button" type="button" onclick="undoValue('fact')" aria-label="Отменить последнюю запись ночного значения" title="Отменить последнюю запись">↩︎</button>
+<button class="save-button" onclick="saveValue('fact')">Сохранить</button>
 </div>
 <div class="toast" id="nightToast"></div>
 </section>
@@ -934,7 +934,7 @@ async function openAction(action){
 async function saveValue(type){
  const input=document.getElementById(type==='sugar'?'sugarInput':type==='fact'?'nightInput':'insulinInput');
  const toast=document.getElementById(type==='sugar'?'sugarToast':type==='fact'?'nightToast':'insulinToast');
- const button=input.parentElement.querySelector('button');
+ const button=input.parentElement.querySelector('.save-button');
  const value=input.value.trim();
  if(!value){
   setToast(toast,'Сначала введи значение.','error');
