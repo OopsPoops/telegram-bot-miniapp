@@ -1311,7 +1311,7 @@ function formatLatestTime(date,time){
 function renderLatestMeasurement(type,value,time){
  const element=document.getElementById(type==='sugar'?'sugarLatest':'insulinLatest');
  if(!element)return;
- element.textContent=`Последнее: ${String(value).replace('.',',')} в ${time||formatLatestTime(new Date())}`;
+ element.textContent=`Последнее: ${String(value).replace('.',',')}ед. в ${time||formatLatestTime(new Date())}`;
  element.hidden=false;
 }
 async function loadNightYesterday(){
@@ -1320,7 +1320,7 @@ async function loadNightYesterday(){
  try{
   const result=await api('night_yesterday');
   if(result&&result.value){
-   element.textContent=`Вчера: ${result.value}${result.time?' в '+result.time:''}`;
+   element.textContent=`Вчера: ${result.value}${result.time?'ед.'}`;
    element.hidden=false;
   }else{
    element.hidden=true;
