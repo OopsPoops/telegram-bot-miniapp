@@ -98,6 +98,10 @@ button{-webkit-tap-highlight-color:transparent}
 .settings-card{background:var(--card);border:1px solid rgba(125,135,170,.12);border-radius:21px;padding:17px;margin-bottom:13px;box-shadow:var(--shadow)}
 .setting-row{display:flex;align-items:center;gap:13px;min-height:53px}
 .setting-icon{width:43px;height:43px;border-radius:15px;background:var(--icon-bg);display:grid;place-items:center;font-size:21px;flex-shrink:0}
+.setting-icon-button{border:0;padding:0;color:inherit;font:inherit;font-size:21px;cursor:pointer;transition:transform .12s}
+.setting-icon-button:active{transform:scale(.9)}
+.setting-icon-button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.setting-row.muted-by-app .setting-copy,.setting-row.muted-by-app .setting-switch{opacity:.45}
 .setting-copy{flex:1;min-width:0}
 .setting-name{font-size:15px;font-weight:700}
 .setting-description{font-size:12px;color:var(--muted);margin-top:4px;overflow-wrap:anywhere}
@@ -175,6 +179,8 @@ button{-webkit-tap-highlight-color:transparent}
 .nav-button:focus-visible{outline:2px solid #fff;outline-offset:-4px}
 .nav-label{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;line-height:1.2}
 @media(max-width:360px){.bottom-nav-wrap{padding-left:9px;padding-right:9px;padding-bottom:calc(6px + env(safe-area-inset-bottom))}.bottom-nav{height:52px;min-height:0}.nav-button{height:46px;min-height:0;gap:0}.nav-button .nav-icon{width:20px;height:20px}.nav-button .nav-icon svg{width:19px;height:19px}.nav-label{font-size:12px}}
+.bottom-nav-wrap{transition:transform .22s ease,opacity .18s ease}
+body.keyboard-open .bottom-nav-wrap{transform:translateY(140%);opacity:0;pointer-events:none}
 @media(prefers-reduced-motion:reduce){.nav-button,.nav-button .nav-icon{transition:none}}
 .modal-backdrop{position:fixed;inset:0;background:rgba(18,24,45,.48);display:none;align-items:center;justify-content:center;padding:22px;z-index:30;backdrop-filter:blur(5px)}
 .modal-backdrop.visible{display:flex;animation:fade .18s ease}
@@ -390,6 +396,25 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 </div>
 <div class="settings-card">
 <div class="setting-row">
+<div class="setting-icon">🔊</div>
+<div class="setting-copy">
+<div class="setting-name">Звук приложения</div>
+<div class="setting-description">Все звуки сразу: вкл или выкл</div>
+</div>
+<button class="setting-switch" id="appSoundSwitch" type="button" onclick="toggleTimerSetting('appSound')" aria-label="Выключить звук приложения" aria-pressed="true"><span></span></button>
+</div>
+<div class="setting-divider"></div>
+<div class="setting-row">
+<div class="setting-icon">📲</div>
+<div class="setting-copy">
+<div class="setting-name">Вибрация приложения</div>
+<div class="setting-description">Вся вибрация сразу: вкл или выкл</div>
+</div>
+<button class="setting-switch" id="appVibrationSwitch" type="button" onclick="toggleTimerSetting('appVibration')" aria-label="Выключить вибрацию приложения" aria-pressed="true"><span></span></button>
+</div>
+</div>
+<div class="settings-card">
+<div class="setting-row">
 <div class="setting-icon">⏱️</div>
 <div class="setting-copy">
 <div class="setting-name">Таймер инсулина</div>
@@ -407,20 +432,20 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 <span>ед.</span>
 </div>
 <div class="setting-divider"></div>
-<div class="setting-row">
-<div class="setting-icon">🔔</div>
+<div class="setting-row" id="timerSoundRow">
+<button class="setting-icon setting-icon-button" type="button" onclick="previewTimerSound()" aria-label="Проверить звук">🔔</button>
 <div class="setting-copy">
 <div class="setting-name">Звук напоминаний</div>
-<div class="setting-description">Звуковой сигнал через 5 и 10 минут</div>
+<div class="setting-description">Через 5 и 10 минут. Нажми на 🔔, чтобы послушать</div>
 </div>
 <button class="setting-switch" id="timerSoundSwitch" type="button" onclick="toggleTimerSetting('sound')" aria-label="Включить звук напоминаний" aria-pressed="true"><span></span></button>
 </div>
 <div class="setting-divider"></div>
-<div class="setting-row">
-<div class="setting-icon">📳</div>
+<div class="setting-row" id="timerVibrationRow">
+<button class="setting-icon setting-icon-button" type="button" onclick="cycleVibrationLevel()" aria-label="Сменить силу вибрации">📳</button>
 <div class="setting-copy">
 <div class="setting-name">Вибрация</div>
-<div class="setting-description">Вибрация через 5 и 10 минут</div>
+<div class="setting-description" id="timerVibrationDescription">Через 5 и 10 минут</div>
 </div>
 <button class="setting-switch" id="timerVibrationSwitch" type="button" onclick="toggleTimerSetting('vibration')" aria-label="Включить вибрацию напоминаний" aria-pressed="true"><span></span></button>
 </div>
@@ -471,7 +496,53 @@ const TIMER_SETTINGS_KEY='sema-insulin-timer-settings';
 const TIMER_STATE_KEY_PREFIX='sema-insulin-timer-state';
 const TIMER_DURATION_MS=20*60*1000;
 const TIMER_REMINDERS_MS=[5*60*1000,10*60*1000];
-const defaultTimerSettings={mode:'always',threshold:5,sound:true,vibration:true};
+const defaultTimerSettings={mode:'always',threshold:5,sound:true,vibration:true,appSound:true,appVibration:true,vibrationLevel:3};
+const VIBRATION_LEVELS=[
+ {name:'Слабо',steps:[['soft',0]],fallback:[40]},
+ {name:'Сильнее',steps:[['medium',0],['medium',140]],fallback:[90,90,90]},
+ {name:'Ещё сильнее',steps:[['heavy',0],['heavy',150],['heavy',300]],fallback:[150,90,150,90,150]},
+ {name:'Сильно',steps:[['rigid',0],['heavy',110],['rigid',220],['heavy',330],['rigid',440],['heavy',550]],fallback:[250,90,250,90,250,90,250]},
+ {name:'Очень сильно',steps:[['error',0],['rigid',120],['heavy',240],['rigid',360],['heavy',480],['rigid',600],['heavy',720],['rigid',840],['heavy',960],['rigid',1080]],fallback:[400,90,400,90,400,90,400,90,400]}
+];
+let vibrationTimeouts=[];
+function appSoundOn(){return insulinTimerSettings.appSound!==false;}
+function appVibrationOn(){return insulinTimerSettings.appVibration!==false;}
+function timerSoundAllowed(){return appSoundOn()&&insulinTimerSettings.sound;}
+function timerVibrationAllowed(){return appVibrationOn()&&insulinTimerSettings.vibration;}
+function uiHaptic(kind){
+ if(!tg||!appVibrationOn())return;
+ const haptic=tg.HapticFeedback;
+ if(!haptic)return;
+ try{
+  if(kind==='selection')haptic.selectionChanged?.();
+  else haptic.notificationOccurred?.(kind);
+ }catch(error){console.warn('Haptic error:',error);}
+}
+function runVibration(level){
+ const config=VIBRATION_LEVELS[Math.min(5,Math.max(1,Number(level)||3))-1];
+ vibrationTimeouts.forEach(clearTimeout);
+ vibrationTimeouts=[];
+ const haptic=tg?.HapticFeedback;
+ if(haptic?.impactOccurred){
+  config.steps.forEach(([style,delay])=>{
+   vibrationTimeouts.push(setTimeout(()=>{
+    try{
+     if(['success','warning','error'].includes(style))haptic.notificationOccurred?.(style);
+     else haptic.impactOccurred(style);
+    }catch(error){console.warn('Haptic error:',error);}
+   },delay));
+  });
+ }else if(navigator.vibrate){
+  navigator.vibrate(config.fallback);
+ }
+}
+function cycleVibrationLevel(){
+ insulinTimerSettings.vibrationLevel=insulinTimerSettings.vibrationLevel%5+1;
+ persistTimerSettings();
+ updateTimerSettingsUi();
+ runVibration(insulinTimerSettings.vibrationLevel);
+}
+function previewTimerSound(){playTimerSound(true);}
 let insulinTimerSettings={...defaultTimerSettings};
 let activeInsulinTimer=null;
 let insulinTimerInterval=null;
@@ -506,7 +577,7 @@ function switchTab(name){
 document.querySelectorAll('.screen').forEach(screen=>screen.classList.toggle('active',screen.id==='screen-'+name));
 document.querySelectorAll('.nav-button').forEach(button=>button.classList.toggle('active',button.dataset.screen===name));
 window.scrollTo({top:0,behavior:'smooth'});
-if(tg)tg.HapticFeedback?.selectionChanged();
+uiHaptic('selection');
 if(name==='graphs')loadAnalytics(true);
 }
 function applyTheme(theme){
@@ -524,7 +595,7 @@ try{localStorage.setItem('sema-theme',dark?'dark':'light')}catch(e){}
 function toggleTheme(){
 const current=document.documentElement.dataset.theme||'light';
 applyTheme(current==='dark'?'light':'dark');
-if(tg)tg.HapticFeedback?.selectionChanged();
+uiHaptic('selection');
 }
 (function initTheme(){
 let theme='light';
@@ -620,7 +691,10 @@ function loadTimerSettings(){
    mode:['always','threshold','off'].includes(saved.mode)?saved.mode:defaultTimerSettings.mode,
    threshold:Number.isFinite(Number(saved.threshold))?Math.min(15,Math.max(0,Number(saved.threshold))):defaultTimerSettings.threshold,
    sound:typeof saved.sound==='boolean'?saved.sound:defaultTimerSettings.sound,
-   vibration:typeof saved.vibration==='boolean'?saved.vibration:defaultTimerSettings.vibration
+   vibration:typeof saved.vibration==='boolean'?saved.vibration:defaultTimerSettings.vibration,
+   appSound:typeof saved.appSound==='boolean'?saved.appSound:defaultTimerSettings.appSound,
+   appVibration:typeof saved.appVibration==='boolean'?saved.appVibration:defaultTimerSettings.appVibration,
+   vibrationLevel:[1,2,3,4,5].includes(Number(saved.vibrationLevel))?Number(saved.vibrationLevel):defaultTimerSettings.vibrationLevel
   };
  }catch(error){console.warn('Не удалось загрузить настройки таймера:',error);}
 }
@@ -657,8 +731,8 @@ function renderInsulinTimer(){
  countdown.textContent=formatTimerElapsed(elapsed);
  countdown.setAttribute('aria-label',`${Math.floor(elapsed/60000)} минут прошло`);
 }
-function ensureTimerAudio(){
- if(!insulinTimerSettings.sound)return;
+function ensureTimerAudio(force=false){
+ if(!force&&!timerSoundAllowed())return;
  try{
   const AudioContextClass=window.AudioContext||window.webkitAudioContext;
   if(!AudioContextClass)return;
@@ -666,10 +740,10 @@ function ensureTimerAudio(){
   if(timerAudioContext.state==='suspended')timerAudioContext.resume().catch(error=>console.warn('Не удалось включить звук таймера:',error));
  }catch(error){console.warn('Не удалось подготовить звук таймера:',error);}
 }
-function playTimerSound(){
- if(!insulinTimerSettings.sound)return;
+function playTimerSound(force=false){
+ if(!force&&!timerSoundAllowed())return;
  try{
-  ensureTimerAudio();
+  ensureTimerAudio(force);
   if(!timerAudioContext)return;
   const now=timerAudioContext.currentTime;
   const oscillator=timerAudioContext.createOscillator();
@@ -685,11 +759,9 @@ function playTimerSound(){
  }catch(error){console.warn('Не удалось воспроизвести звук таймера:',error);}
 }
 function vibrateForTimer(){
- if(!insulinTimerSettings.vibration)return;
- try{
-  if(tg?.HapticFeedback?.notificationOccurred)tg.HapticFeedback.notificationOccurred('warning');
-  else if(navigator.vibrate)navigator.vibrate([250,100,250]);
- }catch(error){console.warn('Не удалось включить вибрацию таймера:',error);}
+ if(!timerVibrationAllowed())return;
+ try{runVibration(insulinTimerSettings.vibrationLevel);}
+ catch(error){console.warn('Не удалось включить вибрацию таймера:',error);}
 }
 function notifyTimerReminder(){
  playTimerSound();
@@ -732,6 +804,19 @@ function clearInsulinTimer(){
  }
 }
 function updateTimerSettingsUi(){
+ const setSwitch=(id,on,onLabel,offLabel)=>{
+  const el=document.getElementById(id);
+  if(!el)return;
+  el.setAttribute('aria-pressed',String(on));
+  el.setAttribute('aria-label',on?offLabel:onLabel);
+ };
+ setSwitch('appSoundSwitch',appSoundOn(),'Включить звук приложения','Выключить звук приложения');
+ setSwitch('appVibrationSwitch',appVibrationOn(),'Включить вибрацию приложения','Выключить вибрацию приложения');
+ document.getElementById('timerSoundRow')?.classList.toggle('muted-by-app',!appSoundOn());
+ document.getElementById('timerVibrationRow')?.classList.toggle('muted-by-app',!appVibrationOn());
+ const level=insulinTimerSettings.vibrationLevel;
+ const vibrationDescription=document.getElementById('timerVibrationDescription');
+ if(vibrationDescription)vibrationDescription.textContent=`Через 5 и 10 минут · ${VIBRATION_LEVELS[level-1].name} (${level}/5). Нажми на 📳, чтобы сменить силу`;
  document.querySelectorAll('input[name="insulinTimerMode"]').forEach(input=>{input.checked=input.value===insulinTimerSettings.mode;});
  document.getElementById('timerThresholdSetting').hidden=insulinTimerSettings.mode!=='threshold';
  document.getElementById('timerThresholdInput').value=String(insulinTimerSettings.threshold);
@@ -835,7 +920,7 @@ async function saveValue(type){
   setToast(toast,'✓ '+result,'success');
   input.value='';
   setAccess(true,'Сервер подтвердил доступ');
-  if(tg)tg.HapticFeedback?.notificationOccurred('success');
+  uiHaptic('success');
   if(type==='sugar'){
    renderLatestMeasurement('sugar',value.replace(',','.'),formatLatestTime(new Date()));
    await loadSugarAverage();
@@ -849,7 +934,7 @@ async function saveValue(type){
  }catch(error){
   setToast(toast,'Не удалось сохранить: '+error.message,'error');
   handleAccessError(error);
-  if(tg)tg.HapticFeedback?.notificationOccurred('error');
+  uiHaptic('error');
  }finally{
   button.disabled=false;
   button.textContent='Сохранить';
@@ -1370,7 +1455,42 @@ async function loadLatestMeasurements(){
 function formatAxisValue(value){
   return Number(value).toFixed(Number.isInteger(value)?0:1);
 }
+function isTextField(el){
+ return !!(el&&el.matches&&el.matches('input:not([type=radio]):not([type=checkbox]),textarea'));
+}
+document.addEventListener('focusin',event=>{
+ if(isTextField(event.target))document.body.classList.add('keyboard-open');
+});
+document.addEventListener('focusout',event=>{
+ if(!isTextField(event.target))return;
+ setTimeout(()=>{if(!isTextField(document.activeElement))document.body.classList.remove('keyboard-open');},60);
+});
+const WAKE_LOCK_MS=15*60*1000;
+const wakeLockEndsAt=Date.now()+WAKE_LOCK_MS;
+let wakeLockSentinel=null;
+async function requestWakeLock(){
+ if(Date.now()>=wakeLockEndsAt||wakeLockSentinel||!navigator.wakeLock)return;
+ try{
+  const sentinel=await navigator.wakeLock.request('screen');
+  if(Date.now()>=wakeLockEndsAt){sentinel.release().catch(()=>{});return;}
+  wakeLockSentinel=sentinel;
+  sentinel.addEventListener('release',()=>{if(wakeLockSentinel===sentinel)wakeLockSentinel=null;});
+ }catch(error){console.warn('Не удалось удержать экран включённым:',error);}
+}
+function releaseWakeLock(){
+ if(!wakeLockSentinel)return;
+ const sentinel=wakeLockSentinel;
+ wakeLockSentinel=null;
+ sentinel.release().catch(()=>{});
+}
+function initWakeLock(){
+ requestWakeLock();
+ setTimeout(releaseWakeLock,Math.max(0,wakeLockEndsAt-Date.now()));
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)requestWakeLock();});
+ document.addEventListener('pointerdown',()=>requestWakeLock(),{passive:true});
+}
 initUser();
+initWakeLock();
 initInsulinTimer();
 updateEntryPlaceholders();
 window.addEventListener('pageshow',()=>{updateEntryPlaceholders();updateInsulinTimer();});
