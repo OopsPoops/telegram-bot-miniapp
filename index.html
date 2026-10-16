@@ -46,6 +46,8 @@ button{-webkit-tap-highlight-color:transparent}
 .value-input:focus{border-color:var(--blue)}
 .save-button{border:0;border-radius:13px;padding:0 17px;font-size:14px;font-weight:700;color:white;min-width:105px;cursor:pointer}
 .save-button:disabled{opacity:.65}
+.undo-button{flex-shrink:0;width:46px;border:1px solid var(--line);border-radius:13px;background:var(--input-bg);color:var(--muted);font-size:19px;line-height:1;cursor:pointer}
+.undo-button:disabled{opacity:.5}
 .sugar .save-button{background:var(--pink)}
 .insulin:not(.night) .save-button{background:#e4faf6;color:#176d63}
 :root[data-theme="dark"] .insulin:not(.night) .save-button{background:#20413e;color:#9aeee2}
@@ -232,6 +234,7 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 <div class="input-row">
 <input class="value-input" id="sugarInput" type="text" inputmode="decimal" placeholder="" aria-label="Новое значение сахара">
 <button class="save-button" onclick="saveValue('sugar')">Сохранить</button>
+<button class="undo-button" type="button" onclick="undoValue('sugar')" aria-label="Отменить последнюю запись сахара" title="Отменить последнюю запись">↩︎</button>
 </div>
 <div class="toast" id="sugarToast"></div>
 </section>
@@ -251,6 +254,7 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 <div class="input-row">
 <input class="value-input" id="insulinInput" type="number" inputmode="numeric" step="1" min="0" max="15" placeholder="" aria-label="Новое значение инсулина">
 <button class="save-button" onclick="saveValue('insulin')">Сохранить</button>
+<button class="undo-button" type="button" onclick="undoValue('insulin')" aria-label="Отменить последнюю запись инсулина" title="Отменить последнюю запись">↩︎</button>
 </div>
 <div class="toast" id="insulinToast"></div>
 <div class="insulin-timer" id="insulinTimer" hidden role="timer" aria-live="off">
@@ -277,6 +281,7 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 <div class="input-row">
 <input class="value-input" id="nightInput" type="text" inputmode="decimal" placeholder="Еще не скоро" aria-label="Новое ночное значение">
 <button class="save-button" onclick="saveValue('fact')">Сохранить</button>
+<button class="undo-button" type="button" onclick="undoValue('fact')" aria-label="Отменить последнюю запись ночного значения" title="Отменить последнюю запись">↩︎</button>
 </div>
 <div class="toast" id="nightToast"></div>
 </section>
@@ -974,6 +979,36 @@ async function saveValue(type){
  }finally{
   button.disabled=false;
   button.textContent='Сохранить';
+ }
+}
+async function undoValue(type){
+ const ids={sugar:['sugarInput','sugarToast'],insulin:['insulinInput','insulinToast'],fact:['nightInput','nightToast']};
+ const [inputId,toastId]=ids[type];
+ const toast=document.getElementById(toastId);
+ const button=document.getElementById(inputId).parentElement.querySelector('.undo-button');
+ button.disabled=true;
+ setToast(toast,'');
+ try{
+  const result=await api('undo_'+type);
+  setAccess(true,'Сервер подтвердил доступ');
+  uiHaptic('success');
+  const value=String(result.value).replace('.',',');
+  const text=type==='fact'
+   ?`Ночное значение ${value} удалено`
+   :`Удалено: ${value}${type==='insulin'?' ед.':''}${result.time?' в '+result.time:''}`;
+  setToast(toast,'✓ '+text,'success');
+  if(type==='sugar')await Promise.all([loadSugarAverage(),loadLatestMeasurements()]);
+  if(type==='insulin'){
+   if(activeInsulinTimer&&Number(activeInsulinTimer.dose)===Number(result.value))clearInsulinTimer();
+   await Promise.all([loadInsulinTotal(),loadNightFact(),loadLatestMeasurements()]);
+  }
+  if(type==='fact')await loadNightFact();
+ }catch(error){
+  setToast(toast,'Не удалось отменить: '+error.message,'error');
+  handleAccessError(error);
+  uiHaptic('error');
+ }finally{
+  button.disabled=false;
  }
 }
 function showMetricLoading(element){
