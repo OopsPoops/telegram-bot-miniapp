@@ -12,26 +12,7 @@
 :root{color-scheme:light;--bg:#f5f6fb;--status-bar-bg:#e6e7ec;--status-bar-fade:#eff0f5;--card:#fff;--text:#20243a;--muted:#81869a;--blue:#5267e8;--pink:#ed6f9b;--teal:#20a99b;--line:#edf0f6;--input-bg:#f7f8fc;--input-text:#20243a;--shadow:0 8px 26px rgba(37,47,82,.08),0 1px 2px rgba(37,47,82,.05);--nav-highlight:#edf3ff;--nav-border:rgba(128,136,158,.18);--nav-active:#dfe7ff;--icon-bg:#f1f4fb;--modal-bg:#fff;--modal-content:#f4f6fb;--close-bg:#eef2fb;--close-text:#3c4664}
 :root[data-theme="dark"]{color-scheme:dark;--bg:#11131b;--status-bar-bg:#11131b;--status-bar-fade:#11131b;--card:#1c202c;--text:#f1f3fa;--muted:#a0a6bb;--blue:#8998ff;--pink:#ed7fa5;--teal:#40cbbb;--line:#3a4051;--input-bg:#292e3d;--input-text:#f1f3fa;--shadow:0 14px 34px rgba(0,0,0,.38),0 1px 2px rgba(0,0,0,.18);--nav-highlight:rgba(255,255,255,.07);--nav-border:rgba(151,160,182,.14);--nav-active:rgba(146,160,255,.14);--icon-bg:#2b313f;--modal-bg:#1a1f2c;--modal-content:#202737;--close-bg:#2d3446;--close-text:#eef2ff}
 *{box-sizing:border-box}
-body{
-  margin:0;padding:0;color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  -webkit-font-smoothing:antialiased;
-  transition:background .2s,color .2s;
-  background:
-    radial-gradient(ellipse 80% 50% at 15% 8%,  rgba(82,103,232,.10),  transparent 60%),
-    radial-gradient(ellipse 70% 45% at 90% 15%, rgba(237,111,155,.08), transparent 60%),
-    radial-gradient(ellipse 90% 55% at 50% 100%,rgba(32,169,155,.09),  transparent 65%),
-    var(--bg);
-  background-attachment:fixed;
-}
-:root[data-theme="dark"] body{
-  background:
-    radial-gradient(ellipse 80% 50% at 15% 8%,  rgba(137,152,255,.14), transparent 60%),
-    radial-gradient(ellipse 70% 45% at 90% 15%, rgba(237,127,165,.10), transparent 60%),
-    radial-gradient(ellipse 90% 55% at 50% 100%,rgba(64,203,187,.12),  transparent 65%),
-    var(--bg);
-  background-attachment:fixed;
-}
+body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;transition:background .2s,color .2s}
 body::before{position:fixed;z-index:25;top:0;left:0;right:0;height:calc(env(safe-area-inset-top) + 39px);background:linear-gradient(to bottom,var(--status-bar-bg) 0%,var(--status-bar-fade) 65%,var(--bg) 100%);content:"";pointer-events:none}
 button,input{font:inherit}
 button{-webkit-tap-highlight-color:transparent}
@@ -198,30 +179,36 @@ button{-webkit-tap-highlight-color:transparent}
 .heatmap-day{font-size:10px;color:var(--muted)}
 .heatmap-cell{height:27px;min-width:0;padding:0;border:1px solid rgba(125,135,170,.12);border-radius:5px;cursor:pointer}
 .heatmap-cell:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
-.bottom-nav-wrap{position:fixed;z-index:20;bottom:0;left:0;right:0;padding:0 12px calc(6px + env(safe-area-inset-bottom));pointer-events:none;background:none;transition:transform .22s ease,opacity .18s ease}
-body.keyboard-open .bottom-nav-wrap{transform:translateY(140%);opacity:0;pointer-events:none}
-
-/* ===== Liquid Glass: преломление (только Chromium) ===== */
-@supports (backdrop-filter: url(#lg-dist)) {
-  .bottom-nav {
-    backdrop-filter: url(#lg-dist) blur(2px) saturate(160%);
-    -webkit-backdrop-filter: url(#lg-dist) blur(2px) saturate(160%);
-  }
-}
-
-/* ===== Базовая панель — Apple-style glass ===== */
+.bottom-nav-wrap{position:fixed;z-index:20;bottom:0;left:0;right:0;padding:0 12px calc(6px + env(safe-area-inset-bottom));pointer-events:none;background:linear-gradient(to top,var(--bg) 15%,transparent 100%)}
+:root[data-theme="dark"] .bottom-nav-wrap{background:linear-gradient(to top,var(--bg) 15%,transparent 100%)}
+.bottom-nav{position:relative;isolation:isolate;pointer-events:auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;width:100%;max-width:484px;min-height:0;height:52px;margin:0 auto;padding:2px;border:1px solid rgba(255,255,255,.25);border-radius:999px;background:rgba(65,65,65,.68);-webkit-backdrop-filter:blur(35px) saturate(180%);backdrop-filter:blur(35px) saturate(180%);box-shadow:0 8px 30px rgba(0,0,0,.2),inset 0 1px 1px rgba(255,255,255,.24),inset 0 -1px 1px rgba(0,0,0,.12);overflow:hidden}
+:root[data-theme="dark"] .bottom-nav{background:rgba(38,38,40,.76);border-color:rgba(255,255,255,.16);box-shadow:0 8px 30px rgba(0,0,0,.3),inset 0 1px 1px rgba(255,255,255,.15)}
+.nav-button{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;min-width:0;min-height:0;height:46px;padding:2px;border:0;border-radius:999px;color:rgba(255,255,255,.96);background:transparent;font-size:13px;font-weight:500;letter-spacing:.1px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:color .2s,transform .2s}
+.nav-button .nav-icon{width:20px;height:20px;display:grid;place-items:center;transition:transform .2s}
+.nav-button .nav-icon svg{display:block;width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.nav-button.active{background:rgba(220,220,220,.19);color:#fff;box-shadow:inset 0 1px 1px rgba(255,255,255,.09)}
+.nav-button.active .nav-icon{transform:scale(1.04)}
+.nav-button:active{transform:scale(.97)}
+.nav-button:focus-visible{outline:2px solid #fff;outline-offset:-4px}
+.nav-label{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;line-height:1.2}
+@media(max-width:360px){.bottom-nav-wrap{padding-left:9px;padding-right:9px;padding-bottom:calc(6px + env(safe-area-inset-bottom))}.bottom-nav{height:52px;min-height:0}.nav-button{height:46px;min-height:0;gap:0}.nav-button .nav-icon{width:20px;height:20px}.nav-button .nav-icon svg{width:19px;height:19px}.nav-label{font-size:12px}}
+/* размер иконок навигации */
+.nav-button .nav-icon{width:38px;height:38px}
+.nav-button .nav-icon svg{width:38px;height:38px}
+/* прозрачная панель: без градиента под ней */
+.bottom-nav-wrap,:root[data-theme="dark"] .bottom-nav-wrap{background:none}
+/* ===== Liquid Glass 2025–26 для нижней навигации ===== */
 .bottom-nav{
   position:relative;
   isolation:isolate;
-  overflow:hidden;
   width:min(83.333vw,484px);
   height:62px;
-  margin:0 auto;
+  border:0;
   border-radius:999px;
-  border:1px solid rgba(255,255,255,.25);
-  background:radial-gradient(ellipse 130% 90% at 50% 0%,rgba(255,255,255,.18) 0%,rgba(255,255,255,.10) 45%,rgba(255,255,255,.05) 100%);
-  -webkit-backdrop-filter:blur(18px) saturate(180%);
-  backdrop-filter:blur(18px) saturate(180%);
+  overflow:hidden;
+  background:radial-gradient(ellipse 130% 90% at 50% 0%,rgba(255,255,255,.180) 0%,rgba(255,255,255,.100) 45%,rgba(255,255,255,.050) 100%);
+  -webkit-backdrop-filter:blur(22px) saturate(180%);
+  backdrop-filter:blur(22px) saturate(180%);
   box-shadow:
     0 15px 45px -11px rgba(0,0,0,.283),
     0 1px 2px rgba(0,0,0,.141),
@@ -237,20 +224,20 @@ body.keyboard-open .bottom-nav-wrap{transform:translateY(140%);opacity:0;pointer
   position:absolute;
   inset:0;
   border-radius:inherit;
-  background:radial-gradient(ellipse 110% 65% at 50% -15%,rgba(255,255,255,.55) 0%,rgba(255,255,255,0) 70%);
+  background:radial-gradient(ellipse 110% 65% at 50% -15%,rgba(255,255,255,.550) 0%,rgba(255,255,255,0) 70%);
   mix-blend-mode:screen;
   pointer-events:none;
   z-index:1;
 }
-/* Внутренний rim — линза по краю */
+/* Внутренний rim по краю */
 .bottom-nav::after{
   content:"";
   position:absolute;
   inset:0;
   border-radius:inherit;
   box-shadow:
-    inset 0 0 0 .5px rgba(255,255,255,.53),
-    inset 0 1px 0 rgba(255,255,255,.80),
+    inset 0 0 0 .5px rgba(255,255,255,.530),
+    inset 0 1px 0 rgba(255,255,255,.800),
     inset 0 -1px 0 rgba(255,255,255,.175);
   pointer-events:none;
   z-index:1;
@@ -281,9 +268,20 @@ body.keyboard-open .bottom-nav-wrap{transform:translateY(140%);opacity:0;pointer
     inset 0 0 0 1px rgba(255,255,255,.14);
 }
 :root[data-theme="dark"] .bottom-nav .nav-button{color:rgba(255,255,255,.78)}
-:root[data-theme="dark"] .bottom-nav .nav-button.active{background:transparent;color:#fff;box-shadow:none}
-
-/* ===== Скользящая стеклянная пилюля ===== */
+:root[data-theme="dark"] .bottom-nav .nav-button.active{
+  background:transparent;
+  color:#fff;
+  box-shadow:none;
+}
+/* Fallback без backdrop-filter */
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  .bottom-nav{background:rgba(255,255,255,.60)}
+  :root[data-theme="dark"] .bottom-nav{background:rgba(38,38,40,.80)}
+}
+.bottom-nav-wrap{transition:transform .22s ease,opacity .18s ease}
+body.keyboard-open .bottom-nav-wrap{transform:translateY(140%);opacity:0;pointer-events:none}
+@media(prefers-reduced-motion:reduce){.nav-button,.nav-button .nav-icon{transition:none}}
+/* ===== Скользящая стеклянная «пилюля» под активной кнопкой ===== */
 .bottom-nav .nav-pill{
   position:absolute;
   top:3px;
@@ -311,22 +309,18 @@ body.keyboard-open .bottom-nav-wrap{transform:translateY(140%);opacity:0;pointer
     inset 0 -1px 1px rgba(0,0,0,.12),
     0 2px 8px rgba(0,0,0,.25);
 }
-/* Иконки — liquid-отклик */
-.nav-button .nav-icon{transition:transform .4s cubic-bezier(.34,1.5,.4,1),opacity .3s}
-.nav-button:not(.active) .nav-icon{transform:scale(.94);opacity:.78}
-.nav-button.active .nav-icon{transform:scale(1.1) translateY(-1px);opacity:1}
-
-/* ===== Доступность ===== */
-@media (prefers-reduced-transparency: reduce){
-  .bottom-nav{background:rgba(255,255,255,.92);backdrop-filter:none;-webkit-backdrop-filter:none}
-  :root[data-theme="dark"] .bottom-nav{background:rgba(28,32,44,.95)}
+/* Иконки — плавный liquid-отклик */
+.nav-button .nav-icon{
+  transition:transform .4s cubic-bezier(.34,1.5,.4,1),opacity .3s;
 }
-@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
-  .bottom-nav{background:rgba(255,255,255,.85)}
-  :root[data-theme="dark"] .bottom-nav{background:rgba(38,38,40,.90)}
+.nav-button:not(.active) .nav-icon{
+  transform:scale(.94);
+  opacity:.78;
 }
-@media(prefers-reduced-motion:reduce){.nav-button,.nav-button .nav-icon,.nav-pill{transition:none}}
-
+.nav-button.active .nav-icon{
+  transform:scale(1.1) translateY(-1px);
+  opacity:1;
+}
 .modal-backdrop{position:fixed;inset:0;background:rgba(18,24,45,.48);display:none;align-items:center;justify-content:center;padding:22px;z-index:30;backdrop-filter:blur(5px)}
 .modal-backdrop.visible{display:flex;animation:fade .18s ease}
 .modal{width:100%;max-width:420px;max-height:82vh;overflow:hidden;background:var(--modal-bg);color:var(--text);border-radius:25px;padding:23px 20px 17px;box-shadow:0 25px 80px rgba(0,0,0,.2);display:flex;flex-direction:column}
@@ -359,15 +353,6 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 </style>
 </head>
 <body>
-
-<svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <filter id="lg-dist">
-    <feTurbulence type="fractalNoise" baseFrequency="0.008 0.008" numOctaves="2" seed="92" result="noise"/>
-    <feGaussianBlur in="noise" stdDeviation="2" result="blurred"/>
-    <feDisplacementMap in="SourceGraphic" in2="blurred" scale="70" xChannelSelector="R" yChannelSelector="G"/>
-  </filter>
-</svg>
-
 <main class="app">
 <section class="screen active" id="screen-home">
 <section class="metric sugar">
@@ -1828,12 +1813,11 @@ loadInsulinTotal();
 loadNightFact();
 loadLatestMeasurements();
 loadNightYesterday();
-
-/* Инициализация Liquid Glass пилюли */
+/* Инициализация пилюли навигации */
 requestAnimationFrame(()=>{
   moveNavPill();
-  window.addEventListener('resize', moveNavPill);
-  window.addEventListener('orientationchange', ()=>setTimeout(moveNavPill,150));
+  window.addEventListener('resize',moveNavPill);
+  window.addEventListener('orientationchange',()=>setTimeout(moveNavPill,150));
 });
 </script>
 </body>
