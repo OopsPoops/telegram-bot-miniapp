@@ -965,7 +965,8 @@ function loadTimerSettings(){
 function persistTimerState(){
  try{
   const key=timerStateStorageKey();
-  if(activeInsulinTimer)localStorage.setItem(key,JSON.stringify(activeInsulinTimer));
+  /* Сам таймер живёт на сервере; локально помним только, какие напоминания уже сработали на этом устройстве. */
+  if(activeInsulinTimer)localStorage.setItem(key,JSON.stringify({id:activeInsulinTimer.id,notified:activeInsulinTimer.notified}));
   else localStorage.removeItem(key);
  }catch(error){console.warn('Не удалось сохранить состояние таймера:',error);}
 }
@@ -1059,16 +1060,57 @@ function updateInsulinTimer(){
  });
  renderInsulinTimer();
 }
-function startInsulinTimer(dose){
- if(!shouldRunInsulinTimer(dose)){
-  clearInsulinTimer();
+let timerSyncBusy=false;
+function applyTimerPayload(data){
+ if(!data||typeof data!=='object')return;
+ if(data.settings&&['always','threshold','off'].includes(data.settings.mode)){
+  insulinTimerSettings.mode=data.settings.mode;
+  const threshold=Number(data.settings.threshold);
+  if(Number.isFinite(threshold))insulinTimerSettings.threshold=Math.min(15,Math.max(0,threshold));
+  persistTimerSettings();
+  updateTimerSettingsUi();
+ }
+ const timer=data.timer;
+ if(!timer){
+  if(activeInsulinTimer)clearInsulinTimer();
   return;
  }
- activeInsulinTimer={startedAt:Date.now(),dose,notified:{}};
+ if(activeInsulinTimer&&activeInsulinTimer.id===timer.id)return;
+ const offset=Number(data.server_now_ms)-Date.now();
+ const startedAt=Number(timer.started_at_ms)-offset;
+ const elapsed=Date.now()-startedAt;
+ if(!Number.isFinite(startedAt)||elapsed>=TIMER_DURATION_MS){
+  if(activeInsulinTimer)clearInsulinTimer();
+  return;
+ }
+ let notified={};
+ try{
+  const saved=JSON.parse(localStorage.getItem(timerStateStorageKey())||'null');
+  if(saved&&saved.id===timer.id&&saved.notified&&typeof saved.notified==='object')notified=saved.notified;
+ }catch(error){}
+ /* Если таймер подхвачен «на ходу», пропущенные напоминания не повторяем. */
+ TIMER_REMINDERS_MS.forEach((reminder,index)=>{if(elapsed-reminder>15000)notified[index]=true;});
+ activeInsulinTimer={id:timer.id,startedAt,dose:Number(timer.dose),notified};
  persistTimerState();
  renderInsulinTimer();
- if(insulinTimerInterval)clearInterval(insulinTimerInterval);
- insulinTimerInterval=setInterval(updateInsulinTimer,1000);
+ if(!insulinTimerInterval)insulinTimerInterval=setInterval(updateInsulinTimer,1000);
+}
+async function syncInsulinTimer(){
+ if(timerSyncBusy)return;
+ timerSyncBusy=true;
+ try{applyTimerPayload(await api('timer_state'));}
+ catch(error){console.warn('Не удалось синхронизировать таймер:',error);}
+ finally{timerSyncBusy=false;}
+}
+async function saveSharedTimerSettings(change){
+ try{
+  applyTimerPayload(await api('timer_settings_set',change));
+  uiHaptic('success');
+ }catch(error){
+  console.warn('Не удалось сохранить настройки таймера:',error);
+  uiHaptic('error');
+  await syncInsulinTimer();
+ }
 }
 function clearInsulinTimer(){
  activeInsulinTimer=null;
@@ -1111,6 +1153,7 @@ function updateTimerMode(){
  persistTimerSettings();
  updateTimerSettingsUi();
  if(activeInsulinTimer&&!shouldRunInsulinTimer(activeInsulinTimer.dose))clearInsulinTimer();
+ saveSharedTimerSettings({mode:selected.value});
 }
 function updateTimerThreshold(){
  const input=document.getElementById('timerThresholdInput');
@@ -1122,6 +1165,7 @@ function updateTimerThreshold(){
  insulinTimerSettings.threshold=threshold;
  persistTimerSettings();
  if(activeInsulinTimer&&!shouldRunInsulinTimer(activeInsulinTimer.dose))clearInsulinTimer();
+ saveSharedTimerSettings({threshold});
 }
 function toggleTimerSetting(setting){
  insulinTimerSettings[setting]=!insulinTimerSettings[setting];
@@ -1131,17 +1175,8 @@ function toggleTimerSetting(setting){
 function initInsulinTimer(){
  loadTimerSettings();
  updateTimerSettingsUi();
- try{
-  const saved=JSON.parse(localStorage.getItem(timerStateStorageKey())||'null');
-  if(saved&&Number.isFinite(saved.startedAt)&&Number.isFinite(saved.dose)&&saved.notified&&typeof saved.notified==='object'){
-   activeInsulinTimer={startedAt:saved.startedAt,dose:saved.dose,notified:saved.notified};
-  }
- }catch(error){console.warn('Не удалось загрузить состояние таймера:',error);}
- if(activeInsulinTimer&&!shouldRunInsulinTimer(activeInsulinTimer.dose))clearInsulinTimer();
- else if(activeInsulinTimer){
-  updateInsulinTimer();
-  if(activeInsulinTimer)insulinTimerInterval=setInterval(updateInsulinTimer,1000);
- }
+ syncInsulinTimer();
+ setInterval(()=>{if(!document.hidden)syncInsulinTimer();},4000);
 }
 let excelLinkCache='';
 function openExternalLink(url){
@@ -1247,8 +1282,7 @@ async function saveValue(type){
   }
   if(type==='insulin'){
    renderLatestMeasurement('insulin',value,formatLatestTime(new Date()));
-   startInsulinTimer(Number(value));
-   await Promise.all([loadInsulinTotal(),loadNightFact()]);
+   await Promise.all([syncInsulinTimer(),loadInsulinTotal(),loadNightFact()]);
   }
   if(type==='fact')await loadNightFact();
  }catch(error){
@@ -1338,8 +1372,7 @@ async function undoValue(type){
   setToast(toast,'✓ '+text,'success');
   if(type==='sugar')await Promise.all([loadSugarAverage(),loadLatestMeasurements()]);
   if(type==='insulin'){
-   if(activeInsulinTimer&&Number(activeInsulinTimer.dose)===Number(result.value))clearInsulinTimer();
-   await Promise.all([loadInsulinTotal(),loadNightFact(),loadLatestMeasurements()]);
+   await Promise.all([syncInsulinTimer(),loadInsulinTotal(),loadNightFact(),loadLatestMeasurements()]);
   }
   if(type==='fact')await loadNightFact();
  }catch(error){
@@ -1997,7 +2030,7 @@ loadReportSettings();
 initInsulinTimer();
 updateEntryPlaceholders();
 window.addEventListener('pageshow',()=>{updateEntryPlaceholders();updateInsulinTimer();});
-document.addEventListener('visibilitychange',()=>{if(!document.hidden){updateEntryPlaceholders();updateInsulinTimer();loadNightYesterday();loadReportSettings();}});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){updateEntryPlaceholders();updateInsulinTimer();syncInsulinTimer();loadNightYesterday();loadReportSettings();}});
 if(tg)tg.onEvent?.('activated',()=>{updateEntryPlaceholders();updateInsulinTimer();});
 updateNightInputPlaceholder();
 setInterval(updateNightInputPlaceholder,60_000);
