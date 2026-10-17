@@ -174,7 +174,7 @@ button{-webkit-tap-highlight-color:transparent}
 .chart-fs-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px}
 .chart-fs-title{font-size:14px;font-weight:800}
 .chart-fs-close{width:34px;height:34px;border:0;border-radius:50%;background:var(--close-bg);color:var(--close-text);font-size:22px;line-height:1;cursor:pointer;padding:0}
-.chart-fs .analytics-legend{margin-bottom:4px;min-height:0}
+.chart-fs .analytics-legend{margin-top:2px;min-height:0}
 .fs-chart{flex:1;min-height:0;overflow:hidden}
 .fs-chart .chart-svg{height:100%}
 .fs-chart .heatmap-scroll{height:100%;overflow:auto}
@@ -476,9 +476,9 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 </select>
 </div>
 <div id="trend-chart" class="chart-wrap"></div>
+<div id="trend-tooltip" class="chart-tooltip" role="status"></div>
 <div class="analytics-toolbar-label">Дни на графике</div>
 <div id="trend-days" class="analytics-days" aria-label="Выберите отображаемые дни"></div>
-<div id="trend-tooltip" class="chart-tooltip" role="status"></div>
 </section>
 <section class="analytics-card analytics-panel" data-panel="compare" hidden>
 <div class="analytics-toolbar">
@@ -488,8 +488,8 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 </select>
 </div>
 <div id="compare-chart" class="chart-wrap"></div>
-<div id="week-toggles" class="week-toggles"></div>
 <div id="compare-tooltip" class="chart-tooltip" role="status"></div>
+<div id="week-toggles" class="week-toggles"></div>
 </section>
 <section class="analytics-card analytics-panel" data-panel="distribution" hidden>
 <div class="analytics-toolbar">
@@ -684,9 +684,9 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 <div class="chart-fs" id="chartFs" role="dialog" aria-modal="true" aria-label="График на весь экран">
 <div class="chart-fs-inner" id="chartFsInner">
 <div class="chart-fs-head"><div class="chart-fs-title" id="fsTitle"></div><button class="chart-fs-close" type="button" onclick="closeChartFullscreen()" aria-label="Закрыть">×</button></div>
-<div class="analytics-legend" id="fs-legend"></div>
 <div class="fs-chart" id="fs-chart"></div>
 <div class="chart-tooltip" id="fs-tooltip" role="status"></div>
+<div class="analytics-legend" id="fs-legend"></div>
 </div>
 </div>
 <div class="loading-overlay" id="loadingOverlay" role="status" aria-label="Загрузка"><div class="spinner"></div></div>
@@ -1522,6 +1522,14 @@ function layoutChartFullscreen(){
   inner.style.height=(portrait?w:h)+'px';
   inner.style.left=portrait?w+'px':'0';
   inner.style.transform=portrait?'rotate(90deg)':'none';
+  const safeTop=(tg?.safeAreaInset?.top||0)+(tg?.contentSafeAreaInset?.top||0);
+  const safeBottom=Math.max(tg?.safeAreaInset?.bottom||0,0);
+  if(portrait){
+   /* верх телефона = левый край повёрнутого блока, низ телефона = правый */
+   inner.style.padding=`16px ${Math.max(safeBottom,30)+6}px 16px ${Math.max(safeTop,48)+14}px`;
+  }else{
+   inner.style.padding='12px 52px 18px 52px';
+  }
   const host=document.getElementById('fs-chart');
   host.dataset.height=String(Math.max(150,host.clientHeight||150));
 }
@@ -1531,7 +1539,8 @@ function openChartFullscreen(name){
   fsRedirect={from:cfg.host};
   const metricName=analyticsState.metric==='sugar'?'Сахар':'Инсулин';
   document.getElementById('fsTitle').textContent=`${cfg.title} · ${metricName}`;
-  document.getElementById('fs-legend').innerHTML='';
+  const staticLegend=document.querySelector(`.analytics-panel[data-panel="${name}"] > .analytics-legend:not([id])`);
+  document.getElementById('fs-legend').innerHTML=staticLegend?staticLegend.innerHTML:'';
   document.getElementById('fs-chart').innerHTML='';
   document.getElementById('chartFs').classList.add('visible');
   try{tg?.disableVerticalSwipes?.();}catch(error){}
