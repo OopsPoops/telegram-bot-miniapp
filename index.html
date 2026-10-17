@@ -165,6 +165,20 @@ button{-webkit-tap-highlight-color:transparent}
 .chart-svg text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:var(--muted);font-size:10px}
 .chart-grid{stroke:var(--line);stroke-width:1}
 .chart-grid-ideal{stroke:#2ea66a;stroke-opacity:.5;stroke-width:1}
+
+.chart-expand{margin-left:auto;display:inline-grid;place-items:center;width:34px;height:34px;border:1px solid var(--line);border-radius:10px;background:var(--input-bg);color:var(--muted);font-size:17px;line-height:1;cursor:pointer;padding:0}
+.chart-expand:active{transform:scale(.94)}
+.chart-fs{position:fixed;inset:0;z-index:45;display:none;background:var(--card);overflow:hidden}
+.chart-fs.visible{display:block}
+.chart-fs-inner{position:absolute;top:0;left:0;transform-origin:top left;display:flex;flex-direction:column;padding:10px 14px 8px;box-sizing:border-box;background:var(--card);color:var(--text)}
+.chart-fs-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px}
+.chart-fs-title{font-size:14px;font-weight:800}
+.chart-fs-close{width:34px;height:34px;border:0;border-radius:50%;background:var(--close-bg);color:var(--close-text);font-size:22px;line-height:1;cursor:pointer;padding:0}
+.chart-fs .analytics-legend{margin-bottom:4px;min-height:0}
+.fs-chart{flex:1;min-height:0;overflow:hidden}
+.fs-chart .chart-svg{height:100%}
+.fs-chart .heatmap-scroll{height:100%;overflow:auto}
+.chart-fs .chart-tooltip{margin-top:2px;min-height:16px}
 .chart-axis{stroke:var(--muted);stroke-width:1;opacity:.6}
 .chart-point{cursor:pointer;stroke:var(--card);stroke-width:1.5}
 .chart-point:focus{outline:none;stroke:var(--text);stroke-width:2.5}
@@ -667,6 +681,14 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 </button>
 </div>
 </nav>
+<div class="chart-fs" id="chartFs" role="dialog" aria-modal="true" aria-label="График на весь экран">
+<div class="chart-fs-inner" id="chartFsInner">
+<div class="chart-fs-head"><div class="chart-fs-title" id="fsTitle"></div><button class="chart-fs-close" type="button" onclick="closeChartFullscreen()" aria-label="Закрыть">×</button></div>
+<div class="analytics-legend" id="fs-legend"></div>
+<div class="fs-chart" id="fs-chart"></div>
+<div class="chart-tooltip" id="fs-tooltip" role="status"></div>
+</div>
+</div>
 <div class="loading-overlay" id="loadingOverlay" role="status" aria-label="Загрузка"><div class="spinner"></div></div>
 <div class="modal-backdrop" id="modalBackdrop" onclick="backdropClose(event)">
 <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
@@ -1472,6 +1494,80 @@ async function loadAnalytics(force=false){
    analyticsState.loading=false;
   }
 }
+let fsRedirect=null;
+const FS_CHARTS={
+  trend:{host:'trend-chart',title:'Динамика'},
+  compare:{host:'compare-chart',title:'Сравнение'},
+  distribution:{host:'distribution-chart',title:'Распределение'},
+  daily:{host:'daily-chart',title:'Сводка'},
+  activity:{host:'activity-chart',title:'Активность'}
+};
+function chartHosts(hostId,tooltipId){
+  if(fsRedirect&&fsRedirect.from===hostId)return [document.getElementById('fs-chart'),document.getElementById('fs-tooltip')];
+  return [document.getElementById(hostId),document.getElementById(tooltipId)];
+}
+function renderFullscreenLegend(groups){
+  const seen=new Map();
+  groups.forEach(group=>{
+   const key=group.weekIndex!==undefined?'w'+group.weekIndex:group.label;
+   if(seen.has(key))return;
+   seen.set(key,{color:group.color,label:group.weekIndex!==undefined?['Текущая неделя','Прошлая неделя','2 недели назад'][group.weekIndex]:group.label});
+  });
+  renderLegend('fs-legend',[...seen.values()]);
+}
+function layoutChartFullscreen(){
+  const inner=document.getElementById('chartFsInner');
+  const w=window.innerWidth,h=window.innerHeight,portrait=h>w;
+  inner.style.width=(portrait?h:w)+'px';
+  inner.style.height=(portrait?w:h)+'px';
+  inner.style.left=portrait?w+'px':'0';
+  inner.style.transform=portrait?'rotate(90deg)':'none';
+  const host=document.getElementById('fs-chart');
+  host.dataset.height=String(Math.max(150,host.clientHeight||150));
+}
+function openChartFullscreen(name){
+  const cfg=FS_CHARTS[name];
+  if(!cfg||!analyticsState.loaded)return;
+  fsRedirect={from:cfg.host};
+  const metricName=analyticsState.metric==='sugar'?'Сахар':'Инсулин';
+  document.getElementById('fsTitle').textContent=`${cfg.title} · ${metricName}`;
+  document.getElementById('fs-legend').innerHTML='';
+  document.getElementById('fs-chart').innerHTML='';
+  document.getElementById('chartFs').classList.add('visible');
+  try{tg?.disableVerticalSwipes?.();}catch(error){}
+  layoutChartFullscreen();
+  renderAnalytics();
+}
+function closeChartFullscreen(){
+  fsRedirect=null;
+  document.getElementById('chartFs').classList.remove('visible');
+  document.getElementById('fs-chart').innerHTML='';
+  document.getElementById('fs-legend').innerHTML='';
+  document.getElementById('fs-tooltip').textContent='';
+  try{tg?.enableVerticalSwipes?.();}catch(error){}
+  renderAnalytics();
+}
+function initChartExpandButtons(){
+  Object.entries(FS_CHARTS).forEach(([name,cfg])=>{
+   const panel=document.querySelector(`.analytics-panel[data-panel="${name}"]`);
+   const bar=panel&&panel.querySelector('.analytics-toolbar');
+   if(!bar||bar.querySelector('.chart-expand'))return;
+   const button=document.createElement('button');
+   button.type='button';button.className='chart-expand';button.textContent='⛶';
+   button.title='Развернуть на весь экран';button.setAttribute('aria-label','Развернуть график на весь экран');
+   button.addEventListener('click',()=>openChartFullscreen(name));
+   bar.appendChild(button);
+  });
+  let timer=null;
+  const relayout=()=>{
+   if(!fsRedirect)return;
+   clearTimeout(timer);
+   timer=setTimeout(()=>{layoutChartFullscreen();renderAnalytics();},120);
+  };
+  window.addEventListener('resize',relayout);
+  window.addEventListener('orientationchange',relayout);
+  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&fsRedirect)closeChartFullscreen();});
+}
 function selectChart(name){
   analyticsState.chart=name;
   document.querySelectorAll('.analytics-tab').forEach(button=>{
@@ -1538,22 +1634,33 @@ function renderTrendDays(rows){
    });
    const swatch=document.createElement('span');
    swatch.className='analytics-swatch';swatch.style.backgroundColor=dayColor(key,dates);
+   if(analyticsState.trendDays===3&&THREE_DAY_STYLE[index]){swatch.style.width='18px';swatch.style.height=THREE_DAY_STYLE[index].bar+'px';swatch.style.borderRadius='3px';}
    const text=document.createElement('span');text.textContent=formatShortDate(key);
    label.append(input,swatch,text);host.appendChild(label);
   });
   return dates;
 }
+const THREE_DAY_STYLE=[
+  {color:'#4a5fe8',width:3.8,radius:5.2,opacity:.95,bar:6},
+  {color:'#8a98f2',width:2.4,radius:4,opacity:.85,bar:4},
+  {color:'#b0baf8',width:1.6,radius:3.2,opacity:.8,bar:2.5}
+];
 function dayColor(key,dates){
   const index=Math.max(0,dates.indexOf(key));
+  if(analyticsState.trendDays===3&&THREE_DAY_STYLE[index])return THREE_DAY_STYLE[index].color;
   return `hsl(${(index*137.508+212)%360} 67% 52%)`;
 }
 function renderTrend(){
   const rows=periodMeasurements(analyticsState.trendDays);
   const dates=renderTrendDays(rows);
   const visible=rows.filter(row=>analyticsState.selectedDates.has(row.dateKey));
-  const groups=dates.filter(key=>analyticsState.selectedDates.has(key)).map(key=>({
-   label:formatShortDate(key),color:dayColor(key,dates),points:visible.filter(row=>row.dateKey===key)
-  }));
+  const groups=dates.filter(key=>analyticsState.selectedDates.has(key)).map(key=>{
+   const index=dates.indexOf(key),style=analyticsState.trendDays===3?THREE_DAY_STYLE[index]:null;
+   return {
+    label:formatShortDate(key),color:dayColor(key,dates),points:visible.filter(row=>row.dateKey===key),
+    ...(style?{width:style.width,radius:style.radius,opacity:style.opacity,layer:-index}:{})
+   };
+  });
   renderTimeChart('trend-chart',groups,{metric:analyticsState.metric,tooltipId:'trend-tooltip',emptyText:'За этот период нет измерений.'});
 }
 function changeTrendPeriod(){
@@ -1626,11 +1733,11 @@ function dailySummary(days){
   }));
 }
 function renderDailySummary(){
-  const host=document.getElementById('daily-chart'),tooltip=document.getElementById('daily-tooltip');
+  const [host,tooltip]=chartHosts('daily-chart','daily-tooltip');
   const days=Number(document.getElementById('daily-period').value),summaries=dailySummary(days);
   tooltip.textContent='';
   if(!summaries.length){host.innerHTML='<div class="analytics-message">За этот период нет измерений.</div>';return;}
-  const width=Math.max(240,Math.floor(host.clientWidth||320)),height=285;
+  const width=Math.max(240,Math.floor(host.clientWidth||320)),height=Number(host.dataset.height)||285;
   const margin={left:43,right:16,top:14,bottom:36},plotW=width-margin.left-margin.right,plotH=height-margin.top-margin.bottom;
   let low=Math.min(...summaries.map(day=>day.minimum)),high=Math.max(...summaries.map(day=>day.maximum));
   if(low===high){const pad=Math.max(Math.abs(low)*.08,.5);low-=pad;high+=pad;}
@@ -1641,11 +1748,11 @@ function renderDailySummary(){
   const slot=plotW/summaries.length;
   let svg=`<svg class="chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="Суточные минимум, среднее и максимум показателей">`;
   let idealLines='';
-  if(analyticsState.metric==='sugar')svg+=idealZoneSvg(y,yMin,yMax,margin.left,width-margin.right,'ideal-daily');
+  if(analyticsState.metric==='sugar')svg+=idealZoneSvg(y,yMin,yMax,margin.left,width-margin.right,'ideal-'+host.id);
   for(let value=yMin;value<=yMax+step*.01;value+=step){
    const py=y(value);idealLines+=`<line class="chart-grid-ideal" x1="${margin.left}" y1="${py}" x2="${width-margin.right}" y2="${py}"/>`;svg+=`<line class="chart-grid" x1="${margin.left}" y1="${py}" x2="${width-margin.right}" y2="${py}"/><text x="${margin.left-6}" y="${py+3}" text-anchor="end">${formatAxisValue(value)}</text>`;
   }
-  if(analyticsState.metric==='sugar')svg+=idealGridOverlay('ideal-daily',idealLines);
+  if(analyticsState.metric==='sugar')svg+=idealGridOverlay('ideal-'+host.id,idealLines);
   summaries.forEach((day,index)=>{
    const x=margin.left+slot*(index+.5);
    svg+=`<line x1="${x}" y1="${y(day.maximum)}" x2="${x}" y2="${y(day.minimum)}" stroke="#8998ff" stroke-width="${Math.min(12,Math.max(4,slot*.42))}" stroke-linecap="round"/><circle class="chart-point daily-point" cx="${x}" cy="${y(day.average)}" r="5" fill="#5267e8" tabindex="0" aria-label="${formatFullDate(day.key)} · мин ${formatAxisValue(day.minimum)} · среднее ${formatAxisValue(day.average)} · макс ${formatAxisValue(day.maximum)}"/><text x="${x}" y="${height-15}" text-anchor="middle">${formatShortDate(day.key)}</text>`;
@@ -1669,7 +1776,7 @@ function idealGridOverlay(clipId,lines){
   return lines?`<g clip-path="url(#${clipId})">${lines}</g>`:'';
 }
 function renderActivityHeatmap(){
-  const host=document.getElementById('activity-chart'),tooltip=document.getElementById('activity-tooltip');
+  const [host,tooltip]=chartHosts('activity-chart','activity-tooltip');
   const days=Number(document.getElementById('activity-period').value),rows=periodMeasurements(days);
   const counts=Array.from({length:7},()=>Array(24).fill(0));
   rows.forEach(row=>counts[row.dateObj.getDay()][row.timeObj.hour]++);
@@ -1742,11 +1849,10 @@ function renderLegend(id,items){
   });
 }
 function renderTimeChart(id,groups,{metric,tooltipId,connect=true,emptyText,weekLabels=false}){
-  const host=document.getElementById(id),all=groups.flatMap(group=>group.points);
-  const tooltip=document.getElementById(tooltipId);
+  const [host,tooltip]=chartHosts(id,tooltipId),all=groups.flatMap(group=>group.points);
   tooltip.textContent='';
   if(!all.length){host.innerHTML=`<div class="analytics-message">${escapeHtml(emptyText)}</div>`;return;}
-  const width=Math.max(240,Math.floor(host.clientWidth||320)),height=285;
+  const width=Math.max(240,Math.floor(host.clientWidth||320)),height=Number(host.dataset.height)||285;
   const margin={left:43,right:14,top:12,bottom:34},plotW=width-margin.left-margin.right,plotH=height-margin.top-margin.bottom;
   const timeWindow=timeAxisWindow(all);
   let low=Math.min(...all.map(row=>row.value)),high=Math.max(...all.map(row=>row.value));
@@ -1758,7 +1864,7 @@ function renderTimeChart(id,groups,{metric,tooltipId,connect=true,emptyText,week
   const x=value=>margin.left+(timeOffset(value)/timeWindow.duration)*plotW;
   const y=value=>margin.top+plotH-((value-yMin)/(yMax-yMin))*plotH;
   let svg=`<svg class="chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="${metric==='sugar'?'График сахара':'График инсулина'}">`;
-  const clipId='ideal-'+id;let idealLines='';
+  const clipId='ideal-'+host.id;let idealLines='';
   if(metric==='sugar')svg+=idealZoneSvg(y,yMin,yMax,margin.left,width-margin.right,clipId);
   for(let value=yMin;value<=yMax+step*.01;value+=step){
    const py=y(value);idealLines+=`<line class="chart-grid-ideal" x1="${margin.left}" y1="${py}" x2="${width-margin.right}" y2="${py}"/>`;svg+=`<line class="chart-grid" x1="${margin.left}" y1="${py}" x2="${width-margin.right}" y2="${py}"/><text x="${margin.left-6}" y="${py+3}" text-anchor="end">${formatAxisValue(value)}</text>`;
@@ -1775,14 +1881,14 @@ function renderTimeChart(id,groups,{metric,tooltipId,connect=true,emptyText,week
   });
   if(metric==='sugar')svg+=idealGridOverlay(clipId,idealLines);
   svg+=`<line class="chart-axis" x1="${margin.left}" y1="${margin.top+plotH}" x2="${width-margin.right}" y2="${margin.top+plotH}"/><text x="${width/2}" y="${height-2}" text-anchor="middle">Время</text>`;
-  groups.forEach(group=>{
+  [...groups].sort((a,b)=>(a.layer||0)-(b.layer||0)).forEach(group=>{
    const points=[...group.points].sort((a,b)=>a.timeObj.minutes-b.timeObj.minutes);
    if(connect&&points.length>1){
     let segment=[];
     const drawSegment=()=>{
      if(segment.length>1){
       const path=segment.map((point,index)=>`${index?'L':'M'}${x(point.timeObj.minutes).toFixed(2)},${y(point.value).toFixed(2)}`).join(' ');
-      svg+=`<path d="${path}" fill="none" stroke="${group.color}" stroke-width="${weekLabels?1.35:1.7}" stroke-opacity="${weekLabels?.48:.72}" stroke-linecap="round" stroke-linejoin="round"/>`;
+      svg+=`<path d="${path}" fill="none" stroke="${group.color}" stroke-width="${group.width||(weekLabels?1.35:1.7)}" stroke-opacity="${group.opacity||(weekLabels?.48:.72)}" stroke-linecap="round" stroke-linejoin="round"/>`;
      }
     };
     points.forEach(point=>{
@@ -1796,11 +1902,12 @@ function renderTimeChart(id,groups,{metric,tooltipId,connect=true,emptyText,week
    points.forEach(point=>{
     const week=weekLabels?` · Неделя ${group.weekIndex+1} (№ ${point.dateKey})`:'';
     const label=`${formatFullDate(point.dateKey)} ${point.timeObj.text} · ${formatAxisValue(point.value)}${metric==='sugar'?' ммоль/л':' ед.'}${week}`;
-    svg+=`<circle class="chart-point" cx="${x(point.timeObj.minutes).toFixed(2)}" cy="${y(point.value).toFixed(2)}" r="${weekLabels?3.2:4}" fill="${group.color}" tabindex="0" role="button" aria-label="${escapeHtml(label)}"/>`;
+    svg+=`<circle class="chart-point" cx="${x(point.timeObj.minutes).toFixed(2)}" cy="${y(point.value).toFixed(2)}" r="${group.radius||(weekLabels?3.2:4)}" fill="${group.color}" tabindex="0" role="button" aria-label="${escapeHtml(label)}"/>`;
    });
   });
   svg+='</svg>';
   host.innerHTML=svg;
+  if(host.id==='fs-chart')renderFullscreenLegend(groups);
   host.querySelectorAll('.chart-point').forEach(point=>{
    const activate=()=>{tooltip.textContent=point.getAttribute('aria-label');};
    point.addEventListener('click',activate);
@@ -1886,6 +1993,7 @@ loadNightYesterday();
 requestAnimationFrame(()=>{
   moveNavPill();
   window.addEventListener('resize',moveNavPill);
+  initChartExpandButtons();
   window.addEventListener('orientationchange',()=>setTimeout(moveNavPill,150));
 });
 </script>
