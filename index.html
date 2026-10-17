@@ -44,6 +44,14 @@ button{-webkit-tap-highlight-color:transparent}
 .value-input{min-width:0;flex:1;border:1px solid var(--line);border-radius:13px;background:var(--input-bg);padding:13px 14px;color:var(--input-text);-webkit-text-fill-color:var(--input-text);caret-color:var(--blue);font-size:15px}
 .value-input::placeholder{color:var(--muted);-webkit-text-fill-color:var(--muted);opacity:1}
 .value-input:focus{border-color:var(--blue)}
+.input-wrap{position:relative;display:flex;flex:1;min-width:0}
+.input-wrap .value-input{flex:1;width:100%}
+.input-wrap .value-input.has-marquee::placeholder{color:transparent;-webkit-text-fill-color:transparent}
+.ph-marquee{position:absolute;inset:1px;padding:0 14px;display:flex;align-items:center;overflow:hidden;pointer-events:none;border-radius:13px;font-size:15px;color:var(--muted);white-space:nowrap}
+.ph-marquee[hidden]{display:none}
+.ph-marquee span{display:inline-block;will-change:transform}
+.ph-marquee.static span{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+
 .save-button{border:0;border-radius:13px;padding:0 17px;font-size:14px;font-weight:700;color:white;min-width:105px;cursor:pointer}
 .save-button:disabled{opacity:.65}
 .undo-button{flex-shrink:0;width:46px;border:1px solid var(--line);border-radius:13px;background:var(--input-bg);color:var(--muted);font-size:19px;line-height:1;cursor:pointer}
@@ -632,15 +640,15 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 </div>
 <div class="setting-divider"></div>
 <div class="setting-name">Вопрос «Сделяля?»</div>
-<div class="setting-description">Приходит через выбранное время после отчёта</div>
+<div class="setting-description">Приходит через выбранное время после отчёта. 0 минут — не приходит</div>
 <div class="followup-presets" id="followupPresets">
 <button class="followup-preset" type="button" data-minutes="10" onclick="saveFollowupMinutes(10)">10 мин</button>
 <button class="followup-preset" type="button" data-minutes="20" onclick="saveFollowupMinutes(20)">20 мин</button>
 <button class="followup-preset" type="button" data-minutes="30" onclick="saveFollowupMinutes(30)">30 мин</button>
 </div>
 <div class="report-field">
-<label for="followupInput">Своё время (1–180 минут)</label>
-<input id="followupInput" type="number" inputmode="numeric" min="1" max="180" step="1" value="20" onchange="saveFollowupMinutes(Number(this.value))" aria-label="Через сколько минут после отчёта спросить Сделяля">
+<label for="followupInput">Своё время (0–180 минут, 0 — не спрашивать)</label>
+<input id="followupInput" type="number" inputmode="numeric" min="0" max="180" step="1" value="20" onchange="saveFollowupMinutes(Number(this.value))" aria-label="Через сколько минут после отчёта спросить Сделяля">
 <span>мин</span>
 </div>
 </div>
@@ -1244,7 +1252,7 @@ async function openAction(action){
 async function saveValue(type){
  const input=document.getElementById(type==='sugar'?'sugarInput':type==='fact'?'nightInput':'insulinInput');
  const toast=document.getElementById(type==='sugar'?'sugarToast':type==='fact'?'nightToast':'insulinToast');
- const button=input.parentElement.querySelector('.save-button');
+ const button=input.closest('.input-row').querySelector('.save-button');
  const value=input.value.trim();
  if(!value){
   setToast(toast,'Сначала введи значение.','error');
@@ -1347,8 +1355,8 @@ function saveReportTime(){
  saveReportSettings({time:value});
 }
 function saveFollowupMinutes(minutes){
- if(!Number.isInteger(minutes)||minutes<1||minutes>180){
-  setToast(document.getElementById('reportToast'),'Введи целое число минут от 1 до 180.','error');
+ if(!Number.isInteger(minutes)||minutes<0||minutes>180){
+  setToast(document.getElementById('reportToast'),'Введи целое число минут от 0 до 180.','error');
   renderReportSettings();
   return;
  }
@@ -1358,7 +1366,7 @@ async function undoValue(type){
  const ids={sugar:['sugarInput','sugarToast'],insulin:['insulinInput','insulinToast'],fact:['nightInput','nightToast']};
  const [inputId,toastId]=ids[type];
  const toast=document.getElementById(toastId);
- const button=document.getElementById(inputId).parentElement.querySelector('.undo-button');
+ const button=document.getElementById(inputId).closest('.input-row').querySelector('.undo-button');
  button.disabled=true;
  setToast(toast,'');
  try{
@@ -2028,7 +2036,58 @@ document.addEventListener('focusout',event=>{
 initUser();
 loadReportSettings();
 initInsulinTimer();
+/* Бегущая строка для длинных подсказок в полях ввода */
+function initPlaceholderMarquee(){
+ const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ document.querySelectorAll('.input-row > .value-input').forEach(input=>{
+  const wrap=document.createElement('div');
+  wrap.className='input-wrap';
+  input.parentNode.insertBefore(wrap,input);
+  wrap.appendChild(input);
+  const overlay=document.createElement('div');
+  overlay.className='ph-marquee';
+  overlay.setAttribute('aria-hidden','true');
+  const text=document.createElement('span');
+  overlay.appendChild(text);
+  wrap.appendChild(overlay);
+  input.classList.add('has-marquee');
+  let animation=null,lastText=null,lastWidth=0;
+  const stop=()=>{if(animation){animation.cancel();animation=null;}};
+  const layout=()=>{
+   const value=input.placeholder||'';
+   const visible=!!value&&!input.value&&document.activeElement!==input;
+   overlay.hidden=!visible;
+   if(!visible){stop();lastText=null;return;}
+   const boxWidth=overlay.clientWidth-28;
+   if(value===lastText&&boxWidth===lastWidth)return;
+   lastText=value;lastWidth=boxWidth;
+   text.textContent=value;
+   stop();
+   overlay.classList.remove('static');
+   const overflow=text.scrollWidth-boxWidth;
+   if(overflow<=2)return;
+   if(reduceMotion){overlay.classList.add('static');return;}
+   const pauseStart=2500,pauseEnd=1800,scroll=Math.max(1500,overflow/0.04);
+   const total=pauseStart+scroll+pauseEnd;
+   animation=text.animate([
+    {transform:'translateX(0)',offset:0},
+    {transform:'translateX(0)',offset:pauseStart/total,easing:'linear'},
+    {transform:`translateX(${-overflow-4}px)`,offset:(pauseStart+scroll)/total},
+    {transform:`translateX(${-overflow-4}px)`,offset:1}
+   ],{duration:total,iterations:Infinity});
+  };
+  new MutationObserver(layout).observe(input,{attributes:true,attributeFilter:['placeholder']});
+  input.addEventListener('input',layout);
+  input.addEventListener('focus',layout);
+  input.addEventListener('blur',layout);
+  window.addEventListener('resize',()=>{lastText=null;layout();});
+  window.addEventListener('pageshow',()=>{lastText=null;layout();});
+  layout();
+  setTimeout(()=>{lastText=null;layout();},300);
+ });
+}
 updateEntryPlaceholders();
+initPlaceholderMarquee();
 window.addEventListener('pageshow',()=>{updateEntryPlaceholders();updateInsulinTimer();});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){updateEntryPlaceholders();updateInsulinTimer();syncInsulinTimer();loadNightYesterday();loadReportSettings();}});
 if(tg)tg.onEvent?.('activated',()=>{updateEntryPlaceholders();updateInsulinTimer();});
