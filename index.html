@@ -1147,6 +1147,10 @@ async function saveValue(type){
   setToast(toast,'Введи число, например 5,6.','error');
   return;
  }
+ if(type==='sugar'&&(Number(value.replace(',','.'))<2||Number(value.replace(',','.'))>20)){
+  setToast(toast,'Сахар должен быть от 2 до 20.','error');
+  return;
+ }
  if(type==='insulin'&&(!/^\d+$/.test(value)||Number(value)>15)){
   setToast(toast,'Введи целое число от 0 до 15.','error');
   return;
@@ -1593,6 +1597,7 @@ function renderDailySummary(){
   const y=value=>margin.top+plotH-((value-yMin)/(yMax-yMin))*plotH;
   const slot=plotW/summaries.length;
   let svg=`<svg class="chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="Суточные минимум, среднее и максимум показателей">`;
+  if(analyticsState.metric==='sugar')svg+=idealZoneSvg(y,yMin,yMax,margin.left,width-margin.right);
   for(let value=yMin;value<=yMax+step*.01;value+=step){
    const py=y(value);svg+=`<line class="chart-grid" x1="${margin.left}" y1="${py}" x2="${width-margin.right}" y2="${py}"/><text x="${margin.left-6}" y="${py+3}" text-anchor="end">${formatAxisValue(value)}</text>`;
   }
@@ -1608,6 +1613,13 @@ function renderDailySummary(){
    point.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();activate();}});
   });
 }
+const IDEAL_LOW=4,IDEAL_HIGH=9;
+function idealZoneSvg(yFn,yMin,yMax,left,right){
+  const top=Math.min(IDEAL_HIGH,yMax),bottom=Math.max(IDEAL_LOW,yMin);
+  if(top<=bottom)return '';
+  const y1=yFn(top),y2=yFn(bottom);
+  return `<rect x="${left}" y="${y1}" width="${right-left}" height="${y2-y1}" fill="#2ea66a" fill-opacity=".14"/>`;
+}
 function renderActivityHeatmap(){
   const host=document.getElementById('activity-chart'),tooltip=document.getElementById('activity-tooltip');
   const days=Number(document.getElementById('activity-period').value),rows=periodMeasurements(days);
@@ -1621,12 +1633,13 @@ function renderActivityHeatmap(){
   const endHour=Math.ceil((timeWindow.start+timeWindow.duration)/60);
   const hours=Array.from({length:endHour-startHour},(_,index)=>(startHour+index)%24);
   const labels=['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+  const dayOrder=[1,2,3,4,5,6,0];
   const gridColumns=`30px repeat(${hours.length},minmax(11px,1fr))`;
   let html=`<div class="heatmap-scroll"><div class="heatmap-grid" style="grid-template-columns:${gridColumns}" role="grid" aria-label="Количество измерений по дню недели и времени">`;
   html+='<span class="heatmap-corner"></span>';
   hours.forEach(hour=>html+=`<span class="heatmap-hour">${hour}</span>`);
   html+='</div>';
-  for(let day=0;day<7;day++){
+  for(const day of dayOrder){
    html+=`<div class="heatmap-grid" style="grid-template-columns:${gridColumns}"><span class="heatmap-day">${labels[day]}</span>`;
    hours.forEach(hour=>{
     const count=counts[day][hour],intensity=count?Math.max(.12,count/max):0;
@@ -1643,6 +1656,10 @@ function renderActivityHeatmap(){
 }
 function measurementWord(count){
   const mod10=count%10,mod100=count%100;
+  if(analyticsState.metric==='insulin'){
+   if(mod10>=2&&mod10<=4&&(mod100<12||mod100>14))return 'раза';
+   return 'раз';
+  }
   if(mod10===1&&mod100!==11)return 'измерение';
   if(mod10>=2&&mod10<=4&&(mod100<12||mod100>14))return 'измерения';
   return 'измерений';
@@ -1693,6 +1710,7 @@ function renderTimeChart(id,groups,{metric,tooltipId,connect=true,emptyText,week
   const x=value=>margin.left+(timeOffset(value)/timeWindow.duration)*plotW;
   const y=value=>margin.top+plotH-((value-yMin)/(yMax-yMin))*plotH;
   let svg=`<svg class="chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="${metric==='sugar'?'График сахара':'График инсулина'}">`;
+  if(metric==='sugar')svg+=idealZoneSvg(y,yMin,yMax,margin.left,width-margin.right);
   for(let value=yMin;value<=yMax+step*.01;value+=step){
    const py=y(value);svg+=`<line class="chart-grid" x1="${margin.left}" y1="${py}" x2="${width-margin.right}" y2="${py}"/><text x="${margin.left-6}" y="${py+3}" text-anchor="end">${formatAxisValue(value)}</text>`;
   }
