@@ -9,8 +9,15 @@
 <script src="night-fact.js"></script>
 <script src="entry-placeholders.js"></script>
 <style>
+/* ============================================================
+   ПЕРЕМЕННЫЕ И ТЕМЫ (светлая / тёмная)
+   ============================================================ */
 :root{color-scheme:light;--bg:#f5f6fb;--status-bar-bg:#e6e7ec;--status-bar-fade:#eff0f5;--card:#fff;--text:#20243a;--muted:#81869a;--blue:#5267e8;--pink:#ed6f9b;--teal:#20a99b;--line:#edf0f6;--input-bg:#f7f8fc;--input-text:#20243a;--shadow:0 8px 26px rgba(37,47,82,.08),0 1px 2px rgba(37,47,82,.05);--nav-highlight:#edf3ff;--nav-border:rgba(128,136,158,.18);--nav-active:#dfe7ff;--icon-bg:#f1f4fb;--modal-bg:#fff;--modal-content:#f4f6fb;--close-bg:#eef2fb;--close-text:#3c4664}
 :root[data-theme="dark"]{color-scheme:dark;--bg:#11131b;--status-bar-bg:#11131b;--status-bar-fade:#11131b;--card:#1c202c;--text:#f1f3fa;--muted:#a0a6bb;--blue:#8998ff;--pink:#ed7fa5;--teal:#40cbbb;--line:#3a4051;--input-bg:#292e3d;--input-text:#f1f3fa;--shadow:0 14px 34px rgba(0,0,0,.38),0 1px 2px rgba(0,0,0,.18);--nav-highlight:rgba(255,255,255,.07);--nav-border:rgba(151,160,182,.14);--nav-active:rgba(146,160,255,.14);--icon-bg:#2b313f;--modal-bg:#1a1f2c;--modal-content:#202737;--close-bg:#2d3446;--close-text:#eef2ff}
+
+/* ============================================================
+   БАЗА: сброс, body, статус-бар, контейнер, экраны
+   ============================================================ */
 *{box-sizing:border-box}
 body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;transition:background .2s,color .2s}
 body::before{position:fixed;z-index:25;top:0;left:0;right:0;height:calc(env(safe-area-inset-top) + 39px);background:linear-gradient(to bottom,var(--status-bar-bg) 0%,var(--status-bar-fade) 65%,var(--bg) 100%);content:"";pointer-events:none}
@@ -19,6 +26,10 @@ button{-webkit-tap-highlight-color:transparent}
 .app{max-width:520px;margin:0 auto;padding:calc(48px + env(safe-area-inset-top)) 18px calc(82px + env(safe-area-inset-bottom))}
 .screen{display:none}
 .screen.active{display:block;animation:screenIn .2s ease}
+
+/* ============================================================
+   ГЛАВНЫЙ ЭКРАН: карточки метрик (сахар / инсулин / ночной)
+   ============================================================ */
 .metric{background:var(--card);border-radius:23px;padding:17px;margin-bottom:13px;box-shadow:var(--shadow);border:1px solid rgba(125,135,170,.12)}
 .metric-head{display:flex;align-items:center;gap:12px;margin-bottom:16px}
 .metric-icon{width:43px;height:43px;flex-shrink:0;border-radius:15px;display:grid;place-items:center;font-size:22px}
@@ -40,6 +51,8 @@ button{-webkit-tap-highlight-color:transparent}
 .metric-loading{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:7px;min-width:76px;margin-left:auto}
 .metric-skeleton{height:13px;width:76px;border-radius:7px;background:linear-gradient(90deg,var(--line) 25%,var(--nav-highlight) 50%,var(--line) 75%);background-size:200% 100%;animation:metricShimmer 1.2s linear infinite}
 .metric-skeleton.short{width:48px;height:9px;opacity:.8}
+
+/* --- Поля ввода, кнопки «Сохранить» и «Отмена», бегущая подсказка --- */
 .input-row{display:flex;gap:9px}
 .value-input{min-width:0;flex:1;border:1px solid var(--line);border-radius:13px;background:var(--input-bg);padding:13px 14px;color:var(--input-text);-webkit-text-fill-color:var(--input-text);caret-color:var(--blue);font-size:15px}
 .value-input::placeholder{color:var(--muted);-webkit-text-fill-color:var(--muted);opacity:1}
@@ -60,6 +73,8 @@ button{-webkit-tap-highlight-color:transparent}
 .insulin:not(.night) .save-button{background:#e4faf6;color:#176d63}
 :root[data-theme="dark"] .insulin:not(.night) .save-button{background:#20413e;color:#9aeee2}
 .night .save-button{background:#e8e9ed;color:#51566a}
+
+/* --- Крупное значение в карточке, тосты --- */
 .metric-figure{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;margin-left:auto;min-width:90px}
 .metric-figure .value{font-size:28px;font-weight:800;letter-spacing:-.7px;line-height:1.1;text-align:right}
 .metric-figure .unit{font-size:12px;font-weight:600;color:var(--muted);margin-top:3px}
@@ -71,6 +86,10 @@ button{-webkit-tap-highlight-color:transparent}
 .toast.error{color:#cf3434}
 :root[data-theme="dark"] .toast.success{color:#48cc83}
 :root[data-theme="dark"] .toast.error{color:#ff7474}
+
+/* ============================================================
+   ТАЙМЕР ИНСУЛИНА (плашка с обратным отсчётом)
+   ============================================================ */
 .insulin-timer{display:flex;align-items:center;gap:12px;margin:13px 0 0;padding:12px 14px;border:1px solid rgba(32,169,155,.2);border-radius:16px;background:#e4faf6;color:#176d63}
 .insulin-timer[hidden]{display:none}
 .insulin-timer-icon{width:38px;height:38px;flex-shrink:0;display:grid;place-items:center;border-radius:12px;background:#c9efe7;font-size:19px}
@@ -82,6 +101,10 @@ button{-webkit-tap-highlight-color:transparent}
 :root[data-theme="dark"] .insulin-timer-label{color:#9aeee2}
 :root[data-theme="dark"] .insulin-timer-countdown{color:#c8fff6}
 @media(max-width:360px){.insulin-timer{padding:10px 11px;gap:9px}.insulin-timer-icon{width:34px;height:34px}.insulin-timer-countdown{font-size:21px}}
+
+/* ============================================================
+   БЫСТРЫЕ КНОПКИ и цвета иконок
+   ============================================================ */
 .quick-title{display:flex;justify-content:space-between;align-items:center;margin:23px 2px 12px}
 .section-title{font-size:17px;font-weight:750}
 .quick-title>span{font-size:12px;color:var(--muted)}
@@ -103,6 +126,10 @@ button{-webkit-tap-highlight-color:transparent}
 :root[data-theme="dark"] .insulin .metric-icon{background:#20413e}
 .insulin.night .metric-icon{background:linear-gradient(135deg,#ffc9cf 0%,#e6c3ec 55%,#cdbdf3 100%)}
 :root[data-theme="dark"] .insulin.night .metric-icon{background:linear-gradient(135deg,#6a2c40 0%,#4d3260 55%,#3b3466 100%)}
+
+/* ============================================================
+   ЭКРАН НАСТРОЕК: общие элементы, переключатели
+   ============================================================ */
 .page-heading{font-size:25px;font-weight:800;letter-spacing:-.7px;margin:8px 2px 5px}
 .page-description{font-size:13px;color:var(--muted);margin:0 2px 22px}
 .settings-card{background:var(--card);border:1px solid rgba(125,135,170,.12);border-radius:21px;padding:17px;margin-bottom:13px;box-shadow:var(--shadow)}
@@ -127,6 +154,8 @@ button{-webkit-tap-highlight-color:transparent}
 .setting-switch span{display:block;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 2px 5px #0002;transition:transform .2s}
 .setting-switch[aria-pressed="true"]{background:#34c759}
 .setting-switch[aria-pressed="true"] span{transform:translateX(22px)}
+
+/* --- Настройки таймера: режимы и порог --- */
 .timer-mode-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:12px}
 .timer-mode-option{position:relative;display:grid;place-items:center;min-height:50px;padding:7px 5px;border:1px solid var(--line);border-radius:11px;color:var(--muted);font-size:11px;font-weight:700;text-align:center;cursor:pointer}
 .timer-mode-option input{position:absolute;opacity:0;pointer-events:none}
@@ -136,6 +165,8 @@ button{-webkit-tap-highlight-color:transparent}
 .timer-threshold label{font-size:12px;color:var(--muted);flex:1}
 .timer-threshold input{width:86px;border:1px solid var(--line);border-radius:10px;padding:9px;background:var(--input-bg);color:var(--input-text);font-size:14px}
 .timer-threshold[hidden]{display:none}
+
+/* --- Настройки ежедневного отчёта и напоминаний --- */
 .report-options{margin-top:12px;transition:opacity .2s}
 .report-options.off{opacity:.45}
 .report-field{display:flex;align-items:center;gap:10px;margin-top:12px}
@@ -147,6 +178,10 @@ button{-webkit-tap-highlight-color:transparent}
 .followup-preset{border:1px solid var(--line);border-radius:11px;background:transparent;color:var(--muted);padding:11px 4px;font-size:12px;font-weight:700;cursor:pointer}
 .followup-preset.active{border-color:var(--blue);background:var(--nav-active);color:var(--text)}
 .report-options.off input,.report-options.off button{pointer-events:none}
+
+/* ============================================================
+   ЭКРАН ГРАФИКОВ: вкладки, карточки, фильтры, легенда
+   ============================================================ */
 .graph-placeholder{background:var(--card);border:1px solid rgba(125,135,170,.12);border-radius:23px;padding:26px 18px;text-align:center;box-shadow:var(--shadow);margin-top:18px}
 .graph-placeholder-icon{width:65px;height:65px;border-radius:22px;background:var(--icon-bg);display:grid;place-items:center;font-size:30px;margin:0 auto 16px}
 .graph-placeholder-title{font-size:17px;font-weight:750}
@@ -168,6 +203,8 @@ button{-webkit-tap-highlight-color:transparent}
 .analytics-swatch{width:10px;height:10px;border-radius:50%;display:inline-block;flex:0 0 auto}
 .week-toggles{display:flex;gap:7px;flex-wrap:wrap;margin:4px 0 11px}
 .week-toggle{display:flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:10px;padding:7px 8px;font-size:10px;color:var(--muted)}
+
+/* --- SVG-графики: оси, сетка, точки, тултип --- */
 .chart-wrap{width:calc(100% + 8px);min-height:220px;margin-left:-8px;overflow:hidden}
 .chart-svg{display:block;width:100%;height:285px;overflow:visible}
 .chart-svg text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:var(--muted);font-size:10px}
@@ -176,6 +213,8 @@ button{-webkit-tap-highlight-color:transparent}
 
 .chart-expand{margin-left:auto;display:inline-grid;place-items:center;width:34px;height:34px;border:1px solid var(--line);border-radius:10px;background:var(--input-bg);color:var(--muted);font-size:17px;line-height:1;cursor:pointer;padding:0}
 .chart-expand:active{transform:scale(.94)}
+
+/* --- Полноэкранный режим графика --- */
 .chart-fs{position:fixed;inset:0;z-index:45;display:none;background:var(--card);overflow:hidden}
 .chart-fs.visible{display:block}
 .chart-fs-inner{position:absolute;top:0;left:0;transform-origin:top left;display:flex;flex-direction:column;padding:10px 14px 8px;box-sizing:border-box;background:var(--card);color:var(--text)}
@@ -194,6 +233,8 @@ button{-webkit-tap-highlight-color:transparent}
 .analytics-note{font-size:11px;line-height:1.45;color:var(--muted);margin:8px 1px 0}
 .analytics-message{padding:28px 14px;text-align:center;color:var(--muted);font-size:13px;line-height:1.5}
 .analytics-retry{margin-top:11px;border:0;border-radius:11px;padding:9px 13px;background:var(--blue);color:white;font-weight:700;cursor:pointer}
+
+/* --- Переключатель сахар / инсулин --- */
 .metric-switch{position:relative;isolation:isolate;display:grid;grid-template-columns:1fr 1fr;height:44px;padding:3px;margin-bottom:12px;border-radius:999px;overflow:hidden;background:radial-gradient(ellipse 130% 90% at 50% 0%,rgba(120,130,165,.20) 0%,rgba(120,130,165,.12) 100%);-webkit-backdrop-filter:blur(22px) saturate(180%);backdrop-filter:blur(22px) saturate(180%);box-shadow:0 8px 24px -10px rgba(0,0,0,.22),0 1px 2px rgba(0,0,0,.10),inset 0 0 8px rgba(255,255,255,.10),inset 0 1px 1px rgba(255,255,255,.70),inset 0 0 0 1px rgba(255,255,255,.38)}
 :root[data-theme="dark"] .metric-switch{background:radial-gradient(ellipse 130% 90% at 50% 0%,rgba(255,255,255,.10) 0%,rgba(255,255,255,.04) 100%);box-shadow:0 8px 24px -10px rgba(0,0,0,.55),0 1px 2px rgba(0,0,0,.35),inset 0 0 8px rgba(255,255,255,.06),inset 0 1px 1px rgba(255,255,255,.20),inset 0 0 0 1px rgba(255,255,255,.14)}
 .metric-switch::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:3;box-shadow:inset 0 0 0 .5px rgba(255,255,255,.5),inset 0 1px 0 rgba(255,255,255,.7)}
@@ -203,12 +244,18 @@ button{-webkit-tap-highlight-color:transparent}
 .metric-switch .analytics-choice,.metric-switch .analytics-choice.active{position:relative;z-index:2;border:0;border-radius:999px;background:transparent;color:var(--muted);padding:0;font-size:14px;font-weight:700;-webkit-tap-highlight-color:transparent;transition:color .2s}
 .metric-switch .analytics-choice.active{color:var(--text)}
 @media(prefers-reduced-motion:reduce){.metric-switch .metric-pill{transition:none}}
+
+/* --- Тепловая карта активности --- */
 .heatmap-scroll{overflow-x:auto;padding-bottom:5px}
 .heatmap-grid{display:grid;gap:3px;align-items:center;min-width:100%;margin-bottom:4px}
 .heatmap-corner,.heatmap-hour{height:15px;text-align:center;color:var(--muted);font-size:9px}
 .heatmap-day{font-size:10px;color:var(--muted)}
 .heatmap-cell{height:27px;min-width:0;padding:0;border:1px solid rgba(125,135,170,.12);border-radius:5px;cursor:pointer}
 .heatmap-cell:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+
+/* ============================================================
+   НИЖНЯЯ НАВИГАЦИЯ (Liquid Glass + скользящая «пилюля»)
+   ============================================================ */
 .bottom-nav-wrap{position:fixed;z-index:20;bottom:0;left:0;right:0;padding:0 12px calc(6px + env(safe-area-inset-bottom));pointer-events:none;background:linear-gradient(to top,var(--bg) 15%,transparent 100%)}
 :root[data-theme="dark"] .bottom-nav-wrap{background:linear-gradient(to top,var(--bg) 15%,transparent 100%)}
 .bottom-nav{position:relative;isolation:isolate;pointer-events:auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;width:100%;max-width:484px;min-height:0;height:52px;margin:0 auto;padding:2px;border:1px solid rgba(255,255,255,.25);border-radius:999px;background:rgba(65,65,65,.68);-webkit-backdrop-filter:blur(35px) saturate(180%);backdrop-filter:blur(35px) saturate(180%);box-shadow:0 8px 30px rgba(0,0,0,.2),inset 0 1px 1px rgba(255,255,255,.24),inset 0 -1px 1px rgba(0,0,0,.12);overflow:hidden}
@@ -351,6 +398,10 @@ body.keyboard-open .bottom-nav-wrap{transform:translateY(140%);opacity:0;pointer
   transform:scale(1.1) translateY(-1px);
   opacity:1;
 }
+
+/* ============================================================
+   МОДАЛЬНЫЕ ОКНА, ЗАГРУЗКА, «ДОСТУП ЗАПРЕЩЁН»
+   ============================================================ */
 .modal-backdrop{position:fixed;inset:0;background:rgba(18,24,45,.48);display:none;align-items:center;justify-content:center;padding:22px;z-index:30;backdrop-filter:blur(5px)}
 .modal-backdrop.visible{display:flex;animation:fade .18s ease}
 .modal{width:100%;max-width:420px;max-height:82vh;overflow:hidden;background:var(--modal-bg);color:var(--text);border-radius:25px;padding:23px 20px 17px;box-shadow:0 25px 80px rgba(0,0,0,.2);display:flex;flex-direction:column}
@@ -375,6 +426,10 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 .loader-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;min-height:145px;color:var(--muted);font-size:13px}
 .spinner{width:39px;height:39px;border:4px solid var(--line);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite}
 .open-link{display:inline-block;margin-top:13px;color:var(--blue);font-weight:700;text-decoration:none}
+
+/* ============================================================
+   АНИМАЦИИ И АДАПТИВ (узкие экраны, reduced-motion)
+   ============================================================ */
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes fade{from{opacity:0}to{opacity:1}}
 @keyframes rise{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
@@ -386,7 +441,9 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 </head>
 <body>
 <main class="app">
+<!-- === ЭКРАН «ГЛАВНАЯ» === -->
 <section class="screen active" id="screen-home">
+<!-- --- Карточка: сахар --- -->
 <section class="metric sugar">
 <div class="metric-head">
 <div class="metric-icon">🩸</div>
@@ -407,6 +464,7 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 </div>
 <div class="toast" id="sugarToast"></div>
 </section>
+<!-- --- Карточка: инсулин (дневной) + таймер --- -->
 <section class="metric insulin">
 <div class="metric-head">
 <div class="metric-icon">💉</div>
@@ -434,6 +492,7 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 <span class="insulin-timer-countdown" id="insulinTimerCountdown">00:00</span>
 </div>
 </section>
+<!-- --- Карточка: инсулин (ночной) --- -->
 <section class="metric insulin night">
 <div class="metric-head">
 <div class="metric-icon">🌙</div>
@@ -458,6 +517,7 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 <div class="section-title">Быстрый доступ</div>
 <span></span>
 </div>
+<!-- --- Быстрые кнопки --- -->
 <section class="quick-grid">
 <button class="quick-button" onclick="openAction('today')"><span class="quick-icon blue">☀️</span><span><div class="quick-label">Сегодня</div><div class="quick-hint">За текущий день</div></span><span class="arrow">›</span></button>
 <button class="quick-button" onclick="openAction('yesterday')"><span class="quick-icon orange">🌙</span><span><div class="quick-label">Вчера</div><div class="quick-hint">За прошлый день</div></span><span class="arrow">›</span></button>
@@ -467,6 +527,7 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 <button class="quick-button" onclick="openAction('memory')"><span class="quick-icon gray">⚙️</span><span><div class="quick-label">Память</div><div class="quick-hint">Состояние бота</div></span><span class="arrow">›</span></button>
 </section>
 </section>
+<!-- === ЭКРАН «ГРАФИКИ» === -->
 <section class="screen" id="screen-graphs">
 <div class="page-heading">Графики</div>
 <div class="page-description">История показателей и динамика</div>
@@ -548,6 +609,7 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 </section>
 </div>
 </section>
+<!-- === ЭКРАН «НАСТРОЙКИ» === -->
 <section class="screen" id="screen-settings">
 <div class="page-heading">Настройки</div>
 <div class="settings-card">
@@ -666,6 +728,7 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 </div>
 </section>
 </main>
+<!-- === НИЖНЯЯ НАВИГАЦИЯ === -->
 <nav class="bottom-nav-wrap" aria-label="Основная навигация">
 <div class="bottom-nav">
 <span class="nav-pill" aria-hidden="true"></span>
@@ -704,7 +767,9 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 <div class="analytics-legend" id="fs-legend"></div>
 </div>
 </div>
+<!-- === ОВЕРЛЕЙ ЗАГРУЗКИ === -->
 <div class="loading-overlay" id="loadingOverlay" role="status" aria-label="Загрузка"><div class="spinner"></div></div>
+<!-- === МОДАЛЬНОЕ ОКНО === -->
 <div class="modal-backdrop" id="modalBackdrop" onclick="backdropClose(event)">
 <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
 <div class="modal-top">
@@ -716,6 +781,7 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 <button class="modal-close" onclick="closeModal()" aria-label="Закрыть">×</button>
 </section>
 </div>
+<!-- === ОКНО «ДОСТУП ЗАПРЕЩЁН» === -->
 <div class="access-denied-backdrop" id="accessDeniedBackdrop">
 <section class="access-denied-dialog" role="alertdialog" aria-modal="true" aria-labelledby="accessDeniedTitle" aria-describedby="accessDeniedMessage">
 <div class="access-denied-icon" aria-hidden="true">🔒</div>
@@ -725,6 +791,9 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 </section>
 </div>
 <script>
+// ============================================================
+// TELEGRAM WEBAPP И КОНСТАНТЫ
+// ============================================================
 const tg=window.Telegram?.WebApp;
 if(tg){tg.ready();tg.expand();}
 const API_URL='https://telegram-daily-sum-bot.onrender.com/api/miniapp';
@@ -733,6 +802,10 @@ const TIMER_STATE_KEY_PREFIX='sema-insulin-timer-state';
 const TIMER_DURATION_MS=20*60*1000;
 const TIMER_REMINDERS_MS=[5*60*1000,10*60*1000];
 const defaultTimerSettings={mode:'always',threshold:5,sound:true,vibration:true,appSound:true,appVibration:true,vibrationLevel:3,appVibrationLevel:3,soundChoice:1};
+
+// ============================================================
+// ВИБРАЦИЯ, ЗВУК И ХАПТИК (настройки приложения и таймера)
+// ============================================================
 const VIBRATION_LEVELS=[
  {steps:[['soft',0]],fallback:[40]},
  {steps:[['medium',0],['medium',140]],fallback:[90,90,90]},
@@ -800,6 +873,10 @@ function cycleTimerSound(){
  updateTimerSettingsUi();
  playTimerSound(true);
 }
+
+// ============================================================
+// ГЛОБАЛЬНОЕ СОСТОЯНИЕ (таймер, аналитика, подписи)
+// ============================================================
 let insulinTimerSettings={...defaultTimerSettings};
 let activeInsulinTimer=null;
 let insulinTimerInterval=null;
@@ -818,6 +895,10 @@ month:{title:'Среднее за месяц',subtitle:'Средние пока�
 excel:{title:'Excel',subtitle:'Твоя таблица',icon:'📗',loading:'Получаю ссылку на таблицу…'},
 memory:{title:'Память',subtitle:'Состояние бота',icon:'⚙️',loading:'Проверяю состояние бота…'}
 };
+
+// ============================================================
+// НАВИГАЦИЯ: клавиатура, переключение вкладок, пилюля
+// ============================================================
 function hideKeyboard(){
  const el=document.activeElement;
  if(el&&el.matches&&el.matches('input,textarea'))el.blur();
@@ -850,6 +931,10 @@ function moveNavPill(){
  pill.style.width=btnRect.width+'px';
  pill.style.transform=`translateX(${offsetX}px)`;
 }
+
+// ============================================================
+// ТЕМА (светлая / тёмная)
+// ============================================================
 function applyTheme(theme){
 const dark=theme==='dark';
 document.documentElement.dataset.theme=dark?'dark':'light';
@@ -872,6 +957,10 @@ let theme='light';
 try{theme=localStorage.getItem('sema-theme')||'light'}catch(e){}
 applyTheme(theme);
 })();
+
+// ============================================================
+// ДОСТУП И ПОЛЬЗОВАТЕЛЬ
+// ============================================================
 function setAccess(allowed,message){
 const status=document.getElementById('accessStatus');
 const text=document.getElementById('accessText');
@@ -908,6 +997,10 @@ document.getElementById('userName').textContent=user?[user.first_name,user.last_
 if(!tg||!tg.initData)setAccess(false,'Открой Mini App через Telegram');
 else setAccess(null,'Статус проверяется при обращении к серверу');
 }
+
+// ============================================================
+// МОДАЛЬНЫЕ ОКНА, УТИЛИТЫ, ЗАПРОСЫ К API
+// ============================================================
 function showModal(title,subtitle,icon,content){
 document.getElementById('modalTitle').textContent=title;
 document.getElementById('modalSubtitle').textContent=subtitle;
@@ -949,6 +1042,10 @@ async function api(action,extra={}){
  }
  return data.result;
 }
+
+// ============================================================
+// ТАЙМЕР ИНСУЛИНА: настройки, состояние, звук, синхронизация, UI
+// ============================================================
 function persistTimerSettings(){
  try{localStorage.setItem(TIMER_SETTINGS_KEY,JSON.stringify(insulinTimerSettings));}
  catch(error){console.warn('Не удалось сохранить настройки таймера:',error);}
@@ -1186,6 +1283,10 @@ function initInsulinTimer(){
  syncInsulinTimer();
  setInterval(()=>{if(!document.hidden)syncInsulinTimer();},4000);
 }
+
+// ============================================================
+// БЫСТРЫЕ ДЕЙСТВИЯ: открытие Excel и пунктов меню
+// ============================================================
 let excelLinkCache='';
 function openExternalLink(url){
  try{
@@ -1249,6 +1350,10 @@ async function openAction(action){
   handleAccessError(error);
  }
 }
+
+// ============================================================
+// ЗАПИСЬ ЗНАЧЕНИЙ: сохранить сахар / инсулин / ночной
+// ============================================================
 async function saveValue(type){
  const input=document.getElementById(type==='sugar'?'sugarInput':type==='fact'?'nightInput':'insulinInput');
  const toast=document.getElementById(type==='sugar'?'sugarToast':type==='fact'?'nightToast':'insulinToast');
@@ -1302,6 +1407,10 @@ async function saveValue(type){
   button.textContent='Сохранить';
  }
 }
+
+// ============================================================
+// НАСТРОЙКИ ЕЖЕДНЕВНОГО ОТЧЁТА
+// ============================================================
 let reportSettings=null;
 function renderReportSettings(){
  if(!reportSettings)return;
@@ -1362,6 +1471,10 @@ function saveFollowupMinutes(minutes){
  }
  saveReportSettings({followup_minutes:minutes});
 }
+
+// ============================================================
+// ОТМЕНА ПОСЛЕДНЕЙ ЗАПИСИ
+// ============================================================
 async function undoValue(type){
  const ids={sugar:['sugarInput','sugarToast'],insulin:['insulinInput','insulinToast'],fact:['nightInput','nightToast']};
  const [inputId,toastId]=ids[type];
@@ -1391,6 +1504,10 @@ async function undoValue(type){
   button.disabled=false;
  }
 }
+
+// ============================================================
+// КАРТОЧКИ МЕТРИК: загрузка, значения, подсказки, ночной факт
+// ============================================================
 function showMetricLoading(element){
   element.className='metric-loading';
   element.setAttribute('role','status');
@@ -1484,6 +1601,10 @@ async function loadInsulinTotal(){
    return false;
   }
 }
+
+// ============================================================
+// ИСТОРИЯ: разбор данных и загрузка аналитики
+// ============================================================
 function parseHistoryDate(value){
   const text=String(value||'').trim();
   let parts;
@@ -1542,6 +1663,10 @@ async function loadAnalytics(force=false){
    analyticsState.loading=false;
   }
 }
+
+// ============================================================
+// ГРАФИКИ: полноэкранный режим
+// ============================================================
 let fsRedirect=null;
 const FS_CHARTS={
   trend:{host:'trend-chart',title:'Динамика'},
@@ -1625,6 +1750,10 @@ function initChartExpandButtons(){
   window.addEventListener('orientationchange',relayout);
   document.addEventListener('keydown',event=>{if(event.key==='Escape'&&fsRedirect)closeChartFullscreen();});
 }
+
+// ============================================================
+// ГРАФИКИ: выбор вкладки и метрики, периоды, даты
+// ============================================================
 function selectChart(name){
   analyticsState.chart=name;
   document.querySelectorAll('.analytics-tab').forEach(button=>{
@@ -1666,6 +1795,10 @@ function formatFullDate(key){
   const [year,month,day]=key.split('-');
   return `${day}.${month}.${year}`;
 }
+
+// ============================================================
+// ГРАФИК «ТРЕНД» и сравнение недель
+// ============================================================
 function renderTrendDays(rows){
   const host=document.getElementById('trend-days');
   const end=new Date();end.setHours(0,0,0,0);
@@ -1770,6 +1903,10 @@ function renderComparison(){
   });
   renderTimeChart('compare-chart',groups,{metric:analyticsState.metric,tooltipId:'compare-tooltip',emptyText:'В выбранных неделях пока нет измерений.',weekLabels:true});
 }
+
+// ============================================================
+// ГРАФИКИ: распределение, сводка по дням, тепловая карта
+// ============================================================
 const weekdayNames=['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
 function renderDistribution(){
   const days=Number(document.getElementById('distribution-period').value);
@@ -1867,6 +2004,10 @@ function renderActivityHeatmap(){
   host.innerHTML=html;
   host.querySelectorAll('.heatmap-cell').forEach(cell=>cell.addEventListener('click',()=>{tooltip.textContent=cell.getAttribute('aria-label');}));
 }
+
+// ============================================================
+// ГРАФИКИ: общие помощники (оси, легенда, рендер линейного графика)
+// ============================================================
 function measurementWord(count){
   const mod10=count%10,mod100=count%100;
   if(analyticsState.metric==='insulin'){
@@ -1972,6 +2113,10 @@ function renderTimeChart(id,groups,{metric,tooltipId,connect=true,emptyText,week
    point.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();activate();}});
   });
 }
+
+// ============================================================
+// ПОСЛЕДНИЕ ИЗМЕРЕНИЯ И ВЧЕРАШНЕЕ ЗНАЧЕНИЕ
+// ============================================================
 function formatLatestTime(date,time){
  if(time)return time;
  return date.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit',hour12:false});
@@ -2020,6 +2165,10 @@ async function loadLatestMeasurements(){
   handleAccessError(error);
  }
 }
+
+// ============================================================
+// КЛАВИАТУРА: скрывать нижнюю панель при вводе
+// ============================================================
 function formatAxisValue(value){
   return Number(value).toFixed(Number.isInteger(value)?0:1);
 }
@@ -2033,10 +2182,17 @@ document.addEventListener('focusout',event=>{
  if(!isTextField(event.target))return;
  setTimeout(()=>{if(!isTextField(document.activeElement))document.body.classList.remove('keyboard-open');},60);
 });
+
+// ============================================================
+// ЗАПУСК ПРИЛОЖЕНИЯ — часть 1: пользователь, настройки, таймер
+// ============================================================
 initUser();
 loadReportSettings();
 initInsulinTimer();
-/* Бегущая строка для длинных подсказок в полях ввода */
+
+// ============================================================
+// БЕГУЩАЯ СТРОКА ДЛЯ ДЛИННЫХ ПОДСКАЗОК В ПОЛЯХ ВВОДА
+// ============================================================
 function initPlaceholderMarquee(){
  const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
  document.querySelectorAll('.input-row > .value-input').forEach(input=>{
@@ -2086,6 +2242,10 @@ function initPlaceholderMarquee(){
   setTimeout(()=>{lastText=null;layout();},300);
  });
 }
+
+// ============================================================
+// ЗАПУСК ПРИЛОЖЕНИЯ — часть 2: события и первоначальная загрузка данных
+// ============================================================
 updateEntryPlaceholders();
 initPlaceholderMarquee();
 window.addEventListener('pageshow',()=>{updateEntryPlaceholders();updateInsulinTimer();});
@@ -2098,7 +2258,8 @@ loadInsulinTotal();
 loadNightFact();
 loadLatestMeasurements();
 loadNightYesterday();
-/* Инициализация пилюли навигации */
+
+// --- Инициализация пилюли навигации ---
 requestAnimationFrame(()=>{
   moveNavPill();
   window.addEventListener('resize',moveNavPill);
