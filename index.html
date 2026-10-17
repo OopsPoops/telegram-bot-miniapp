@@ -164,6 +164,7 @@ button{-webkit-tap-highlight-color:transparent}
 .chart-svg{display:block;width:100%;height:285px;overflow:visible}
 .chart-svg text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:var(--muted);font-size:10px}
 .chart-grid{stroke:var(--line);stroke-width:1}
+.chart-grid-ideal{stroke:#2ea66a;stroke-opacity:.5;stroke-width:1}
 .chart-axis{stroke:var(--muted);stroke-width:1;opacity:.6}
 .chart-point{cursor:pointer;stroke:var(--card);stroke-width:1.5}
 .chart-point:focus{outline:none;stroke:var(--text);stroke-width:2.5}
@@ -329,6 +330,8 @@ body.keyboard-open .bottom-nav-wrap{transform:translateY(140%);opacity:0;pointer
 .modal-title{font-size:19px;font-weight:800}
 .modal-subtitle{font-size:12px;color:var(--muted);margin-top:4px}
 .modal-content{overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:1.6;min-height:55px;max-height:48vh;padding:14px;border-radius:15px;background:var(--modal-content)}
+.loading-overlay{position:fixed;inset:0;z-index:40;display:none;align-items:center;justify-content:center;background:rgba(120,125,140,.45);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.loading-overlay.visible{display:flex;animation:fade .15s ease}
 .modal-close{display:block;margin:16px auto 0;border:0;border-radius:50%;width:46px;height:46px;background:var(--close-bg);color:var(--close-text);font-size:25px;cursor:pointer}
 .access-denied-backdrop{position:fixed;z-index:100;inset:0;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(18,24,45,.34);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px)}
 body.access-denied .access-denied-backdrop{display:flex}
@@ -664,6 +667,7 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 </button>
 </div>
 </nav>
+<div class="loading-overlay" id="loadingOverlay" role="status" aria-label="Загрузка"><div class="spinner"></div></div>
 <div class="modal-backdrop" id="modalBackdrop" onclick="backdropClose(event)">
 <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
 <div class="modal-top">
@@ -1110,7 +1114,46 @@ function initInsulinTimer(){
   if(activeInsulinTimer)insulinTimerInterval=setInterval(updateInsulinTimer,1000);
  }
 }
+let excelLinkCache='';
+function openExternalLink(url){
+ try{
+  if(tg&&typeof tg.openLink==='function'){tg.openLink(url);return true;}
+ }catch(error){console.warn('tg.openLink не сработал:',error);}
+ const opened=window.open(url,'_blank','noopener,noreferrer');
+ return !!opened;
+}
+async function openExcel(){
+ hideKeyboard();
+ const item=labels.excel;
+ const showLink=link=>{
+  showModal(item.title,item.subtitle,item.icon,'');
+  document.getElementById('modalContent').hidden=true;
+  const a=document.createElement('a');
+  a.href=link;a.target='_blank';a.rel='noopener noreferrer';a.className='open-link';a.textContent='Открыть Excel ↗';
+  document.getElementById('modalLink').appendChild(a);
+ };
+ if(excelLinkCache){
+  if(!openExternalLink(excelLinkCache))showLink(excelLinkCache);
+  return;
+ }
+ const overlay=document.getElementById('loadingOverlay');
+ overlay.classList.add('visible');
+ try{
+  const result=await api('excel');
+  setAccess(true,'Сервер подтвердил доступ');
+  if(!result)throw new Error('Ссылка на Excel не настроена');
+  excelLinkCache=String(result);
+  if(!openExternalLink(excelLinkCache))showLink(excelLinkCache);
+ }catch(error){
+  showModal(item.title,item.subtitle,item.icon,'');
+  document.getElementById('modalContent').textContent=error.message;
+  handleAccessError(error);
+ }finally{
+  overlay.classList.remove('visible');
+ }
+}
 async function openAction(action){
+ if(action==='excel')return openExcel();
  hideKeyboard();
  const item=labels[action];
  showModal(item.title,item.subtitle,item.icon,loadingContent(item.loading));
@@ -1597,10 +1640,12 @@ function renderDailySummary(){
   const y=value=>margin.top+plotH-((value-yMin)/(yMax-yMin))*plotH;
   const slot=plotW/summaries.length;
   let svg=`<svg class="chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="Суточные минимум, среднее и максимум показателей">`;
-  if(analyticsState.metric==='sugar')svg+=idealZoneSvg(y,yMin,yMax,margin.left,width-margin.right);
+  let idealLines='';
+  if(analyticsState.metric==='sugar')svg+=idealZoneSvg(y,yMin,yMax,margin.left,width-margin.right,'ideal-daily');
   for(let value=yMin;value<=yMax+step*.01;value+=step){
-   const py=y(value);svg+=`<line class="chart-grid" x1="${margin.left}" y1="${py}" x2="${width-margin.right}" y2="${py}"/><text x="${margin.left-6}" y="${py+3}" text-anchor="end">${formatAxisValue(value)}</text>`;
+   const py=y(value);idealLines+=`<line class="chart-grid-ideal" x1="${margin.left}" y1="${py}" x2="${width-margin.right}" y2="${py}"/>`;svg+=`<line class="chart-grid" x1="${margin.left}" y1="${py}" x2="${width-margin.right}" y2="${py}"/><text x="${margin.left-6}" y="${py+3}" text-anchor="end">${formatAxisValue(value)}</text>`;
   }
+  if(analyticsState.metric==='sugar')svg+=idealGridOverlay('ideal-daily',idealLines);
   summaries.forEach((day,index)=>{
    const x=margin.left+slot*(index+.5);
    svg+=`<line x1="${x}" y1="${y(day.maximum)}" x2="${x}" y2="${y(day.minimum)}" stroke="#8998ff" stroke-width="${Math.min(12,Math.max(4,slot*.42))}" stroke-linecap="round"/><circle class="chart-point daily-point" cx="${x}" cy="${y(day.average)}" r="5" fill="#5267e8" tabindex="0" aria-label="${formatFullDate(day.key)} · мин ${formatAxisValue(day.minimum)} · среднее ${formatAxisValue(day.average)} · макс ${formatAxisValue(day.maximum)}"/><text x="${x}" y="${height-15}" text-anchor="middle">${formatShortDate(day.key)}</text>`;
@@ -1614,11 +1659,14 @@ function renderDailySummary(){
   });
 }
 const IDEAL_LOW=4,IDEAL_HIGH=9;
-function idealZoneSvg(yFn,yMin,yMax,left,right){
+function idealZoneSvg(yFn,yMin,yMax,left,right,clipId){
   const top=Math.min(IDEAL_HIGH,yMax),bottom=Math.max(IDEAL_LOW,yMin);
   if(top<=bottom)return '';
   const y1=yFn(top),y2=yFn(bottom);
-  return `<rect x="${left}" y="${y1}" width="${right-left}" height="${y2-y1}" fill="#2ea66a" fill-opacity=".14"/>`;
+  return `<clipPath id="${clipId}"><rect x="${left}" y="${y1}" width="${right-left}" height="${y2-y1}"/></clipPath><rect x="${left}" y="${y1}" width="${right-left}" height="${y2-y1}" fill="#2ea66a" fill-opacity=".1"/>`;
+}
+function idealGridOverlay(clipId,lines){
+  return lines?`<g clip-path="url(#${clipId})">${lines}</g>`:'';
 }
 function renderActivityHeatmap(){
   const host=document.getElementById('activity-chart'),tooltip=document.getElementById('activity-tooltip');
@@ -1710,9 +1758,10 @@ function renderTimeChart(id,groups,{metric,tooltipId,connect=true,emptyText,week
   const x=value=>margin.left+(timeOffset(value)/timeWindow.duration)*plotW;
   const y=value=>margin.top+plotH-((value-yMin)/(yMax-yMin))*plotH;
   let svg=`<svg class="chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="${metric==='sugar'?'График сахара':'График инсулина'}">`;
-  if(metric==='sugar')svg+=idealZoneSvg(y,yMin,yMax,margin.left,width-margin.right);
+  const clipId='ideal-'+id;let idealLines='';
+  if(metric==='sugar')svg+=idealZoneSvg(y,yMin,yMax,margin.left,width-margin.right,clipId);
   for(let value=yMin;value<=yMax+step*.01;value+=step){
-   const py=y(value);svg+=`<line class="chart-grid" x1="${margin.left}" y1="${py}" x2="${width-margin.right}" y2="${py}"/><text x="${margin.left-6}" y="${py+3}" text-anchor="end">${formatAxisValue(value)}</text>`;
+   const py=y(value);idealLines+=`<line class="chart-grid-ideal" x1="${margin.left}" y1="${py}" x2="${width-margin.right}" y2="${py}"/>`;svg+=`<line class="chart-grid" x1="${margin.left}" y1="${py}" x2="${width-margin.right}" y2="${py}"/><text x="${margin.left-6}" y="${py+3}" text-anchor="end">${formatAxisValue(value)}</text>`;
   }
   const firstHour=Math.ceil(timeWindow.start/60)*60,lastMinute=timeWindow.start+timeWindow.duration;
   const ticks=[];
@@ -1721,8 +1770,10 @@ function renderTimeChart(id,groups,{metric,tooltipId,connect=true,emptyText,week
    const position=x(minute%1440);
    const anchor='middle';
    const label=formatClockHour(minute);
+   idealLines+=`<line class="chart-grid-ideal" x1="${position}" y1="${margin.top}" x2="${position}" y2="${margin.top+plotH}"/>`;
    svg+=`<line class="chart-grid" x1="${position}" y1="${margin.top}" x2="${position}" y2="${margin.top+plotH}"/><text x="${position}" y="${height-17}" text-anchor="${anchor}">${label}</text>`;
   });
+  if(metric==='sugar')svg+=idealGridOverlay(clipId,idealLines);
   svg+=`<line class="chart-axis" x1="${margin.left}" y1="${margin.top+plotH}" x2="${width-margin.right}" y2="${margin.top+plotH}"/><text x="${width/2}" y="${height-2}" text-anchor="middle">Время</text>`;
   groups.forEach(group=>{
    const points=[...group.points].sort((a,b)=>a.timeObj.minutes-b.timeObj.minutes);
