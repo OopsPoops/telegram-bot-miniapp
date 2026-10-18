@@ -31,7 +31,7 @@ button{-webkit-tap-highlight-color:transparent}
    ГЛАВНЫЙ ЭКРАН: карточки метрик (сахар / инсулин / ночной)
    ============================================================ */
 .metric{background:var(--card);border-radius:23px;padding:17px;margin-bottom:13px;box-shadow:var(--shadow);border:1px solid rgba(125,135,170,.12)}
-.metric-head{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.metric-head{display:flex;align-items:center;gap:12px;margin-bottom:16px;min-height:56px}
 .metric-icon{width:43px;height:43px;flex-shrink:0;border-radius:15px;display:grid;place-items:center;font-size:22px}
 .sugar .metric-icon{background:#fff0f5}
 .insulin .metric-icon{background:#e4faf6}
@@ -482,28 +482,28 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .metric.night>*{position:relative;z-index:1}
 .metric.night .metric-copy{flex:0 1 auto}
 .night-sky{position:relative;flex:1;align-self:stretch;min-width:0;margin:0 2px}
-.night-sky::before,.night-sky::after{content:"";position:absolute;inset:0;pointer-events:none;background-repeat:no-repeat}
-.night-sky::before{background-image:var(--sp-white),var(--sp-blue),radial-gradient(circle at 60% 24%,var(--star) 0 1.1px,transparent 1.8px),var(--sp-white);
- background-size:11px 11px,8px 8px,100% 100%,6px 6px;
- background-position:16% 14%,80% 66%,0 0,46% 82%;
- animation:twinkleA 3.8s ease-in-out infinite}
-.night-sky::after{background-image:var(--sp-blue),var(--sp-white),radial-gradient(circle at 92% 30%,var(--star2) 0 1px,transparent 1.7px);
- background-size:9px 9px,6px 6px,100% 100%;
- background-position:64% 8%,6% 74%,0 0;
- animation:twinkleB 5.4s ease-in-out infinite .9s}
-.metric.night::before,.metric.night::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background-repeat:no-repeat;opacity:.8}
-/* мелкие звёздочки по всей карточке, в том числе за буквами и цифрами */
-.metric.night::before{background-image:var(--sp-white),var(--sp-blue),var(--sp-white),var(--sp-blue),var(--sp-white),var(--sp-blue),radial-gradient(circle at 40% 24%,var(--star) 0 0.9px,transparent 1.6px),radial-gradient(circle at 84% 12%,var(--star2) 0 0.9px,transparent 1.6px),radial-gradient(circle at 66% 50%,var(--star) 0 0.8px,transparent 1.5px);
- background-size:5px 5px,5px 5px,6px 6px,5px 5px,6px 6px,5px 5px,100% 100%,100% 100%,100% 100%;
- background-position:6% 18%,30% 10%,52% 42%,74% 20%,90% 40%,14% 54%,0 0,0 0,0 0;
+.metric.night::before,.metric.night::after,.night-sky::before,.night-sky::after{content:"";position:absolute;inset:0;pointer-events:none;background-repeat:no-repeat}
+.metric.night::before,.metric.night::after{z-index:0}
+/* позиции звёзд (--pa…--pd) заново случайно задаёт JS при каждом новом цикле мерцания */
+.metric.night{--dot:radial-gradient(circle,var(--star) 0 1px,transparent 1.8px);--dot2:radial-gradient(circle,var(--star2) 0 1px,transparent 1.8px)}
+.metric.night::before{background-image:var(--sp-white),var(--sp-blue),var(--sp-white),var(--sp-blue),var(--sp-white),var(--sp-blue),var(--dot),var(--dot2),var(--dot);
+ background-size:5px 5px,5px 5px,6px 6px,5px 5px,6px 6px,5px 5px,5px 5px,5px 5px,5px 5px;
+ background-position:var(--pa,6% 18%,30% 10%,52% 42%,74% 20%,90% 40%,14% 54%,40% 24%,84% 12%,66% 50%);
  animation:twinkleA 4.2s ease-in-out infinite .4s}
-/* крупные звёзды по краям карточки, где нет текста */
 .metric.night::after{background-image:var(--sp-white),var(--sp-blue),var(--sp-white),var(--sp-blue),var(--sp-white),var(--sp-blue);
  background-size:10px 10px,8px 8px,9px 9px,10px 10px,8px 8px,9px 9px;
- background-position:left 20% top 3px,left 58% top 2px,right 6px top 5px,left 12% bottom 3px,left 46% bottom 4px,right 24% bottom 3px;
+ background-position:var(--pb,left 20% top 3px,left 58% top 2px,right 6px top 5px,left 12% bottom 3px,left 46% bottom 4px,right 24% bottom 3px);
  animation:twinkleB 5s ease-in-out infinite 1.3s}
-@keyframes twinkleA{0%,100%{opacity:.2}50%{opacity:1}}
-@keyframes twinkleB{0%,100%{opacity:1}50%{opacity:.2}}
+.night-sky::before{background-image:var(--sp-white),var(--sp-blue),var(--sp-white),var(--dot);
+ background-size:11px 11px,8px 8px,6px 6px,5px 5px;
+ background-position:var(--pc,16% 14%,80% 66%,46% 82%,60% 24%);
+ animation:twinkleA 3.8s ease-in-out infinite}
+.night-sky::after{background-image:var(--sp-blue),var(--sp-white),var(--dot2);
+ background-size:9px 9px,6px 6px,5px 5px;
+ background-position:var(--pd,64% 8%,6% 74%,92% 30%);
+ animation:twinkleB 5.4s ease-in-out infinite .9s}
+@keyframes twinkleA{0%,100%{opacity:0}50%{opacity:1}}
+@keyframes twinkleB{0%,100%{opacity:0}50%{opacity:1}}
 
 /* --- Кнопки «Сохранить»: объём, свечение, пружина --- */
 .save-button{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:transform .38s cubic-bezier(.34,1.5,.4,1),box-shadow .25s,background .3s,color .2s;box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 10px 20px -10px rgba(var(--glow),.8)}
@@ -743,8 +743,7 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 </section>
 <!-- === ЭКРАН «ГРАФИКИ» === -->
 <section class="screen" id="screen-graphs">
-<div class="page-heading">Графики</div>
-<div class="page-description">История показателей и динамика</div>
+<div class="page-heading" style="margin-bottom:16px">Графики</div>
 <div class="analytics-switches" role="tablist" aria-label="Тип графика">
 <button class="analytics-tab active" type="button" role="tab" aria-label="Динамика по дням" title="Динамика по дням" aria-selected="true" data-chart="trend" onclick="selectChart('trend')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l5.5-6.5 4 4L21 6"/><path d="M15.5 6H21v5.5"/></svg><span class="tab-label">Динамика</span></button>
 <button class="analytics-tab" type="button" role="tab" aria-label="Сравнение трёх недель" title="Сравнение трёх недель" aria-selected="false" data-chart="compare" onclick="selectChart('compare')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9c3-4 6 4 9 0s6-4 9 0"/><path d="M3 17c3-4 6 4 9 0s6-4 9 0"/></svg><span class="tab-label">Сравнение</span></button>
@@ -2732,6 +2731,32 @@ requestAnimationFrame(()=>{
 });
 
 renderTargetInputs();
+
+// ============================================================
+// НОЧНОЙ: звёзды каждый раз появляются в новых местах
+// ============================================================
+function initNightStars(){
+ const card=document.querySelector('.metric.night');
+ if(!card)return;
+ const rnd=(a,b)=>Math.round(a+Math.random()*(b-a));
+ const spot=(x0,x1,y0,y1)=>rnd(x0,x1)+'% '+rnd(y0,y1)+'%';
+ const many=(n,x0,x1,y0,y1)=>Array.from({length:n},()=>spot(x0,x1,y0,y1)).join(',');
+ const layers={
+  '--pa':()=>many(9,3,94,6,88),
+  '--pb':()=>Array.from({length:6},(_,i)=>'left '+rnd(4,90)+'% '+(i%2?'bottom ':'top ')+rnd(2,5)+'px').join(','),
+  '--pc':()=>many(4,4,82,6,80),
+  '--pd':()=>many(3,4,86,6,80)
+ };
+ const apply=name=>card.style.setProperty(name,layers[name]());
+ Object.keys(layers).forEach(apply);
+ card.addEventListener('animationiteration',event=>{
+  const sky=event.target.classList&&event.target.classList.contains('night-sky');
+  if(event.target!==card&&!sky)return;
+  const first=event.pseudoElement==='::before';
+  apply(sky?(first?'--pc':'--pd'):(first?'--pa':'--pb'));
+ });
+}
+initNightStars();
 
 // ============================================================
 // ГРАФИКИ: ступенчатое появление элементов после отрисовки
