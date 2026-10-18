@@ -481,13 +481,13 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 :root[data-theme="dark"] .metric.night{--sp-white:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23ffffff' d='M12 0c.8 6.5 3.5 10.2 12 12-8.5 1.8-11.2 5.5-12 12-.8-6.5-3.5-10.2-12-12C8.5 10.2 11.2 6.5 12 0z'/%3E%3C/svg%3E");--star:#ffffff;--star2:#b4bcd6;--star3:#8fa8ff;--sp-blue:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%238fa8ff' d='M12 0c.8 6.5 3.5 10.2 12 12-8.5 1.8-11.2 5.5-12 12-.8-6.5-3.5-10.2-12-12C8.5 10.2 11.2 6.5 12 0z'/%3E%3C/svg%3E");--muted:#9aa1b8;background:linear-gradient(155deg,#171a38 0%,#0b0d20 100%);border-color:rgba(160,150,255,.18)}
 .metric.night>*{position:relative;z-index:1}
 .metric.night::before,.metric.night::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background-repeat:no-repeat;opacity:.75}
-.metric.night::before{background-image:radial-gradient(circle at 56% 16%,var(--star) 0 1.2px,transparent 1.9px),radial-gradient(circle at 72% 34%,var(--star2) 0 1px,transparent 1.7px),radial-gradient(circle at 84% 52%,var(--star3) 0 1.1px,transparent 1.8px),radial-gradient(circle at 46% 40%,var(--star2) 0 0.9px,transparent 1.6px),radial-gradient(circle at 94% 26%,var(--star) 0 1px,transparent 1.7px),radial-gradient(circle at 64% 56%,var(--star) 0 0.8px,transparent 1.5px),var(--sp-white);
- background-size:100% 100%,100% 100%,100% 100%,100% 100%,100% 100%,100% 100%,11px 11px;
- background-position:0 0,0 0,0 0,0 0,0 0,0 0,right 30px top 14px;
+.metric.night::before{background-image:radial-gradient(circle at 70% 22%,var(--star) 0 1.1px,transparent 1.8px),radial-gradient(circle at 92% 74%,var(--star2) 0 1px,transparent 1.7px),var(--sp-white),var(--sp-blue),var(--sp-white);
+ background-size:100% 100%,100% 100%,13px 13px,9px 9px,7px 7px;
+ background-position:0 0,0 0,right 26px top 9px,right 118px top 14px,right 64px top 64px;
  animation:twinkleA 3.8s ease-in-out infinite}
-.metric.night::after{background-image:radial-gradient(circle at 52% 26%,var(--star) 0 0.9px,transparent 1.6px),radial-gradient(circle at 78% 16%,var(--star3) 0 1.2px,transparent 1.9px),radial-gradient(circle at 90% 40%,var(--star2) 0 0.9px,transparent 1.6px),radial-gradient(circle at 68% 8%,var(--star2) 0 1px,transparent 1.7px),radial-gradient(circle at 60% 46%,var(--star) 0 1.1px,transparent 1.8px),radial-gradient(circle at 97% 58%,var(--star3) 0 0.9px,transparent 1.6px),var(--sp-blue),var(--sp-white);
- background-size:100% 100%,100% 100%,100% 100%,100% 100%,100% 100%,100% 100%,8px 8px,6px 6px;
- background-position:0 0,0 0,0 0,0 0,0 0,0 0,right 72px top 38px,right 14px top 56px;
+.metric.night::after{background-image:radial-gradient(circle at 58% 72%,var(--star2) 0 0.9px,transparent 1.6px),radial-gradient(circle at 84% 18%,var(--star) 0 0.9px,transparent 1.6px),var(--sp-blue),var(--sp-white),var(--sp-blue);
+ background-size:100% 100%,100% 100%,10px 10px,8px 8px,6px 6px;
+ background-position:0 0,0 0,right 14px top 66px,right 156px top 46px,right 96px top 32px;
  animation:twinkleB 5.4s ease-in-out infinite .9s}
 @keyframes twinkleA{0%,100%{opacity:.2}50%{opacity:1}}
 @keyframes twinkleB{0%,100%{opacity:1}50%{opacity:.2}}
@@ -565,6 +565,59 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 /* --- Пружинный отклик на нажатие --- */
 .analytics-tab,.followup-preset,.chart-expand,.access-denied-close,.modal-close,.setting-switch span{transition:transform .38s cubic-bezier(.34,1.5,.4,1),background .25s,color .2s,border-color .2s,box-shadow .2s}
 .analytics-tab:active,.followup-preset:active{transform:scale(.94)}
+
+/* --- Целевой диапазон: настройки --- */
+.target-fields{display:flex;gap:10px;margin-top:12px}
+.target-field{flex:1;display:flex;flex-direction:column;gap:6px}
+.target-field label{font-size:12px;color:var(--muted)}
+.target-field input{width:100%;border:1px solid var(--line);border-radius:12px;padding:11px 10px;background:var(--input-bg);color:var(--input-text);font-size:17px;font-weight:700;text-align:center;font-variant-numeric:tabular-nums}
+.target-field input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--nav-active)}
+.target-unit{font-size:11px;color:var(--muted);margin-top:8px}
+.target-save{margin-top:12px;width:100%;height:44px;background:linear-gradient(180deg,#3fcb92 0%,#25a46c 100%);--glow:37,164,108}
+.settings-card .save-button.saved{background:linear-gradient(180deg,#4bdc8e 0%,#25b565 100%)!important;color:#fff!important;pointer-events:none;animation:savePop .55s cubic-bezier(.34,1.56,.4,1)}
+
+/* --- Полоска «в цели» под графиками сахара --- */
+.range-summary{margin-top:10px;padding:11px 12px 11px;border:1px solid var(--card-border);border-radius:15px;background:var(--input-bg)}
+.range-summary[hidden]{display:none}
+.range-bar{display:flex;gap:2px;height:9px;border-radius:99px;overflow:hidden}
+.range-bar i{display:block;height:100%;min-width:3px;transform-origin:left center;animation:barX .7s cubic-bezier(.3,1,.4,1) both}
+.range-bar .low,.range-dot.low{background:#f0a23a}
+.range-bar .in,.range-dot.in{background:#2ea66a}
+.range-bar .high,.range-dot.high{background:#ee6b6b}
+.range-stats{display:flex;justify-content:space-between;gap:6px 10px;flex-wrap:wrap;margin-top:9px;font-size:12px;color:var(--muted)}
+.range-stats span{display:inline-flex;align-items:baseline;gap:4px}
+.range-stats b{font-size:16px;color:var(--text)}
+.range-stats .in b{color:#23925a}
+.range-stats .high b{color:#d6555b}
+.range-stats .low b{color:#c98219}
+:root[data-theme="dark"] .range-stats .in b{color:#52e0a0}
+:root[data-theme="dark"] .range-stats .high b{color:#ff8a8a}
+:root[data-theme="dark"] .range-stats .low b{color:#ffbf66}
+.range-note{margin-top:7px;font-size:11px;color:var(--muted)}
+@keyframes barX{from{transform:scaleX(0)}}
+
+/* --- Бублик «в цели» --- */
+.range-donut{position:relative;width:min(240px,70vw);aspect-ratio:1;margin:8px auto 4px}
+.range-donut svg{width:100%;height:100%;display:block}
+.donut-track{fill:none;stroke:var(--line);stroke-width:14}
+.donut-seg{fill:none;stroke-width:14;animation:donutGrow .95s cubic-bezier(.3,1,.4,1) both;animation-delay:var(--d,0s)}
+@keyframes donutGrow{from{stroke-dasharray:0 100}}
+.donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none}
+.donut-pct{font-size:46px;font-weight:800;letter-spacing:-1.6px;line-height:1;font-variant-numeric:tabular-nums}
+.donut-pct small{font-size:22px;letter-spacing:0;margin-left:1px}
+.donut-sub{margin-top:6px;font-size:12px;font-weight:700;color:var(--muted)}
+.range-legend{display:grid;gap:8px;margin-top:14px}
+.range-legend-row{display:flex;align-items:center;gap:11px;padding:11px 13px;border-radius:14px;background:var(--input-bg)}
+.range-dot{width:11px;height:11px;border-radius:50%;flex:none}
+.range-legend-name{flex:1;font-size:13px;font-weight:700}
+.range-legend-name small{display:block;margin-top:2px;font-size:11px;font-weight:600;color:var(--muted)}
+.range-legend-row b{font-size:17px;font-variant-numeric:tabular-nums}
+.range-legend-row em{min-width:62px;text-align:right;font-style:normal;font-size:11px;color:var(--muted)}
+.range-compare{margin-top:12px;font-size:12px;color:var(--muted);text-align:center;line-height:1.5}
+.range-compare b.up{color:#23925a}
+.range-compare b.down{color:#d6555b}
+:root[data-theme="dark"] .range-compare b.up{color:#52e0a0}
+:root[data-theme="dark"] .range-compare b.down{color:#ff8a8a}
 </style>
 </head>
 <body>
@@ -670,6 +723,7 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 <button class="analytics-tab" type="button" role="tab" aria-label="Сравнение трёх недель" title="Сравнение трёх недель" aria-selected="false" data-chart="compare" onclick="selectChart('compare')">Сравнение</button>
 <button class="analytics-tab" type="button" role="tab" aria-label="Распределение измерений" title="Распределение измерений" aria-selected="false" data-chart="distribution" onclick="selectChart('distribution')">Распределение</button>
 <button class="analytics-tab" type="button" role="tab" aria-label="Суточная сводка" title="Суточная сводка" aria-selected="false" data-chart="daily" onclick="selectChart('daily')">Сводка</button>
+<button class="analytics-tab" type="button" role="tab" aria-label="Доля сахара в целевом диапазоне" title="Доля сахара в целевом диапазоне" aria-selected="false" data-chart="range" onclick="selectChart('range')">В цели</button>
 <button class="analytics-tab" type="button" role="tab" aria-label="Активность по времени" title="Активность по времени" aria-selected="false" data-chart="activity" onclick="selectChart('activity')">Активность</button>
 </div>
 <div class="metric-switch" role="group" aria-label="Показатель" data-active="sugar">
@@ -688,6 +742,7 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 </div>
 <div id="trend-chart" class="chart-wrap"></div>
 <div id="trend-tooltip" class="chart-tooltip" role="status"></div>
+<div id="trend-range" class="range-summary" hidden></div>
 <div class="analytics-toolbar-label">Дни на графике</div>
 <div id="trend-days" class="analytics-days" aria-label="Выберите отображаемые дни"></div>
 </section>
@@ -700,6 +755,7 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 </div>
 <div id="compare-chart" class="chart-wrap"></div>
 <div id="compare-tooltip" class="chart-tooltip" role="status"></div>
+<div id="compare-range" class="range-summary" hidden></div>
 <div id="week-toggles" class="week-toggles"></div>
 </section>
 <section class="analytics-card analytics-panel" data-panel="distribution" hidden>
@@ -711,6 +767,7 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 </div>
 <div id="distribution-chart" class="chart-wrap"></div>
 <div id="distribution-tooltip" class="chart-tooltip" role="status"></div>
+<div id="distribution-range" class="range-summary" hidden></div>
 <div id="distribution-legend" class="analytics-legend"></div>
 </section>
 <section class="analytics-card analytics-panel" data-panel="daily" hidden>
@@ -722,10 +779,22 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 </div>
 <div id="daily-chart" class="chart-wrap"></div>
 <div id="daily-tooltip" class="chart-tooltip" role="status"></div>
+<div id="daily-range" class="range-summary" hidden></div>
 <div class="analytics-legend">
 <span class="analytics-legend-item"><span class="analytics-swatch" style="background:#8998ff"></span>Минимум — максимум</span>
 <span class="analytics-legend-item"><span class="analytics-swatch" style="background:#5267e8"></span>Среднее</span>
 </div>
+</section>
+<section class="analytics-card analytics-panel" data-panel="range" hidden>
+<div class="analytics-toolbar">
+<span class="analytics-toolbar-label">Сахар в целевом диапазоне</span>
+<select id="range-period" aria-label="Период для расчёта доли в цели" onchange="renderRangeDonut()">
+<option value="1">Сегодня</option><option value="3">3 дня</option><option value="7">7 дней</option><option value="14" selected>14 дней</option><option value="21">21 день</option><option value="30">30 дней</option><option value="45">45 дней</option>
+</select>
+</div>
+<div id="range-donut" class="range-donut"></div>
+<div id="range-legend" class="range-legend"></div>
+<div id="range-compare" class="range-compare"></div>
 </section>
 <section class="analytics-card analytics-panel" data-panel="activity" hidden>
 <div class="analytics-toolbar">
@@ -849,6 +918,22 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 </div>
 </div>
 <div class="toast" id="reportToast"></div>
+</div>
+<div class="settings-card">
+<div class="setting-row">
+<div class="setting-icon">🎯</div>
+<div class="setting-copy">
+<div class="setting-name">Целевой диапазон сахара</div>
+<div class="setting-description" id="targetDescription">Общая настройка для всех пользователей бота</div>
+</div>
+</div>
+<div class="target-fields">
+<div class="target-field"><label for="targetLowInput">Минимум</label><input id="targetLowInput" type="text" inputmode="decimal" value="4,0" aria-label="Минимум целевого диапазона сахара"></div>
+<div class="target-field"><label for="targetHighInput">Максимум</label><input id="targetHighInput" type="text" inputmode="decimal" value="9,0" aria-label="Максимум целевого диапазона сахара"></div>
+</div>
+<div class="target-unit">ммоль/л · зелёная полоса на графиках и расчёт «в цели»</div>
+<button class="save-button target-save" id="targetSaveButton" type="button" onclick="saveTargetRange()">Сохранить</button>
+<div class="toast" id="targetToast"></div>
 </div>
 <div class="settings-card">
 <div class="setting-row">
@@ -1626,6 +1711,7 @@ function renderReportSettings(){
  const followupInput=document.getElementById('followupInput');
  if(document.activeElement!==followupInput)followupInput.value=reportSettings.followup_minutes;
  document.querySelectorAll('.followup-preset').forEach(button=>button.classList.toggle('active',Number(button.dataset.minutes)===reportSettings.followup_minutes));
+ syncTargetFromServer();
 }
 async function loadReportSettings(){
  try{
@@ -1976,6 +2062,7 @@ function initChartExpandButtons(){
 // ============================================================
 function selectChart(name){
   analyticsState.chart=name;
+  if(name==='range'&&analyticsState.metric!=='sugar')selectMetric('sugar');
   document.querySelectorAll('.analytics-tab').forEach(button=>{
    const active=button.dataset.chart===name;
    button.classList.toggle('active',active);
@@ -1997,6 +2084,7 @@ function renderAnalytics(){
   else if(analyticsState.chart==='compare')renderComparison();
   else if(analyticsState.chart==='distribution')renderDistribution();
   else if(analyticsState.chart==='daily')renderDailySummary();
+  else if(analyticsState.chart==='range')renderRangeDonut();
   else renderActivityHeatmap();
 }
 function metricMeasurements(){
@@ -2073,6 +2161,7 @@ function renderTrend(){
    };
   });
   renderTimeChart('trend-chart',groups,{metric:analyticsState.metric,tooltipId:'trend-tooltip',emptyText:'За этот период нет измерений.'});
+  updateRangeSummary('trend-range',visible);
 }
 function changeTrendPeriod(){
   analyticsState.trendDays=Number(document.getElementById('trend-period').value);
@@ -2122,6 +2211,7 @@ function renderComparison(){
    }
   });
   renderTimeChart('compare-chart',groups,{metric:analyticsState.metric,tooltipId:'compare-tooltip',emptyText:'В выбранных неделях пока нет измерений.',weekLabels:true});
+  updateRangeSummary('compare-range',groups.flatMap(group=>group.points));
 }
 
 // ============================================================
@@ -2135,6 +2225,7 @@ function renderDistribution(){
   const groups=dates.map(key=>({label:formatShortDate(key),color:dayColor(key,dates),points:rows.filter(row=>row.dateKey===key)}));
   renderTimeChart('distribution-chart',groups,{metric:analyticsState.metric,tooltipId:'distribution-tooltip',connect:false,emptyText:'За этот период нет измерений.'});
   renderLegend('distribution-legend',groups);
+  updateRangeSummary('distribution-range',rows);
 }
 function dailySummary(days){
   const byDate=new Map();
@@ -2151,6 +2242,7 @@ function renderDailySummary(){
   const [host,tooltip]=chartHosts('daily-chart','daily-tooltip');
   const days=Number(document.getElementById('daily-period').value),summaries=dailySummary(days);
   tooltip.textContent='';
+  updateRangeSummary('daily-range',periodMeasurements(days));
   if(!summaries.length){host.innerHTML='<div class="analytics-message">За этот период нет измерений.</div>';return;}
   const width=Math.max(240,Math.floor(host.clientWidth||320)),height=Number(host.dataset.height)||285;
   const margin={left:43,right:16,top:14,bottom:36},plotW=width-margin.left-margin.right,plotH=height-margin.top-margin.bottom;
@@ -2180,7 +2272,115 @@ function renderDailySummary(){
    point.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();activate();}});
   });
 }
-const IDEAL_LOW=4,IDEAL_HIGH=9;
+let IDEAL_LOW=4,IDEAL_HIGH=9,targetShared=false;
+const TARGET_KEY='sema-target-range';
+(function loadLocalTarget(){
+  try{const t=JSON.parse(localStorage.getItem(TARGET_KEY)||'null');if(t&&t.low>0&&t.high>t.low){IDEAL_LOW=t.low;IDEAL_HIGH=t.high;}}catch(e){}
+})();
+
+// ============================================================
+// ЦЕЛЕВОЙ ДИАПАЗОН САХАРА: настройка, доля в цели, бублик
+// ============================================================
+function fmtMmol(value){return (Math.round(value*10)/10).toFixed(1).replace('.',',');}
+function parseMmol(text){return parseFloat(String(text).trim().replace(',','.'));}
+function ruPlural(n,one,few,many){const a=Math.abs(n)%100,b=a%10;if(a>10&&a<20)return many;if(b>1&&b<5)return few;return b===1?one:many;}
+function rangeClass(value){return value<IDEAL_LOW?'low':(value>IDEAL_HIGH?'high':'in');}
+function rangeStats(rows){const r={low:0,in:0,high:0,total:rows.length};rows.forEach(row=>{r[rangeClass(row.value)]++;});return r;}
+function roundedPercents(st){
+  const keys=['low','in','high'],raw=keys.map(k=>st.total?st[k]/st.total*100:0),base=raw.map(Math.floor);
+  let left=(st.total?100:0)-base.reduce((a,b)=>a+b,0);
+  raw.map((v,i)=>[v-base[i],i]).sort((a,b)=>b[0]-a[0]).forEach(([,i])=>{if(left>0){base[i]++;left--;}});
+  return {low:base[0],in:base[1],high:base[2]};
+}
+function renderTargetInputs(){
+  const lo=document.getElementById('targetLowInput'),hi=document.getElementById('targetHighInput');
+  if(lo&&document.activeElement!==lo)lo.value=fmtMmol(IDEAL_LOW);
+  if(hi&&document.activeElement!==hi)hi.value=fmtMmol(IDEAL_HIGH);
+  const d=document.getElementById('targetDescription');
+  if(d)d.textContent=targetShared?'Общая настройка для всех пользователей бота':'Сохранено только на этом устройстве';
+}
+function applyTargetRange(low,high){
+  if(!(low>0&&high>low))return;
+  const changed=low!==IDEAL_LOW||high!==IDEAL_HIGH;
+  IDEAL_LOW=low;IDEAL_HIGH=high;
+  try{localStorage.setItem(TARGET_KEY,JSON.stringify({low,high}));}catch(e){}
+  renderTargetInputs();
+  if(changed&&typeof analyticsState!=='undefined'&&analyticsState.loaded)renderAnalytics();
+}
+function syncTargetFromServer(){
+  if(reportSettings&&reportSettings.target_low!=null&&reportSettings.target_high!=null){
+    targetShared=true;
+    applyTargetRange(Number(reportSettings.target_low),Number(reportSettings.target_high));
+  }
+}
+async function saveTargetRange(){
+  const lo=document.getElementById('targetLowInput'),hi=document.getElementById('targetHighInput');
+  const toast=document.getElementById('targetToast'),button=document.getElementById('targetSaveButton');
+  const low=parseMmol(lo.value),high=parseMmol(hi.value);
+  setToast(toast,'');
+  if(!(low>=1.5&&low<=15)||!(high>=3&&high<=30)||high-low<1){
+    setToast(toast,'Минимум — от 1,5 до 15, максимум — от 3 до 30 ммоль/л, и максимум минимум на 1 больше.','error');
+    uiHaptic('error');return;
+  }
+  button.disabled=true;
+  let shared=false,reason='';
+  try{
+    const result=await api('report_settings_set',{target_low:low,target_high:high});
+    if(result&&result.target_low!=null&&result.target_high!=null){reportSettings=result;shared=true;}
+  }catch(error){reason=error.message||'';}
+  targetShared=shared;
+  applyTargetRange(low,high);
+  button.disabled=false;
+  if(shared){uiHaptic('success');showSaveSuccess(button);setToast(toast,'✓ Диапазон сохранён для всех пользователей','success');}
+  else{uiHaptic('error');setToast(toast,'Применено только на этом устройстве: сервер бота пока не хранит диапазон'+(reason?' ('+reason+')':'')+'.','error');}
+}
+function updateRangeSummary(id,rows){
+  const el=document.getElementById(id);if(!el)return;
+  if(analyticsState.metric!=='sugar'||!rows||!rows.length){el.hidden=true;el.innerHTML='';return;}
+  const st=rangeStats(rows),p=roundedPercents(st);
+  const bar=['low','in','high'].filter(k=>st[k]).map(k=>`<i class="${k}" style="width:${(st[k]/st.total*100).toFixed(2)}%"></i>`).join('');
+  el.hidden=false;
+  el.innerHTML=`<div class="range-bar" role="img" aria-label="В цели ${p.in}%, выше ${p.high}%, ниже ${p.low}%">${bar}</div>`
+   +`<div class="range-stats"><span class="in"><b>${p.in}%</b> в цели</span><span class="high"><b>${p.high}%</b> выше</span><span class="low"><b>${p.low}%</b> ниже</span></div>`
+   +`<div class="range-note">Цель ${fmtMmol(IDEAL_LOW)}–${fmtMmol(IDEAL_HIGH)} ммоль/л · ${st.total} ${ruPlural(st.total,'измерение','измерения','измерений')}</div>`;
+}
+function previousPeriodMeasurements(days){
+  const start=new Date();start.setHours(0,0,0,0);start.setDate(start.getDate()-days+1);
+  const prevStart=new Date(start);prevStart.setDate(prevStart.getDate()-days);
+  return metricMeasurements().filter(row=>row.dateObj>=prevStart&&row.dateObj<start);
+}
+function renderRangeDonut(){
+  const host=document.getElementById('range-donut'),legend=document.getElementById('range-legend'),cmp=document.getElementById('range-compare');
+  if(!host)return;
+  const message=text=>{host.style.aspectRatio='auto';host.innerHTML='<div class="analytics-message">'+text+'</div>';legend.innerHTML='';cmp.innerHTML='';};
+  if(analyticsState.metric!=='sugar'){message('Доля в цели считается только для сахара.');return;}
+  const days=Number(document.getElementById('range-period').value),rows=periodMeasurements(days);
+  if(!rows.length){message('За этот период нет измерений.');return;}
+  host.style.aspectRatio='';
+  const st=rangeStats(rows),p=roundedPercents(st);
+  let offset=0,segs='';
+  [['in','#2ea66a'],['high','#ee6b6b'],['low','#f0a23a']].forEach(([key,color],index)=>{
+    const len=st[key]/st.total*100;
+    if(!len)return;
+    const gap=len<99.9?Math.min(1.4,len*.4):0;
+    segs+=`<circle class="donut-seg" cx="50" cy="50" r="38" pathLength="100" stroke="${color}" stroke-dasharray="${(len-gap).toFixed(2)} ${(100-len+gap).toFixed(2)}" stroke-dashoffset="${(-offset).toFixed(2)}" transform="rotate(-90 50 50)" style="--d:${(index*.12).toFixed(2)}s"/>`;
+    offset+=len;
+  });
+  host.innerHTML=`<svg viewBox="0 0 100 100" role="img" aria-label="В целевом диапазоне ${p.in}% измерений"><circle class="donut-track" cx="50" cy="50" r="38"/>${segs}</svg>`
+   +`<div class="donut-center"><div class="donut-pct"><span id="donutNum">${p.in}</span><small>%</small></div><div class="donut-sub">в цели</div></div>`;
+  const num=document.getElementById('donutNum');if(num)countUp(num,'donut');
+  const row=(k,name,hint,pct,count)=>`<div class="range-legend-row"><span class="range-dot ${k}"></span><div class="range-legend-name">${name}<small>${hint}</small></div><b>${pct}%</b><em>${count} ${ruPlural(count,'измерение','измерения','измерений')}</em></div>`;
+  legend.innerHTML=row('in','В цели',`${fmtMmol(IDEAL_LOW)}–${fmtMmol(IDEAL_HIGH)} ммоль/л`,p.in,st.in)
+   +row('high','Выше цели',`больше ${fmtMmol(IDEAL_HIGH)}`,p.high,st.high)
+   +row('low','Ниже цели',`меньше ${fmtMmol(IDEAL_LOW)}`,p.low,st.low);
+  const prev=previousPeriodMeasurements(days);
+  if(prev.length>=3){
+    const pp=roundedPercents(rangeStats(prev)).in,diff=p.in-pp;
+    const label=days===1?'вчера':'в предыдущем периоде';
+    const sign=diff>0?`<b class="up">▲ +${diff} п.п.</b>`:diff<0?`<b class="down">▼ ${diff} п.п.</b>`:'<b>без изменений</b>';
+    cmp.innerHTML=`${label[0].toUpperCase()+label.slice(1)}: ${pp}% в цели · ${sign}`;
+  }else cmp.textContent='';
+}
 function idealZoneSvg(yFn,yMin,yMax,left,right,clipId){
   const top=Math.min(IDEAL_HIGH,yMax),bottom=Math.max(IDEAL_LOW,yMin);
   if(top<=bottom)return '';
@@ -2307,7 +2507,7 @@ function renderTimeChart(id,groups,{metric,tooltipId,connect=true,emptyText,week
     const drawSegment=()=>{
      if(segment.length>1){
       const path=segment.map((point,index)=>`${index?'L':'M'}${x(point.timeObj.minutes).toFixed(2)},${y(point.value).toFixed(2)}`).join(' ');
-      svg+=`<path class="chart-line" d="${path}" fill="none" stroke="${group.color}" stroke-width="${group.width||(weekLabels?1.35:1.7)}" stroke-opacity="${group.opacity||(weekLabels?.48:.72)}" stroke-linecap="round" stroke-linejoin="round"/>`;
+      svg+=`<path class="chart-line" pathLength="1" d="${path}" fill="none" stroke="${group.color}" stroke-width="${group.width||(weekLabels?1.35:1.7)}" stroke-opacity="${group.opacity||(weekLabels?.48:.72)}" stroke-linecap="round" stroke-linejoin="round"/>`;
      }
     };
     points.forEach(point=>{
@@ -2487,6 +2687,8 @@ requestAnimationFrame(()=>{
   initChartExpandButtons();
   window.addEventListener('orientationchange',()=>setTimeout(moveNavPill,150));
 });
+
+renderTargetInputs();
 
 // ============================================================
 // ГРАФИКИ: ступенчатое появление элементов после отрисовки
