@@ -482,26 +482,12 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .metric.night>*{position:relative;z-index:1}
 .metric.night .metric-copy{flex:0 1 auto}
 .night-sky{position:relative;flex:1;align-self:stretch;min-width:0;margin:0 2px}
-.metric.night::before,.metric.night::after,.night-sky::before,.night-sky::after{content:"";position:absolute;inset:0;pointer-events:none;background-repeat:no-repeat}
-.metric.night::before,.metric.night::after{z-index:0}
-/* позиции звёзд (--pa…--pd) заново случайно задаёт JS при каждом новом цикле мерцания */
 .metric.night{--dot:radial-gradient(circle,var(--star) 0 1px,transparent 1.8px);--dot2:radial-gradient(circle,var(--star2) 0 1px,transparent 1.8px)}
-.metric.night::before{background-image:var(--sp-white),var(--sp-blue),var(--sp-white),var(--sp-blue),var(--sp-white),var(--sp-blue),var(--dot),var(--dot2),var(--dot);
- background-size:5px 5px,5px 5px,6px 6px,5px 5px,6px 6px,5px 5px,5px 5px,5px 5px,5px 5px;
- background-position:var(--pa,6% 18%,30% 10%,52% 42%,74% 20%,90% 40%,14% 54%,40% 24%,84% 12%,66% 50%);
- animation:twinkleA 4.2s ease-in-out infinite .4s}
-.metric.night::after{background-image:var(--sp-white),var(--sp-blue),var(--sp-white),var(--sp-blue),var(--sp-white),var(--sp-blue);
- background-size:10px 10px,8px 8px,9px 9px,10px 10px,8px 8px,9px 9px;
- background-position:var(--pb,left 20% top 3px,left 58% top 2px,right 6px top 5px,left 12% bottom 3px,left 46% bottom 4px,right 24% bottom 3px);
- animation:twinkleB 5s ease-in-out infinite 1.3s}
-.night-sky::before{background-image:var(--sp-white),var(--sp-blue),var(--sp-white),var(--dot);
- background-size:11px 11px,8px 8px,6px 6px,5px 5px;
- background-position:var(--pc,16% 14%,80% 66%,46% 82%,60% 24%);
- animation:twinkleA 3.8s ease-in-out infinite}
-.night-sky::after{background-image:var(--sp-blue),var(--sp-white),var(--dot2);
- background-size:9px 9px,6px 6px,5px 5px;
- background-position:var(--pd,64% 8%,6% 74%,92% 30%);
- animation:twinkleB 5.4s ease-in-out infinite .9s}
+/* звёзды живут только в маленьком квадрате с луной */
+.metric.night .metric-icon{overflow:hidden}
+.metric.night .metric-icon::before,.metric.night .metric-icon::after{content:"";position:absolute;inset:0;pointer-events:none;background-repeat:no-repeat}
+.metric.night .metric-icon::before{background-image:var(--sp-white),var(--sp-blue),var(--dot);background-size:8px 8px,6px 6px,4px 4px;background-position:12% 14%,84% 76%,24% 82%;animation:twinkleA 3.8s ease-in-out infinite}
+.metric.night .metric-icon::after{background-image:var(--sp-blue),var(--sp-white),var(--dot2);background-size:7px 7px,5px 5px,4px 4px;background-position:82% 12%,10% 62%,70% 90%;animation:twinkleB 5s ease-in-out infinite .9s}
 @keyframes twinkleA{0%,100%{opacity:0}50%{opacity:1}}
 @keyframes twinkleB{0%,100%{opacity:0}50%{opacity:1}}
 
@@ -662,9 +648,10 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 :root[data-theme="dark"] .doctor-undo-note{background:rgba(255,123,134,.14);color:#ff9aa2}
 .doctor-card{background:var(--card-grad);border:1px solid var(--card-border);border-radius:21px;padding:14px 12px 6px;margin-bottom:13px;box-shadow:var(--shadow)}
 .doctor-table{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr) minmax(0,1.05fr);column-gap:6px;align-items:stretch}
-.doctor-table>div{padding:13px 0;border-bottom:1px solid var(--line);min-width:0;display:flex;flex-direction:column;justify-content:center}
+.doctor-table>div{padding:8px 0;border-bottom:1px solid var(--line);min-width:0;display:flex;flex-direction:column;justify-content:center}
 .doctor-table>.doctor-last{border-bottom:0}
-.doctor-table>.doctor-th{padding:0 0 13px;justify-content:flex-end;align-items:center;gap:6px;font-size:15px;font-weight:800}
+.doctor-table>.doctor-span{grid-column:2 / 4;text-align:center;align-items:center}
+.doctor-table>.doctor-th{padding:0 0 10px;justify-content:flex-end;align-items:center;gap:6px;font-size:15px;font-weight:800}
 .doctor-table>.doctor-th-date{align-items:flex-start;gap:2px;font-weight:800}
 .doctor-th .doctor-drug{display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin-top:-3px}
 .doctor-th-date small{font-size:12.5px;font-weight:600;color:var(--muted)}
@@ -682,7 +669,7 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .doctor-hint{display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin-top:3px}
 .doctor-hint.warn{color:#e08a22}
 .doctor-empty{padding:18px;text-align:center;color:var(--muted);font-size:15px}
-.doctor-backdrop{align-items:flex-start;padding:calc(env(safe-area-inset-top) + 14px) 14px 14px}
+.doctor-backdrop{align-items:center;padding:calc(env(safe-area-inset-top) + 14px) 14px 14px}
 .doctor-backdrop .modal{max-height:calc(100dvh - env(safe-area-inset-top) - 28px);overflow-y:auto;padding:16px 16px 14px}
 .doctor-backdrop .modal-top{margin-bottom:10px}
 .doctor-backdrop .modal-icon{width:38px;height:38px;font-size:19px}
@@ -696,11 +683,12 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .doctor-field input[type="date"]{overflow:hidden;padding-left:10px;padding-right:10px}
 .doctor-field input[type="date"]::-webkit-date-and-time-value{text-align:center;margin:0;min-width:0}
 .doctor-field input[type="date"]::-webkit-calendar-picker-indicator{display:none}
-.wheel{position:relative;height:96px;border-radius:14px;background:var(--input-bg);border:1px solid var(--line);overflow:hidden}
-.wheel::before{content:"";position:absolute;left:6px;right:6px;top:50%;height:32px;transform:translateY(-50%);border-radius:10px;background:rgba(82,103,232,.13);pointer-events:none}
-.wheel-scroll{position:relative;height:100%;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;touch-action:pan-y;padding:32px 0;box-sizing:border-box;scrollbar-width:none;-webkit-overflow-scrolling:touch;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 30%,#000 70%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 30%,#000 70%,transparent 100%)}
+.wheel{position:relative;height:60px;border-radius:14px;background:var(--input-bg);border:1px solid var(--line);overflow:hidden}
+.wheel::before{content:"";position:absolute;left:6px;right:6px;top:50%;height:30px;transform:translateY(-50%);border-radius:10px;background:rgba(82,103,232,.14);border:1.5px solid rgba(82,103,232,.5);box-sizing:border-box;pointer-events:none}
+.wheel-scroll{position:relative;height:100%;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;touch-action:pan-y;padding:15px 0;box-sizing:border-box;scrollbar-width:none;-webkit-overflow-scrolling:touch;-webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,.45) 0,#000 26%,#000 74%,rgba(0,0,0,.45) 100%);mask-image:linear-gradient(to bottom,rgba(0,0,0,.45) 0,#000 26%,#000 74%,rgba(0,0,0,.45) 100%)}
 .wheel-scroll::-webkit-scrollbar{display:none}
-.wheel-item{height:32px;line-height:32px;text-align:center;font-size:21px;font-weight:700;color:var(--input-text);scroll-snap-align:center;scroll-snap-stop:always;cursor:pointer;user-select:none;-webkit-user-select:none}
+.wheel-item{height:30px;line-height:30px;text-align:center;font-size:17px;font-weight:600;opacity:.45;transition:font-size .12s,opacity .12s,color .12s;color:var(--input-text);scroll-snap-align:center;scroll-snap-stop:always;cursor:pointer;user-select:none;-webkit-user-select:none}
+.wheel-item.sel{opacity:1;font-size:25px;font-weight:800;color:var(--blue)}
 .doctor-form-actions{display:flex;gap:10px;margin-top:2px}
 .doctor-cancel{width:auto;padding:0 16px;font-size:15px;font-weight:700;color:var(--text)}
 .doctor-save{flex:1;min-height:46px;font-size:16px;background:linear-gradient(180deg,#36c9b8 0%,#1f9d8f 100%);color:#fff}
@@ -1109,16 +1097,16 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 <section class="modal" role="dialog" aria-modal="true" aria-labelledby="doctorFormTitle">
 <div class="modal-top">
 <div class="modal-icon">🩺</div>
-<div class="modal-title" id="doctorFormTitle">Новое поступление</div>
+<div class="modal-title" id="doctorFormTitle">Запись о визите</div>
 </div>
 <div class="doctor-form">
 <label class="doctor-field"><span>Дата получения</span><input class="value-input" id="docDate" type="date"></label>
-<div class="doctor-form-group">Получено, ручек</div>
+<div class="doctor-form-group">Получено ручек</div>
 <div class="doctor-form-row">
 <div class="doctor-field"><span>Короткий</span><div class="wheel" id="wheelShortRecv"></div></div>
 <div class="doctor-field"><span>Ночной</span><div class="wheel" id="wheelNightRecv"></div></div>
 </div>
-<div class="doctor-form-group">Всего в наличии, ручек</div>
+<div class="doctor-form-group">Всего в наличии ручек</div>
 <div class="doctor-form-row">
 <div class="doctor-field"><span>Короткий</span><div class="wheel" id="wheelShortTotal"></div></div>
 <div class="doctor-field"><span>Ночной</span><div class="wheel" id="wheelNightTotal"></div></div>
@@ -2860,7 +2848,6 @@ function initNightStars(){
   apply(sky?(first?'--pc':'--pd'):(first?'--pa':'--pb'));
  });
 }
-initNightStars();
 
 // ============================================================
 // ГРАФИКИ: ступенчатое появление элементов после отрисовки
@@ -2885,7 +2872,7 @@ function staggerChart(host){
 // ============================================================
 let doctorLast=null;
 const DOCTOR_WHEELS=['wheelShortRecv','wheelNightRecv','wheelShortTotal','wheelNightTotal','wheelTests','wheelNeedles'];
-const WHEEL_ITEM_H=32;
+const WHEEL_ITEM_H=30;
 function doctorHint(days,warnWithin){
  if(days===null||days===undefined)return '';
  const text=days>0?'через '+days+' дн.':days===0?'сегодня':Math.abs(days)+' дн. назад';
@@ -2894,6 +2881,9 @@ function doctorHint(days,warnWithin){
 }
 function doctorCell(value,hint,last){
  return '<div class="doctor-cell'+(last?' doctor-last':'')+'"><div>'+(value?escapeHtml(value)+(hint||''):'—')+'</div></div>';
+}
+function doctorSpanCell(value,last){
+ return '<div class="doctor-cell doctor-span'+(last?' doctor-last':'')+'"><div>'+(value?escapeHtml(value):'—')+'</div></div>';
 }
 function doctorTapCell(value,hint){
  if(!value)return doctorCell(value,hint);
@@ -2918,19 +2908,18 @@ function renderDoctor(data){
  const body=document.getElementById('doctorBody');
  const s=data.short||{},n=data.night||{},dose=data.dose||{};
  if(!data.short&&!data.night){body.innerHTML='<div class="doctor-card doctor-empty">На листе get_ins пока нет данных. Нажми «+», чтобы добавить.</div>';return;}
- const blank=last=>'<div class="doctor-cell'+(last?' doctor-last':'')+'"></div>';
- body.innerHTML='<div class="doctor-card"><div class="doctor-table">'
-  +'<div class="doctor-th doctor-th-date">'+(data.date?'<small>Данные от</small><b>'+escapeHtml(data.date)+'</b>':'')+'</div>'
+  body.innerHTML='<div class="doctor-card"><div class="doctor-table">'
+  +'<div class="doctor-th doctor-th-date">'+(data.date?'<small>🗓️ Данные от</small><b>'+escapeHtml(data.date)+'</b>':'')+'</div>'
   +'<div class="doctor-th"><span class="doctor-ico short">💉</span>Короткий<small class="doctor-drug">Новорапид</small></div>'
   +'<div class="doctor-th"><span class="doctor-ico night">🌙</span>Ночной<small class="doctor-drug">РинГлар</small></div>'
-  +doctorRowHtml('Суточная дозировка',doctorCell(dose.short),doctorCell(dose.night))
+  +doctorRowHtml('Суточная дозировка',doctorCell(dose.short?dose.short+' ед.':dose.short),doctorCell(dose.night?dose.night+' ед.':dose.night))
   +doctorRowHtml('Получено ручек (уп.)',doctorCell(receivedText(s.received)),doctorCell(receivedText(n.received)))
   +doctorRowHtml('Записаться',doctorTapCell(s.sign_date,doctorHint(s.sign_in_days,14)),doctorTapCell(n.sign_date,doctorHint(n.sign_in_days,14)))
   +doctorRowHtml('Идти за инсулином',doctorCell(s.go_date,doctorHint(s.go_in_days,14)),doctorCell(n.go_date,doctorHint(n.go_in_days,14)))
   +doctorRowHtml('Всего ручек',doctorCell(s.total),doctorCell(n.total))
   +doctorRowHtml('Хватит до',doctorCell(s.until_date,doctorHint(s.until_in_days,30)),doctorCell(n.until_date,doctorHint(n.until_in_days,30)))
-  +doctorRowHtml('Тест полоски, уп.',doctorCell(s.tests),blank(false))
-  +doctorRowHtml('Иглы, уп.',doctorCell(s.needles,'',true),blank(true),true)
+  +'<div class="doctor-label">Тест полоски, уп.</div>'+doctorSpanCell(s.tests,false)
+  +'<div class="doctor-label doctor-last">Иглы, уп.</div>'+doctorSpanCell(s.needles,true)
   +'</div></div>';
 }
 // Открывает стандартное приложение «Календарь» на нужной дате (без добавления событий).
@@ -3013,13 +3002,20 @@ function buildWheel(id,value,max){
   const item=event.target.closest('.wheel-item');
   if(item)scroller.scrollTo({top:Number(item.dataset.v)*WHEEL_ITEM_H,behavior:'smooth'});
  });
- let last=-1;
+ let last=-1,prev=null;
+ const mark=v=>{
+  if(prev)prev.classList.remove('sel');
+  prev=scroller.children[Math.min(scroller.children.length-1,Math.max(0,v))]||null;
+  if(prev)prev.classList.add('sel');
+ };
  scroller.addEventListener('scroll',()=>{
   const v=Math.round(scroller.scrollTop/WHEEL_ITEM_H);
-  if(v!==last){last=v;selectionHaptic();}
+  if(v!==last){last=v;mark(v);selectionHaptic();}
  },{passive:true});
  scroller.style.scrollSnapType='none';
  scroller.scrollTop=value*WHEEL_ITEM_H;
+ last=value;
+ mark(value);
  requestAnimationFrame(()=>{scroller.style.scrollSnapType='';});
 }
 function wheelValue(id){
