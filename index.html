@@ -650,26 +650,28 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .quick-big.q-doctor{min-height:73px;background:linear-gradient(150deg,rgba(32,169,155,.15) 0%,transparent 62%),var(--card-grad)}
 :root[data-theme="dark"] .quick-big.q-doctor{background:linear-gradient(150deg,rgba(69,224,203,.18) 0%,transparent 62%),var(--card-grad)}
 .screen.active>.quick-grid>:nth-child(7){animation-delay:.52s}
-.doctor-head{display:flex;align-items:center;gap:12px;margin:8px 0 16px}
+.doctor-head{display:flex;align-items:center;gap:10px;margin:8px 0 16px}
 .doctor-head-copy{flex:1;min-width:0}
 .doctor-date{font-size:12px;color:var(--muted);margin-top:3px}
 .doctor-back,.doctor-add{flex-shrink:0;width:42px;height:42px;border-radius:14px;border:1px solid var(--card-border);background:var(--card-grad);color:var(--text);font-size:26px;line-height:1;cursor:pointer;box-shadow:var(--shadow);display:grid;place-items:center;padding:0;transition:transform .38s cubic-bezier(.34,1.5,.4,1)}
+.doctor-undo{font-size:20px;color:var(--muted)}
 .doctor-add{background:linear-gradient(180deg,#36c9b8 0%,#1f9d8f 100%);color:#fff;border:0;font-size:28px}
 .doctor-back:active,.doctor-add:active{transform:scale(.92)}
 .doctor-card{background:var(--card-grad);border:1px solid var(--card-border);border-radius:21px;padding:14px 14px 6px;margin-bottom:13px;box-shadow:var(--shadow)}
-.doctor-table{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr) minmax(0,1fr);column-gap:8px;align-items:center}
-.doctor-table>div{padding:12px 0;border-bottom:1px solid var(--line);min-width:0}
+.doctor-table{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr) minmax(0,1fr);column-gap:8px;align-items:stretch}
+.doctor-table>div{padding:12px 0;border-bottom:1px solid var(--line);min-width:0;display:flex;flex-direction:column;justify-content:center}
 .doctor-table>.doctor-last{border-bottom:0}
-.doctor-table>.doctor-th{padding-top:0;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:13px;font-weight:800}
+.doctor-table>.doctor-th{padding:0 0 12px;justify-content:flex-end;align-items:center;gap:6px;font-size:13px;font-weight:800}
 .doctor-ico{width:43px;height:43px;border-radius:15px;display:grid;place-items:center;font-size:22px}
 .doctor-ico.short{background:linear-gradient(145deg,#ecfcf9,#c9f1e8)}
 .doctor-ico.night{background:linear-gradient(135deg,#ffc9cf 0%,#e6c3ec 55%,#cdbdf3 100%)}
 :root[data-theme="dark"] .doctor-ico.short{background:linear-gradient(145deg,rgba(69,224,203,.28),rgba(69,224,203,.09))}
 :root[data-theme="dark"] .doctor-ico.night{background:linear-gradient(135deg,#6a2c40 0%,#4d3260 55%,#3b3466 100%)}
 .doctor-label{font-size:13px;color:var(--muted);line-height:1.3}
-.doctor-label.tap{color:var(--blue);font-weight:700;cursor:pointer;border:0;background:none;padding:12px 0;text-align:left;font-family:inherit;-webkit-tap-highlight-color:transparent}
-.doctor-label.tap span{border-bottom:1px dashed currentColor}
-.doctor-cell{font-size:14px;font-weight:800;text-align:center}
+.doctor-cell{font-size:14px;font-weight:800;text-align:center;align-items:center}
+.doctor-cell.tap{cursor:pointer;color:var(--blue);-webkit-tap-highlight-color:transparent}
+.doctor-cell.tap .doctor-date-text{border-bottom:1px dashed currentColor}
+.doctor-cell.tap:active{opacity:.6}
 .doctor-hint{display:block;font-size:11px;font-weight:600;color:var(--muted);margin-top:2px}
 .doctor-hint.warn{color:#e08a22}
 .doctor-empty{padding:18px;text-align:center;color:var(--muted);font-size:14px}
@@ -679,11 +681,16 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .doctor-form-group{font-size:12px;font-weight:800;color:var(--muted);margin-top:4px}
 .doctor-form-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
 .doctor-field{display:flex;flex-direction:column;gap:5px;min-width:0}
-.doctor-field>span{font-size:12px;color:var(--muted)}
+.doctor-field>span{font-size:12px;color:var(--muted);text-align:center}
 .doctor-field .value-input{display:block;width:100%;max-width:100%;min-width:0;box-sizing:border-box;font-size:16px;min-height:46px;-webkit-appearance:none;appearance:none;text-align:center;margin:0}
 .doctor-field input[type="date"]{overflow:hidden;padding-left:10px;padding-right:10px}
 .doctor-field input[type="date"]::-webkit-date-and-time-value{text-align:center;margin:0;min-width:0}
 .doctor-field input[type="date"]::-webkit-calendar-picker-indicator{display:none}
+.wheel{position:relative;height:132px;border-radius:14px;background:var(--input-bg);border:1px solid var(--line);overflow:hidden}
+.wheel::before{content:"";position:absolute;left:6px;right:6px;top:50%;height:40px;transform:translateY(-50%);border-radius:10px;background:rgba(82,103,232,.13);pointer-events:none}
+.wheel-scroll{position:relative;height:100%;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;touch-action:pan-y;padding:46px 0;box-sizing:border-box;scrollbar-width:none;-webkit-overflow-scrolling:touch;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 30%,#000 70%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 30%,#000 70%,transparent 100%)}
+.wheel-scroll::-webkit-scrollbar{display:none}
+.wheel-item{height:40px;line-height:40px;text-align:center;font-size:20px;font-weight:700;color:var(--input-text);scroll-snap-align:center;scroll-snap-stop:always;cursor:pointer;user-select:none;-webkit-user-select:none}
 .doctor-form-actions{display:flex;gap:10px;margin-top:4px}
 .doctor-cancel{width:auto;padding:0 16px;font-size:14px;font-weight:700;color:var(--text)}
 .doctor-save{flex:1;min-height:46px;background:linear-gradient(180deg,#36c9b8 0%,#1f9d8f 100%);color:#fff}
@@ -790,6 +797,7 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 <div class="doctor-head">
 <button class="doctor-back" type="button" onclick="switchTab('home')" aria-label="Назад">‹</button>
 <div class="doctor-head-copy"><div class="page-heading" style="margin:0">К врачу</div><div class="doctor-date" id="doctorDate">Загрузка…</div></div>
+<button class="doctor-back doctor-undo" type="button" onclick="undoDoctor()" aria-label="Отменить последнее поступление" title="Отменить последнее поступление">↩︎</button>
 <button class="doctor-add" type="button" onclick="openDoctorForm()" aria-label="Добавить поступление">+</button>
 </div>
 <div id="doctorBody"><div class="loader-wrap"><div class="spinner"></div><div>Загружаю данные…</div></div></div>
@@ -1096,13 +1104,13 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 <label class="doctor-field"><span>Дата получения</span><input class="value-input" id="docDate" type="date"></label>
 <div class="doctor-form-group">Получено, ручек</div>
 <div class="doctor-form-row">
-<label class="doctor-field"><span>Короткий</span><input class="value-input" id="docShortRecv" type="text" inputmode="numeric" enterkeyhint="next"></label>
-<label class="doctor-field"><span>Ночной</span><input class="value-input" id="docNightRecv" type="text" inputmode="numeric" enterkeyhint="next"></label>
+<div class="doctor-field"><span>Короткий</span><div class="wheel" id="wheelShortRecv"></div></div>
+<div class="doctor-field"><span>Ночной</span><div class="wheel" id="wheelNightRecv"></div></div>
 </div>
 <div class="doctor-form-group">Всего в наличии, ручек</div>
 <div class="doctor-form-row">
-<label class="doctor-field"><span>Короткий</span><input class="value-input" id="docShortTotal" type="text" inputmode="numeric" enterkeyhint="next"></label>
-<label class="doctor-field"><span>Ночной</span><input class="value-input" id="docNightTotal" type="text" inputmode="numeric" enterkeyhint="done"></label>
+<div class="doctor-field"><span>Короткий</span><div class="wheel" id="wheelShortTotal"></div></div>
+<div class="doctor-field"><span>Ночной</span><div class="wheel" id="wheelNightTotal"></div></div>
 </div>
 <div class="toast" id="doctorToast"></div>
 <div class="doctor-form-actions">
@@ -2860,7 +2868,8 @@ function staggerChart(host){
 // К ВРАЧУ: лист get_ins (запас ручек, когда идти и записаться)
 // ============================================================
 let doctorLast=null;
-const DOCTOR_IDS=['docShortRecv','docNightRecv','docShortTotal','docNightTotal'];
+const DOCTOR_WHEELS=['wheelShortRecv','wheelNightRecv','wheelShortTotal','wheelNightTotal'];
+const WHEEL_ITEM_H=40;
 function doctorHint(days,warnWithin){
  if(days===null||days===undefined)return '';
  const text=days>0?'через '+days+' дн.':days===0?'сегодня':Math.abs(days)+' дн. назад';
@@ -2868,7 +2877,11 @@ function doctorHint(days,warnWithin){
  return '<span class="doctor-hint'+(warn?' warn':'')+'">'+text+'</span>';
 }
 function doctorCell(value,hint,last){
- return '<div class="doctor-cell'+(last?' doctor-last':'')+'">'+(value?escapeHtml(value)+(hint||''):'—')+'</div>';
+ return '<div class="doctor-cell'+(last?' doctor-last':'')+'"><div>'+(value?escapeHtml(value)+(hint||''):'—')+'</div></div>';
+}
+function doctorTapCell(value,hint){
+ if(!value)return doctorCell(value,hint);
+ return '<div class="doctor-cell tap" role="button" tabindex="0" onclick="openCalendarDate(\''+escapeHtml(value)+'\')" aria-label="Открыть календарь на '+escapeHtml(value)+'"><div><span class="doctor-date-text">'+escapeHtml(value)+'</span>'+(hint||'')+'</div></div>';
 }
 function renderDoctor(data){
  doctorLast=data;
@@ -2882,23 +2895,30 @@ function renderDoctor(data){
   +'<div class="doctor-th"><span class="doctor-ico night">🌙</span>Ночной</div>'
   +'<div class="doctor-label">Получено, ручек</div>'+doctorCell(s.received)+doctorCell(n.received)
   +'<div class="doctor-label">Идти за инсулином</div>'+doctorCell(s.go_date,doctorHint(s.go_in_days,14))+doctorCell(n.go_date,doctorHint(n.go_in_days,14))
-  +'<button class="doctor-label tap" type="button" onclick="addDoctorToCalendar()" aria-label="Добавить запись к врачу в календарь"><span>Записаться 📅</span></button>'+doctorCell(s.sign_date,doctorHint(s.sign_in_days,14))+doctorCell(n.sign_date,doctorHint(n.sign_in_days,14))
+  +'<div class="doctor-label">Записаться</div>'+doctorTapCell(s.sign_date,doctorHint(s.sign_in_days,14))+doctorTapCell(n.sign_date,doctorHint(n.sign_in_days,14))
   +'<div class="doctor-label">Всего в наличии, ручек</div>'+doctorCell(s.total)+doctorCell(n.total)
   +'<div class="doctor-label doctor-last">Хватит до</div>'+doctorCell(s.until_date,doctorHint(s.until_in_days,30),true)+doctorCell(n.until_date,doctorHint(n.until_in_days,30),true)
   +'</div></div>';
 }
-function parseRuDate(text){
+// Открывает стандартный календарь на нужной дате (без добавления событий).
+function openCalendarDate(text){
  const m=/^(\d{2})\.(\d{2})\.(\d{4})$/.exec(text||'');
- return m?{d:m[1],m:m[2],y:m[3],key:m[3]+m[2]+m[1]}:null;
-}
-function addDoctorToCalendar(){
- const s=parseRuDate(doctorLast?.short?.sign_date),n=parseRuDate(doctorLast?.night?.sign_date);
- const picked=[s,n].filter(Boolean).sort((a,b)=>a.key.localeCompare(b.key))[0];
- if(!picked){setToast(document.getElementById('doctorToast'),'');return;}
- const note=[s?'Короткий: '+s.d+'.'+s.m+'.'+s.y:'',n?'Ночной: '+n.d+'.'+n.m+'.'+n.y:''].filter(Boolean).join('; ');
- const url=API_URL.replace(/\/api\/miniapp$/,'/api/calendar.ics')+'?date='+picked.key+'&title='+encodeURIComponent('Записаться к врачу')+'&note='+encodeURIComponent('Даты записи — '+note);
+ if(!m)return;
+ const y=+m[3],mo=+m[2],d=+m[1];
  selectionHaptic();
- openExternalLink(url);
+ const platform=String(tg?.platform||'').toLowerCase();
+ const noonUtc=Date.UTC(y,mo-1,d,12);
+ const web='https://calendar.google.com/calendar/r/day/'+y+'/'+mo+'/'+d;
+ if(platform==='ios'||platform==='macos'){
+  const seconds=Math.round((noonUtc-Date.UTC(2001,0,1))/1000);
+  window.location.href='calshow:'+seconds;
+ }else if(platform==='android'){
+  window.location.href='intent://com.android.calendar/time/'+noonUtc+'#Intent;scheme=content;action=android.intent.action.VIEW;end';
+ }else{
+  openExternalLink(web);
+  return;
+ }
+ setTimeout(()=>{if(!document.hidden)openExternalLink(web);},1500);
 }
 async function loadDoctor(){
  const body=document.getElementById('doctorBody');
@@ -2920,49 +2940,79 @@ function openDoctor(){
  window.scrollTo({top:0,behavior:'smooth'});
  loadDoctor();
 }
+async function undoDoctor(){
+ const date=doctorLast?.date;
+ if(!doctorLast||(!doctorLast.short&&!doctorLast.night))return;
+ const question='Удалить последнее поступление'+(date?' от '+date:'')+'? Из таблицы уйдут две верхние строки.';
+ const confirmed=await new Promise(resolve=>{
+  if(tg?.showConfirm){try{tg.showConfirm(question,resolve);return;}catch(e){}}
+  resolve(window.confirm(question));
+ });
+ if(!confirmed)return;
+ const body=document.getElementById('doctorBody');
+ body.innerHTML=loadingContent('Удаляю…');
+ try{
+  const data=await api('doctor_undo');
+  setAccess(true,'Сервер подтвердил доступ');
+  uiHaptic('success');
+  renderDoctor(data);
+ }catch(error){
+  uiHaptic('error');
+  if(doctorLast)renderDoctor(doctorLast);
+  if(tg?.showAlert)tg.showAlert(error.message);else alert(error.message);
+  handleAccessError(error);
+ }
+}
 function localDateInputValue(){
  const now=new Date();
  return now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
 }
+// ---- карусель-колесо
+function buildWheel(id,value,max){
+ const wheel=document.getElementById(id);
+ let html='';
+ for(let i=0;i<=max;i++)html+='<div class="wheel-item" data-v="'+i+'">'+i+'</div>';
+ wheel.innerHTML='<div class="wheel-scroll">'+html+'</div>';
+ const scroller=wheel.firstChild;
+ scroller.addEventListener('click',event=>{
+  const item=event.target.closest('.wheel-item');
+  if(item)scroller.scrollTo({top:Number(item.dataset.v)*WHEEL_ITEM_H,behavior:'smooth'});
+ });
+ let last=-1;
+ scroller.addEventListener('scroll',()=>{
+  const v=Math.round(scroller.scrollTop/WHEEL_ITEM_H);
+  if(v!==last){last=v;selectionHaptic();}
+ },{passive:true});
+ scroller.style.scrollSnapType='none';
+ scroller.scrollTop=value*WHEEL_ITEM_H;
+ requestAnimationFrame(()=>{scroller.style.scrollSnapType='';});
+}
+function wheelValue(id){
+ const scroller=document.getElementById(id).firstChild;
+ const max=scroller.children.length-1;
+ return Math.min(max,Math.max(0,Math.round(scroller.scrollTop/WHEEL_ITEM_H)));
+}
 function openDoctorForm(){
  hideKeyboard();
  const s=doctorLast?.short||{},n=doctorLast?.night||{};
- const prefill=[s.received,n.received,s.total,n.total];
+ const prefill=[s.received,n.received,s.total,n.total].map(v=>{const x=parseInt(v,10);return Number.isFinite(x)?x:0;});
  document.getElementById('docDate').value=localDateInputValue();
- DOCTOR_IDS.forEach((id,i)=>{document.getElementById(id).value=prefill[i]||'';});
  setToast(document.getElementById('doctorToast'),'');
  document.getElementById('doctorFormBackdrop').classList.add('visible');
- const first=document.getElementById(DOCTOR_IDS[0]);
- try{first.focus({preventScroll:true});first.select();}catch(e){}
+ try{tg?.disableVerticalSwipes?.();}catch(e){}
+ DOCTOR_WHEELS.forEach((id,i)=>buildWheel(id,prefill[i],Math.min(1000,Math.max(100,prefill[i]+50))));
 }
 function closeDoctorForm(){
  hideKeyboard();
  document.getElementById('doctorFormBackdrop').classList.remove('visible');
+ try{tg?.enableVerticalSwipes?.();}catch(e){}
 }
-DOCTOR_IDS.forEach((id,i)=>{
- document.addEventListener('DOMContentLoaded',()=>{
-  const input=document.getElementById(id);
-  if(!input)return;
-  input.addEventListener('focus',()=>{try{input.select();}catch(e){}});
-  input.addEventListener('keydown',event=>{
-   if(event.key!=='Enter')return;
-   event.preventDefault();
-   if(i<DOCTOR_IDS.length-1)document.getElementById(DOCTOR_IDS[i+1]).focus({preventScroll:true});
-   else saveDoctor();
-  });
- });
-});
 async function saveDoctor(){
  const toast=document.getElementById('doctorToast');
  const button=document.getElementById('doctorSave');
  const iso=document.getElementById('docDate').value;
  if(!/^\d{4}-\d{2}-\d{2}$/.test(iso)){setToast(toast,'Выбери дату.','error');return;}
- const values=[];
- for(const id of DOCTOR_IDS){
-  const text=document.getElementById(id).value.trim();
-  if(!/^\d{1,4}$/.test(text)||Number(text)>1000){setToast(toast,'Во всех полях нужны целые числа от 0 до 1000.','error');return;}
-  values.push(Number(text));
- }
+ const values=DOCTOR_WHEELS.map(wheelValue);
  const [y,m,d]=iso.split('-');
  button.disabled=true;
  button.textContent='Сохраняю…';
