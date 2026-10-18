@@ -12,15 +12,15 @@
 /* ============================================================
    ПЕРЕМЕННЫЕ И ТЕМЫ (светлая / тёмная)
    ============================================================ */
-:root{color-scheme:light;--bg:#f5f6fb;--status-bar-bg:#e6e7ec;--status-bar-fade:#eff0f5;--card:#fff;--text:#20243a;--muted:#81869a;--blue:#5267e8;--pink:#ed6f9b;--teal:#20a99b;--line:#edf0f6;--input-bg:#f7f8fc;--input-text:#20243a;--shadow:0 8px 26px rgba(37,47,82,.08),0 1px 2px rgba(37,47,82,.05);--nav-highlight:#edf3ff;--nav-border:rgba(128,136,158,.18);--nav-active:#dfe7ff;--icon-bg:#f1f4fb;--modal-bg:#fff;--modal-content:#f4f6fb;--close-bg:#eef2fb;--close-text:#3c4664}
-:root[data-theme="dark"]{color-scheme:dark;--bg:#11131b;--status-bar-bg:#11131b;--status-bar-fade:#11131b;--card:#1c202c;--text:#f1f3fa;--muted:#a0a6bb;--blue:#8998ff;--pink:#ed7fa5;--teal:#40cbbb;--line:#3a4051;--input-bg:#292e3d;--input-text:#f1f3fa;--shadow:0 14px 34px rgba(0,0,0,.38),0 1px 2px rgba(0,0,0,.18);--nav-highlight:rgba(255,255,255,.07);--nav-border:rgba(151,160,182,.14);--nav-active:rgba(146,160,255,.14);--icon-bg:#2b313f;--modal-bg:#1a1f2c;--modal-content:#202737;--close-bg:#2d3446;--close-text:#eef2ff}
+:root{color-scheme:light;--bg:#f3f4fb;--status-bar-bg:#eceefa;--status-bar-fade:#f0f1fa;--card:#fff;--card-grad:linear-gradient(180deg,#ffffff 0%,#fafbff 100%);--text:#1f2340;--muted:#7b8199;--blue:#5267e8;--pink:#ee6f9c;--teal:#20a99b;--violet:#7d6be8;--line:#e9ecf6;--input-bg:#f5f6fc;--input-text:#1f2340;--shadow:inset 0 1px 0 rgba(255,255,255,.95),0 14px 32px -14px rgba(60,72,150,.24),0 2px 6px rgba(60,72,150,.06);--card-border:rgba(125,135,170,.13);--aura:radial-gradient(60% 38% at 0% 0%,rgba(130,145,255,.20),transparent 70%),radial-gradient(55% 34% at 100% 8%,rgba(255,160,200,.17),transparent 70%),radial-gradient(70% 42% at 50% 105%,rgba(110,215,200,.15),transparent 70%);--nav-highlight:#edf1ff;--nav-border:rgba(128,136,158,.18);--nav-active:#e3e8ff;--icon-bg:#f0f3fb;--modal-bg:#fff;--modal-content:#f4f6fb;--close-bg:#eef2fb;--close-text:#3c4664}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#05060a;--status-bar-bg:#05060a;--status-bar-fade:#05060a;--card:#12141c;--card-grad:linear-gradient(180deg,#171a24 0%,#10121a 100%);--text:#f2f4fb;--muted:#9aa1b8;--blue:#8f9bff;--pink:#ff7fa9;--teal:#45e0cb;--violet:#a898ff;--line:#262a38;--input-bg:#1a1d29;--input-text:#f2f4fb;--shadow:inset 0 1px 0 rgba(255,255,255,.07),0 18px 40px -16px rgba(0,0,0,.9),0 2px 8px rgba(0,0,0,.5);--card-border:rgba(255,255,255,.07);--aura:radial-gradient(60% 34% at 0% 0%,rgba(110,125,255,.15),transparent 70%),radial-gradient(55% 30% at 100% 5%,rgba(255,110,170,.09),transparent 70%),radial-gradient(70% 40% at 50% 108%,rgba(60,225,200,.08),transparent 70%);--nav-highlight:rgba(255,255,255,.06);--nav-border:rgba(151,160,182,.14);--nav-active:rgba(143,155,255,.18);--icon-bg:#1d2130;--modal-bg:#14161f;--modal-content:#1a1d29;--close-bg:#262a3a;--close-text:#eef2ff}
 
 /* ============================================================
    БАЗА: сброс, body, статус-бар, контейнер, экраны
    ============================================================ */
 *{box-sizing:border-box}
-body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;transition:background .2s,color .2s}
-body::before{position:fixed;z-index:25;top:0;left:0;right:0;height:calc(env(safe-area-inset-top) + 39px);background:linear-gradient(to bottom,var(--status-bar-bg) 0%,var(--status-bar-fade) 65%,var(--bg) 100%);content:"";pointer-events:none}
+body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:ui-rounded,"SF Pro Rounded",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;transition:background .2s,color .2s}
+body::before{position:fixed;z-index:25;top:0;left:0;right:0;height:calc(env(safe-area-inset-top) + 39px);background:linear-gradient(to bottom,var(--status-bar-bg) 0%,var(--status-bar-fade) 60%,transparent 100%);content:"";pointer-events:none}
 button,input{font:inherit}
 button{-webkit-tap-highlight-color:transparent}
 .app{max-width:520px;margin:0 auto;padding:calc(48px + env(safe-area-inset-top)) 18px calc(82px + env(safe-area-inset-bottom))}
@@ -35,7 +35,7 @@ button{-webkit-tap-highlight-color:transparent}
 .metric-icon{width:43px;height:43px;flex-shrink:0;border-radius:15px;display:grid;place-items:center;font-size:22px}
 .sugar .metric-icon{background:#fff0f5}
 .insulin .metric-icon{background:#e4faf6}
-.metric-name{font-size:17px;font-weight:750}
+.metric-name{font-size:18px;font-weight:750}
 .metric-description{font-size:12px;color:var(--muted);margin-top:4px}
 .metric-latest{display:flex;align-items:center;gap:5px;margin-top:6px;font-size:12px;font-weight:650;line-height:1.3;font-variant-numeric:tabular-nums}
 .metric-latest[hidden]{display:none}
@@ -46,7 +46,7 @@ button{-webkit-tap-highlight-color:transparent}
 :root[data-theme="dark"] .insulin:not(.night) .metric-latest{color:#6fe0d0}
 .metric-copy{flex:1;min-width:0}
 .night .metric-latest{color:var(--muted)}
-.metric-value{display:flex;flex-direction:column;align-items:flex-end;font-size:28px;font-weight:800;letter-spacing:-.7px;line-height:1.1;margin-left:auto;text-align:right;white-space:nowrap}
+.metric-value{display:flex;flex-direction:column;align-items:flex-end;font-size:32px;font-weight:800;letter-spacing:-.9px;line-height:1.1;margin-left:auto;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
 .metric-value small{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:0}
 .metric-loading{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:7px;min-width:76px;margin-left:auto}
 .metric-skeleton{height:13px;width:76px;border-radius:7px;background:linear-gradient(90deg,var(--line) 25%,var(--nav-highlight) 50%,var(--line) 75%);background-size:200% 100%;animation:metricShimmer 1.2s linear infinite}
@@ -76,9 +76,9 @@ button{-webkit-tap-highlight-color:transparent}
 
 /* --- Крупное значение в карточке, тосты --- */
 .metric-figure{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;margin-left:auto;min-width:90px}
-.metric-figure .value{font-size:28px;font-weight:800;letter-spacing:-.7px;line-height:1.1;text-align:right}
+.metric-figure .value{font-size:32px;font-weight:800;letter-spacing:-.9px;line-height:1.1;text-align:right;font-variant-numeric:tabular-nums}
 .metric-figure .unit{font-size:12px;font-weight:600;color:var(--muted);margin-top:3px}
-.night .metric-figure .value{font-size:28px}
+.night .metric-figure .value{font-size:32px}
 .night .metric-figure .unit{font-size:12px}
 .toast{font-size:12px;color:var(--muted);min-height:16px;margin:8px 2px 0}
 .toast:empty{display:none}
@@ -88,19 +88,30 @@ button{-webkit-tap-highlight-color:transparent}
 :root[data-theme="dark"] .toast.error{color:#ff7474}
 
 /* ============================================================
-   ТАЙМЕР ИНСУЛИНА (плашка с обратным отсчётом)
+   ТАЙМЕР ИНСУЛИНА (кольцо прогресса + метки напоминаний)
    ============================================================ */
-.insulin-timer{display:flex;align-items:center;gap:12px;margin:13px 0 0;padding:12px 14px;border:1px solid rgba(32,169,155,.2);border-radius:16px;background:#e4faf6;color:#176d63}
+.insulin-timer{display:flex;align-items:center;gap:15px;margin:14px 0 0;padding:12px 18px 12px 12px;border:1px solid rgba(32,169,155,.22);border-radius:22px;background:linear-gradient(135deg,#ecfcf8 0%,#d9f4ee 100%);color:#176d63;box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 12px 26px -16px rgba(32,169,155,.6)}
 .insulin-timer[hidden]{display:none}
-.insulin-timer-icon{width:38px;height:38px;flex-shrink:0;display:grid;place-items:center;border-radius:12px;background:#c9efe7;font-size:19px}
-.insulin-timer-info{flex:1;min-width:0}
-.insulin-timer-label{display:block;font-size:12px;font-weight:650;color:#176d63}
-.insulin-timer-countdown{font-size:23px;font-weight:800;letter-spacing:-.6px;font-variant-numeric:tabular-nums;white-space:nowrap;color:#0f4f47}
-:root[data-theme="dark"] .insulin-timer{background:#20413e;border-color:#2f5c57;color:#9aeee2}
-:root[data-theme="dark"] .insulin-timer-icon{background:#2c5651}
+.timer-ring{position:relative;width:78px;height:78px;flex-shrink:0;display:grid;place-items:center;border-radius:50%}
+.timer-ring svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.ring-track{fill:none;stroke:rgba(32,169,155,.2);stroke-width:6}
+.ring-progress{fill:none;stroke:url(#timerGrad);stroke-width:6;stroke-linecap:round;stroke-dasharray:213.63;stroke-dashoffset:213.63;transition:stroke-dashoffset 1s linear}
+.ring-tick{fill:#fff;stroke:rgba(32,169,155,.55);stroke-width:2;transition:fill .3s,stroke .3s,r .3s}
+.ring-tick.passed{fill:#20a99b;stroke:#fff}
+.insulin-timer-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.insulin-timer-label{display:block;font-size:14px;font-weight:750;color:#176d63}
+.insulin-timer-next{display:block;font-size:12px;font-weight:600;color:#3d8a80}
+.insulin-timer-countdown{position:relative;font-size:18px;font-weight:800;letter-spacing:-.4px;font-variant-numeric:tabular-nums;white-space:nowrap;color:#0f4f47}
+.insulin-timer.pulse .timer-ring{animation:ringPulse 1.5s ease-out 3}
+:root[data-theme="dark"] .insulin-timer{background:linear-gradient(135deg,#17322f 0%,#112623 100%);border-color:rgba(69,224,203,.22);color:#9aeee2;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 14px 30px -18px rgba(69,224,203,.55)}
+:root[data-theme="dark"] .ring-track{stroke:rgba(69,224,203,.18)}
+:root[data-theme="dark"] .ring-tick{fill:#12141c;stroke:rgba(69,224,203,.6)}
+:root[data-theme="dark"] .ring-tick.passed{fill:#45e0cb;stroke:#12141c}
 :root[data-theme="dark"] .insulin-timer-label{color:#9aeee2}
-:root[data-theme="dark"] .insulin-timer-countdown{color:#c8fff6}
-@media(max-width:360px){.insulin-timer{padding:10px 11px;gap:9px}.insulin-timer-icon{width:34px;height:34px}.insulin-timer-countdown{font-size:21px}}
+:root[data-theme="dark"] .insulin-timer-next{color:#6fbfb3}
+:root[data-theme="dark"] .insulin-timer-countdown{color:#d4fff8}
+@keyframes ringPulse{0%{box-shadow:0 0 0 0 rgba(32,169,155,.55)}100%{box-shadow:0 0 0 20px rgba(32,169,155,0)}}
+@media(max-width:360px){.insulin-timer{padding:10px 12px 10px 10px;gap:11px}.timer-ring{width:68px;height:68px}.insulin-timer-countdown{font-size:16px}}
 
 /* ============================================================
    БЫСТРЫЕ КНОПКИ и цвета иконок
@@ -207,7 +218,7 @@ button{-webkit-tap-highlight-color:transparent}
 /* --- SVG-графики: оси, сетка, точки, тултип --- */
 .chart-wrap{width:calc(100% + 8px);min-height:220px;margin-left:-8px;overflow:hidden}
 .chart-svg{display:block;width:100%;height:285px;overflow:visible}
-.chart-svg text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:var(--muted);font-size:10px}
+.chart-svg text{font-family:ui-rounded,"SF Pro Rounded",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:var(--muted);font-size:10px}
 .chart-grid{stroke:var(--line);stroke-width:1}
 .chart-grid-ideal{stroke:#2ea66a;stroke-opacity:.5;stroke-width:1}
 
@@ -435,8 +446,133 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 @keyframes rise{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes screenIn{from{opacity:.65;transform:translateY(4px)}to{opacity:1;transform:translateY(0)} }
 @keyframes metricShimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-@media(max-width:360px){.app{padding-left:13px;padding-right:13px}.metric{padding:14px}.metric-value{font-size:24px}.save-button{min-width:88px;padding:0 11px}.quick-button{padding:12px 10px;gap:9px}} 
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+@media(max-width:360px){.app{padding-left:13px;padding-right:13px}.metric{padding:14px}.metric-value{font-size:27px}.save-button{min-width:88px;padding:0 11px}.quick-button{padding:12px 10px;gap:9px}} 
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+/* ============================================================
+   ДИЗАЙН v2: спокойный фон, глубина, новая тёмная тема, анимации
+   ============================================================ */
+html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:var(--aura)}
+@supports (background:color-mix(in srgb,red,blue)){
+ :root{--nav-active:color-mix(in srgb,var(--blue) 14%,transparent)}
+ :root[data-theme="dark"]{--nav-active:color-mix(in srgb,var(--blue) 20%,transparent)}
+}
+
+/* --- Карточки: градиент, мягкие слои тени, верхний блик --- */
+.metric,.quick-button,.settings-card,.analytics-card,.graph-placeholder{background:var(--card-grad);border-color:var(--card-border)}
+.access-denied-dialog,.modal{border:1px solid var(--card-border)}
+.metric.sugar{--glow:238,111,156}
+.metric.insulin{--glow:32,169,155}
+.metric.night{--glow:125,107,232}
+:root[data-theme="dark"] .metric.sugar{--glow:255,127,169}
+:root[data-theme="dark"] .metric.insulin{--glow:69,224,203}
+:root[data-theme="dark"] .metric.night{--glow:168,152,255}
+
+/* --- Иконки карточек: объём и цветное свечение --- */
+.metric .metric-icon{box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 9px 18px -9px rgba(var(--glow),.65)}
+.metric.sugar .metric-icon{background:linear-gradient(145deg,#fff4f8,#ffdceb)}
+.metric.insulin:not(.night) .metric-icon{background:linear-gradient(145deg,#ecfcf9,#c9f1e8)}
+:root[data-theme="dark"] .metric .metric-icon{box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 10px 20px -10px rgba(var(--glow),.7)}
+:root[data-theme="dark"] .metric.sugar .metric-icon{background:linear-gradient(145deg,rgba(255,127,169,.30),rgba(255,127,169,.10))}
+:root[data-theme="dark"] .metric.insulin:not(.night) .metric-icon{background:linear-gradient(145deg,rgba(69,224,203,.28),rgba(69,224,203,.09))}
+
+/* --- Ночная карточка: мягкий лавандовый фон и мерцающие звёзды --- */
+.metric.night{position:relative;overflow:hidden;isolation:isolate;--star:rgba(125,107,232,.75);--star2:rgba(240,168,70,.9);background:linear-gradient(155deg,#fdfbff 0%,#efeaff 100%);border-color:rgba(125,107,232,.2)}
+:root[data-theme="dark"] .metric.night{--star:#ffffff;--star2:#cfd6ff;background:linear-gradient(155deg,#191b3b 0%,#0d0f22 100%);border-color:rgba(160,150,255,.18)}
+.metric.night>*{position:relative;z-index:1}
+.metric.night::before,.metric.night::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background-repeat:no-repeat;opacity:.7}
+.metric.night::before{background-image:
+ radial-gradient(circle at 58% 14%,var(--star) 0 1.3px,transparent 2px),
+ radial-gradient(circle at 74% 30%,var(--star2) 0 1.1px,transparent 1.8px),
+ radial-gradient(circle at 88% 12%,var(--star) 0 1.8px,transparent 2.6px),
+ radial-gradient(circle at 46% 36%,var(--star2) 0 1px,transparent 1.7px),
+ radial-gradient(circle at 96% 44%,var(--star) 0 1.2px,transparent 2px),
+ radial-gradient(circle at 66% 52%,var(--star) 0 .9px,transparent 1.5px);
+ animation:twinkleA 3.8s ease-in-out infinite}
+.metric.night::after{background-image:
+ radial-gradient(circle at 52% 22%,var(--star) 0 1px,transparent 1.7px),
+ radial-gradient(circle at 82% 22%,var(--star2) 0 1.5px,transparent 2.3px),
+ radial-gradient(circle at 92% 30%,var(--star) 0 .9px,transparent 1.5px),
+ radial-gradient(circle at 70% 8%,var(--star) 0 1.2px,transparent 2px),
+ radial-gradient(circle at 60% 44%,var(--star2) 0 1.3px,transparent 2px),
+ radial-gradient(circle at 98% 62%,var(--star2) 0 1px,transparent 1.7px);
+ animation:twinkleB 5.4s ease-in-out infinite .9s}
+@keyframes twinkleA{0%,100%{opacity:.18}50%{opacity:1}}
+@keyframes twinkleB{0%,100%{opacity:1}50%{opacity:.15}}
+
+/* --- Кнопки «Сохранить»: объём, свечение, пружина --- */
+.save-button{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:transform .38s cubic-bezier(.34,1.5,.4,1),box-shadow .25s,background .3s,color .2s;box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 10px 20px -10px rgba(var(--glow),.8)}
+.save-button:active{transform:scale(.95)}
+.metric.sugar .save-button{background:linear-gradient(180deg,#f78db3 0%,#ea6593 100%)}
+.metric.insulin:not(.night) .save-button{background:linear-gradient(180deg,#36c9b8 0%,#1f9d8f 100%);color:#fff}
+.metric.night .save-button{background:linear-gradient(180deg,#9a8bf2 0%,#7664e0 100%);color:#fff}
+:root[data-theme="dark"] .metric.sugar .save-button{background:linear-gradient(180deg,#ff94b8 0%,#f26a9c 100%)}
+:root[data-theme="dark"] .metric.insulin:not(.night) .save-button{background:linear-gradient(180deg,#5cf0dc 0%,#2fcbb8 100%);color:#05302a}
+:root[data-theme="dark"] .metric.night .save-button{background:linear-gradient(180deg,#b3a6ff 0%,#8d7bf0 100%);color:#fff}
+.metric .save-button.saved{background:linear-gradient(180deg,#4bdc8e 0%,#25b565 100%)!important;color:#fff!important;pointer-events:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 10px 22px -8px rgba(37,181,101,.85);animation:savePop .55s cubic-bezier(.34,1.56,.4,1)}
+.save-button.saved::after{content:"";position:absolute;inset:0;border-radius:13px;border:2px solid rgba(75,220,142,.8);pointer-events:none;animation:saveRing .8s ease-out forwards}
+.save-check{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.save-check path{stroke-dasharray:1;stroke-dashoffset:1;animation:chartDraw .45s ease-out .1s forwards}
+@keyframes savePop{0%{transform:scale(.9)}60%{transform:scale(1.07)}100%{transform:scale(1)}}
+@keyframes saveRing{0%{opacity:.9;transform:scale(1)}100%{opacity:0;transform:scale(1.35)}}
+
+/* --- Поля ввода, плашки, переключатели --- */
+.value-input{box-shadow:inset 0 1px 2px rgba(40,50,100,.07);transition:border-color .2s,box-shadow .2s}
+:root[data-theme="dark"] .value-input{box-shadow:inset 0 1px 3px rgba(0,0,0,.5)}
+.value-input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--nav-active)}
+.analytics-tab.active,.analytics-choice.active{box-shadow:0 8px 16px -8px var(--blue)}
+.metric-switch .analytics-choice.active{box-shadow:none}
+.undo-button{transition:transform .38s cubic-bezier(.34,1.5,.4,1)}
+.undo-button:active{transform:scale(.92)}
+
+/* --- Быстрый доступ: две крупные плитки и четыре чипа --- */
+.quick-grid{gap:11px}
+.quick-button{transition:transform .38s cubic-bezier(.34,1.5,.4,1),box-shadow .2s}
+.quick-button:active{transform:scale(.96)}
+.quick-big{flex-direction:column;align-items:flex-start;justify-content:space-between;gap:16px;min-height:118px;padding:16px;border-radius:22px}
+.quick-big .quick-icon{width:46px;height:46px;border-radius:16px;font-size:22px;box-shadow:inset 0 1px 0 rgba(255,255,255,.7)}
+.quick-big .quick-label{font-size:17px}
+.quick-big .quick-hint{font-size:12px;margin-top:4px}
+.quick-big.q-today{background:linear-gradient(150deg,rgba(82,103,232,.12) 0%,transparent 62%),var(--card-grad)}
+.quick-big.q-yest{background:linear-gradient(150deg,rgba(236,148,56,.14) 0%,transparent 62%),var(--card-grad)}
+:root[data-theme="dark"] .quick-big.q-today{background:linear-gradient(150deg,rgba(143,155,255,.20) 0%,transparent 62%),var(--card-grad)}
+:root[data-theme="dark"] .quick-big.q-yest{background:linear-gradient(150deg,rgba(255,176,90,.18) 0%,transparent 62%),var(--card-grad)}
+.quick-chip{min-height:58px;padding:10px 12px;border-radius:17px;gap:10px}
+.quick-chip .quick-icon{width:34px;height:34px;border-radius:11px;font-size:17px}
+.quick-chip .quick-label{font-size:13px;line-height:1.25}
+:root[data-theme="dark"] .blue{background:rgba(143,155,255,.18)}
+:root[data-theme="dark"] .orange{background:rgba(255,176,90,.17)}
+:root[data-theme="dark"] .purple{background:rgba(184,150,255,.18)}
+:root[data-theme="dark"] .green{background:rgba(80,230,160,.16)}
+:root[data-theme="dark"] .yellow{background:rgba(255,214,90,.16)}
+:root[data-theme="dark"] .gray{background:rgba(180,190,215,.13)}
+
+/* --- Каскадное появление карточек --- */
+.screen.active>.metric,.screen.active>.quick-title,.screen.active>.quick-grid>*{animation:rise .55s cubic-bezier(.22,1,.36,1) backwards}
+.screen.active>.metric:nth-child(1){animation-delay:.02s}
+.screen.active>.metric:nth-child(2){animation-delay:.09s}
+.screen.active>.metric:nth-child(3){animation-delay:.16s}
+.screen.active>.quick-title{animation-delay:.22s}
+.screen.active>.quick-grid>:nth-child(1){animation-delay:.26s}
+.screen.active>.quick-grid>:nth-child(2){animation-delay:.31s}
+.screen.active>.quick-grid>:nth-child(3){animation-delay:.36s}
+.screen.active>.quick-grid>:nth-child(4){animation-delay:.40s}
+.screen.active>.quick-grid>:nth-child(5){animation-delay:.44s}
+.screen.active>.quick-grid>:nth-child(6){animation-delay:.48s}
+
+/* --- Графики: прорисовка линий, всплытие точек и столбцов --- */
+.chart-svg .chart-line{stroke-dasharray:1;stroke-dashoffset:1;animation:chartDraw .75s cubic-bezier(.4,0,.2,1) .1s forwards}
+.chart-svg .chart-point{transform-box:fill-box;transform-origin:center;animation:pointPop .45s cubic-bezier(.34,1.56,.4,1) both;animation-delay:var(--d,.3s)}
+.chart-svg .daily-range{transform-box:fill-box;transform-origin:center;animation:barGrow .6s cubic-bezier(.3,1.2,.4,1) both;animation-delay:var(--d,0s)}
+.heatmap-cell{animation:cellIn .4s ease both;animation-delay:var(--d,0s)}
+@keyframes chartDraw{to{stroke-dashoffset:0}}
+@keyframes pointPop{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
+@keyframes barGrow{from{opacity:0;transform:scaleY(0)}to{opacity:1;transform:scaleY(1)}}
+@keyframes cellIn{from{opacity:0;transform:scale(.55)}to{opacity:1;transform:scale(1)}}
+
+/* --- Пружинный отклик на нажатие --- */
+.analytics-tab,.followup-preset,.chart-expand,.access-denied-close,.modal-close,.setting-switch span{transition:transform .38s cubic-bezier(.34,1.5,.4,1),background .25s,color .2s,border-color .2s,box-shadow .2s}
+.analytics-tab:active,.followup-preset:active{transform:scale(.94)}
 </style>
 </head>
 <body>
@@ -449,7 +585,6 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 <div class="metric-icon">🩸</div>
 <div class="metric-copy">
 <div class="metric-name">Сахар</div>
-<div class="metric-description">Среднее за сегодня</div>
 <div class="metric-latest" id="sugarLatest">Последнее: <span class="metric-skeleton"></span></div>
 </div>
 <div class="metric-loading" id="sugarAverage" role="status" aria-label="Загрузка среднего сахара">
@@ -470,7 +605,6 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 <div class="metric-icon">💉</div>
 <div class="metric-copy">
 <div class="metric-name">Инсулин</div>
-<div class="metric-description">Сумма за сегодня</div>
 <div class="metric-latest" id="insulinLatest">Последнее: <span class="metric-skeleton"></span></div>
 </div>
 <div class="metric-loading" id="insulinTotal" role="status" aria-label="Загрузка суммы инсулина">
@@ -485,11 +619,20 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 </div>
 <div class="toast" id="insulinToast"></div>
 <div class="insulin-timer" id="insulinTimer" hidden role="timer" aria-live="off">
-<div class="insulin-timer-icon">⏱️</div>
+<div class="timer-ring">
+<svg viewBox="0 0 80 80" aria-hidden="true">
+<defs><linearGradient id="timerGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#46dcc8"/><stop offset="1" stop-color="#1f9d8f"/></linearGradient></defs>
+<circle class="ring-track" cx="40" cy="40" r="34"/>
+<circle class="ring-progress" id="timerRingProgress" cx="40" cy="40" r="34" transform="rotate(-90 40 40)"/>
+<circle class="ring-tick" id="timerTick0" cx="74" cy="40" r="3.4"/>
+<circle class="ring-tick" id="timerTick1" cx="40" cy="74" r="3.4"/>
+</svg>
+<span class="insulin-timer-countdown" id="insulinTimerCountdown">00:00</span>
+</div>
 <div class="insulin-timer-info">
 <span class="insulin-timer-label">После инъекции</span>
+<span class="insulin-timer-next" id="insulinTimerNext"></span>
 </div>
-<span class="insulin-timer-countdown" id="insulinTimerCountdown">00:00</span>
 </div>
 </section>
 <!-- --- Карточка: инсулин (ночной) --- -->
@@ -498,7 +641,6 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 <div class="metric-icon">🌙</div>
 <div class="metric-copy">
 <div class="metric-name">Ночной</div>
-<div class="metric-description">Факт за сегодня</div>
 <div class="metric-latest" id="nightYesterday">Вчера: <span class="metric-skeleton"></span></div>
 </div>
 <div class="metric-loading" id="nightFact" role="status" aria-live="polite" aria-label="Загрузка ночного значения">
@@ -519,12 +661,12 @@ body.access-denied .app,body.access-denied .bottom-nav-wrap{filter:blur(9px);poi
 </div>
 <!-- --- Быстрые кнопки --- -->
 <section class="quick-grid">
-<button class="quick-button" onclick="openAction('today')"><span class="quick-icon blue">☀️</span><span><div class="quick-label">Сегодня</div><div class="quick-hint">За текущий день</div></span><span class="arrow">›</span></button>
-<button class="quick-button" onclick="openAction('yesterday')"><span class="quick-icon orange">🌙</span><span><div class="quick-label">Вчера</div><div class="quick-hint">За прошлый день</div></span><span class="arrow">›</span></button>
-<button class="quick-button" onclick="openAction('week')"><span class="quick-icon purple">📊</span><span><div class="quick-label">Среднее за неделю</div><div class="quick-hint">Лучшая динамика</div></span><span class="arrow">›</span></button>
-<button class="quick-button" onclick="openAction('month')"><span class="quick-icon green">🗓️</span><span><div class="quick-label">Среднее за месяц</div><div class="quick-hint">Больше данных</div></span><span class="arrow">›</span></button>
-<button class="quick-button" onclick="openAction('excel')"><span class="quick-icon yellow">📗</span><span><div class="quick-label">Excel</div><div class="quick-hint">Открыть таблицу</div></span><span class="arrow">›</span></button>
-<button class="quick-button" onclick="openAction('memory')"><span class="quick-icon gray">⚙️</span><span><div class="quick-label">Память</div><div class="quick-hint">Состояние бота</div></span><span class="arrow">›</span></button>
+<button class="quick-button quick-big q-today" onclick="openAction('today')"><span class="quick-icon blue">☀️</span><span><div class="quick-label">Сегодня</div><div class="quick-hint">За текущий день</div></span></button>
+<button class="quick-button quick-big q-yest" onclick="openAction('yesterday')"><span class="quick-icon orange">🌙</span><span><div class="quick-label">Вчера</div><div class="quick-hint">За прошлый день</div></span></button>
+<button class="quick-button quick-chip" onclick="openAction('week')"><span class="quick-icon purple">📊</span><span class="quick-label">Среднее за неделю</span></button>
+<button class="quick-button quick-chip" onclick="openAction('month')"><span class="quick-icon green">🗓️</span><span class="quick-label">Среднее за месяц</span></button>
+<button class="quick-button quick-chip" onclick="openAction('excel')"><span class="quick-icon yellow">📗</span><span class="quick-label">Excel</span></button>
+<button class="quick-button quick-chip" onclick="openAction('memory')"><span class="quick-icon gray">⚙️</span><span class="quick-label">Память</span></button>
 </section>
 </section>
 <!-- === ЭКРАН «ГРАФИКИ» === -->
@@ -837,6 +979,14 @@ function uiHaptic(kind){
  if(!appVibrationOn())return;
  playUiHaptic(insulinTimerSettings.appVibrationLevel,kind);
 }
+function selectionHaptic(){
+ if(!appVibrationOn())return;
+ const h=tg?.HapticFeedback;
+ try{if(h?.selectionChanged)h.selectionChanged();else if(navigator.vibrate)navigator.vibrate(8);}catch(e){}
+}
+document.addEventListener('click',event=>{
+ if(event.target.closest&&event.target.closest('.quick-button,.analytics-tab,.followup-preset'))selectionHaptic();
+},true);
 function cycleAppVibrationLevel(){
  insulinTimerSettings.appVibrationLevel=insulinTimerSettings.appVibrationLevel%5+1;
  persistTimerSettings();
@@ -916,7 +1066,7 @@ function switchTab(name){
  document.querySelectorAll('.nav-button').forEach(button=>button.classList.toggle('active',button.dataset.screen===name));
  moveNavPill();
  window.scrollTo({top:0,behavior:'smooth'});
- uiHaptic('selection');
+ selectionHaptic();
  if(name==='graphs')loadAnalytics(true);
  if(name==='settings')loadReportSettings();
 }
@@ -938,24 +1088,43 @@ function moveNavPill(){
 function applyTheme(theme){
 const dark=theme==='dark';
 document.documentElement.dataset.theme=dark?'dark':'light';
-const statusBarColor=dark?'#11131b':'#e6e7ec';
+const statusBarColor=dark?'#05060a':'#eceefa';
 document.getElementById('themeColor').content=statusBarColor;
-if(tg)tg.setHeaderColor?.(statusBarColor);
+if(tg){try{tg.setHeaderColor?.(statusBarColor);tg.setBackgroundColor?.(dark?'#05060a':'#f3f4fb');tg.setBottomBarColor?.(dark?'#05060a':'#f3f4fb');}catch(e){}}
+applyTelegramAccent(dark);
 document.getElementById('themeIcon').textContent=dark?'☀️':'🌙';
 document.getElementById('themeSwitchIcon').textContent=dark?'☀️':'🌙';
 document.getElementById('themeDescription').textContent=dark?'Включена тёмная тема':'Комфортное оформление в темноте';
 document.getElementById('themeSwitch').setAttribute('aria-label',dark?'Включить светлую тему':'Включить тёмную тему');
-try{localStorage.setItem('sema-theme',dark?'dark':'light')}catch(e){}
 }
 function toggleTheme(){
 const current=document.documentElement.dataset.theme||'light';
-applyTheme(current==='dark'?'light':'dark');
+const next=current==='dark'?'light':'dark';
+try{localStorage.setItem('sema-theme',next)}catch(e){}
+applyTheme(next);
 uiHaptic('selection');
 }
+// Акцентный цвет берётся из темы Telegram (поставь false, чтобы вернуть фирменный)
+const USE_TELEGRAM_ACCENT=true;
+function hexToRgb(hex){const m=/^#?([0-9a-f]{6})$/i.exec(hex||'');if(!m)return null;const n=parseInt(m[1],16);return [(n>>16)&255,(n>>8)&255,n&255];}
+function relLuminance(c){const f=v=>{v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4);};return .2126*f(c[0])+.7152*f(c[1])+.0722*f(c[2]);}
+function mixRgb(c,t,a){return c.map((v,i)=>Math.round(v+(t[i]-v)*a));}
+function applyTelegramAccent(dark){
+ const root=document.documentElement;
+ const base=USE_TELEGRAM_ACCENT?hexToRgb(tg?.themeParams?.button_color):null;
+ if(!base){root.style.removeProperty('--blue');return;}
+ let c=base;
+ if(dark){if(relLuminance(c)<.22)c=mixRgb(c,[255,255,255],.35);}
+ else if(relLuminance(c)>.45)c=mixRgb(c,[0,0,0],.3);
+ root.style.setProperty('--blue','rgb('+c.join(',')+')');
+}
+function storedTheme(){try{return localStorage.getItem('sema-theme');}catch(e){return null;}}
 (function initTheme(){
-let theme='light';
-try{theme=localStorage.getItem('sema-theme')||'light'}catch(e){}
-applyTheme(theme);
+ applyTheme(storedTheme()||(tg?.colorScheme==='dark'?'dark':'light'));
+ tg?.onEvent?.('themeChanged',()=>{
+  if(!storedTheme())applyTheme(tg.colorScheme==='dark'?'dark':'light');
+  else applyTelegramAccent(document.documentElement.dataset.theme==='dark');
+ });
 })();
 
 // ============================================================
@@ -1083,6 +1252,15 @@ function formatTimerElapsed(elapsedMs){
  const seconds=Math.min(20*60,Math.max(0,Math.floor(elapsedMs/1000)));
  return `${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`;
 }
+const TIMER_RING_LENGTH=213.63;
+function pulseInsulinTimer(){
+ const container=document.getElementById('insulinTimer');
+ if(!container)return;
+ container.classList.remove('pulse');
+ void container.offsetWidth;
+ container.classList.add('pulse');
+ setTimeout(()=>container.classList.remove('pulse'),4800);
+}
 function renderInsulinTimer(){
  const container=document.getElementById('insulinTimer');
  const countdown=document.getElementById('insulinTimerCountdown');
@@ -1100,6 +1278,17 @@ function renderInsulinTimer(){
  const elapsed=Math.min(TIMER_DURATION_MS,Math.max(0,Date.now()-activeInsulinTimer.startedAt));
  countdown.textContent=formatTimerElapsed(elapsed);
  countdown.setAttribute('aria-label',`${Math.floor(elapsed/60000)} минут прошло`);
+ const ring=document.getElementById('timerRingProgress');
+ if(ring)ring.style.strokeDashoffset=(TIMER_RING_LENGTH*(1-elapsed/TIMER_DURATION_MS)).toFixed(2);
+ TIMER_REMINDERS_MS.forEach((reminder,index)=>{
+  const tick=document.getElementById('timerTick'+index);
+  if(tick)tick.classList.toggle('passed',elapsed>=reminder);
+ });
+ const next=document.getElementById('insulinTimerNext');
+ if(next){
+  const upcoming=TIMER_REMINDERS_MS.find(reminder=>elapsed<reminder);
+  next.textContent=upcoming!==undefined?'Напоминание в '+formatTimerElapsed(upcoming):'Таймер до '+formatTimerElapsed(TIMER_DURATION_MS);
+ }
 }
 function ensureTimerAudio(force=false){
  if(!force&&!timerSoundAllowed())return;
@@ -1161,6 +1350,7 @@ function updateInsulinTimer(){
    activeInsulinTimer.notified[index]=true;
    persistTimerState();
    notifyTimerReminder();
+   pulseInsulinTimer();
   }
  });
  renderInsulinTimer();
@@ -1354,6 +1544,18 @@ async function openAction(action){
 // ============================================================
 // ЗАПИСЬ ЗНАЧЕНИЙ: сохранить сахар / инсулин / ночной
 // ============================================================
+function showSaveSuccess(button){
+ const card=button.closest('.metric');
+ clearTimeout(button._savedTimer);
+ button.classList.add('saved');
+ button.innerHTML='<svg class="save-check" viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M5 12.5l4.6 4.6L19 7.5"/></svg><span>Готово</span>';
+ if(card&&card.animate&&!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+  const cs=getComputedStyle(card),glow=cs.getPropertyValue('--glow').trim()||'82,103,232';
+  const base=cs.boxShadow&&cs.boxShadow!=='none'?cs.boxShadow+', ':'';
+  try{card.animate([{boxShadow:base+'0 0 0 0 rgba('+glow+',.5)'},{boxShadow:base+'0 0 0 14px rgba('+glow+',0)'}],{duration:900,easing:'ease-out'});}catch(e){}
+ }
+ button._savedTimer=setTimeout(()=>{button.classList.remove('saved');button.textContent='Сохранить';},1600);
+}
 async function saveValue(type){
  const input=document.getElementById(type==='sugar'?'sugarInput':type==='fact'?'nightInput':'insulinInput');
  const toast=document.getElementById(type==='sugar'?'sugarToast':type==='fact'?'nightToast':'insulinToast');
@@ -1383,9 +1585,12 @@ async function saveValue(type){
  button.textContent='Сохраняю…';
  setToast(toast,'');
  if(type==='insulin'&&shouldRunInsulinTimer(Number(value)))ensureTimerAudio();
+ let saved=false;
  try{
   const result=await api(type,{value});
   setToast(toast,'✓ '+result,'success');
+  saved=true;
+  showSaveSuccess(button);
   input.value='';
   setAccess(true,'Сервер подтвердил доступ');
   uiHaptic('success');
@@ -1404,7 +1609,7 @@ async function saveValue(type){
   uiHaptic('error');
  }finally{
   button.disabled=false;
-  button.textContent='Сохранить';
+  if(!saved)button.textContent='Сохранить';
  }
 }
 
@@ -1508,6 +1713,23 @@ async function undoValue(type){
 // ============================================================
 // КАРТОЧКИ МЕТРИК: загрузка, значения, подсказки, ночной факт
 // ============================================================
+const countState={};
+function countUp(el,key){
+ const text=el.textContent.trim();
+ const m=/^(-?\d+)([.,](\d+))?$/.exec(text);
+ const changed=countState[key]!==text;
+ countState[key]=text;
+ if(!m||!changed||window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+ const sep=m[2]?m[2][0]:'.',dec=m[3]?m[3].length:0,target=parseFloat(text.replace(',','.'));
+ const fmt=v=>{const t=v.toFixed(dec);return sep===','?t.replace('.',','):t;};
+ const start=performance.now(),duration=650;
+ el.textContent=fmt(0);
+ const tick=now=>{
+  const p=Math.min(1,(now-start)/duration),eased=1-Math.pow(1-p,3);
+  if(p<1){el.textContent=fmt(target*eased);requestAnimationFrame(tick);}else el.textContent=text;
+ };
+ requestAnimationFrame(tick);
+}
 function showMetricLoading(element){
   element.className='metric-loading';
   element.setAttribute('role','status');
@@ -1516,7 +1738,9 @@ function showMetricLoading(element){
 function showMetricValue(element,value,unit){
   element.className='metric-value';
   element.removeAttribute('role');
-  element.innerHTML=escapeHtml(String(value))+' <small>'+unit+'</small>';
+  element.innerHTML='<span class="num">'+escapeHtml(String(value))+'</span> <small>'+unit+'</small>';
+  const num=element.querySelector('.num');
+  if(num)countUp(num,element.id||'metric');
 }
 function showMetricError(element,figure=false){
   element.className=figure?'metric-figure':'metric-value';
@@ -1554,6 +1778,8 @@ function renderNightFact(rawValue, loading = false){
   container.className='metric-figure';
   container.removeAttribute('role');
   container.innerHTML='<div class="value">'+escapeHtml(result.text)+'</div><div class="unit">'+escapeHtml(result.unit)+'</div>';
+  const nightValue=container.querySelector('.value');
+  if(nightValue)countUp(nightValue,'nightFact');
 }
 async function loadNightFact(){
   const element=document.getElementById('nightFact');
@@ -1950,7 +2176,7 @@ function renderDailySummary(){
   if(analyticsState.metric==='sugar')svg+=idealGridOverlay('ideal-'+host.id,idealLines);
   summaries.forEach((day,index)=>{
    const x=margin.left+slot*(index+.5);
-   svg+=`<line x1="${x}" y1="${y(day.maximum)}" x2="${x}" y2="${y(day.minimum)}" stroke="#8998ff" stroke-width="${Math.min(12,Math.max(4,slot*.42))}" stroke-linecap="round"/><circle class="chart-point daily-point" cx="${x}" cy="${y(day.average)}" r="5" fill="#5267e8" tabindex="0" aria-label="${formatFullDate(day.key)} · мин ${formatAxisValue(day.minimum)} · среднее ${formatAxisValue(day.average)} · макс ${formatAxisValue(day.maximum)}"/><text x="${x}" y="${height-15}" text-anchor="middle">${formatShortDate(day.key)}</text>`;
+   svg+=`<line class="daily-range" x1="${x}" y1="${y(day.maximum)}" x2="${x}" y2="${y(day.minimum)}" stroke="#8998ff" stroke-width="${Math.min(12,Math.max(4,slot*.42))}" stroke-linecap="round"/><circle class="chart-point daily-point" cx="${x}" cy="${y(day.average)}" r="5" fill="#5267e8" tabindex="0" aria-label="${formatFullDate(day.key)} · мин ${formatAxisValue(day.minimum)} · среднее ${formatAxisValue(day.average)} · макс ${formatAxisValue(day.maximum)}"/><text x="${x}" y="${height-15}" text-anchor="middle">${formatShortDate(day.key)}</text>`;
   });
   svg+=`<line class="chart-axis" x1="${margin.left}" y1="${margin.top+plotH}" x2="${width-margin.right}" y2="${margin.top+plotH}"/><text x="${width/2}" y="${height-2}" text-anchor="middle">Дата</text></svg>`;
   host.innerHTML=svg;
@@ -2087,7 +2313,7 @@ function renderTimeChart(id,groups,{metric,tooltipId,connect=true,emptyText,week
     const drawSegment=()=>{
      if(segment.length>1){
       const path=segment.map((point,index)=>`${index?'L':'M'}${x(point.timeObj.minutes).toFixed(2)},${y(point.value).toFixed(2)}`).join(' ');
-      svg+=`<path d="${path}" fill="none" stroke="${group.color}" stroke-width="${group.width||(weekLabels?1.35:1.7)}" stroke-opacity="${group.opacity||(weekLabels?.48:.72)}" stroke-linecap="round" stroke-linejoin="round"/>`;
+      svg+=`<path class="chart-line" d="${path}" fill="none" stroke="${group.color}" stroke-width="${group.width||(weekLabels?1.35:1.7)}" stroke-opacity="${group.opacity||(weekLabels?.48:.72)}" stroke-linecap="round" stroke-linejoin="round"/>`;
      }
     };
     points.forEach(point=>{
@@ -2266,6 +2492,24 @@ requestAnimationFrame(()=>{
   initChartExpandButtons();
   window.addEventListener('orientationchange',()=>setTimeout(moveNavPill,150));
 });
+
+// ============================================================
+// ГРАФИКИ: ступенчатое появление элементов после отрисовки
+// ============================================================
+function staggerChart(host){
+ host.querySelectorAll('.chart-point').forEach((el,i)=>el.style.setProperty('--d',(0.35+Math.min(i*0.012,0.6)).toFixed(3)+'s'));
+ host.querySelectorAll('.daily-range').forEach((el,i)=>el.style.setProperty('--d',Math.min(i*0.03,0.6).toFixed(3)+'s'));
+ host.querySelectorAll('.heatmap-cell').forEach((el,i)=>el.style.setProperty('--d',Math.min(i*0.004,0.5).toFixed(3)+'s'));
+}
+(function initChartStagger(){
+ if(!window.MutationObserver)return;
+ const observer=new MutationObserver(records=>{
+  const hosts=new Set();
+  records.forEach(record=>{if(record.target&&record.target.nodeType===1)hosts.add(record.target);});
+  hosts.forEach(staggerChart);
+ });
+ document.querySelectorAll('.chart-wrap,.fs-chart,[id$="-chart"]').forEach(host=>observer.observe(host,{childList:true}));
+})();
 </script>
 </body>
 </html>
