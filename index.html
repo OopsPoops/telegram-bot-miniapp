@@ -491,6 +491,17 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
  background-size:9px 9px,6px 6px,100% 100%;
  background-position:64% 8%,6% 74%,0 0;
  animation:twinkleB 5.4s ease-in-out infinite .9s}
+.metric.night::before,.metric.night::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background-repeat:no-repeat;opacity:.8}
+/* мелкие звёздочки по всей карточке, в том числе за буквами и цифрами */
+.metric.night::before{background-image:var(--sp-white),var(--sp-blue),var(--sp-white),var(--sp-blue),var(--sp-white),var(--sp-blue),radial-gradient(circle at 40% 24%,var(--star) 0 0.9px,transparent 1.6px),radial-gradient(circle at 84% 12%,var(--star2) 0 0.9px,transparent 1.6px),radial-gradient(circle at 66% 50%,var(--star) 0 0.8px,transparent 1.5px);
+ background-size:5px 5px,5px 5px,6px 6px,5px 5px,6px 6px,5px 5px,100% 100%,100% 100%,100% 100%;
+ background-position:6% 18%,30% 10%,52% 42%,74% 20%,90% 40%,14% 54%,0 0,0 0,0 0;
+ animation:twinkleA 4.2s ease-in-out infinite .4s}
+/* крупные звёзды по краям карточки, где нет текста */
+.metric.night::after{background-image:var(--sp-white),var(--sp-blue),var(--sp-white),var(--sp-blue),var(--sp-white),var(--sp-blue);
+ background-size:10px 10px,8px 8px,9px 9px,10px 10px,8px 8px,9px 9px;
+ background-position:left 20% top 3px,left 58% top 2px,right 6px top 5px,left 12% bottom 3px,left 46% bottom 4px,right 24% bottom 3px;
+ animation:twinkleB 5s ease-in-out infinite 1.3s}
 @keyframes twinkleA{0%,100%{opacity:.2}50%{opacity:1}}
 @keyframes twinkleB{0%,100%{opacity:1}50%{opacity:.2}}
 
