@@ -652,48 +652,55 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .screen.active>.quick-grid>:nth-child(7){animation-delay:.52s}
 .doctor-head{display:flex;align-items:center;gap:10px;margin:8px 0 16px}
 .doctor-head-copy{flex:1;min-width:0}
-.doctor-date{font-size:12px;color:var(--muted);margin-top:3px}
-.doctor-back,.doctor-add{flex-shrink:0;width:42px;height:42px;border-radius:14px;border:1px solid var(--card-border);background:var(--card-grad);color:var(--text);font-size:26px;line-height:1;cursor:pointer;box-shadow:var(--shadow);display:grid;place-items:center;padding:0;transition:transform .38s cubic-bezier(.34,1.5,.4,1)}
-.doctor-undo{font-size:20px;color:var(--muted)}
-.doctor-add{background:linear-gradient(180deg,#36c9b8 0%,#1f9d8f 100%);color:#fff;border:0;font-size:28px}
-.doctor-back:active,.doctor-add:active{transform:scale(.92)}
-.doctor-card{background:var(--card-grad);border:1px solid var(--card-border);border-radius:21px;padding:14px 14px 6px;margin-bottom:13px;box-shadow:var(--shadow)}
-.doctor-table{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr) minmax(0,1fr);column-gap:8px;align-items:stretch}
-.doctor-table>div{padding:12px 0;border-bottom:1px solid var(--line);min-width:0;display:flex;flex-direction:column;justify-content:center}
+.doctor-back,.doctor-add{flex-shrink:0;height:44px;border-radius:14px;border:1px solid var(--card-border);background:var(--card-grad);color:var(--text);font-size:26px;line-height:1;cursor:pointer;box-shadow:var(--shadow);display:grid;place-items:center;padding:0;transition:transform .38s cubic-bezier(.34,1.5,.4,1),background .2s,color .2s}
+.doctor-back{width:44px}
+.doctor-undo{font-size:21px;color:var(--muted)}
+.doctor-undo.armed{background:linear-gradient(180deg,#ff7b86 0%,#e5484d 100%);color:#fff;border-color:transparent}
+.doctor-add{width:84px;background:linear-gradient(180deg,#36c9b8 0%,#1f9d8f 100%);color:#fff;border:0;font-size:30px}
+.doctor-back:active,.doctor-add:active{transform:scale(.94)}
+.doctor-undo-note{margin:-6px 2px 14px;padding:11px 13px;border-radius:14px;background:rgba(229,72,77,.10);color:#d23a40;font-size:14px;line-height:1.4;font-weight:600}
+:root[data-theme="dark"] .doctor-undo-note{background:rgba(255,123,134,.14);color:#ff9aa2}
+.doctor-card{background:var(--card-grad);border:1px solid var(--card-border);border-radius:21px;padding:14px 12px 6px;margin-bottom:13px;box-shadow:var(--shadow)}
+.doctor-table{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr) minmax(0,1.05fr);column-gap:6px;align-items:stretch}
+.doctor-table>div{padding:13px 0;border-bottom:1px solid var(--line);min-width:0;display:flex;flex-direction:column;justify-content:center}
 .doctor-table>.doctor-last{border-bottom:0}
-.doctor-table>.doctor-th{padding:0 0 12px;justify-content:flex-end;align-items:center;gap:6px;font-size:13px;font-weight:800}
-.doctor-ico{width:43px;height:43px;border-radius:15px;display:grid;place-items:center;font-size:22px}
+.doctor-table>.doctor-th{padding:0 0 13px;justify-content:flex-end;align-items:center;gap:6px;font-size:15px;font-weight:800}
+.doctor-table>.doctor-th-date{align-items:flex-start;gap:2px;font-weight:800}
+.doctor-th-date small{font-size:12.5px;font-weight:600;color:var(--muted)}
+.doctor-th-date b{font-size:clamp(13px,3.9vw,15px);font-weight:800;color:var(--text);white-space:nowrap}
+.doctor-ico{width:46px;height:46px;border-radius:16px;display:grid;place-items:center;font-size:24px}
 .doctor-ico.short{background:linear-gradient(145deg,#ecfcf9,#c9f1e8)}
 .doctor-ico.night{background:linear-gradient(135deg,#ffc9cf 0%,#e6c3ec 55%,#cdbdf3 100%)}
 :root[data-theme="dark"] .doctor-ico.short{background:linear-gradient(145deg,rgba(69,224,203,.28),rgba(69,224,203,.09))}
 :root[data-theme="dark"] .doctor-ico.night{background:linear-gradient(135deg,#6a2c40 0%,#4d3260 55%,#3b3466 100%)}
-.doctor-label{font-size:13px;color:var(--muted);line-height:1.3}
-.doctor-cell{font-size:14px;font-weight:800;text-align:center;align-items:center}
+.doctor-label{font-size:15px;color:var(--muted);line-height:1.3}
+.doctor-cell{font-size:clamp(14px,4.2vw,16px);font-weight:800;text-align:center;align-items:center;white-space:nowrap}
 .doctor-cell.tap{cursor:pointer;color:var(--blue);-webkit-tap-highlight-color:transparent}
 .doctor-cell.tap .doctor-date-text{border-bottom:1px dashed currentColor}
 .doctor-cell.tap:active{opacity:.6}
-.doctor-hint{display:block;font-size:11px;font-weight:600;color:var(--muted);margin-top:2px}
+.doctor-hint{display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin-top:3px}
 .doctor-hint.warn{color:#e08a22}
-.doctor-empty{padding:18px;text-align:center;color:var(--muted);font-size:14px}
+.doctor-empty{padding:18px;text-align:center;color:var(--muted);font-size:15px}
 .doctor-backdrop{align-items:flex-start;padding-top:calc(env(safe-area-inset-top) + 56px)}
 .doctor-backdrop .modal{max-height:none}
-.doctor-form{display:flex;flex-direction:column;gap:11px}
-.doctor-form-group{font-size:12px;font-weight:800;color:var(--muted);margin-top:4px}
+.doctor-backdrop .modal-title{font-size:22px}
+.doctor-form{display:flex;flex-direction:column;gap:12px}
+.doctor-form-group{font-size:15px;font-weight:800;color:var(--muted);margin-top:4px}
 .doctor-form-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
-.doctor-field{display:flex;flex-direction:column;gap:5px;min-width:0}
-.doctor-field>span{font-size:12px;color:var(--muted);text-align:center}
-.doctor-field .value-input{display:block;width:100%;max-width:100%;min-width:0;box-sizing:border-box;font-size:16px;min-height:46px;-webkit-appearance:none;appearance:none;text-align:center;margin:0}
+.doctor-field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.doctor-field>span{font-size:14px;color:var(--muted);text-align:center}
+.doctor-field .value-input{display:block;width:100%;max-width:100%;min-width:0;box-sizing:border-box;font-size:18px;min-height:50px;-webkit-appearance:none;appearance:none;text-align:center;margin:0}
 .doctor-field input[type="date"]{overflow:hidden;padding-left:10px;padding-right:10px}
 .doctor-field input[type="date"]::-webkit-date-and-time-value{text-align:center;margin:0;min-width:0}
 .doctor-field input[type="date"]::-webkit-calendar-picker-indicator{display:none}
-.wheel{position:relative;height:132px;border-radius:14px;background:var(--input-bg);border:1px solid var(--line);overflow:hidden}
-.wheel::before{content:"";position:absolute;left:6px;right:6px;top:50%;height:40px;transform:translateY(-50%);border-radius:10px;background:rgba(82,103,232,.13);pointer-events:none}
-.wheel-scroll{position:relative;height:100%;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;touch-action:pan-y;padding:46px 0;box-sizing:border-box;scrollbar-width:none;-webkit-overflow-scrolling:touch;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 30%,#000 70%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 30%,#000 70%,transparent 100%)}
+.wheel{position:relative;height:144px;border-radius:14px;background:var(--input-bg);border:1px solid var(--line);overflow:hidden}
+.wheel::before{content:"";position:absolute;left:6px;right:6px;top:50%;height:44px;transform:translateY(-50%);border-radius:10px;background:rgba(82,103,232,.13);pointer-events:none}
+.wheel-scroll{position:relative;height:100%;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;touch-action:pan-y;padding:50px 0;box-sizing:border-box;scrollbar-width:none;-webkit-overflow-scrolling:touch;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 30%,#000 70%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 30%,#000 70%,transparent 100%)}
 .wheel-scroll::-webkit-scrollbar{display:none}
-.wheel-item{height:40px;line-height:40px;text-align:center;font-size:20px;font-weight:700;color:var(--input-text);scroll-snap-align:center;scroll-snap-stop:always;cursor:pointer;user-select:none;-webkit-user-select:none}
+.wheel-item{height:44px;line-height:44px;text-align:center;font-size:26px;font-weight:700;color:var(--input-text);scroll-snap-align:center;scroll-snap-stop:always;cursor:pointer;user-select:none;-webkit-user-select:none}
 .doctor-form-actions{display:flex;gap:10px;margin-top:4px}
-.doctor-cancel{width:auto;padding:0 16px;font-size:14px;font-weight:700;color:var(--text)}
-.doctor-save{flex:1;min-height:46px;background:linear-gradient(180deg,#36c9b8 0%,#1f9d8f 100%);color:#fff}
+.doctor-cancel{width:auto;padding:0 18px;font-size:16px;font-weight:700;color:var(--text)}
+.doctor-save{flex:1;min-height:50px;font-size:17px;background:linear-gradient(180deg,#36c9b8 0%,#1f9d8f 100%);color:#fff}
 </style>
 </head>
 <body>
@@ -796,10 +803,11 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 <section class="screen" id="screen-doctor">
 <div class="doctor-head">
 <button class="doctor-back" type="button" onclick="switchTab('home')" aria-label="Назад">‹</button>
-<div class="doctor-head-copy"><div class="page-heading" style="margin:0">К врачу</div><div class="doctor-date" id="doctorDate">Загрузка…</div></div>
+<div class="doctor-head-copy"><div class="page-heading" style="margin:0">К врачу</div></div>
 <button class="doctor-back doctor-undo" type="button" onclick="undoDoctor()" aria-label="Отменить последнее поступление" title="Отменить последнее поступление">↩︎</button>
 <button class="doctor-add" type="button" onclick="openDoctorForm()" aria-label="Добавить поступление">+</button>
 </div>
+<div class="doctor-undo-note" id="doctorUndoNote" hidden></div>
 <div id="doctorBody"><div class="loader-wrap"><div class="spinner"></div><div>Загружаю данные…</div></div></div>
 </section>
 <!-- === ЭКРАН «ГРАФИКИ» === -->
@@ -2869,7 +2877,7 @@ function staggerChart(host){
 // ============================================================
 let doctorLast=null;
 const DOCTOR_WHEELS=['wheelShortRecv','wheelNightRecv','wheelShortTotal','wheelNightTotal'];
-const WHEEL_ITEM_H=40;
+const WHEEL_ITEM_H=44;
 function doctorHint(days,warnWithin){
  if(days===null||days===undefined)return '';
  const text=days>0?'через '+days+' дн.':days===0?'сегодня':Math.abs(days)+' дн. назад';
@@ -2885,40 +2893,29 @@ function doctorTapCell(value,hint){
 }
 function renderDoctor(data){
  doctorLast=data;
- document.getElementById('doctorDate').textContent=data.date?'Данные от '+data.date:'Нет данных';
  const body=document.getElementById('doctorBody');
  const s=data.short||{},n=data.night||{};
  if(!data.short&&!data.night){body.innerHTML='<div class="doctor-card doctor-empty">На листе get_ins пока нет данных. Нажми «+», чтобы добавить.</div>';return;}
  body.innerHTML='<div class="doctor-card"><div class="doctor-table">'
-  +'<div class="doctor-th"></div>'
+  +'<div class="doctor-th doctor-th-date">'+(data.date?'<small>Данные от</small><b>'+escapeHtml(data.date)+'</b>':'')+'</div>'
   +'<div class="doctor-th"><span class="doctor-ico short">💉</span>Короткий</div>'
   +'<div class="doctor-th"><span class="doctor-ico night">🌙</span>Ночной</div>'
   +'<div class="doctor-label">Получено, ручек</div>'+doctorCell(s.received)+doctorCell(n.received)
-  +'<div class="doctor-label">Идти за инсулином</div>'+doctorCell(s.go_date,doctorHint(s.go_in_days,14))+doctorCell(n.go_date,doctorHint(n.go_in_days,14))
   +'<div class="doctor-label">Записаться</div>'+doctorTapCell(s.sign_date,doctorHint(s.sign_in_days,14))+doctorTapCell(n.sign_date,doctorHint(n.sign_in_days,14))
+  +'<div class="doctor-label">Идти за инсулином</div>'+doctorCell(s.go_date,doctorHint(s.go_in_days,14))+doctorCell(n.go_date,doctorHint(n.go_in_days,14))
   +'<div class="doctor-label">Всего в наличии, ручек</div>'+doctorCell(s.total)+doctorCell(n.total)
   +'<div class="doctor-label doctor-last">Хватит до</div>'+doctorCell(s.until_date,doctorHint(s.until_in_days,30),true)+doctorCell(n.until_date,doctorHint(n.until_in_days,30),true)
   +'</div></div>';
 }
-// Открывает стандартный календарь на нужной дате (без добавления событий).
+// Открывает стандартное приложение «Календарь» на нужной дате (без добавления событий).
+// Telegram не пускает схему calshow: из мини-аппа, поэтому открываем страницу бота
+// в браузере телефона — она перенаправляет в Календарь.
 function openCalendarDate(text){
  const m=/^(\d{2})\.(\d{2})\.(\d{4})$/.exec(text||'');
  if(!m)return;
- const y=+m[3],mo=+m[2],d=+m[1];
  selectionHaptic();
- const platform=String(tg?.platform||'').toLowerCase();
- const noonUtc=Date.UTC(y,mo-1,d,12);
- const web='https://calendar.google.com/calendar/r/day/'+y+'/'+mo+'/'+d;
- if(platform==='ios'||platform==='macos'){
-  const seconds=Math.round((noonUtc-Date.UTC(2001,0,1))/1000);
-  window.location.href='calshow:'+seconds;
- }else if(platform==='android'){
-  window.location.href='intent://com.android.calendar/time/'+noonUtc+'#Intent;scheme=content;action=android.intent.action.VIEW;end';
- }else{
-  openExternalLink(web);
-  return;
- }
- setTimeout(()=>{if(!document.hidden)openExternalLink(web);},1500);
+ const url=API_URL.replace(/\/api\/miniapp$/,'/api/calendar-open')+'?date='+m[3]+m[2]+m[1];
+ openExternalLink(url);
 }
 async function loadDoctor(){
  const body=document.getElementById('doctorBody');
@@ -2929,26 +2926,38 @@ async function loadDoctor(){
   renderDoctor(data);
   return data;
  }catch(error){
-  document.getElementById('doctorDate').textContent='Ошибка';
   body.innerHTML='<div class="doctor-card doctor-empty">'+escapeHtml(error.message)+'</div>';
   handleAccessError(error);
  }
 }
 function openDoctor(){
  hideKeyboard();
+ disarmDoctorUndo();
  document.querySelectorAll('.screen').forEach(screen=>screen.classList.toggle('active',screen.id==='screen-doctor'));
  window.scrollTo({top:0,behavior:'smooth'});
  loadDoctor();
 }
+let doctorUndoTimer=null;
+function disarmDoctorUndo(){
+ clearTimeout(doctorUndoTimer);
+ doctorUndoTimer=null;
+ document.querySelector('.doctor-undo')?.classList.remove('armed');
+ const note=document.getElementById('doctorUndoNote');
+ if(note){note.hidden=true;note.textContent='';}
+}
 async function undoDoctor(){
- const date=doctorLast?.date;
  if(!doctorLast||(!doctorLast.short&&!doctorLast.night))return;
- const question='Удалить последнее поступление'+(date?' от '+date:'')+'? Из таблицы уйдут две верхние строки.';
- const confirmed=await new Promise(resolve=>{
-  if(tg?.showConfirm){try{tg.showConfirm(question,resolve);return;}catch(e){}}
-  resolve(window.confirm(question));
- });
- if(!confirmed)return;
+ const button=document.querySelector('.doctor-undo');
+ if(!doctorUndoTimer){
+  button.classList.add('armed');
+  const note=document.getElementById('doctorUndoNote');
+  note.textContent='Чтобы отменить последнее поступление'+(doctorLast.date?' от '+doctorLast.date:'')+', нажми ↩︎ ещё раз. Из таблицы удалятся две верхние строки.';
+  note.hidden=false;
+  uiHaptic('error');
+  doctorUndoTimer=setTimeout(disarmDoctorUndo,6000);
+  return;
+ }
+ disarmDoctorUndo();
  const body=document.getElementById('doctorBody');
  body.innerHTML=loadingContent('Удаляю…');
  try{
