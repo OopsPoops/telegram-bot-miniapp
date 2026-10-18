@@ -476,29 +476,21 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 :root[data-theme="dark"] .metric.sugar .metric-icon{background:linear-gradient(145deg,rgba(255,127,169,.30),rgba(255,127,169,.10))}
 :root[data-theme="dark"] .metric.insulin:not(.night) .metric-icon{background:linear-gradient(145deg,rgba(69,224,203,.28),rgba(69,224,203,.09))}
 
-/* --- Ночная карточка: мягкий лавандовый фон и мерцающие звёзды --- */
-.metric.night{position:relative;overflow:hidden;isolation:isolate;--star:rgba(125,107,232,.75);--star2:rgba(240,168,70,.9);background:linear-gradient(155deg,#fdfbff 0%,#efeaff 100%);border-color:rgba(125,107,232,.2)}
-:root[data-theme="dark"] .metric.night{--star:#ffffff;--star2:#cfd6ff;background:linear-gradient(155deg,#191b3b 0%,#0d0f22 100%);border-color:rgba(160,150,255,.18)}
+/* --- Ночная карточка: серо-голубое «небо» и мерцающие звёзды (белые, серые, синие) --- */
+.metric.night{position:relative;overflow:hidden;isolation:isolate;--star:#ffffff;--star2:#8d99b8;--star3:#5b78e0;--sp-blue:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%235b78e0' d='M12 0c.8 6.5 3.5 10.2 12 12-8.5 1.8-11.2 5.5-12 12-.8-6.5-3.5-10.2-12-12C8.5 10.2 11.2 6.5 12 0z'/%3E%3C/svg%3E");--muted:#5d6682;background:linear-gradient(155deg,#e9eefb 0%,#cdd8f0 100%);border-color:rgba(90,110,180,.24)}
+:root[data-theme="dark"] .metric.night{--star:#ffffff;--star2:#b4bcd6;--star3:#8fa8ff;--sp-blue:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%238fa8ff' d='M12 0c.8 6.5 3.5 10.2 12 12-8.5 1.8-11.2 5.5-12 12-.8-6.5-3.5-10.2-12-12C8.5 10.2 11.2 6.5 12 0z'/%3E%3C/svg%3E");--muted:#9aa1b8;background:linear-gradient(155deg,#171a38 0%,#0b0d20 100%);border-color:rgba(160,150,255,.18)}
 .metric.night>*{position:relative;z-index:1}
-.metric.night::before,.metric.night::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background-repeat:no-repeat;opacity:.7}
-.metric.night::before{background-image:
- radial-gradient(circle at 58% 14%,var(--star) 0 1.3px,transparent 2px),
- radial-gradient(circle at 74% 30%,var(--star2) 0 1.1px,transparent 1.8px),
- radial-gradient(circle at 88% 12%,var(--star) 0 1.8px,transparent 2.6px),
- radial-gradient(circle at 46% 36%,var(--star2) 0 1px,transparent 1.7px),
- radial-gradient(circle at 96% 44%,var(--star) 0 1.2px,transparent 2px),
- radial-gradient(circle at 66% 52%,var(--star) 0 .9px,transparent 1.5px);
+.metric.night::before,.metric.night::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background-repeat:no-repeat;opacity:.75}
+.metric.night::before{background-image:radial-gradient(circle at 56% 16%,var(--star) 0 1.2px,transparent 1.9px),radial-gradient(circle at 72% 34%,var(--star2) 0 1px,transparent 1.7px),radial-gradient(circle at 84% 52%,var(--star3) 0 1.1px,transparent 1.8px),radial-gradient(circle at 46% 40%,var(--star2) 0 0.9px,transparent 1.6px),radial-gradient(circle at 94% 26%,var(--star) 0 1px,transparent 1.7px),radial-gradient(circle at 64% 56%,var(--star) 0 0.8px,transparent 1.5px),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23ffffff' d='M12 0c.8 6.5 3.5 10.2 12 12-8.5 1.8-11.2 5.5-12 12-.8-6.5-3.5-10.2-12-12C8.5 10.2 11.2 6.5 12 0z'/%3E%3C/svg%3E");
+ background-size:100% 100%,100% 100%,100% 100%,100% 100%,100% 100%,100% 100%,11px 11px;
+ background-position:0 0,0 0,0 0,0 0,0 0,0 0,right 30px top 14px;
  animation:twinkleA 3.8s ease-in-out infinite}
-.metric.night::after{background-image:
- radial-gradient(circle at 52% 22%,var(--star) 0 1px,transparent 1.7px),
- radial-gradient(circle at 82% 22%,var(--star2) 0 1.5px,transparent 2.3px),
- radial-gradient(circle at 92% 30%,var(--star) 0 .9px,transparent 1.5px),
- radial-gradient(circle at 70% 8%,var(--star) 0 1.2px,transparent 2px),
- radial-gradient(circle at 60% 44%,var(--star2) 0 1.3px,transparent 2px),
- radial-gradient(circle at 98% 62%,var(--star2) 0 1px,transparent 1.7px);
+.metric.night::after{background-image:radial-gradient(circle at 52% 26%,var(--star) 0 0.9px,transparent 1.6px),radial-gradient(circle at 78% 16%,var(--star3) 0 1.2px,transparent 1.9px),radial-gradient(circle at 90% 40%,var(--star2) 0 0.9px,transparent 1.6px),radial-gradient(circle at 68% 8%,var(--star2) 0 1px,transparent 1.7px),radial-gradient(circle at 60% 46%,var(--star) 0 1.1px,transparent 1.8px),radial-gradient(circle at 97% 58%,var(--star3) 0 0.9px,transparent 1.6px),var(--sp-blue),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23ffffff' d='M12 0c.8 6.5 3.5 10.2 12 12-8.5 1.8-11.2 5.5-12 12-.8-6.5-3.5-10.2-12-12C8.5 10.2 11.2 6.5 12 0z'/%3E%3C/svg%3E");
+ background-size:100% 100%,100% 100%,100% 100%,100% 100%,100% 100%,100% 100%,8px 8px,6px 6px;
+ background-position:0 0,0 0,0 0,0 0,0 0,0 0,right 72px top 38px,right 14px top 56px;
  animation:twinkleB 5.4s ease-in-out infinite .9s}
-@keyframes twinkleA{0%,100%{opacity:.18}50%{opacity:1}}
-@keyframes twinkleB{0%,100%{opacity:1}50%{opacity:.15}}
+@keyframes twinkleA{0%,100%{opacity:.2}50%{opacity:1}}
+@keyframes twinkleB{0%,100%{opacity:1}50%{opacity:.2}}
 
 /* --- Кнопки «Сохранить»: объём, свечение, пружина --- */
 .save-button{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:transform .38s cubic-bezier(.34,1.5,.4,1),box-shadow .25s,background .3s,color .2s;box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 10px 20px -10px rgba(var(--glow),.8)}
@@ -529,10 +521,10 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .quick-grid{gap:11px}
 .quick-button{transition:transform .38s cubic-bezier(.34,1.5,.4,1),box-shadow .2s}
 .quick-button:active{transform:scale(.96)}
-.quick-big{flex-direction:column;align-items:flex-start;justify-content:space-between;gap:16px;min-height:118px;padding:16px;border-radius:22px}
-.quick-big .quick-icon{width:46px;height:46px;border-radius:16px;font-size:22px;box-shadow:inset 0 1px 0 rgba(255,255,255,.7)}
-.quick-big .quick-label{font-size:17px}
-.quick-big .quick-hint{font-size:12px;margin-top:4px}
+.quick-big{flex-direction:row;align-items:center;gap:12px;min-height:88px;padding:12px 14px;border-radius:21px}
+.quick-big .quick-icon{width:44px;height:44px;border-radius:15px;font-size:21px;box-shadow:inset 0 1px 0 rgba(255,255,255,.7)}
+.quick-big .quick-label{font-size:16px}
+.quick-big .quick-hint{font-size:11px;line-height:1.25;margin-top:3px}
 .quick-big.q-today{background:linear-gradient(150deg,rgba(82,103,232,.12) 0%,transparent 62%),var(--card-grad)}
 .quick-big.q-yest{background:linear-gradient(150deg,rgba(236,148,56,.14) 0%,transparent 62%),var(--card-grad)}
 :root[data-theme="dark"] .quick-big.q-today{background:linear-gradient(150deg,rgba(143,155,255,.20) 0%,transparent 62%),var(--card-grad)}
@@ -1592,6 +1584,8 @@ async function saveValue(type){
   saved=true;
   showSaveSuccess(button);
   input.value='';
+  input.blur();
+  input.dispatchEvent(new Event('input'));
   setAccess(true,'Сервер подтвердил доступ');
   uiHaptic('success');
   if(type==='sugar'){
@@ -2446,6 +2440,7 @@ function initPlaceholderMarquee(){
    text.textContent=value;
    stop();
    overlay.classList.remove('static');
+   if(value.length<=15){overlay.classList.add('static');return;}
    const overflow=text.scrollWidth-boxWidth;
    if(overflow<=2)return;
    if(reduceMotion){overlay.classList.add('static');return;}
