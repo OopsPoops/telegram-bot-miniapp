@@ -666,6 +666,7 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .doctor-table>.doctor-last{border-bottom:0}
 .doctor-table>.doctor-th{padding:0 0 13px;justify-content:flex-end;align-items:center;gap:6px;font-size:15px;font-weight:800}
 .doctor-table>.doctor-th-date{align-items:flex-start;gap:2px;font-weight:800}
+.doctor-th .doctor-drug{display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin-top:-3px}
 .doctor-th-date small{font-size:12.5px;font-weight:600;color:var(--muted)}
 .doctor-th-date b{font-size:clamp(13px,3.9vw,15px);font-weight:800;color:var(--text);white-space:nowrap}
 .doctor-ico{width:46px;height:46px;border-radius:16px;display:grid;place-items:center;font-size:24px}
@@ -681,26 +682,28 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .doctor-hint{display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin-top:3px}
 .doctor-hint.warn{color:#e08a22}
 .doctor-empty{padding:18px;text-align:center;color:var(--muted);font-size:15px}
-.doctor-backdrop{align-items:flex-start;padding-top:calc(env(safe-area-inset-top) + 56px)}
-.doctor-backdrop .modal{max-height:none}
-.doctor-backdrop .modal-title{font-size:22px}
-.doctor-form{display:flex;flex-direction:column;gap:12px}
-.doctor-form-group{font-size:15px;font-weight:800;color:var(--muted);margin-top:4px}
+.doctor-backdrop{align-items:flex-start;padding:calc(env(safe-area-inset-top) + 14px) 14px 14px}
+.doctor-backdrop .modal{max-height:calc(100dvh - env(safe-area-inset-top) - 28px);overflow-y:auto;padding:16px 16px 14px}
+.doctor-backdrop .modal-top{margin-bottom:10px}
+.doctor-backdrop .modal-icon{width:38px;height:38px;font-size:19px}
+.doctor-backdrop .modal-title{font-size:19px}
+.doctor-form{display:flex;flex-direction:column;gap:8px}
+.doctor-form-group{font-size:13px;font-weight:800;color:var(--muted);margin-top:2px}
 .doctor-form-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
-.doctor-field{display:flex;flex-direction:column;gap:6px;min-width:0}
-.doctor-field>span{font-size:14px;color:var(--muted);text-align:center}
-.doctor-field .value-input{display:block;width:100%;max-width:100%;min-width:0;box-sizing:border-box;font-size:18px;min-height:50px;-webkit-appearance:none;appearance:none;text-align:center;margin:0}
+.doctor-field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.doctor-field>span{font-size:12.5px;color:var(--muted);text-align:center}
+.doctor-field .value-input{display:block;width:100%;max-width:100%;min-width:0;box-sizing:border-box;font-size:16px;min-height:44px;-webkit-appearance:none;appearance:none;text-align:center;margin:0}
 .doctor-field input[type="date"]{overflow:hidden;padding-left:10px;padding-right:10px}
 .doctor-field input[type="date"]::-webkit-date-and-time-value{text-align:center;margin:0;min-width:0}
 .doctor-field input[type="date"]::-webkit-calendar-picker-indicator{display:none}
-.wheel{position:relative;height:144px;border-radius:14px;background:var(--input-bg);border:1px solid var(--line);overflow:hidden}
-.wheel::before{content:"";position:absolute;left:6px;right:6px;top:50%;height:44px;transform:translateY(-50%);border-radius:10px;background:rgba(82,103,232,.13);pointer-events:none}
-.wheel-scroll{position:relative;height:100%;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;touch-action:pan-y;padding:50px 0;box-sizing:border-box;scrollbar-width:none;-webkit-overflow-scrolling:touch;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 30%,#000 70%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 30%,#000 70%,transparent 100%)}
+.wheel{position:relative;height:96px;border-radius:14px;background:var(--input-bg);border:1px solid var(--line);overflow:hidden}
+.wheel::before{content:"";position:absolute;left:6px;right:6px;top:50%;height:32px;transform:translateY(-50%);border-radius:10px;background:rgba(82,103,232,.13);pointer-events:none}
+.wheel-scroll{position:relative;height:100%;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;touch-action:pan-y;padding:32px 0;box-sizing:border-box;scrollbar-width:none;-webkit-overflow-scrolling:touch;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 30%,#000 70%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 30%,#000 70%,transparent 100%)}
 .wheel-scroll::-webkit-scrollbar{display:none}
-.wheel-item{height:44px;line-height:44px;text-align:center;font-size:26px;font-weight:700;color:var(--input-text);scroll-snap-align:center;scroll-snap-stop:always;cursor:pointer;user-select:none;-webkit-user-select:none}
-.doctor-form-actions{display:flex;gap:10px;margin-top:4px}
-.doctor-cancel{width:auto;padding:0 18px;font-size:16px;font-weight:700;color:var(--text)}
-.doctor-save{flex:1;min-height:50px;font-size:17px;background:linear-gradient(180deg,#36c9b8 0%,#1f9d8f 100%);color:#fff}
+.wheel-item{height:32px;line-height:32px;text-align:center;font-size:21px;font-weight:700;color:var(--input-text);scroll-snap-align:center;scroll-snap-stop:always;cursor:pointer;user-select:none;-webkit-user-select:none}
+.doctor-form-actions{display:flex;gap:10px;margin-top:2px}
+.doctor-cancel{width:auto;padding:0 16px;font-size:15px;font-weight:700;color:var(--text)}
+.doctor-save{flex:1;min-height:46px;font-size:16px;background:linear-gradient(180deg,#36c9b8 0%,#1f9d8f 100%);color:#fff}
 </style>
 </head>
 <body>
@@ -1119,6 +1122,11 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 <div class="doctor-form-row">
 <div class="doctor-field"><span>Короткий</span><div class="wheel" id="wheelShortTotal"></div></div>
 <div class="doctor-field"><span>Ночной</span><div class="wheel" id="wheelNightTotal"></div></div>
+</div>
+<div class="doctor-form-group">Тест полоски и иглы, уп.</div>
+<div class="doctor-form-row">
+<div class="doctor-field"><span>Тест полоски</span><div class="wheel" id="wheelTests"></div></div>
+<div class="doctor-field"><span>Иглы</span><div class="wheel" id="wheelNeedles"></div></div>
 </div>
 <div class="toast" id="doctorToast"></div>
 <div class="doctor-form-actions">
@@ -2876,8 +2884,8 @@ function staggerChart(host){
 // К ВРАЧУ: лист get_ins (запас ручек, когда идти и записаться)
 // ============================================================
 let doctorLast=null;
-const DOCTOR_WHEELS=['wheelShortRecv','wheelNightRecv','wheelShortTotal','wheelNightTotal'];
-const WHEEL_ITEM_H=44;
+const DOCTOR_WHEELS=['wheelShortRecv','wheelNightRecv','wheelShortTotal','wheelNightTotal','wheelTests','wheelNeedles'];
+const WHEEL_ITEM_H=32;
 function doctorHint(days,warnWithin){
  if(days===null||days===undefined)return '';
  const text=days>0?'через '+days+' дн.':days===0?'сегодня':Math.abs(days)+' дн. назад';
@@ -2891,20 +2899,38 @@ function doctorTapCell(value,hint){
  if(!value)return doctorCell(value,hint);
  return '<div class="doctor-cell tap" role="button" tabindex="0" onclick="openCalendarDate(\''+escapeHtml(value)+'\')" aria-label="Открыть календарь на '+escapeHtml(value)+'"><div><span class="doctor-date-text">'+escapeHtml(value)+'</span>'+(hint||'')+'</div></div>';
 }
+function packsText(value){
+ const n=Number(String(value).replace(',','.'));
+ if(!Number.isFinite(n))return '';
+ const packs=Math.round(n/5*10)/10;
+ return String(packs).replace('.',',');
+}
+function receivedText(value){
+ if(!value)return value;
+ const packs=packsText(value);
+ return packs===''?value:value+' ('+packs+')';
+}
+function doctorRowHtml(label,short,night,last){
+ return '<div class="doctor-label'+(last?' doctor-last':'')+'">'+label+'</div>'+short+night;
+}
 function renderDoctor(data){
  doctorLast=data;
  const body=document.getElementById('doctorBody');
- const s=data.short||{},n=data.night||{};
+ const s=data.short||{},n=data.night||{},dose=data.dose||{};
  if(!data.short&&!data.night){body.innerHTML='<div class="doctor-card doctor-empty">На листе get_ins пока нет данных. Нажми «+», чтобы добавить.</div>';return;}
+ const blank=last=>'<div class="doctor-cell'+(last?' doctor-last':'')+'"></div>';
  body.innerHTML='<div class="doctor-card"><div class="doctor-table">'
   +'<div class="doctor-th doctor-th-date">'+(data.date?'<small>Данные от</small><b>'+escapeHtml(data.date)+'</b>':'')+'</div>'
-  +'<div class="doctor-th"><span class="doctor-ico short">💉</span>Короткий</div>'
-  +'<div class="doctor-th"><span class="doctor-ico night">🌙</span>Ночной</div>'
-  +'<div class="doctor-label">Получено, ручек</div>'+doctorCell(s.received)+doctorCell(n.received)
-  +'<div class="doctor-label">Записаться</div>'+doctorTapCell(s.sign_date,doctorHint(s.sign_in_days,14))+doctorTapCell(n.sign_date,doctorHint(n.sign_in_days,14))
-  +'<div class="doctor-label">Идти за инсулином</div>'+doctorCell(s.go_date,doctorHint(s.go_in_days,14))+doctorCell(n.go_date,doctorHint(n.go_in_days,14))
-  +'<div class="doctor-label">Всего в наличии, ручек</div>'+doctorCell(s.total)+doctorCell(n.total)
-  +'<div class="doctor-label doctor-last">Хватит до</div>'+doctorCell(s.until_date,doctorHint(s.until_in_days,30),true)+doctorCell(n.until_date,doctorHint(n.until_in_days,30),true)
+  +'<div class="doctor-th"><span class="doctor-ico short">💉</span>Короткий<small class="doctor-drug">Новорапид</small></div>'
+  +'<div class="doctor-th"><span class="doctor-ico night">🌙</span>Ночной<small class="doctor-drug">РинГлар</small></div>'
+  +doctorRowHtml('Суточная дозировка',doctorCell(dose.short),doctorCell(dose.night))
+  +doctorRowHtml('Получено ручек (уп.)',doctorCell(receivedText(s.received)),doctorCell(receivedText(n.received)))
+  +doctorRowHtml('Записаться',doctorTapCell(s.sign_date,doctorHint(s.sign_in_days,14)),doctorTapCell(n.sign_date,doctorHint(n.sign_in_days,14)))
+  +doctorRowHtml('Идти за инсулином',doctorCell(s.go_date,doctorHint(s.go_in_days,14)),doctorCell(n.go_date,doctorHint(n.go_in_days,14)))
+  +doctorRowHtml('Всего ручек',doctorCell(s.total),doctorCell(n.total))
+  +doctorRowHtml('Хватит до',doctorCell(s.until_date,doctorHint(s.until_in_days,30)),doctorCell(n.until_date,doctorHint(n.until_in_days,30)))
+  +doctorRowHtml('Тест полоски, уп.',doctorCell(s.tests),blank(false))
+  +doctorRowHtml('Иглы, уп.',doctorCell(s.needles,'',true),blank(true),true)
   +'</div></div>';
 }
 // Открывает стандартное приложение «Календарь» на нужной дате (без добавления событий).
@@ -3004,12 +3030,12 @@ function wheelValue(id){
 function openDoctorForm(){
  hideKeyboard();
  const s=doctorLast?.short||{},n=doctorLast?.night||{};
- const prefill=[s.received,n.received,s.total,n.total].map(v=>{const x=parseInt(v,10);return Number.isFinite(x)?x:0;});
+ const prefill=[s.received,n.received,s.total,n.total,s.tests,s.needles].map(v=>{const x=parseInt(v,10);return Number.isFinite(x)?x:0;});
  document.getElementById('docDate').value=localDateInputValue();
  setToast(document.getElementById('doctorToast'),'');
  document.getElementById('doctorFormBackdrop').classList.add('visible');
  try{tg?.disableVerticalSwipes?.();}catch(e){}
- DOCTOR_WHEELS.forEach((id,i)=>buildWheel(id,prefill[i],Math.min(1000,Math.max(100,prefill[i]+50))));
+ DOCTOR_WHEELS.forEach((id,i)=>buildWheel(id,prefill[i],i<4?Math.min(1000,Math.max(100,prefill[i]+50)):Math.min(1000,Math.max(30,prefill[i]+20))));
 }
 function closeDoctorForm(){
  hideKeyboard();
@@ -3027,7 +3053,7 @@ async function saveDoctor(){
  button.textContent='Сохраняю…';
  setToast(toast,'');
  try{
-  const data=await api('doctor_add',{date:d+'.'+m+'.'+y,short_received:values[0],night_received:values[1],short_total:values[2],night_total:values[3]});
+  const data=await api('doctor_add',{date:d+'.'+m+'.'+y,short_received:values[0],night_received:values[1],short_total:values[2],night_total:values[3],tests_packs:values[4],needles_packs:values[5]});
   setAccess(true,'Сервер подтвердил доступ');
   uiHaptic('success');
   renderDoctor(data);
