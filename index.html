@@ -644,6 +644,39 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .toolbar-count:empty{display:none}
 .toolbar-count:not(:empty)+.chart-expand{margin-left:0}
 .range-summary{margin-top:6px}
+
+/* --- К врачу --- */
+.quick-wide{grid-column:1/-1;min-height:73px}
+.quick-big.q-doctor{background:linear-gradient(150deg,rgba(32,169,155,.15) 0%,transparent 62%),var(--card-grad)}
+:root[data-theme="dark"] .quick-big.q-doctor{background:linear-gradient(150deg,rgba(69,224,203,.18) 0%,transparent 62%),var(--card-grad)}
+.screen.active>.quick-grid>:nth-child(7){animation-delay:.52s}
+.doctor-head{display:flex;align-items:center;gap:12px;margin:8px 0 16px}
+.doctor-head-copy{flex:1;min-width:0}
+.doctor-date{font-size:12px;color:var(--muted);margin-top:3px}
+.doctor-back,.doctor-add{flex-shrink:0;width:42px;height:42px;border-radius:14px;border:1px solid var(--card-border);background:var(--card-grad);color:var(--text);font-size:26px;line-height:1;cursor:pointer;box-shadow:var(--shadow);display:grid;place-items:center;padding:0;transition:transform .38s cubic-bezier(.34,1.5,.4,1)}
+.doctor-add{background:linear-gradient(180deg,#36c9b8 0%,#1f9d8f 100%);color:#fff;border:0;font-size:28px}
+.doctor-back:active,.doctor-add:active{transform:scale(.92)}
+.doctor-card{background:var(--card-grad);border:1px solid var(--card-border);border-radius:21px;padding:16px;margin-bottom:13px;box-shadow:var(--shadow)}
+.doctor-card-head{display:flex;align-items:center;gap:11px;margin-bottom:6px}
+.doctor-card-icon{width:40px;height:40px;border-radius:13px;background:var(--icon-bg);display:grid;place-items:center;font-size:19px}
+.doctor-card-name{font-size:17px;font-weight:800}
+.doctor-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+.doctor-row:last-child{border-bottom:0;padding-bottom:2px}
+.doctor-label{font-size:13px;color:var(--muted)}
+.doctor-value{font-size:16px;font-weight:800;text-align:right}
+.doctor-hint{display:block;font-size:11px;font-weight:600;color:var(--muted);margin-top:2px}
+.doctor-hint.warn{color:#e08a22}
+.doctor-section{font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin:12px 0 0}
+.doctor-empty{padding:18px;text-align:center;color:var(--muted);font-size:14px}
+.doctor-form{display:flex;flex-direction:column;gap:11px;overflow:auto}
+.doctor-form-group{font-size:12px;font-weight:800;color:var(--muted);margin-top:4px}
+.doctor-form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.doctor-field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.doctor-field>span{font-size:12px;color:var(--muted)}
+.doctor-field .value-input{width:100%;box-sizing:border-box}
+.doctor-form-actions{display:flex;gap:10px;margin-top:4px}
+.doctor-cancel{width:auto;padding:0 16px;font-size:14px;font-weight:700;color:var(--text)}
+.doctor-save{flex:1;min-height:46px;background:linear-gradient(180deg,#36c9b8 0%,#1f9d8f 100%);color:#fff}
 </style>
 </head>
 <body>
@@ -739,7 +772,17 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 <button class="quick-button quick-chip" onclick="openAction('month')"><span class="quick-icon green">🗓️</span><span class="quick-label">Среднее за месяц</span></button>
 <button class="quick-button quick-chip" onclick="openAction('excel')"><span class="quick-icon yellow">📗</span><span class="quick-label">Excel</span></button>
 <button class="quick-button quick-chip" onclick="openAction('memory')"><span class="quick-icon gray">⚙️</span><span class="quick-label">Память</span></button>
+<button class="quick-button quick-big quick-wide q-doctor" onclick="openDoctor()"><span class="quick-icon green">🩺</span><span><div class="quick-label">К врачу</div><div class="quick-hint">Запас ручек, когда идти за инсулином и записаться</div></span></button>
 </section>
+</section>
+<!-- === ЭКРАН «К ВРАЧУ» === -->
+<section class="screen" id="screen-doctor">
+<div class="doctor-head">
+<button class="doctor-back" type="button" onclick="switchTab('home')" aria-label="Назад">‹</button>
+<div class="doctor-head-copy"><div class="page-heading" style="margin:0">К врачу</div><div class="doctor-date" id="doctorDate">Загрузка…</div></div>
+<button class="doctor-add" type="button" onclick="openDoctorForm()" aria-label="Добавить поступление">+</button>
+</div>
+<div id="doctorBody"><div class="loader-wrap"><div class="spinner"></div><div>Загружаю данные…</div></div></div>
 </section>
 <!-- === ЭКРАН «ГРАФИКИ» === -->
 <section class="screen" id="screen-graphs">
@@ -1030,6 +1073,33 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 <div class="modal-content" id="modalContent"><div class="loader-wrap"><div class="spinner"></div><div>Загружаю данные…</div></div></div>
 <div id="modalLink"></div>
 <button class="modal-close" onclick="closeModal()" aria-label="Закрыть">×</button>
+</section>
+</div>
+<!-- === ФОРМА «К ВРАЧУ: ДОБАВИТЬ» === -->
+<div class="modal-backdrop" id="doctorFormBackdrop" onclick="if(event.target===this)closeDoctorForm()">
+<section class="modal" role="dialog" aria-modal="true" aria-labelledby="doctorFormTitle">
+<div class="modal-top">
+<div class="modal-icon">🩺</div>
+<div><div class="modal-title" id="doctorFormTitle">Новое поступление</div><div class="modal-subtitle">Добавится две строки в get_ins</div></div>
+</div>
+<div class="doctor-form">
+<label class="doctor-field"><span>Дата получения</span><input class="value-input" id="docDate" type="date"></label>
+<div class="doctor-form-group">Получено, ручек</div>
+<div class="doctor-form-row">
+<label class="doctor-field"><span>Короткий</span><input class="value-input" id="docShortRecv" type="text" inputmode="numeric" placeholder="0"></label>
+<label class="doctor-field"><span>Ночной</span><input class="value-input" id="docNightRecv" type="text" inputmode="numeric" placeholder="0"></label>
+</div>
+<div class="doctor-form-group">Всего в наличии, ручек</div>
+<div class="doctor-form-row">
+<label class="doctor-field"><span>Короткий</span><input class="value-input" id="docShortTotal" type="text" inputmode="numeric" placeholder="0"></label>
+<label class="doctor-field"><span>Ночной</span><input class="value-input" id="docNightTotal" type="text" inputmode="numeric" placeholder="0"></label>
+</div>
+<div class="toast" id="doctorToast"></div>
+<div class="doctor-form-actions">
+<button class="undo-button doctor-cancel" type="button" onclick="closeDoctorForm()">Отмена</button>
+<button class="save-button doctor-save" id="doctorSave" type="button" onclick="saveDoctor()">Сохранить</button>
+</div>
+</div>
 </section>
 </div>
 <!-- === ОКНО «ДОСТУП ЗАПРЕЩЁН» === -->
@@ -2775,6 +2845,103 @@ function staggerChart(host){
  });
  document.querySelectorAll('.chart-wrap,.fs-chart,[id$="-chart"]').forEach(host=>observer.observe(host,{childList:true}));
 })();
+
+// ============================================================
+// К ВРАЧУ: лист get_ins (запас ручек, когда идти и записаться)
+// ============================================================
+const DOCTOR_TYPES=[['short','Короткий','💉'],['night','Ночной','🌙']];
+function doctorHint(days,warnWithin){
+ if(days===null||days===undefined)return '';
+ const text=days>0?'через '+days+' дн.':days===0?'сегодня':Math.abs(days)+' дн. назад';
+ const warn=warnWithin&&days>=0&&days<=warnWithin;
+ return '<span class="doctor-hint'+(warn?' warn':'')+'">'+text+'</span>';
+}
+function doctorRow(label,value,hint){
+ return '<div class="doctor-row"><div class="doctor-label">'+escapeHtml(label)+'</div><div class="doctor-value">'+escapeHtml(value||'—')+(value?hint:'')+'</div></div>';
+}
+function renderDoctor(data){
+ document.getElementById('doctorDate').textContent=data.date?'Данные от '+data.date:'Нет данных';
+ const body=document.getElementById('doctorBody');
+ if(!data.short&&!data.night){body.innerHTML='<div class="doctor-card doctor-empty">На листе get_ins пока нет данных. Нажми «+», чтобы добавить.</div>';return;}
+ body.innerHTML=DOCTOR_TYPES.map(([key,name,icon])=>{
+  const d=data[key];
+  if(!d)return '<div class="doctor-card"><div class="doctor-card-head"><div class="doctor-card-icon">'+icon+'</div><div class="doctor-card-name">'+name+'</div></div><div class="doctor-empty">Нет данных</div></div>';
+  return '<div class="doctor-card"><div class="doctor-card-head"><div class="doctor-card-icon">'+icon+'</div><div class="doctor-card-name">'+name+'</div></div>'
+   +'<div class="doctor-section">Получено</div>'
+   +doctorRow('Ручек',d.received,'')
+   +doctorRow('Идти за инсулином',d.go_date,doctorHint(d.go_in_days,14))
+   +doctorRow('Записаться',d.sign_date,doctorHint(d.sign_in_days,14))
+   +'<div class="doctor-section">Всего</div>'
+   +doctorRow('В наличии, ручек',d.total,'')
+   +doctorRow('Хватит до',d.until_date,doctorHint(d.until_in_days,30))
+   +'</div>';
+ }).join('');
+}
+async function loadDoctor(){
+ const body=document.getElementById('doctorBody');
+ body.innerHTML=loadingContent('Загружаю данные…');
+ try{
+  const data=await api('doctor');
+  setAccess(true,'Сервер подтвердил доступ');
+  renderDoctor(data);
+  return data;
+ }catch(error){
+  document.getElementById('doctorDate').textContent='Ошибка';
+  body.innerHTML='<div class="doctor-card doctor-empty">'+escapeHtml(error.message)+'</div>';
+  handleAccessError(error);
+ }
+}
+function openDoctor(){
+ hideKeyboard();
+ document.querySelectorAll('.screen').forEach(screen=>screen.classList.toggle('active',screen.id==='screen-doctor'));
+ window.scrollTo({top:0,behavior:'smooth'});
+ loadDoctor();
+}
+function localDateInputValue(){
+ const now=new Date();
+ return now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+}
+function openDoctorForm(){
+ hideKeyboard();
+ document.getElementById('docDate').value=localDateInputValue();
+ ['docShortRecv','docNightRecv','docShortTotal','docNightTotal'].forEach(id=>{document.getElementById(id).value='';});
+ setToast(document.getElementById('doctorToast'),'');
+ document.getElementById('doctorFormBackdrop').classList.add('visible');
+}
+function closeDoctorForm(){
+ document.getElementById('doctorFormBackdrop').classList.remove('visible');
+}
+async function saveDoctor(){
+ const toast=document.getElementById('doctorToast');
+ const button=document.getElementById('doctorSave');
+ const iso=document.getElementById('docDate').value;
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(iso)){setToast(toast,'Выбери дату.','error');return;}
+ const ids=['docShortRecv','docNightRecv','docShortTotal','docNightTotal'];
+ const values=[];
+ for(const id of ids){
+  const text=document.getElementById(id).value.trim();
+  if(!/^\d{1,4}$/.test(text)||Number(text)>1000){setToast(toast,'Во всех полях нужны целые числа от 0 до 1000.','error');return;}
+  values.push(Number(text));
+ }
+ const [y,m,d]=iso.split('-');
+ button.disabled=true;
+ button.textContent='Сохраняю…';
+ setToast(toast,'');
+ try{
+  const data=await api('doctor_add',{date:d+'.'+m+'.'+y,short_received:values[0],night_received:values[1],short_total:values[2],night_total:values[3]});
+  setAccess(true,'Сервер подтвердил доступ');
+  uiHaptic('success');
+  renderDoctor(data);
+  closeDoctorForm();
+ }catch(error){
+  setToast(toast,error.message,'error');
+  uiHaptic('error');
+  handleAccessError(error);
+ }finally{
+  button.disabled=false;
+  button.textContent='Сохранить';
+ }
+}
 </script>
 </body>
 </html>
