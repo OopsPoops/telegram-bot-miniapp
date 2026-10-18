@@ -480,14 +480,16 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .metric.night{position:relative;overflow:hidden;isolation:isolate;--star:#a3a9b8;--star2:#b9bdc9;--star3:#8e96aa;--sp-white:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23a3a9b8' d='M12 0c.8 6.5 3.5 10.2 12 12-8.5 1.8-11.2 5.5-12 12-.8-6.5-3.5-10.2-12-12C8.5 10.2 11.2 6.5 12 0z'/%3E%3C/svg%3E");--sp-blue:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%238e96aa' d='M12 0c.8 6.5 3.5 10.2 12 12-8.5 1.8-11.2 5.5-12 12-.8-6.5-3.5-10.2-12-12C8.5 10.2 11.2 6.5 12 0z'/%3E%3C/svg%3E");}
 :root[data-theme="dark"] .metric.night{--sp-white:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23ffffff' d='M12 0c.8 6.5 3.5 10.2 12 12-8.5 1.8-11.2 5.5-12 12-.8-6.5-3.5-10.2-12-12C8.5 10.2 11.2 6.5 12 0z'/%3E%3C/svg%3E");--star:#ffffff;--star2:#b4bcd6;--star3:#8fa8ff;--sp-blue:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%238fa8ff' d='M12 0c.8 6.5 3.5 10.2 12 12-8.5 1.8-11.2 5.5-12 12-.8-6.5-3.5-10.2-12-12C8.5 10.2 11.2 6.5 12 0z'/%3E%3C/svg%3E");--muted:#9aa1b8;background:linear-gradient(155deg,#171a38 0%,#0b0d20 100%);border-color:rgba(160,150,255,.18)}
 .metric.night>*{position:relative;z-index:1}
-.metric.night::before,.metric.night::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background-repeat:no-repeat;opacity:.75}
-.metric.night::before{background-image:radial-gradient(circle at 70% 22%,var(--star) 0 1.1px,transparent 1.8px),radial-gradient(circle at 92% 74%,var(--star2) 0 1px,transparent 1.7px),var(--sp-white),var(--sp-blue),var(--sp-white);
- background-size:100% 100%,100% 100%,13px 13px,9px 9px,7px 7px;
- background-position:0 0,0 0,right 26px top 9px,right 118px top 14px,right 64px top 64px;
+.metric.night .metric-copy{flex:0 1 auto}
+.night-sky{position:relative;flex:1;align-self:stretch;min-width:0;margin:0 2px}
+.night-sky::before,.night-sky::after{content:"";position:absolute;inset:0;pointer-events:none;background-repeat:no-repeat}
+.night-sky::before{background-image:var(--sp-white),var(--sp-blue),radial-gradient(circle at 60% 24%,var(--star) 0 1.1px,transparent 1.8px),var(--sp-white);
+ background-size:11px 11px,8px 8px,100% 100%,6px 6px;
+ background-position:16% 14%,80% 66%,0 0,46% 82%;
  animation:twinkleA 3.8s ease-in-out infinite}
-.metric.night::after{background-image:radial-gradient(circle at 58% 72%,var(--star2) 0 0.9px,transparent 1.6px),radial-gradient(circle at 84% 18%,var(--star) 0 0.9px,transparent 1.6px),var(--sp-blue),var(--sp-white),var(--sp-blue);
- background-size:100% 100%,100% 100%,10px 10px,8px 8px,6px 6px;
- background-position:0 0,0 0,right 14px top 66px,right 156px top 46px,right 96px top 32px;
+.night-sky::after{background-image:var(--sp-blue),var(--sp-white),radial-gradient(circle at 92% 30%,var(--star2) 0 1px,transparent 1.7px);
+ background-size:9px 9px,6px 6px,100% 100%;
+ background-position:64% 8%,6% 74%,0 0;
  animation:twinkleB 5.4s ease-in-out infinite .9s}
 @keyframes twinkleA{0%,100%{opacity:.2}50%{opacity:1}}
 @keyframes twinkleB{0%,100%{opacity:1}50%{opacity:.2}}
@@ -618,6 +620,19 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .range-compare b.down{color:#d6555b}
 :root[data-theme="dark"] .range-compare b.up{color:#52e0a0}
 :root[data-theme="dark"] .range-compare b.down{color:#ff8a8a}
+
+/* --- Вкладки графиков: иконки, подпись только у активной --- */
+.analytics-switches{gap:6px}
+.analytics-tab{display:inline-flex;align-items:center;justify-content:center;padding:9px 11px}
+.analytics-tab .tab-icon{width:19px;height:19px;flex:none;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.analytics-tab .tab-label{max-width:0;opacity:0;overflow:hidden;white-space:nowrap;margin-left:0;transition:max-width .38s cubic-bezier(.3,1.1,.4,1),opacity .25s,margin .38s}
+.analytics-tab.active .tab-label{max-width:120px;opacity:1;margin-left:7px}
+
+/* --- Счётчик измерений в шапке графика --- */
+.toolbar-count{margin-left:auto;font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.toolbar-count:empty{display:none}
+.toolbar-count:not(:empty)+.chart-expand{margin-left:0}
+.range-summary{margin-top:6px}
 </style>
 </head>
 <body>
@@ -688,6 +703,7 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 <div class="metric-name">Ночной</div>
 <div class="metric-latest" id="nightYesterday">Вчера: <span class="metric-skeleton"></span></div>
 </div>
+<div class="night-sky" aria-hidden="true"></div>
 <div class="metric-loading" id="nightFact" role="status" aria-live="polite" aria-label="Загрузка ночного значения">
 <div class="metric-skeleton"></div>
 <div class="metric-skeleton short"></div>
@@ -719,12 +735,12 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 <div class="page-heading">Графики</div>
 <div class="page-description">История показателей и динамика</div>
 <div class="analytics-switches" role="tablist" aria-label="Тип графика">
-<button class="analytics-tab active" type="button" role="tab" aria-label="Динамика по дням" title="Динамика по дням" aria-selected="true" data-chart="trend" onclick="selectChart('trend')">Динамика</button>
-<button class="analytics-tab" type="button" role="tab" aria-label="Сравнение трёх недель" title="Сравнение трёх недель" aria-selected="false" data-chart="compare" onclick="selectChart('compare')">Сравнение</button>
-<button class="analytics-tab" type="button" role="tab" aria-label="Распределение измерений" title="Распределение измерений" aria-selected="false" data-chart="distribution" onclick="selectChart('distribution')">Распределение</button>
-<button class="analytics-tab" type="button" role="tab" aria-label="Суточная сводка" title="Суточная сводка" aria-selected="false" data-chart="daily" onclick="selectChart('daily')">Сводка</button>
-<button class="analytics-tab" type="button" role="tab" aria-label="Доля сахара в целевом диапазоне" title="Доля сахара в целевом диапазоне" aria-selected="false" data-chart="range" onclick="selectChart('range')">В цели</button>
-<button class="analytics-tab" type="button" role="tab" aria-label="Активность по времени" title="Активность по времени" aria-selected="false" data-chart="activity" onclick="selectChart('activity')">Активность</button>
+<button class="analytics-tab active" type="button" role="tab" aria-label="Динамика по дням" title="Динамика по дням" aria-selected="true" data-chart="trend" onclick="selectChart('trend')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l5.5-6.5 4 4L21 6"/><path d="M15.5 6H21v5.5"/></svg><span class="tab-label">Динамика</span></button>
+<button class="analytics-tab" type="button" role="tab" aria-label="Сравнение трёх недель" title="Сравнение трёх недель" aria-selected="false" data-chart="compare" onclick="selectChart('compare')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9c3-4 6 4 9 0s6-4 9 0"/><path d="M3 17c3-4 6 4 9 0s6-4 9 0"/></svg><span class="tab-label">Сравнение</span></button>
+<button class="analytics-tab" type="button" role="tab" aria-label="Доля сахара в целевом диапазоне" title="Доля сахара в целевом диапазоне" aria-selected="false" data-chart="range" onclick="selectChart('range')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/></svg><span class="tab-label">ЦД</span></button>
+<button class="analytics-tab" type="button" role="tab" aria-label="Распределение измерений" title="Распределение измерений" aria-selected="false" data-chart="distribution" onclick="selectChart('distribution')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="9" r="1.8" fill="currentColor" stroke="none"/><circle cx="11" cy="16" r="1.8" fill="currentColor" stroke="none"/><circle cx="14" cy="7" r="1.8" fill="currentColor" stroke="none"/><circle cx="18.5" cy="13" r="1.8" fill="currentColor" stroke="none"/><circle cx="7" cy="19" r="1.8" fill="currentColor" stroke="none"/><circle cx="19" cy="19" r="1.8" fill="currentColor" stroke="none"/></svg><span class="tab-label">Разброс</span></button>
+<button class="analytics-tab" type="button" role="tab" aria-label="Суточная сводка" title="Суточная сводка" aria-selected="false" data-chart="daily" onclick="selectChart('daily')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7v10M12 4v13M18 9v11"/><circle cx="6" cy="12" r="2" fill="currentColor" stroke="none"/><circle cx="12" cy="10" r="2" fill="currentColor" stroke="none"/><circle cx="18" cy="14" r="2" fill="currentColor" stroke="none"/></svg><span class="tab-label">Сводка</span></button>
+<button class="analytics-tab" type="button" role="tab" aria-label="Активность по времени" title="Активность по времени" aria-selected="false" data-chart="activity" onclick="selectChart('activity')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6" fill="currentColor" fill-opacity=".45"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6" fill="currentColor" fill-opacity=".45"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6" fill="currentColor"/></svg><span class="tab-label">Активность</span></button>
 </div>
 <div class="metric-switch" role="group" aria-label="Показатель" data-active="sugar">
 <span class="metric-pill" aria-hidden="true"></span>
@@ -739,10 +755,11 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 <select id="trend-period" aria-label="Период графика динамики" onchange="changeTrendPeriod()">
 <option value="3" selected>3 дня</option><option value="7">7 дней</option><option value="14">14 дней</option><option value="21">21 день</option><option value="30">30 дней</option><option value="45">45 дней</option>
 </select>
+<span class="toolbar-count" id="trend-count" role="status"></span>
 </div>
 <div id="trend-chart" class="chart-wrap"></div>
-<div id="trend-tooltip" class="chart-tooltip" role="status"></div>
 <div id="trend-range" class="range-summary" hidden></div>
+<div id="trend-tooltip" class="chart-tooltip" role="status"></div>
 <div class="analytics-toolbar-label">Дни на графике</div>
 <div id="trend-days" class="analytics-days" aria-label="Выберите отображаемые дни"></div>
 </section>
@@ -752,10 +769,11 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 <select id="compare-weekday" aria-label="День недели для сравнения" onchange="renderComparison()">
 <option value="all">Все дни</option><option value="1">Понедельник</option><option value="2">Вторник</option><option value="3">Среда</option><option value="4">Четверг</option><option value="5">Пятница</option><option value="6">Суббота</option><option value="0">Воскресенье</option>
 </select>
+<span class="toolbar-count" id="compare-count" role="status"></span>
 </div>
 <div id="compare-chart" class="chart-wrap"></div>
-<div id="compare-tooltip" class="chart-tooltip" role="status"></div>
 <div id="compare-range" class="range-summary" hidden></div>
+<div id="compare-tooltip" class="chart-tooltip" role="status"></div>
 <div id="week-toggles" class="week-toggles"></div>
 </section>
 <section class="analytics-card analytics-panel" data-panel="distribution" hidden>
@@ -764,10 +782,11 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 <select id="distribution-period" aria-label="Период графика распределения" onchange="renderDistribution()">
 <option value="3" selected>3 дня</option><option value="7">7 дней</option><option value="14">14 дней</option><option value="21">21 день</option><option value="30">30 дней</option><option value="45">45 дней</option>
 </select>
+<span class="toolbar-count" id="distribution-count" role="status"></span>
 </div>
 <div id="distribution-chart" class="chart-wrap"></div>
-<div id="distribution-tooltip" class="chart-tooltip" role="status"></div>
 <div id="distribution-range" class="range-summary" hidden></div>
+<div id="distribution-tooltip" class="chart-tooltip" role="status"></div>
 <div id="distribution-legend" class="analytics-legend"></div>
 </section>
 <section class="analytics-card analytics-panel" data-panel="daily" hidden>
@@ -776,10 +795,11 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 <select id="daily-period" aria-label="Период суточной сводки" onchange="renderDailySummary()">
 <option value="3" selected>3 дня</option><option value="7">7 дней</option><option value="14">14 дней</option><option value="21">21 день</option><option value="30">30 дней</option><option value="45">45 дней</option>
 </select>
+<span class="toolbar-count" id="daily-count" role="status"></span>
 </div>
 <div id="daily-chart" class="chart-wrap"></div>
-<div id="daily-tooltip" class="chart-tooltip" role="status"></div>
 <div id="daily-range" class="range-summary" hidden></div>
+<div id="daily-tooltip" class="chart-tooltip" role="status"></div>
 <div class="analytics-legend">
 <span class="analytics-legend-item"><span class="analytics-swatch" style="background:#8998ff"></span>Минимум — максимум</span>
 <span class="analytics-legend-item"><span class="analytics-swatch" style="background:#5267e8"></span>Среднее</span>
@@ -787,10 +807,11 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 </section>
 <section class="analytics-card analytics-panel" data-panel="range" hidden>
 <div class="analytics-toolbar">
-<span class="analytics-toolbar-label">Сахар в целевом диапазоне</span>
+<span class="analytics-toolbar-label">Период</span>
 <select id="range-period" aria-label="Период для расчёта доли в цели" onchange="renderRangeDonut()">
 <option value="1">Сегодня</option><option value="3">3 дня</option><option value="7">7 дней</option><option value="14" selected>14 дней</option><option value="21">21 день</option><option value="30">30 дней</option><option value="45">45 дней</option>
 </select>
+<span class="toolbar-count" id="range-count" role="status"></span>
 </div>
 <div id="range-donut" class="range-donut"></div>
 <div id="range-legend" class="range-legend"></div>
@@ -802,6 +823,7 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 <select id="activity-period" aria-label="Период тепловой карты" onchange="renderActivityHeatmap()">
 <option value="3" selected>3 дня</option><option value="7">7 дней</option><option value="14">14 дней</option><option value="21">21 день</option><option value="30">30 дней</option><option value="45">45 дней</option>
 </select>
+<span class="toolbar-count" id="activity-count" role="status"></span>
 </div>
 <div id="activity-chart" class="chart-wrap"></div>
 <div id="activity-tooltip" class="chart-tooltip" role="status"></div>
@@ -2162,6 +2184,7 @@ function renderTrend(){
   });
   renderTimeChart('trend-chart',groups,{metric:analyticsState.metric,tooltipId:'trend-tooltip',emptyText:'За этот период нет измерений.'});
   updateRangeSummary('trend-range',visible);
+  setChartCount('trend-count',visible.length);
 }
 function changeTrendPeriod(){
   analyticsState.trendDays=Number(document.getElementById('trend-period').value);
@@ -2212,6 +2235,7 @@ function renderComparison(){
   });
   renderTimeChart('compare-chart',groups,{metric:analyticsState.metric,tooltipId:'compare-tooltip',emptyText:'В выбранных неделях пока нет измерений.',weekLabels:true});
   updateRangeSummary('compare-range',groups.flatMap(group=>group.points));
+  setChartCount('compare-count',groups.reduce((sum,group)=>sum+group.points.length,0));
 }
 
 // ============================================================
@@ -2226,6 +2250,7 @@ function renderDistribution(){
   renderTimeChart('distribution-chart',groups,{metric:analyticsState.metric,tooltipId:'distribution-tooltip',connect:false,emptyText:'За этот период нет измерений.'});
   renderLegend('distribution-legend',groups);
   updateRangeSummary('distribution-range',rows);
+  setChartCount('distribution-count',rows.length);
 }
 function dailySummary(days){
   const byDate=new Map();
@@ -2243,6 +2268,7 @@ function renderDailySummary(){
   const days=Number(document.getElementById('daily-period').value),summaries=dailySummary(days);
   tooltip.textContent='';
   updateRangeSummary('daily-range',periodMeasurements(days));
+  setChartCount('daily-count',periodMeasurements(days).length);
   if(!summaries.length){host.innerHTML='<div class="analytics-message">За этот период нет измерений.</div>';return;}
   const width=Math.max(240,Math.floor(host.clientWidth||320)),height=Number(host.dataset.height)||285;
   const margin={left:43,right:16,top:14,bottom:36},plotW=width-margin.left-margin.right,plotH=height-margin.top-margin.bottom;
@@ -2334,6 +2360,11 @@ async function saveTargetRange(){
   if(shared){uiHaptic('success');showSaveSuccess(button);setToast(toast,'✓ Диапазон сохранён для всех пользователей','success');}
   else{uiHaptic('error');setToast(toast,'Применено только на этом устройстве: сервер бота пока не хранит диапазон'+(reason?' ('+reason+')':'')+'.','error');}
 }
+function setChartCount(id,n){
+  const el=document.getElementById(id);if(!el)return;
+  el.textContent=n?`${n} изм.`:'';
+  el.title=n?`${n} ${ruPlural(n,'измерение','измерения','измерений')} на графике`:'';
+}
 function updateRangeSummary(id,rows){
   const el=document.getElementById(id);if(!el)return;
   if(analyticsState.metric!=='sugar'||!rows||!rows.length){el.hidden=true;el.innerHTML='';return;}
@@ -2341,8 +2372,7 @@ function updateRangeSummary(id,rows){
   const bar=['low','in','high'].filter(k=>st[k]).map(k=>`<i class="${k}" style="width:${(st[k]/st.total*100).toFixed(2)}%"></i>`).join('');
   el.hidden=false;
   el.innerHTML=`<div class="range-bar" role="img" aria-label="В цели ${p.in}%, выше ${p.high}%, ниже ${p.low}%">${bar}</div>`
-   +`<div class="range-stats"><span class="in"><b>${p.in}%</b> в цели</span><span class="high"><b>${p.high}%</b> выше</span><span class="low"><b>${p.low}%</b> ниже</span></div>`
-   +`<div class="range-note">Цель ${fmtMmol(IDEAL_LOW)}–${fmtMmol(IDEAL_HIGH)} ммоль/л · ${st.total} ${ruPlural(st.total,'измерение','измерения','измерений')}</div>`;
+   +`<div class="range-stats"><span class="low"><b>${p.low}%</b> ниже</span><span class="in"><b>${p.in}%</b> в цели</span><span class="high"><b>${p.high}%</b> выше</span></div>`;
 }
 function previousPeriodMeasurements(days){
   const start=new Date();start.setHours(0,0,0,0);start.setDate(start.getDate()-days+1);
@@ -2353,8 +2383,9 @@ function renderRangeDonut(){
   const host=document.getElementById('range-donut'),legend=document.getElementById('range-legend'),cmp=document.getElementById('range-compare');
   if(!host)return;
   const message=text=>{host.style.aspectRatio='auto';host.innerHTML='<div class="analytics-message">'+text+'</div>';legend.innerHTML='';cmp.innerHTML='';};
-  if(analyticsState.metric!=='sugar'){message('Доля в цели считается только для сахара.');return;}
+  if(analyticsState.metric!=='sugar'){setChartCount('range-count',0);message('Доля в цели считается только для сахара.');return;}
   const days=Number(document.getElementById('range-period').value),rows=periodMeasurements(days);
+  setChartCount('range-count',rows.length);
   if(!rows.length){message('За этот период нет измерений.');return;}
   host.style.aspectRatio='';
   const st=rangeStats(rows),p=roundedPercents(st);
@@ -2370,9 +2401,9 @@ function renderRangeDonut(){
    +`<div class="donut-center"><div class="donut-pct"><span id="donutNum">${p.in}</span><small>%</small></div><div class="donut-sub">в цели</div></div>`;
   const num=document.getElementById('donutNum');if(num)countUp(num,'donut');
   const row=(k,name,hint,pct,count)=>`<div class="range-legend-row"><span class="range-dot ${k}"></span><div class="range-legend-name">${name}<small>${hint}</small></div><b>${pct}%</b><em>${count} ${ruPlural(count,'измерение','измерения','измерений')}</em></div>`;
-  legend.innerHTML=row('in','В цели',`${fmtMmol(IDEAL_LOW)}–${fmtMmol(IDEAL_HIGH)} ммоль/л`,p.in,st.in)
-   +row('high','Выше цели',`больше ${fmtMmol(IDEAL_HIGH)}`,p.high,st.high)
-   +row('low','Ниже цели',`меньше ${fmtMmol(IDEAL_LOW)}`,p.low,st.low);
+  legend.innerHTML=row('low','Ниже цели',`меньше ${fmtMmol(IDEAL_LOW)}`,p.low,st.low)
+   +row('in','В цели',`${fmtMmol(IDEAL_LOW)}–${fmtMmol(IDEAL_HIGH)} ммоль/л`,p.in,st.in)
+   +row('high','Выше цели',`больше ${fmtMmol(IDEAL_HIGH)}`,p.high,st.high);
   const prev=previousPeriodMeasurements(days);
   if(prev.length>=3){
     const pp=roundedPercents(rangeStats(prev)).in,diff=p.in-pp;
@@ -2393,6 +2424,7 @@ function idealGridOverlay(clipId,lines){
 function renderActivityHeatmap(){
   const [host,tooltip]=chartHosts('activity-chart','activity-tooltip');
   const days=Number(document.getElementById('activity-period').value),rows=periodMeasurements(days);
+  setChartCount('activity-count',rows.length);
   const counts=Array.from({length:7},()=>Array(24).fill(0));
   rows.forEach(row=>counts[row.dateObj.getDay()][row.timeObj.hour]++);
   const max=Math.max(0,...counts.flat());
