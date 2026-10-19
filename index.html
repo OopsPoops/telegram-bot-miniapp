@@ -690,6 +690,11 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .doctor-form-actions{display:flex;gap:10px;margin-top:2px}
 .doctor-cancel{width:auto;padding:0 16px;font-size:15px;font-weight:700;color:var(--text)}
 .doctor-save{flex:1;min-height:46px;font-size:16px;background:linear-gradient(180deg,#36c9b8 0%,#1f9d8f 100%);color:#fff}
+
+/* --- Нижние вкладки в цветах темы Telegram --- */
+:root[data-tg-hint] .bottom-nav .nav-button{color:var(--tg-hint)}
+:root[data-tg-theme] .bottom-nav .nav-button.active{color:var(--tg-accent)}
+:root[data-tg-theme] .bottom-nav .nav-pill{background:var(--tg-accent-soft,rgba(120,120,130,.18))}
 </style>
 </head>
 <body>
@@ -2270,7 +2275,7 @@ function applyMetricWording(){
       node.nodeValue=insulin?toInjectionWords(node._mw):node._mw;
     });
     (el.dataset.mwAttrs||'').split(' ').filter(Boolean).forEach(attr=>{
-      const key='mw_'+attr;
+      const key='mw_'+attr.replace(/-/g,'_');
       if(el.dataset[key]===undefined)el.dataset[key]=el.getAttribute(attr)||'';
       el.setAttribute(attr,insulin?toInjectionWords(el.dataset[key]):el.dataset[key]);
     });
@@ -2546,7 +2551,7 @@ async function saveTargetRange(){
 }
 function setChartCount(id,n){
   const el=document.getElementById(id);if(!el)return;
-  el.textContent=n?`${n} изм.`:'';
+  el.textContent=n?`${n} ${analyticsState.metric==='insulin'?'инъ.':'изм.'}`:'';
   el.title=n?`${n} ${ruPlural(n,...measureForms())} на графике`:'';
 }
 function updateRangeSummary(id,rows){
@@ -2647,8 +2652,9 @@ function renderActivityHeatmap(){
 function measurementWord(count){
   const mod10=count%10,mod100=count%100;
   if(analyticsState.metric==='insulin'){
-   if(mod10>=2&&mod10<=4&&(mod100<12||mod100>14))return 'раза';
-   return 'раз';
+   if(mod10===1&&mod100!==11)return 'инъекция';
+   if(mod10>=2&&mod10<=4&&(mod100<12||mod100>14))return 'инъекции';
+   return 'инъекций';
   }
   if(mod10===1&&mod100!==11)return 'измерение';
   if(mod10>=2&&mod10<=4&&(mod100<12||mod100>14))return 'измерения';
@@ -3118,6 +3124,33 @@ async function saveDoctor(){
   button.textContent='Сохранить';
  }
 }
+
+// ============================================================
+// Цвета нижних вкладок берём из темы Telegram пользователя
+// ============================================================
+function applyTelegramNavTheme(){
+ const root=document.documentElement;
+ const params=(tg&&tg.themeParams)||{};
+ const accent=params.accent_text_color||params.button_color||params.link_color;
+ const hint=params.hint_color||params.subtitle_text_color;
+ const toRgb=color=>{
+  const m=/^#?([0-9a-f]{6})$/i.exec(String(color||'').trim());
+  return m?[0,2,4].map(i=>parseInt(m[1].slice(i,i+2),16)):null;
+ };
+ if(accent){
+  root.style.setProperty('--tg-accent',accent);
+  const rgb=toRgb(accent);
+  if(rgb)root.style.setProperty('--tg-accent-soft','rgba('+rgb.join(',')+',.18)');
+  else root.style.removeProperty('--tg-accent-soft');
+  root.setAttribute('data-tg-theme','1');
+ }else{
+  root.removeAttribute('data-tg-theme');
+ }
+ if(hint){root.style.setProperty('--tg-hint',hint);root.setAttribute('data-tg-hint','1');}
+ else{root.style.removeProperty('--tg-hint');root.removeAttribute('data-tg-hint');}
+}
+applyTelegramNavTheme();
+try{tg?.onEvent?.('themeChanged',applyTelegramNavTheme);}catch(error){}
 </script>
 </body>
 </html>
