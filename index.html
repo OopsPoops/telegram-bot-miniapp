@@ -1983,6 +1983,67 @@ function renderNightFact(rawValue, loading = false){
   const nightValue=container.querySelector('.value');
   if(nightValue)countUp(nightValue,'nightFact');
 }
+// ============================================================
+// ГЛАВНАЯ: карточки сахара, инсулина и ночного — одним быстрым запросом
+// ============================================================
+const HOME_CACHE_KEY='homeCardsCacheV1'; // старый кэш больше не используется, чистим его
+let homeBusy=false,lastHomeJson=null;
+function applyHomeData(data){
+ const put=(id,unit,raw)=>{
+  const el=document.getElementById(id);
+  if(!el)return;
+  const value=raw!==null&&raw!==undefined&&String(raw).trim()!==''?String(raw):'—';
+  showMetricValue(el,value,unit);
+ };
+ put('sugarAverage','ммоль/л',data.sugar_average);
+ put('insulinTotal','ед.',data.insulin_total);
+ renderNightFact(data.today);
+ const yesterday=document.getElementById('nightYesterday');
+ if(yesterday){
+  if(data.night_yesterday&&data.night_yesterday.value){
+   yesterday.textContent=`Вчера: ${data.night_yesterday.value} ед.`;
+   yesterday.hidden=false;
+  }else{
+   yesterday.textContent='Вчера: —';
+  }
+ }
+ ['sugar','insulin'].forEach(type=>{
+  const latest=data.latest&&data.latest[type];
+  const el=document.getElementById(type==='sugar'?'sugarLatest':'insulinLatest');
+  if(latest)renderLatestMeasurement(type,latest.value,latest.time);
+  else if(el)el.textContent='Последнее: —';
+ });
+}
+async function loadHomeCards(first){
+ if(homeBusy)return;
+ homeBusy=true;
+ if(first){
+  try{localStorage.removeItem(HOME_CACHE_KEY);}catch(error){}
+  showMetricLoading(document.getElementById('sugarAverage'));
+  showMetricLoading(document.getElementById('insulinTotal'));
+  renderNightFact(null,true);
+ }
+ try{
+  const data=await api('home');
+  setAccess(true,'Сервер подтвердил доступ');
+  const json=JSON.stringify(data);
+  if(first||json!==lastHomeJson){applyHomeData(data);lastHomeJson=json;}
+ }catch(error){
+  console.error('Ошибка загрузки карточек главной:',error);
+  if(first){
+   showMetricError(document.getElementById('sugarAverage'));
+   showMetricError(document.getElementById('insulinTotal'));
+   showMetricError(document.getElementById('nightFact'),true);
+   ['sugarLatest','insulinLatest'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='Последнее: —';});
+   const yesterday=document.getElementById('nightYesterday');
+   if(yesterday)yesterday.textContent='Вчера: —';
+  }
+  handleAccessError(error);
+ }finally{
+  homeBusy=false;
+ }
+}
+
 async function loadNightFact(){
   const element=document.getElementById('nightFact');
   renderNightFact(null,true);
@@ -2824,15 +2885,11 @@ function initPlaceholderMarquee(){
 updateEntryPlaceholders();
 initPlaceholderMarquee();
 window.addEventListener('pageshow',()=>{updateEntryPlaceholders();updateInsulinTimer();});
-document.addEventListener('visibilitychange',()=>{if(!document.hidden){updateEntryPlaceholders();updateInsulinTimer();syncInsulinTimer();loadNightYesterday();loadReportSettings();}});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){updateEntryPlaceholders();updateInsulinTimer();syncInsulinTimer();loadHomeCards(false);loadReportSettings();}});
 if(tg)tg.onEvent?.('activated',()=>{updateEntryPlaceholders();updateInsulinTimer();});
 updateNightInputPlaceholder();
 setInterval(updateNightInputPlaceholder,60_000);
-loadSugarAverage();
-loadInsulinTotal();
-loadNightFact();
-loadLatestMeasurements();
-loadNightYesterday();
+loadHomeCards(true);
 
 // --- Инициализация пилюли навигации ---
 requestAnimationFrame(()=>{
