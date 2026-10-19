@@ -483,11 +483,6 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .metric.night .metric-copy{flex:0 1 auto}
 .night-sky{position:relative;flex:1;align-self:stretch;min-width:0;margin:0 2px}
 .metric.night{--dot:radial-gradient(circle,var(--star) 0 1px,transparent 1.8px);--dot2:radial-gradient(circle,var(--star2) 0 1px,transparent 1.8px)}
-/* звёзды живут только в маленьком квадрате с луной */
-.metric.night .metric-icon{overflow:hidden}
-.metric.night .metric-icon::before,.metric.night .metric-icon::after{content:"";position:absolute;inset:0;pointer-events:none;background-repeat:no-repeat}
-.metric.night .metric-icon::before{background-image:var(--sp-white),var(--sp-blue),var(--dot);background-size:8px 8px,6px 6px,4px 4px;background-position:12% 14%,84% 76%,24% 82%;animation:twinkleA 3.8s ease-in-out infinite}
-.metric.night .metric-icon::after{background-image:var(--sp-blue),var(--sp-white),var(--dot2);background-size:7px 7px,5px 5px,4px 4px;background-position:82% 12%,10% 62%,70% 90%;animation:twinkleB 5s ease-in-out infinite .9s}
 @keyframes twinkleA{0%,100%{opacity:0}50%{opacity:1}}
 @keyframes twinkleB{0%,100%{opacity:0}50%{opacity:1}}
 
@@ -652,13 +647,16 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .doctor-table>.doctor-last{border-bottom:0}
 .doctor-table>.doctor-span{grid-column:2 / 4;text-align:center;align-items:center}
 .doctor-table>.doctor-th{padding:0 0 10px;justify-content:flex-end;align-items:center;gap:6px;font-size:15px;font-weight:800}
-.doctor-table>.doctor-th-date{align-items:flex-start;gap:2px;font-weight:800}
+.doctor-table>.doctor-th-date{align-items:center;gap:2px;font-weight:800;text-align:center}
+.doctor-th-date .doctor-ico{margin-bottom:4px}
 .doctor-th .doctor-drug{display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin-top:-3px}
 .doctor-th-date small{font-size:12.5px;font-weight:600;color:var(--muted)}
 .doctor-th-date b{font-size:clamp(13px,3.9vw,15px);font-weight:800;color:var(--text);white-space:nowrap}
 .doctor-ico{width:46px;height:46px;border-radius:16px;display:grid;place-items:center;font-size:24px}
 .doctor-ico.short{background:linear-gradient(145deg,#ecfcf9,#c9f1e8)}
+.doctor-ico.date{background:var(--icon-bg,#eef0fb)}
 .doctor-ico.night{background:linear-gradient(135deg,#ffc9cf 0%,#e6c3ec 55%,#cdbdf3 100%)}
+:root[data-theme="dark"] .doctor-ico.date{background:rgba(255,255,255,.08)}
 :root[data-theme="dark"] .doctor-ico.short{background:linear-gradient(145deg,rgba(69,224,203,.28),rgba(69,224,203,.09))}
 :root[data-theme="dark"] .doctor-ico.night{background:linear-gradient(135deg,#6a2c40 0%,#4d3260 55%,#3b3466 100%)}
 .doctor-label{font-size:15px;color:var(--muted);line-height:1.3}
@@ -683,9 +681,9 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .doctor-field input[type="date"]{overflow:hidden;padding-left:10px;padding-right:10px}
 .doctor-field input[type="date"]::-webkit-date-and-time-value{text-align:center;margin:0;min-width:0}
 .doctor-field input[type="date"]::-webkit-calendar-picker-indicator{display:none}
-.wheel{position:relative;height:60px;border-radius:14px;background:var(--input-bg);border:1px solid var(--line);overflow:hidden}
+.wheel{position:relative;height:72px;border-radius:14px;background:var(--input-bg);border:1px solid var(--line);overflow:hidden}
 .wheel::before{content:"";position:absolute;left:6px;right:6px;top:50%;height:30px;transform:translateY(-50%);border-radius:10px;background:rgba(82,103,232,.14);border:1.5px solid rgba(82,103,232,.5);box-sizing:border-box;pointer-events:none}
-.wheel-scroll{position:relative;height:100%;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;touch-action:pan-y;padding:15px 0;box-sizing:border-box;scrollbar-width:none;-webkit-overflow-scrolling:touch;-webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,.45) 0,#000 26%,#000 74%,rgba(0,0,0,.45) 100%);mask-image:linear-gradient(to bottom,rgba(0,0,0,.45) 0,#000 26%,#000 74%,rgba(0,0,0,.45) 100%)}
+.wheel-scroll{position:relative;height:100%;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;touch-action:pan-y;padding:21px 0;box-sizing:border-box;scrollbar-width:none;-webkit-overflow-scrolling:touch;-webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,.45) 0,#000 26%,#000 74%,rgba(0,0,0,.45) 100%);mask-image:linear-gradient(to bottom,rgba(0,0,0,.45) 0,#000 26%,#000 74%,rgba(0,0,0,.45) 100%)}
 .wheel-scroll::-webkit-scrollbar{display:none}
 .wheel-item{height:30px;line-height:30px;text-align:center;font-size:17px;font-weight:600;opacity:.45;transition:font-size .12s,opacity .12s,color .12s;color:var(--input-text);scroll-snap-align:center;scroll-snap-stop:always;cursor:pointer;user-select:none;-webkit-user-select:none}
 .wheel-item.sel{opacity:1;font-size:25px;font-weight:800;color:var(--blue)}
@@ -808,7 +806,7 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 <button class="analytics-tab active" type="button" role="tab" aria-label="Динамика по дням" title="Динамика по дням" aria-selected="true" data-chart="trend" onclick="selectChart('trend')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l5.5-6.5 4 4L21 6"/><path d="M15.5 6H21v5.5"/></svg><span class="tab-label">Динамика</span></button>
 <button class="analytics-tab" type="button" role="tab" aria-label="Сравнение трёх недель" title="Сравнение трёх недель" aria-selected="false" data-chart="compare" onclick="selectChart('compare')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9c3-4 6 4 9 0s6-4 9 0"/><path d="M3 17c3-4 6 4 9 0s6-4 9 0"/></svg><span class="tab-label">Сравнение</span></button>
 <button class="analytics-tab" type="button" role="tab" aria-label="Доля сахара в целевом диапазоне" title="Доля сахара в целевом диапазоне" aria-selected="false" data-chart="range" onclick="selectChart('range')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/></svg><span class="tab-label">ЦД</span></button>
-<button class="analytics-tab" type="button" role="tab" aria-label="Распределение измерений" title="Распределение измерений" aria-selected="false" data-chart="distribution" onclick="selectChart('distribution')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="9" r="1.8" fill="currentColor" stroke="none"/><circle cx="11" cy="16" r="1.8" fill="currentColor" stroke="none"/><circle cx="14" cy="7" r="1.8" fill="currentColor" stroke="none"/><circle cx="18.5" cy="13" r="1.8" fill="currentColor" stroke="none"/><circle cx="7" cy="19" r="1.8" fill="currentColor" stroke="none"/><circle cx="19" cy="19" r="1.8" fill="currentColor" stroke="none"/></svg><span class="tab-label">Разброс</span></button>
+<button class="analytics-tab" type="button" role="tab" aria-label="Распределение измерений" title="Распределение измерений" data-mw data-mw-attrs="aria-label title" aria-selected="false" data-chart="distribution" onclick="selectChart('distribution')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="9" r="1.8" fill="currentColor" stroke="none"/><circle cx="11" cy="16" r="1.8" fill="currentColor" stroke="none"/><circle cx="14" cy="7" r="1.8" fill="currentColor" stroke="none"/><circle cx="18.5" cy="13" r="1.8" fill="currentColor" stroke="none"/><circle cx="7" cy="19" r="1.8" fill="currentColor" stroke="none"/><circle cx="19" cy="19" r="1.8" fill="currentColor" stroke="none"/></svg><span class="tab-label">Разброс</span></button>
 <button class="analytics-tab" type="button" role="tab" aria-label="Суточная сводка" title="Суточная сводка" aria-selected="false" data-chart="daily" onclick="selectChart('daily')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7v10M12 4v13M18 9v11"/><circle cx="6" cy="12" r="2" fill="currentColor" stroke="none"/><circle cx="12" cy="10" r="2" fill="currentColor" stroke="none"/><circle cx="18" cy="14" r="2" fill="currentColor" stroke="none"/></svg><span class="tab-label">Сводка</span></button>
 <button class="analytics-tab" type="button" role="tab" aria-label="Активность по времени" title="Активность по времени" aria-selected="false" data-chart="activity" onclick="selectChart('activity')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6" fill="currentColor" fill-opacity=".45"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6" fill="currentColor" fill-opacity=".45"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6" fill="currentColor"/></svg><span class="tab-label">Активность</span></button>
 </div>
@@ -817,7 +815,7 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 <button class="analytics-choice active" type="button" data-metric="sugar" onclick="selectMetric('sugar')">Сахар</button>
 <button class="analytics-choice" type="button" data-metric="insulin" onclick="selectMetric('insulin')">Инсулин</button>
 </div>
-<div id="analytics-loading" class="analytics-card analytics-message" role="status">Загружаю измерения…</div>
+<div id="analytics-loading" class="analytics-card analytics-message" role="status" data-mw>Загружаю измерения…</div>
 <div id="analytics-content" hidden>
 <section class="analytics-card analytics-panel" data-panel="trend">
 <div class="analytics-toolbar">
@@ -898,8 +896,8 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 <div id="activity-chart" class="chart-wrap"></div>
 <div id="activity-tooltip" class="chart-tooltip" role="status"></div>
 <div class="analytics-legend">
-<span class="analytics-legend-item">Редкие измерения</span>
-<span class="analytics-legend-item"><span class="analytics-swatch" style="background:#dfe3ff"></span><span class="analytics-swatch" style="background:#5267e8"></span>Частые измерения</span>
+<span class="analytics-legend-item" data-mw>Редкие измерения</span>
+<span class="analytics-legend-item" data-mw><span class="analytics-swatch" style="background:#dfe3ff"></span><span class="analytics-swatch" style="background:#5267e8"></span>Частые измерения</span>
 </div>
 </section>
 </div>
@@ -2074,7 +2072,7 @@ async function loadAnalytics(force=false){
   const loading=document.getElementById('analytics-loading');
   const content=document.getElementById('analytics-content');
   loading.hidden=false;
-  loading.textContent='Загружаю измерения…';
+  loading.textContent=mw('Загружаю измерения…');
   content.hidden=true;
   try{
    const result=await api('history',{days:45});
@@ -2195,11 +2193,34 @@ function selectChart(name){
   document.querySelectorAll('.analytics-panel').forEach(panel=>panel.hidden=panel.dataset.panel!==name);
   renderAnalytics();
 }
+function toInjectionWords(text){
+  return String(text).replace(/измерений/g,'инъекций').replace(/измерения/g,'инъекции').replace(/измерение/g,'инъекция');
+}
+function mw(text){return analyticsState.metric==='insulin'?toInjectionWords(text):text;}
+function measureForms(){
+  return analyticsState.metric==='insulin'?['инъекция','инъекции','инъекций']:['измерение','измерения','измерений'];
+}
+function applyMetricWording(){
+  const insulin=analyticsState.metric==='insulin';
+  document.querySelectorAll('[data-mw]').forEach(el=>{
+    el.childNodes.forEach(node=>{
+      if(node.nodeType!==3)return;
+      if(node._mw===undefined)node._mw=node.nodeValue;
+      node.nodeValue=insulin?toInjectionWords(node._mw):node._mw;
+    });
+    (el.dataset.mwAttrs||'').split(' ').filter(Boolean).forEach(attr=>{
+      const key='mw_'+attr;
+      if(el.dataset[key]===undefined)el.dataset[key]=el.getAttribute(attr)||'';
+      el.setAttribute(attr,insulin?toInjectionWords(el.dataset[key]):el.dataset[key]);
+    });
+  });
+}
 function selectMetric(metric){
   analyticsState.metric=metric;
   analyticsState.selectedDates=null;
   document.querySelector('.metric-switch')?.setAttribute('data-active',metric);
   document.querySelectorAll('[data-metric]').forEach(button=>button.classList.toggle('active',button.dataset.metric===metric));
+  applyMetricWording();
   renderAnalytics();
 }
 function renderAnalytics(){
@@ -2284,7 +2305,7 @@ function renderTrend(){
     ...(style?{width:style.width,radius:style.radius,opacity:style.opacity,layer:-index}:{})
    };
   });
-  renderTimeChart('trend-chart',groups,{metric:analyticsState.metric,tooltipId:'trend-tooltip',emptyText:'За этот период нет измерений.'});
+  renderTimeChart('trend-chart',groups,{metric:analyticsState.metric,tooltipId:'trend-tooltip',emptyText:mw('За этот период нет измерений.')});
   updateRangeSummary('trend-range',visible);
   setChartCount('trend-count',visible.length);
 }
@@ -2335,7 +2356,7 @@ function renderComparison(){
     if(points.length){groups.push({label:`${['Текущая','Прошлая','2 недели назад'][weekIndex]}, ${weekdayNames[date.getDay()]}`,color:weekColors[weekIndex],points,weekIndex});}
    }
   });
-  renderTimeChart('compare-chart',groups,{metric:analyticsState.metric,tooltipId:'compare-tooltip',emptyText:'В выбранных неделях пока нет измерений.',weekLabels:true});
+  renderTimeChart('compare-chart',groups,{metric:analyticsState.metric,tooltipId:'compare-tooltip',emptyText:mw('В выбранных неделях пока нет измерений.'),weekLabels:true});
   updateRangeSummary('compare-range',groups.flatMap(group=>group.points));
   setChartCount('compare-count',groups.reduce((sum,group)=>sum+group.points.length,0));
 }
@@ -2349,7 +2370,7 @@ function renderDistribution(){
   const rows=periodMeasurements(days);
   const dates=[...new Set(rows.map(row=>row.dateKey))].sort();
   const groups=dates.map(key=>({label:formatShortDate(key),color:dayColor(key,dates),points:rows.filter(row=>row.dateKey===key)}));
-  renderTimeChart('distribution-chart',groups,{metric:analyticsState.metric,tooltipId:'distribution-tooltip',connect:false,emptyText:'За этот период нет измерений.'});
+  renderTimeChart('distribution-chart',groups,{metric:analyticsState.metric,tooltipId:'distribution-tooltip',connect:false,emptyText:mw('За этот период нет измерений.')});
   renderLegend('distribution-legend',groups);
   updateRangeSummary('distribution-range',rows);
   setChartCount('distribution-count',rows.length);
@@ -2371,7 +2392,7 @@ function renderDailySummary(){
   tooltip.textContent='';
   updateRangeSummary('daily-range',periodMeasurements(days));
   setChartCount('daily-count',periodMeasurements(days).length);
-  if(!summaries.length){host.innerHTML='<div class="analytics-message">За этот период нет измерений.</div>';return;}
+  if(!summaries.length){host.innerHTML='<div class="analytics-message">'+mw('За этот период нет измерений.')+'</div>';return;}
   const width=Math.max(240,Math.floor(host.clientWidth||320)),height=Number(host.dataset.height)||285;
   const margin={left:43,right:16,top:14,bottom:36},plotW=width-margin.left-margin.right,plotH=height-margin.top-margin.bottom;
   let low=Math.min(...summaries.map(day=>day.minimum)),high=Math.max(...summaries.map(day=>day.maximum));
@@ -2465,7 +2486,7 @@ async function saveTargetRange(){
 function setChartCount(id,n){
   const el=document.getElementById(id);if(!el)return;
   el.textContent=n?`${n} изм.`:'';
-  el.title=n?`${n} ${ruPlural(n,'измерение','измерения','измерений')} на графике`:'';
+  el.title=n?`${n} ${ruPlural(n,...measureForms())} на графике`:'';
 }
 function updateRangeSummary(id,rows){
   const el=document.getElementById(id);if(!el)return;
@@ -2488,7 +2509,7 @@ function renderRangeDonut(){
   if(analyticsState.metric!=='sugar'){setChartCount('range-count',0);message('Доля в цели считается только для сахара.');return;}
   const days=Number(document.getElementById('range-period').value),rows=periodMeasurements(days);
   setChartCount('range-count',rows.length);
-  if(!rows.length){message('За этот период нет измерений.');return;}
+  if(!rows.length){message(mw('За этот период нет измерений.'));return;}
   host.style.aspectRatio='';
   const st=rangeStats(rows),p=roundedPercents(st);
   let offset=0,segs='';
@@ -2499,10 +2520,10 @@ function renderRangeDonut(){
     segs+=`<circle class="donut-seg" cx="50" cy="50" r="38" pathLength="100" stroke="${color}" stroke-dasharray="${(len-gap).toFixed(2)} ${(100-len+gap).toFixed(2)}" stroke-dashoffset="${(-offset).toFixed(2)}" transform="rotate(-90 50 50)" style="--d:${(index*.12).toFixed(2)}s"/>`;
     offset+=len;
   });
-  host.innerHTML=`<svg viewBox="0 0 100 100" role="img" aria-label="В целевом диапазоне ${p.in}% измерений"><circle class="donut-track" cx="50" cy="50" r="38"/>${segs}</svg>`
+  host.innerHTML=`<svg viewBox="0 0 100 100" role="img" aria-label="В целевом диапазоне ${p.in}% ${mw('измерений')}"><circle class="donut-track" cx="50" cy="50" r="38"/>${segs}</svg>`
    +`<div class="donut-center"><div class="donut-pct"><span id="donutNum">${p.in}</span><small>%</small></div><div class="donut-sub">в цели</div></div>`;
   const num=document.getElementById('donutNum');if(num)countUp(num,'donut');
-  const row=(k,name,hint,pct,count)=>`<div class="range-legend-row"><span class="range-dot ${k}"></span><div class="range-legend-name">${name}<small>${hint}</small></div><b>${pct}%</b><em>${count} ${ruPlural(count,'измерение','измерения','измерений')}</em></div>`;
+  const row=(k,name,hint,pct,count)=>`<div class="range-legend-row"><span class="range-dot ${k}"></span><div class="range-legend-name">${name}<small>${hint}</small></div><b>${pct}%</b><em>${count} ${ruPlural(count,...measureForms())}</em></div>`;
   legend.innerHTML=row('low','Ниже цели',`меньше ${fmtMmol(IDEAL_LOW)}`,p.low,st.low)
    +row('in','В цели',`${fmtMmol(IDEAL_LOW)}–${fmtMmol(IDEAL_HIGH)} ммоль/л`,p.in,st.in)
    +row('high','Выше цели',`больше ${fmtMmol(IDEAL_HIGH)}`,p.high,st.high);
@@ -2531,7 +2552,7 @@ function renderActivityHeatmap(){
   rows.forEach(row=>counts[row.dateObj.getDay()][row.timeObj.hour]++);
   const max=Math.max(0,...counts.flat());
   tooltip.textContent='';
-  if(!max){host.innerHTML='<div class="analytics-message">За этот период нет измерений.</div>';return;}
+  if(!max){host.innerHTML='<div class="analytics-message">'+mw('За этот период нет измерений.')+'</div>';return;}
   const timeWindow=timeAxisWindow(rows);
   const startHour=Math.floor(timeWindow.start/60);
   const endHour=Math.ceil((timeWindow.start+timeWindow.duration)/60);
@@ -2539,7 +2560,7 @@ function renderActivityHeatmap(){
   const labels=['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
   const dayOrder=[1,2,3,4,5,6,0];
   const gridColumns=`30px repeat(${hours.length},minmax(11px,1fr))`;
-  let html=`<div class="heatmap-scroll"><div class="heatmap-grid" style="grid-template-columns:${gridColumns}" role="grid" aria-label="Количество измерений по дню недели и времени">`;
+  let html=`<div class="heatmap-scroll"><div class="heatmap-grid" style="grid-template-columns:${gridColumns}" role="grid" aria-label="Количество ${mw('измерений')} по дню недели и времени">`;
   html+='<span class="heatmap-corner"></span>';
   hours.forEach(hour=>html+=`<span class="heatmap-hour">${hour}</span>`);
   html+='</div>';
@@ -2774,7 +2795,6 @@ function initPlaceholderMarquee(){
    text.textContent=value;
    stop();
    overlay.classList.remove('static');
-   if(value.length<=15){overlay.classList.add('static');return;}
    const overflow=text.scrollWidth-boxWidth;
    if(overflow<=2)return;
    if(reduceMotion){overlay.classList.add('static');return;}
@@ -2827,28 +2847,6 @@ renderTargetInputs();
 // ============================================================
 // НОЧНОЙ: звёзды каждый раз появляются в новых местах
 // ============================================================
-function initNightStars(){
- const card=document.querySelector('.metric.night');
- if(!card)return;
- const rnd=(a,b)=>Math.round(a+Math.random()*(b-a));
- const spot=(x0,x1,y0,y1)=>rnd(x0,x1)+'% '+rnd(y0,y1)+'%';
- const many=(n,x0,x1,y0,y1)=>Array.from({length:n},()=>spot(x0,x1,y0,y1)).join(',');
- const layers={
-  '--pa':()=>many(9,3,94,6,88),
-  '--pb':()=>Array.from({length:6},(_,i)=>'left '+rnd(4,90)+'% '+(i%2?'bottom ':'top ')+rnd(2,5)+'px').join(','),
-  '--pc':()=>many(4,4,82,6,80),
-  '--pd':()=>many(3,4,86,6,80)
- };
- const apply=name=>card.style.setProperty(name,layers[name]());
- Object.keys(layers).forEach(apply);
- card.addEventListener('animationiteration',event=>{
-  const sky=event.target.classList&&event.target.classList.contains('night-sky');
-  if(event.target!==card&&!sky)return;
-  const first=event.pseudoElement==='::before';
-  apply(sky?(first?'--pc':'--pd'):(first?'--pa':'--pb'));
- });
-}
-
 // ============================================================
 // ГРАФИКИ: ступенчатое появление элементов после отрисовки
 // ============================================================
@@ -2909,7 +2907,7 @@ function renderDoctor(data){
  const s=data.short||{},n=data.night||{},dose=data.dose||{};
  if(!data.short&&!data.night){body.innerHTML='<div class="doctor-card doctor-empty">На листе get_ins пока нет данных. Нажми «+», чтобы добавить.</div>';return;}
   body.innerHTML='<div class="doctor-card"><div class="doctor-table">'
-  +'<div class="doctor-th doctor-th-date">'+(data.date?'<small>🗓️ Данные от</small><b>'+escapeHtml(data.date)+'</b>':'')+'</div>'
+  +'<div class="doctor-th doctor-th-date"><span class="doctor-ico date">🗓️</span>'+(data.date?'<small>Данные от</small><b>'+escapeHtml(data.date)+'</b>':'')+'</div>'
   +'<div class="doctor-th"><span class="doctor-ico short">💉</span>Короткий<small class="doctor-drug">Новорапид</small></div>'
   +'<div class="doctor-th"><span class="doctor-ico night">🌙</span>Ночной<small class="doctor-drug">РинГлар</small></div>'
   +doctorRowHtml('Суточная дозировка',doctorCell(dose.short?dose.short+' ед.':dose.short),doctorCell(dose.night?dose.night+' ед.':dose.night))
