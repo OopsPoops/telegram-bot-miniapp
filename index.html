@@ -854,7 +854,7 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 <div class="analytics-toolbar">
 <span class="analytics-toolbar-label">Период</span>
 <select id="trend-period" aria-label="Период графика динамики" onchange="changeTrendPeriod()">
-<option value="3" selected>3 дня</option><option value="7">7 дней</option><option value="14">14 дней</option><option value="21">21 день</option><option value="30">30 дней</option><option value="45">45 дней</option>
+<option value="1" selected>1 день</option><option value="2">2 дня</option><option value="3">3 дня</option><option value="7">7 дней</option><option value="14">14 дней</option><option value="21">21 день</option><option value="30">30 дней</option><option value="45">45 дней</option>
 </select>
 <span class="toolbar-count" id="trend-count" role="status"></span>
 </div>
@@ -910,7 +910,7 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 <div class="analytics-toolbar">
 <span class="analytics-toolbar-label">Период</span>
 <select id="dose-period" aria-label="Период" onchange="renderDoseChart()">
-<option value="7" selected>7 дней</option><option value="14">14 дней</option><option value="30">30 дней</option><option value="45">45 дней</option>
+<option value="7">7 дней</option><option value="14">14 дней</option><option value="30" selected>30 дней</option><option value="45">45 дней</option>
 </select>
 <span class="toolbar-count" id="dose-count" role="status"></span>
 </div>
@@ -1285,7 +1285,7 @@ function timerStateStorageKey(){
  const userId=tg?.initDataUnsafe?.user?.id;
  return userId?`${TIMER_STATE_KEY_PREFIX}:${userId}`:TIMER_STATE_KEY_PREFIX;
 }
-const analyticsState={loaded:false,loading:false,measurements:[],doses:{limitInsulin:null,limitNight:null,night:new Map()},chart:'trend',metric:'sugar',trendDays:3,selectedDates:null,visibleWeeks:[true,true,true]};
+const analyticsState={loaded:false,loading:false,measurements:[],doses:{limitInsulin:null,limitNight:null,night:new Map()},chart:'trend',metric:'sugar',trendDays:1,selectedDates:null,visibleWeeks:[true,true,true]};
 const weekColors=['#5267e8','#ec9438','#31a66d'];
 const labels={
 today:{title:'Сегодня',subtitle:'Данные за текущий день',icon:'☀️',loading:'Собираю данные за сегодня…'},
@@ -2410,7 +2410,7 @@ function renderTrendDays(rows){
    });
    const swatch=document.createElement('span');
    swatch.className='analytics-swatch';swatch.style.backgroundColor=dayColor(key,dates);
-   if(analyticsState.trendDays===3&&THREE_DAY_STYLE[index]){swatch.style.width='18px';swatch.style.height=THREE_DAY_STYLE[index].bar+'px';swatch.style.borderRadius='3px';}
+   if(analyticsState.trendDays<=3&&THREE_DAY_STYLE[index]){swatch.style.width='18px';swatch.style.height=THREE_DAY_STYLE[index].bar+'px';swatch.style.borderRadius='3px';}
    const text=document.createElement('span');text.textContent=formatShortDate(key);
    label.append(input,swatch,text);host.appendChild(label);
   });
@@ -2423,7 +2423,7 @@ const THREE_DAY_STYLE=[
 ];
 function dayColor(key,dates){
   const index=Math.max(0,dates.indexOf(key));
-  if(analyticsState.trendDays===3&&THREE_DAY_STYLE[index])return THREE_DAY_STYLE[index].color;
+  if(analyticsState.trendDays<=3&&THREE_DAY_STYLE[index])return THREE_DAY_STYLE[index].color;
   return `hsl(${(index*137.508+212)%360} 67% 52%)`;
 }
 function renderTrend(){
@@ -2431,7 +2431,7 @@ function renderTrend(){
   const dates=renderTrendDays(rows);
   const visible=rows.filter(row=>analyticsState.selectedDates.has(row.dateKey));
   const groups=dates.filter(key=>analyticsState.selectedDates.has(key)).map(key=>{
-   const index=dates.indexOf(key),style=analyticsState.trendDays===3?THREE_DAY_STYLE[index]:null;
+   const index=dates.indexOf(key),style=analyticsState.trendDays<=3?THREE_DAY_STYLE[index]:null;
    return {
     label:formatShortDate(key),color:dayColor(key,dates),points:visible.filter(row=>row.dateKey===key),
     ...(style?{width:style.width,radius:style.radius,opacity:style.opacity,layer:-index}:{})
@@ -3397,7 +3397,7 @@ function doseSeries(kind,days){
 function renderDoseChart(){
  const kind=analyticsState.metric==='night'?'night':'insulin';
  const [host,tooltip]=chartHosts('dose-chart','dose-tooltip');
- const days=Number(document.getElementById('dose-period').value)||7;
+ const days=Number(document.getElementById('dose-period').value)||30;
  const limit=kind==='night'?analyticsState.doses.limitNight:analyticsState.doses.limitInsulin;
  const summary=document.getElementById('dose-summary');
  const color=kind==='night'?'#8b6ee0':'#1f9d8f';
