@@ -6,7 +6,11 @@
 <meta name="theme-color" content="#f5f6fb" id="themeColor">
 <title>Сёма</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
+<script src="night-fact.js"></script>
+<script src="entry-placeholders.js"></script>
+<style>
+/* ============================================================
+   ПЕРЕМЕННЫЕ И ТЕМЫ (светлая / тёмная)
    ============================================================ */
 :root{color-scheme:light;--bg:#f3f4fb;--status-bar-bg:#eceefa;--status-bar-fade:#f0f1fa;--card:#fff;--card-grad:linear-gradient(180deg,#ffffff 0%,#fafbff 100%);--text:#1f2340;--muted:#7b8199;--blue:#5267e8;--pink:#ee6f9c;--teal:#20a99b;--violet:#7d6be8;--line:#e9ecf6;--input-bg:#f5f6fc;--input-text:#1f2340;--shadow:inset 0 1px 0 rgba(255,255,255,.95),0 14px 32px -14px rgba(60,72,150,.24),0 2px 6px rgba(60,72,150,.06);--card-border:rgba(125,135,170,.13);--aura:radial-gradient(60% 38% at 0% 0%,rgba(130,145,255,.20),transparent 70%),radial-gradient(55% 34% at 100% 8%,rgba(255,160,200,.17),transparent 70%),radial-gradient(70% 42% at 50% 105%,rgba(110,215,200,.15),transparent 70%);--nav-highlight:#edf1ff;--nav-border:rgba(128,136,158,.18);--nav-active:#e3e8ff;--icon-bg:#f0f3fb;--modal-bg:#fff;--modal-content:#f4f6fb;--close-bg:#eef2fb;--close-text:#3c4664}
 :root[data-theme="dark"]{color-scheme:dark;--bg:#05060a;--status-bar-bg:#05060a;--status-bar-fade:#05060a;--card:#12141c;--card-grad:linear-gradient(180deg,#171a24 0%,#10121a 100%);--text:#f2f4fb;--muted:#9aa1b8;--blue:#8f9bff;--pink:#ff7fa9;--teal:#45e0cb;--violet:#a898ff;--line:#262a38;--input-bg:#1a1d29;--input-text:#f2f4fb;--shadow:inset 0 1px 0 rgba(255,255,255,.07),0 18px 40px -16px rgba(0,0,0,.9),0 2px 8px rgba(0,0,0,.5);--card-border:rgba(255,255,255,.07);--aura:radial-gradient(60% 34% at 0% 0%,rgba(110,125,255,.15),transparent 70%),radial-gradient(55% 30% at 100% 5%,rgba(255,110,170,.09),transparent 70%),radial-gradient(70% 40% at 50% 108%,rgba(60,225,200,.08),transparent 70%);--nav-highlight:rgba(255,255,255,.06);--nav-border:rgba(151,160,182,.14);--nav-active:rgba(143,155,255,.18);--icon-bg:#1d2130;--modal-bg:#14161f;--modal-content:#1a1d29;--close-bg:#262a3a;--close-text:#eef2ff}
