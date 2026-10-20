@@ -703,6 +703,23 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .doctor-head .page-heading{font-size:22px;white-space:nowrap}
 .doctor-shot-note{margin:-6px 2px 12px;font-size:14px;line-height:1.4;color:var(--muted);text-align:center}
 .doctor-shot-note.error{color:#d23a40}
+
+/* --- комментарий к визиту --- */
+.doctor-comment-card{background:var(--card-grad);border:1px solid var(--card-border);border-radius:21px;padding:14px 16px;margin-bottom:13px;box-shadow:var(--shadow)}
+.doctor-comment-title{font-size:13px;font-weight:700;color:var(--muted);margin-bottom:6px}
+.doctor-comment-text{font-size:16px;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere}
+.doctor-field .value-input.doctor-comment{text-align:left;padding-left:14px;padding-right:14px}
+/* --- переключатель Сахар / Инсулин / Ночной --- */
+.metric-switch{grid-template-columns:1fr 1fr 1fr}
+.metric-switch .metric-pill{width:calc(33.3333% - 2px)}
+.metric-switch[data-active="night"] .metric-pill{transform:translateX(200%)}
+/* --- график ЦД --- */
+.dose-bar{cursor:pointer;outline:none}
+.dose-bar:focus-visible{stroke:var(--text);stroke-width:2}
+.dose-summary{margin:4px 2px 10px;font-size:14px;line-height:1.45;color:var(--muted)}
+.dose-summary b{color:var(--text)}
+.dose-summary .over{color:#e5484d;font-weight:800}
+.dose-limit-swatch{display:inline-block;width:16px;height:0;border-top:2px dashed #e5a13a;margin-right:6px;vertical-align:middle}
 </style>
 </head>
 <body>
@@ -823,12 +840,14 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 <button class="analytics-tab" type="button" role="tab" aria-label="Доля сахара в целевом диапазоне" title="Доля сахара в целевом диапазоне" aria-selected="false" data-chart="range" onclick="selectChart('range')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/></svg><span class="tab-label">ЦД</span></button>
 <button class="analytics-tab" type="button" role="tab" aria-label="Распределение измерений" title="Распределение измерений" data-mw data-mw-attrs="aria-label title" aria-selected="false" data-chart="distribution" onclick="selectChart('distribution')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="9" r="1.8" fill="currentColor" stroke="none"/><circle cx="11" cy="16" r="1.8" fill="currentColor" stroke="none"/><circle cx="14" cy="7" r="1.8" fill="currentColor" stroke="none"/><circle cx="18.5" cy="13" r="1.8" fill="currentColor" stroke="none"/><circle cx="7" cy="19" r="1.8" fill="currentColor" stroke="none"/><circle cx="19" cy="19" r="1.8" fill="currentColor" stroke="none"/></svg><span class="tab-label">Разброс</span></button>
 <button class="analytics-tab" type="button" role="tab" aria-label="Суточная сводка" title="Суточная сводка" aria-selected="false" data-chart="daily" onclick="selectChart('daily')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7v10M12 4v13M18 9v11"/><circle cx="6" cy="12" r="2" fill="currentColor" stroke="none"/><circle cx="12" cy="10" r="2" fill="currentColor" stroke="none"/><circle cx="18" cy="14" r="2" fill="currentColor" stroke="none"/></svg><span class="tab-label">Сводка</span></button>
+<button class="analytics-tab" type="button" role="tab" aria-label="ЦД: доза за день" title="ЦД: доза за день" aria-selected="false" data-chart="dose" onclick="selectChart('dose')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 20v-7M12 20V9M18 20v-5"/><path d="M3 6.5h18" stroke-dasharray="2 2.6"/></svg><span class="tab-label">ЦД</span></button>
 <button class="analytics-tab" type="button" role="tab" aria-label="Активность по времени" title="Активность по времени" aria-selected="false" data-chart="activity" onclick="selectChart('activity')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6" fill="currentColor" fill-opacity=".45"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6" fill="currentColor" fill-opacity=".45"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6" fill="currentColor"/></svg><span class="tab-label">Активность</span></button>
 </div>
 <div class="metric-switch" role="group" aria-label="Показатель" data-active="sugar">
 <span class="metric-pill" aria-hidden="true"></span>
 <button class="analytics-choice active" type="button" data-metric="sugar" onclick="selectMetric('sugar')">Сахар</button>
 <button class="analytics-choice" type="button" data-metric="insulin" onclick="selectMetric('insulin')">Инсулин</button>
+<button class="analytics-choice" type="button" data-metric="night" onclick="selectMetric('night')">Ночной</button>
 </div>
 <div id="analytics-loading" class="analytics-card analytics-message" role="status" data-mw>Загружаю измерения…</div>
 <div id="analytics-content" hidden>
@@ -886,6 +905,23 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 <div class="analytics-legend">
 <span class="analytics-legend-item"><span class="analytics-swatch" style="background:#8998ff"></span>Минимум — максимум</span>
 <span class="analytics-legend-item"><span class="analytics-swatch" style="background:#5267e8"></span>Среднее</span>
+</div>
+</section>
+<section class="analytics-card analytics-panel" data-panel="dose" hidden>
+<div class="analytics-toolbar">
+<span class="analytics-toolbar-label" id="dose-title">Доза за день и ЦД</span>
+<select id="dose-period" aria-label="Период" onchange="renderDoseChart()">
+<option value="7" selected>7 дней</option><option value="14">14 дней</option><option value="30">30 дней</option><option value="45">45 дней</option>
+</select>
+<span class="toolbar-count" id="dose-count" role="status"></span>
+</div>
+<div id="dose-chart" class="chart-wrap"></div>
+<div id="dose-summary" class="dose-summary"></div>
+<div id="dose-tooltip" class="chart-tooltip" role="status"></div>
+<div class="analytics-legend">
+<span class="analytics-legend-item"><span class="analytics-swatch" id="dose-swatch-ok" style="background:#1f9d8f"></span>В пределах ЦД</span>
+<span class="analytics-legend-item"><span class="analytics-swatch" style="background:#e5484d"></span>Перебор</span>
+<span class="analytics-legend-item"><span class="dose-limit-swatch"></span>ЦД</span>
 </div>
 </section>
 <section class="analytics-card analytics-panel" data-panel="range" hidden>
@@ -1129,6 +1165,7 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 <div class="doctor-field"><span>Тест полоски</span><div class="wheel" id="wheelTests"></div></div>
 <div class="doctor-field"><span>Иглы</span><div class="wheel" id="wheelNeedles"></div></div>
 </div>
+<label class="doctor-field"><span>Комментарий</span><input class="value-input doctor-comment" id="docComment" type="text" maxlength="200" placeholder="Необязательно" autocomplete="off" enterkeyhint="done"></label>
 <div class="toast" id="doctorToast"></div>
 <div class="doctor-form-actions">
 <button class="undo-button doctor-cancel" type="button" onclick="closeDoctorForm()">Отмена</button>
@@ -1249,7 +1286,7 @@ function timerStateStorageKey(){
  const userId=tg?.initDataUnsafe?.user?.id;
  return userId?`${TIMER_STATE_KEY_PREFIX}:${userId}`:TIMER_STATE_KEY_PREFIX;
 }
-const analyticsState={loaded:false,loading:false,measurements:[],chart:'trend',metric:'sugar',trendDays:3,selectedDates:null,visibleWeeks:[true,true,true]};
+const analyticsState={loaded:false,loading:false,measurements:[],doses:{limitInsulin:null,limitNight:null,night:new Map()},chart:'trend',metric:'sugar',trendDays:3,selectedDates:null,visibleWeeks:[true,true,true]};
 const weekColors=['#5267e8','#ec9438','#31a66d'];
 const labels={
 today:{title:'Сегодня',subtitle:'Данные за текущий день',icon:'☀️',loading:'Собираю данные за сегодня…'},
@@ -2154,6 +2191,7 @@ async function loadAnalytics(force=false){
   try{
    const result=await api('history',{days:45});
    analyticsState.measurements=normalizeHistory(result);
+   analyticsState.doses=normalizeDoses(result);
    analyticsState.loaded=true;
    analyticsState.selectedDates=null;
    setAccess(true,'Сервер подтвердил доступ');
@@ -2262,6 +2300,7 @@ function initChartExpandButtons(){
 function selectChart(name){
   analyticsState.chart=name;
   if(name==='range'&&analyticsState.metric!=='sugar')selectMetric('sugar');
+  if(name==='dose'&&analyticsState.metric==='sugar')selectMetric('insulin');
   document.querySelectorAll('.analytics-tab').forEach(button=>{
    const active=button.dataset.chart===name;
    button.classList.toggle('active',active);
@@ -2298,7 +2337,14 @@ function selectMetric(metric){
   document.querySelector('.metric-switch')?.setAttribute('data-active',metric);
   document.querySelectorAll('[data-metric]').forEach(button=>button.classList.toggle('active',button.dataset.metric===metric));
   applyMetricWording();
+  updateChartTabs();
+  if(metric==='night'&&analyticsState.chart!=='dose'){selectChart('dose');return;}
+  if(metric==='sugar'&&analyticsState.chart==='dose'){selectChart('trend');return;}
   renderAnalytics();
+}
+function updateChartTabs(){
+  const night=analyticsState.metric==='night';
+  document.querySelectorAll('.analytics-tab').forEach(button=>{button.style.display=night&&button.dataset.chart!=='dose'?'none':'';});
 }
 function renderAnalytics(){
   if(!analyticsState.loaded)return;
@@ -2306,6 +2352,7 @@ function renderAnalytics(){
   else if(analyticsState.chart==='compare')renderComparison();
   else if(analyticsState.chart==='distribution')renderDistribution();
   else if(analyticsState.chart==='daily')renderDailySummary();
+  else if(analyticsState.chart==='dose')renderDoseChart();
   else if(analyticsState.chart==='range')renderRangeDonut();
   else renderActivityHeatmap();
 }
@@ -2471,7 +2518,7 @@ function renderDailySummary(){
   setChartCount('daily-count',periodMeasurements(days).length);
   if(!summaries.length){host.innerHTML='<div class="analytics-message">'+mw('За этот период нет измерений.')+'</div>';return;}
   const width=Math.max(240,Math.floor(host.clientWidth||320)),height=Number(host.dataset.height)||285;
-  const margin={left:43,right:16,top:14,bottom:36},plotW=width-margin.left-margin.right,plotH=height-margin.top-margin.bottom;
+  const margin={left:43,right:16,top:14,bottom:58},plotW=width-margin.left-margin.right,plotH=height-margin.top-margin.bottom;
   let low=Math.min(...summaries.map(day=>day.minimum)),high=Math.max(...summaries.map(day=>day.maximum));
   if(low===high){const pad=Math.max(Math.abs(low)*.08,.5);low-=pad;high+=pad;}
   else{const pad=(high-low)*.12;low-=pad;high+=pad;}
@@ -2488,7 +2535,7 @@ function renderDailySummary(){
   if(analyticsState.metric==='sugar')svg+=idealGridOverlay('ideal-'+host.id,idealLines);
   summaries.forEach((day,index)=>{
    const x=margin.left+slot*(index+.5);
-   svg+=`<line class="daily-range" x1="${x}" y1="${y(day.maximum)}" x2="${x}" y2="${y(day.minimum)}" stroke="#8998ff" stroke-width="${Math.min(12,Math.max(4,slot*.42))}" stroke-linecap="round"/><circle class="chart-point daily-point" cx="${x}" cy="${y(day.average)}" r="5" fill="#5267e8" tabindex="0" aria-label="${formatFullDate(day.key)} · мин ${formatAxisValue(day.minimum)} · среднее ${formatAxisValue(day.average)} · макс ${formatAxisValue(day.maximum)}"/><text x="${x}" y="${height-15}" text-anchor="middle">${formatShortDate(day.key)}</text>`;
+   svg+=`<line class="daily-range" x1="${x}" y1="${y(day.maximum)}" x2="${x}" y2="${y(day.minimum)}" stroke="#8998ff" stroke-width="${Math.min(12,Math.max(4,slot*.42))}" stroke-linecap="round"/><circle class="chart-point daily-point" cx="${x}" cy="${y(day.average)}" r="5" fill="#5267e8" tabindex="0" aria-label="${formatFullDate(day.key)} · мин ${formatAxisValue(day.minimum)} · среднее ${formatAxisValue(day.average)} · макс ${formatAxisValue(day.maximum)}"/><text transform="rotate(-90 ${x+4} ${margin.top+plotH+6})" x="${x+4}" y="${margin.top+plotH+6}" text-anchor="end">${formatShortDate(day.key)}</text>`;
   });
   svg+=`<line class="chart-axis" x1="${margin.left}" y1="${margin.top+plotH}" x2="${width-margin.right}" y2="${margin.top+plotH}"/><text x="${width/2}" y="${height-2}" text-anchor="middle">Дата</text></svg>`;
   host.innerHTML=svg;
@@ -2992,7 +3039,8 @@ function renderDoctor(data){
   +doctorRowHtml('Идти за инсулином',doctorCell(s.go_date,doctorHint(s.go_in_days,14)),doctorCell(n.go_date,doctorHint(n.go_in_days,14)))
   +doctorRowHtml('Всего ручек',doctorCell(s.total),doctorCell(n.total))
   +doctorRowHtml('Хватит до',doctorCell(s.until_date,doctorHint(s.until_in_days,30),true),doctorCell(n.until_date,doctorHint(n.until_in_days,30),true),true)
-  +'</div></div>';
+  +'</div></div>'
+  +(s.comment?'<div class="doctor-comment-card"><div class="doctor-comment-title">Комментарий</div><div class="doctor-comment-text">'+escapeHtml(s.comment)+'</div></div>':'');
 }
 // Открывает стандартное приложение «Календарь» на нужной дате (без добавления событий).
 // Telegram не пускает схему calshow: из мини-аппа, поэтому открываем страницу бота
@@ -3100,6 +3148,7 @@ function openDoctorForm(){
  const s=doctorLast?.short||{},n=doctorLast?.night||{};
  const prefill=[s.received,n.received,s.total,n.total,s.tests,s.needles].map(v=>{const x=parseInt(v,10);return Number.isFinite(x)?x:0;});
  document.getElementById('docDate').value=localDateInputValue();
+ document.getElementById('docComment').value='';
  setToast(document.getElementById('doctorToast'),'');
  document.getElementById('doctorFormBackdrop').classList.add('visible');
  try{tg?.disableVerticalSwipes?.();}catch(e){}
@@ -3121,7 +3170,7 @@ async function saveDoctor(){
  button.textContent='Сохраняю…';
  setToast(toast,'');
  try{
-  const data=await api('doctor_add',{date:d+'.'+m+'.'+y,short_received:values[0],night_received:values[1],short_total:values[2],night_total:values[3],tests_packs:values[4],needles_packs:values[5]});
+  const data=await api('doctor_add',{date:d+'.'+m+'.'+y,short_received:values[0],night_received:values[1],short_total:values[2],night_total:values[3],tests_packs:values[4],needles_packs:values[5],comment:document.getElementById('docComment').value.trim()});
   setAccess(true,'Сервер подтвердил доступ');
   uiHaptic('success');
   renderDoctor(data);
@@ -3303,6 +3352,100 @@ async function saveDoctorSnapshot(){
   button.disabled=false;
   button.textContent=label;
  }
+}
+
+// ============================================================
+// ГРАФИК «ЦД»: доза за день против предела (M1 — инсулин, O1 — ночной)
+// ============================================================
+function normalizeDoses(result){
+ const raw=result&&!Array.isArray(result)?result.doses:null;
+ const limits=(raw&&raw.limits)||{};
+ const num=value=>{const n=Number(value);return Number.isFinite(n)&&n>0?n:null;};
+ const night=new Map();
+ (raw&&Array.isArray(raw.night_days)?raw.night_days:[]).forEach(row=>{
+  const date=parseHistoryDate(row.date),value=Number(row.value);
+  if(date&&!Number.isNaN(date.getTime())&&Number.isFinite(value))night.set(dateKey(date),{value,fact:!!row.fact,approx:!!row.approx});
+ });
+ return {limitInsulin:num(limits.insulin),limitNight:num(limits.night),night};
+}
+function fmtDose(value){return String(Math.round(value*10)/10).replace('.',',');}
+function doseSeries(kind,days){
+ const sums=new Map();
+ if(kind==='insulin'){
+  analyticsState.measurements.forEach(row=>{
+   if(row.type!=='insulin')return;
+   sums.set(row.dateKey,(sums.get(row.dateKey)||0)+row.value);
+  });
+ }
+ const series=[];
+ for(let i=days-1;i>=0;i--){
+  const date=new Date();date.setHours(12,0,0,0);date.setDate(date.getDate()-i);
+  const key=dateKey(date);
+  if(kind==='insulin'){series.push({key,value:sums.has(key)?sums.get(key):null,fact:false,approx:false});}
+  else{const item=analyticsState.doses.night.get(key);series.push({key,value:item?item.value:null,fact:!!(item&&item.fact),approx:!!(item&&item.approx)});}
+ }
+ return series;
+}
+function renderDoseChart(){
+ const kind=analyticsState.metric==='night'?'night':'insulin';
+ const [host,tooltip]=chartHosts('dose-chart','dose-tooltip');
+ const days=Number(document.getElementById('dose-period').value)||7;
+ const limit=kind==='night'?analyticsState.doses.limitNight:analyticsState.doses.limitInsulin;
+ const summary=document.getElementById('dose-summary');
+ const color=kind==='night'?'#8b6ee0':'#1f9d8f';
+ const okSwatch=document.getElementById('dose-swatch-ok');if(okSwatch)okSwatch.style.background=color;
+ document.getElementById('dose-title').textContent=kind==='night'?'Ночной: доза за день и ЦД':'Инсулин: доза за день и ЦД';
+ tooltip.textContent='';
+ const series=doseSeries(kind,days),filled=series.filter(day=>day.value!==null);
+ const count=document.getElementById('dose-count');
+ if(count)count.textContent=filled.length?filled.length+' дн.':'';
+ if(!limit){
+  host.innerHTML='<div class="analytics-message">Не удалось прочитать ЦД из листа get_ins ('+(kind==='night'?'ячейка O1':'ячейка M1')+').</div>';
+  summary.innerHTML='';return;
+ }
+ if(!filled.length){
+  host.innerHTML='<div class="analytics-message">За этот период нет данных.</div>';
+  summary.innerHTML='';return;
+ }
+ const width=Math.max(240,Math.floor(host.clientWidth||320)),height=Number(host.dataset.height)||285;
+ const margin={left:43,right:16,top:20,bottom:58},plotW=width-margin.left-margin.right,plotH=height-margin.top-margin.bottom;
+ const maxValue=Math.max(limit,...filled.map(day=>day.value));
+ const rough=maxValue*1.18/5;
+ const step=[1,2,5,10,20,50,100].find(s=>s>=rough)||100;
+ const yMax=Math.ceil(maxValue*1.12/step)*step;
+ const y=value=>margin.top+plotH-(value/yMax)*plotH;
+ const slot=plotW/series.length,barW=Math.min(28,Math.max(6,slot*.62));
+ let svg=`<svg class="chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="Доза за день и ЦД">`;
+ for(let value=0;value<=yMax+step*.01;value+=step){
+  const py=y(value);
+  svg+=`<line class="chart-grid" x1="${margin.left}" y1="${py}" x2="${width-margin.right}" y2="${py}"/><text x="${margin.left-6}" y="${py+4}" text-anchor="end">${value}</text>`;
+ }
+ let over=0,sum=0;
+ series.forEach((day,index)=>{
+  const x=margin.left+slot*(index+.5);
+  if(day.value!==null){
+   const isOver=day.value>limit;
+   if(isOver)over++;
+   sum+=day.value;
+   const top=y(day.value),barH=Math.max(1,margin.top+plotH-top);
+   const extra=kind==='night'?(day.fact?' (факт)':' (≈ по сумме за день)'):'';
+   const label=`${formatFullDate(day.key)} · ${fmtDose(day.value)} ед.${extra}${isOver?' · перебор +'+fmtDose(day.value-limit)+' ед.':''}`;
+   svg+=`<rect class="dose-bar" x="${x-barW/2}" y="${top}" width="${barW}" height="${barH}" rx="${Math.min(5,barW/3)}" fill="${isOver?'#e5484d':color}" tabindex="0" aria-label="${label}"/>`;
+   if(slot>=22)svg+=`<text x="${x}" y="${top-4}" text-anchor="middle" font-size="10" font-weight="700">${fmtDose(day.value)}</text>`;
+  }
+  svg+=`<text transform="rotate(-90 ${x+4} ${margin.top+plotH+6})" x="${x+4}" y="${margin.top+plotH+6}" text-anchor="end">${formatShortDate(day.key)}</text>`;
+ });
+ const ly=y(limit);
+ svg+=`<line x1="${margin.left}" y1="${ly}" x2="${width-margin.right}" y2="${ly}" stroke="#e5a13a" stroke-width="2" stroke-dasharray="6 4"/><text x="${width-margin.right}" y="${ly-5}" text-anchor="end" font-size="11" font-weight="800" fill="#c98417" stroke="var(--card)" stroke-width="4" paint-order="stroke" stroke-linejoin="round">ЦД ${fmtDose(limit)}</text>`;
+ svg+=`<line class="chart-axis" x1="${margin.left}" y1="${margin.top+plotH}" x2="${width-margin.right}" y2="${margin.top+plotH}"/></svg>`;
+ host.innerHTML=svg;
+ const average=sum/filled.length;
+ summary.innerHTML=`Дней в пределах ЦД: <b>${filled.length-over}</b> из ${filled.length}`+(over?` · <span class="over">перебор: ${over}</span>`:'')+` · среднее <b>${fmtDose(average)}</b> ед.`;
+ host.querySelectorAll('.dose-bar').forEach(bar=>{
+  const activate=()=>{tooltip.textContent=bar.getAttribute('aria-label');};
+  bar.addEventListener('click',activate);
+  bar.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();activate();}});
+ });
 }
 </script>
 </body>
