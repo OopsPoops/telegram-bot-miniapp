@@ -908,7 +908,7 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 </section>
 <section class="analytics-card analytics-panel" data-panel="dose" hidden>
 <div class="analytics-toolbar">
-<span class="analytics-toolbar-label" id="dose-title">Доза за день и ЦД</span>
+<span class="analytics-toolbar-label">Период</span>
 <select id="dose-period" aria-label="Период" onchange="renderDoseChart()">
 <option value="7" selected>7 дней</option><option value="14">14 дней</option><option value="30">30 дней</option><option value="45">45 дней</option>
 </select>
@@ -2215,7 +2215,8 @@ const FS_CHARTS={
   compare:{host:'compare-chart',title:'Сравнение'},
   distribution:{host:'distribution-chart',title:'Распределение'},
   daily:{host:'daily-chart',title:'Сводка'},
-  activity:{host:'activity-chart',title:'Активность'}
+  activity:{host:'activity-chart',title:'Активность'},
+  dose:{host:'dose-chart',title:'ЦД'}
 };
 function chartHosts(hostId,tooltipId){
   if(fsRedirect&&fsRedirect.from===hostId)return [document.getElementById('fs-chart'),document.getElementById('fs-tooltip')];
@@ -2252,7 +2253,7 @@ function openChartFullscreen(name){
   const cfg=FS_CHARTS[name];
   if(!cfg||!analyticsState.loaded)return;
   fsRedirect={from:cfg.host};
-  const metricName=analyticsState.metric==='sugar'?'Сахар':'Инсулин';
+  const metricName={sugar:'Сахар',insulin:'Инсулин',night:'Ночной'}[analyticsState.metric]||'';
   document.getElementById('fsTitle').textContent=`${cfg.title} · ${metricName}`;
   const staticLegend=document.querySelector(`.analytics-panel[data-panel="${name}"] > .analytics-legend:not([id])`);
   document.getElementById('fs-legend').innerHTML=staticLegend?staticLegend.innerHTML:'';
@@ -3401,7 +3402,6 @@ function renderDoseChart(){
  const summary=document.getElementById('dose-summary');
  const color=kind==='night'?'#8b6ee0':'#1f9d8f';
  const okSwatch=document.getElementById('dose-swatch-ok');if(okSwatch)okSwatch.style.background=color;
- document.getElementById('dose-title').textContent=kind==='night'?'Ночной: доза за день и ЦД':'Инсулин: доза за день и ЦД';
  tooltip.textContent='';
  const series=doseSeries(kind,days),filled=series.filter(day=>day.value!==null);
  const count=document.getElementById('dose-count');
