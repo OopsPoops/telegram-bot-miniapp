@@ -710,9 +710,9 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .doctor-comment-text{font-size:16px;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere}
 .doctor-field .value-input.doctor-comment{text-align:left;padding-left:14px;padding-right:14px}
 /* --- переключатель Сахар / Инсулин / Ночной --- */
-.metric-switch{grid-template-columns:1fr 1fr 1fr}
-.metric-switch .metric-pill{width:calc(33.3333% - 2px)}
-.metric-switch[data-active="night"] .metric-pill{transform:translateX(200%)}
+.metric-switch[data-night="1"]{grid-template-columns:1fr 1fr 1fr}
+.metric-switch[data-night="1"] .metric-pill{width:calc(33.3333% - 2px)}
+.metric-switch[data-night="1"][data-active="night"] .metric-pill{transform:translateX(200%)}
 /* --- график ЦД --- */
 .dose-bar{cursor:pointer;outline:none}
 .dose-bar:focus-visible{stroke:var(--text);stroke-width:2}
@@ -840,7 +840,6 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 <button class="analytics-tab" type="button" role="tab" aria-label="Доля сахара в целевом диапазоне" title="Доля сахара в целевом диапазоне" aria-selected="false" data-chart="range" onclick="selectChart('range')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/></svg><span class="tab-label">ЦД</span></button>
 <button class="analytics-tab" type="button" role="tab" aria-label="Распределение измерений" title="Распределение измерений" data-mw data-mw-attrs="aria-label title" aria-selected="false" data-chart="distribution" onclick="selectChart('distribution')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="9" r="1.8" fill="currentColor" stroke="none"/><circle cx="11" cy="16" r="1.8" fill="currentColor" stroke="none"/><circle cx="14" cy="7" r="1.8" fill="currentColor" stroke="none"/><circle cx="18.5" cy="13" r="1.8" fill="currentColor" stroke="none"/><circle cx="7" cy="19" r="1.8" fill="currentColor" stroke="none"/><circle cx="19" cy="19" r="1.8" fill="currentColor" stroke="none"/></svg><span class="tab-label">Разброс</span></button>
 <button class="analytics-tab" type="button" role="tab" aria-label="Суточная сводка" title="Суточная сводка" aria-selected="false" data-chart="daily" onclick="selectChart('daily')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7v10M12 4v13M18 9v11"/><circle cx="6" cy="12" r="2" fill="currentColor" stroke="none"/><circle cx="12" cy="10" r="2" fill="currentColor" stroke="none"/><circle cx="18" cy="14" r="2" fill="currentColor" stroke="none"/></svg><span class="tab-label">Сводка</span></button>
-<button class="analytics-tab" type="button" role="tab" aria-label="ЦД: доза за день" title="ЦД: доза за день" aria-selected="false" data-chart="dose" onclick="selectChart('dose')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 20v-7M12 20V9M18 20v-5"/><path d="M3 6.5h18" stroke-dasharray="2 2.6"/></svg><span class="tab-label">ЦД</span></button>
 <button class="analytics-tab" type="button" role="tab" aria-label="Активность по времени" title="Активность по времени" aria-selected="false" data-chart="activity" onclick="selectChart('activity')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6" fill="currentColor" fill-opacity=".45"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6" fill="currentColor" fill-opacity=".45"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6" fill="currentColor"/></svg><span class="tab-label">Активность</span></button>
 </div>
 <div class="metric-switch" role="group" aria-label="Показатель" data-active="sugar">
@@ -2297,16 +2296,34 @@ function initChartExpandButtons(){
 // ============================================================
 // ГРАФИКИ: выбор вкладки и метрики, периоды, даты
 // ============================================================
+function setMetricState(metric){
+  analyticsState.metric=metric;
+  analyticsState.selectedDates=null;
+  document.querySelector('.metric-switch')?.setAttribute('data-active',metric);
+  document.querySelectorAll('[data-metric]').forEach(button=>button.classList.toggle('active',button.dataset.metric===metric));
+}
+// «Ночной» есть только у вкладки ЦД; панель «доза за день» заменяет бублик сахара для инсулина и ночного
+function syncAnalyticsLayout(){
+  const onRange=analyticsState.chart==='range';
+  const sw=document.querySelector('.metric-switch');
+  if(sw){if(onRange)sw.setAttribute('data-night','1');else sw.removeAttribute('data-night');}
+  const nightButton=document.querySelector('[data-metric="night"]');
+  if(nightButton)nightButton.style.display=onRange?'':'none';
+  const showDose=onRange&&analyticsState.metric!=='sugar';
+  document.querySelectorAll('.analytics-panel').forEach(panel=>{
+   const name=panel.dataset.panel;
+   panel.hidden=showDose?name!=='dose':name!==analyticsState.chart;
+  });
+}
 function selectChart(name){
   analyticsState.chart=name;
-  if(name==='range'&&analyticsState.metric!=='sugar')selectMetric('sugar');
-  if(name==='dose'&&analyticsState.metric==='sugar')selectMetric('insulin');
+  if(name!=='range'&&analyticsState.metric==='night'){setMetricState('sugar');applyMetricWording();}
   document.querySelectorAll('.analytics-tab').forEach(button=>{
    const active=button.dataset.chart===name;
    button.classList.toggle('active',active);
    button.setAttribute('aria-selected',String(active));
   });
-  document.querySelectorAll('.analytics-panel').forEach(panel=>panel.hidden=panel.dataset.panel!==name);
+  syncAnalyticsLayout();
   renderAnalytics();
 }
 function toInjectionWords(text){
@@ -2332,19 +2349,10 @@ function applyMetricWording(){
   });
 }
 function selectMetric(metric){
-  analyticsState.metric=metric;
-  analyticsState.selectedDates=null;
-  document.querySelector('.metric-switch')?.setAttribute('data-active',metric);
-  document.querySelectorAll('[data-metric]').forEach(button=>button.classList.toggle('active',button.dataset.metric===metric));
+  setMetricState(metric);
   applyMetricWording();
-  updateChartTabs();
-  if(metric==='night'&&analyticsState.chart!=='dose'){selectChart('dose');return;}
-  if(metric==='sugar'&&analyticsState.chart==='dose'){selectChart('trend');return;}
+  syncAnalyticsLayout();
   renderAnalytics();
-}
-function updateChartTabs(){
-  const night=analyticsState.metric==='night';
-  document.querySelectorAll('.analytics-tab').forEach(button=>{button.style.display=night&&button.dataset.chart!=='dose'?'none':'';});
 }
 function renderAnalytics(){
   if(!analyticsState.loaded)return;
@@ -2352,8 +2360,7 @@ function renderAnalytics(){
   else if(analyticsState.chart==='compare')renderComparison();
   else if(analyticsState.chart==='distribution')renderDistribution();
   else if(analyticsState.chart==='daily')renderDailySummary();
-  else if(analyticsState.chart==='dose')renderDoseChart();
-  else if(analyticsState.chart==='range')renderRangeDonut();
+  else if(analyticsState.chart==='range'){if(analyticsState.metric==='sugar')renderRangeDonut();else renderDoseChart();}
   else renderActivityHeatmap();
 }
 function metricMeasurements(){
@@ -3447,6 +3454,8 @@ function renderDoseChart(){
   bar.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();activate();}});
  });
 }
+
+syncAnalyticsLayout();
 </script>
 </body>
 </html>
