@@ -1260,9 +1260,9 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 <div class="doctor-field"><span>Короткий</span><div class="wheel" id="wheelShortTotal"></div></div>
 <div class="doctor-field"><span>Ночной</span><div class="wheel" id="wheelNightTotal"></div></div>
 </div>
-<div class="doctor-form-group">Тест полоски и иглы, уп.</div>
+<div class="doctor-form-group">Полоски и иглы, уп.</div>
 <div class="doctor-form-row">
-<div class="doctor-field"><span>Тест полоски</span><div class="wheel" id="wheelTests"></div></div>
+<div class="doctor-field"><span>Полоски</span><div class="wheel" id="wheelTests"></div></div>
 <div class="doctor-field"><span>Иглы</span><div class="wheel" id="wheelNeedles"></div></div>
 </div>
 <label class="doctor-field"><span>Комментарий</span><input class="value-input doctor-comment" id="docComment" type="text" maxlength="200" placeholder="Необязательно" autocomplete="off" enterkeyhint="done"></label>
@@ -3170,7 +3170,7 @@ function renderDoctor(data){
   +'<div class="doctor-th"><span class="doctor-ico night">🌙</span><small class="doctor-drug">РинГлар</small>Ночной</div>'
   +doctorRowHtml('Суточная дозировка',doctorCell(dose.short?dose.short+' ед.':dose.short),doctorCell(dose.night?dose.night+' ед.':dose.night))
   +doctorRowHtml('Получено ручек (уп.)',doctorCell(receivedText(s.received)),doctorCell(receivedText(n.received)))
-  +'<div class="doctor-label">Тест полоски, уп.</div>'+doctorSpanCell(s.tests,false)
+  +'<div class="doctor-label">Полоски, уп.</div>'+doctorSpanCell(s.tests,false)
   +'<div class="doctor-label">Иглы, уп.</div>'+doctorSpanCell(s.needles,false)
   +doctorRowHtml('Записаться',doctorTapCell(s.sign_date,doctorHint(s.sign_in_days,14)),doctorTapCell(n.sign_date,doctorHint(n.sign_in_days,14)))
   +doctorRowHtml('Идти за инсулином',doctorCell(s.go_date,doctorHint(s.go_in_days,14)),doctorCell(n.go_date,doctorHint(n.go_in_days,14)))
@@ -3381,7 +3381,7 @@ function renderDoctorCanvas(data){
  const rows=[
   {label:'Суточная дозировка',a:cell(dose.short?dose.short+' ед.':'',null),b:cell(dose.night?dose.night+' ед.':'',null)},
   {label:'Получено ручек (уп.)',a:cell(receivedText(s.received),null),b:cell(receivedText(n.received),null)},
-  {label:'Тест полоски, уп.',span:cell(s.tests,null)},
+  {label:'Полоски, уп.',span:cell(s.tests,null)},
   {label:'Иглы, уп.',span:cell(s.needles,null)}
   // ниже «Иглы» (с «Записаться» и дальше) в картинку не попадает
  ];
