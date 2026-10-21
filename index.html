@@ -762,16 +762,16 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 :root[data-theme="dark"] .metric.yesterday .metric-icon{background:linear-gradient(145deg,rgba(130,150,255,.28),rgba(130,150,255,.1))}
 .metric.yesterday .metric-latest{color:var(--muted)}
 .yd-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-.yd-tile{--tone:238,111,156;--ink:#c94b7b;position:relative;display:flex;flex-direction:column;gap:3px;min-width:0;padding:11px 10px 10px;border-radius:18px;background:linear-gradient(160deg,rgba(var(--tone),.17),rgba(var(--tone),.07));border:1px solid rgba(var(--tone),.2)}
+.yd-tile{--tone:238,111,156;--ink:#c94b7b;position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:3px;min-width:0;padding:11px 10px 10px;border-radius:18px;background:linear-gradient(160deg,rgba(var(--tone),.17),rgba(var(--tone),.07));border:1px solid rgba(var(--tone),.2)}
 .yd-tile.insulin{--tone:32,169,155;--ink:#17867b}
 :root[data-theme="dark"] .yd-tile{--ink:#ff9ab9}
 :root[data-theme="dark"] .yd-tile.insulin{--ink:#6fe0d0}
 .yd-tile:not(:last-child)::after{content:"›";position:absolute;right:-15px;top:50%;width:18px;height:18px;margin-top:-9px;border-radius:50%;background:var(--card);box-shadow:0 1px 4px rgba(20,30,70,.18);display:grid;place-items:center;font-size:14px;font-weight:800;line-height:1;color:var(--muted);z-index:2;padding-bottom:1px;box-sizing:border-box}
-.yd-label{font-size:11.5px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.yd-value{display:flex;align-items:baseline;gap:3px;font-size:27px;font-weight:800;letter-spacing:-.7px;line-height:1.1;font-variant-numeric:tabular-nums}
+.yd-label{max-width:100%;font-size:11.5px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.yd-value{display:flex;align-items:baseline;justify-content:center;gap:3px;font-size:27px;font-weight:800;letter-spacing:-.7px;line-height:1.1;font-variant-numeric:tabular-nums}
 .yd-value small{font-size:11px;font-weight:650;color:var(--muted);letter-spacing:0}
 .yd-time{font-size:12px;font-weight:650;color:var(--muted);font-variant-numeric:tabular-nums}
-.yd-delta{align-self:flex-start;margin-top:2px;padding:2px 7px;border-radius:99px;font-size:11.5px;font-weight:750;font-variant-numeric:tabular-nums;background:rgba(125,135,170,.15);color:var(--muted)}
+.yd-delta{align-self:center;margin-top:2px;padding:2px 7px;border-radius:99px;font-size:11.5px;font-weight:750;font-variant-numeric:tabular-nums;background:rgba(125,135,170,.15);color:var(--muted)}
 .yd-tile.empty .yd-value{color:var(--muted)}
 .yd-tile.sk{min-height:92px;border-color:transparent;background:linear-gradient(90deg,var(--line) 25%,var(--nav-highlight) 50%,var(--line) 75%);background-size:200% 100%;animation:metricShimmer 1.2s linear infinite}
 .yd-tile.sk::after{display:none}
@@ -781,25 +781,48 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .yd-shot small{font-size:11.5px;font-weight:600;opacity:.8}
 :root[data-theme="dark"] .yd-shot{background:rgba(255,196,107,.16);color:#ffc46b}
 .yd-empty{padding:14px 12px;border-radius:16px;background:rgba(125,135,170,.1);color:var(--muted);font-size:13.5px;line-height:1.4;text-align:center}
+.yd-card{cursor:default}
+#yesterdayCard{cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .3s cubic-bezier(.34,1.5,.4,1)}
+#yesterdayCard:active{transform:scale(.99)}
+#yesterdayCard:focus-visible{outline:2px solid rgba(82,103,232,.55);outline-offset:2px}
+.yd-chevron{flex-shrink:0;width:30px;height:30px;margin-left:auto;border-radius:50%;display:grid;place-items:center;background:rgba(125,135,170,.14);color:var(--muted);transition:transform .35s cubic-bezier(.34,1.4,.4,1),background .2s}
+.yd-chevron svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.yd-group.open .yd-chevron{transform:rotate(180deg);background:rgba(82,103,232,.16);color:#5267e8}
+.yd-today{display:none}
+.yd-group.open .yd-today{display:block;animation:ydDrop .38s cubic-bezier(.2,.8,.2,1)}
+@keyframes ydDrop{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
 </style>
 </head>
 <body>
 <main class="app">
 <!-- === ЭКРАН «ГЛАВНАЯ» === -->
 <section class="screen active" id="screen-home">
-<!-- --- Карточка: вчера (завтрак или ужин) --- -->
-<section class="metric yesterday loading" id="yesterdayCard" aria-live="polite">
+<!-- --- Карточки: вчера, а по нажатию ниже — сегодня --- -->
+<div class="yd-group" id="ydGroup">
+<section class="metric yesterday yd-card loading" id="yesterdayCard" role="button" tabindex="0" aria-expanded="false" aria-label="Вчерашний приём пищи. Нажмите, чтобы показать сегодняшний" onclick="toggleTodayMeal()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleTodayMeal();}">
 <div class="metric-head">
-<div class="metric-icon" id="ydIcon">🍽️</div>
+<div class="metric-icon yd-icon">🍽️</div>
 <div class="metric-copy">
-<div class="metric-name" id="ydTitle">Вчера</div>
-<div class="metric-latest" id="ydSub"><span class="metric-skeleton"></span></div>
+<div class="metric-name yd-title">Вчера</div>
+<div class="metric-latest yd-sub"><span class="metric-skeleton"></span></div>
 </div>
-<div class="metric-figure" id="ydFigure"><div class="metric-skeleton"></div></div>
+<span class="yd-chevron" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
 </div>
-<div class="yd-strip" id="ydStrip"><div class="yd-tile sk"></div><div class="yd-tile sk"></div><div class="yd-tile sk"></div></div>
-<div class="yd-shots" id="ydShots" hidden></div>
+<div class="yd-strip"><div class="yd-tile sk"></div><div class="yd-tile sk"></div><div class="yd-tile sk"></div></div>
+<div class="yd-shots" hidden></div>
 </section>
+<section class="metric yesterday yd-card yd-today loading" id="todayMealCard" aria-live="polite">
+<div class="metric-head">
+<div class="metric-icon yd-icon">🍽️</div>
+<div class="metric-copy">
+<div class="metric-name yd-title">Сегодня</div>
+<div class="metric-latest yd-sub"><span class="metric-skeleton"></span></div>
+</div>
+</div>
+<div class="yd-strip"><div class="yd-tile sk"></div><div class="yd-tile sk"></div><div class="yd-tile sk"></div></div>
+<div class="yd-shots" hidden></div>
+</section>
+</div>
 <!-- --- Карточка: сахар --- -->
 <section class="metric sugar">
 <div class="metric-head">
@@ -2128,7 +2151,7 @@ function applyHomeData(data){
  put('sugarAverage','ммоль/л',data.sugar_average);
  put('insulinTotal','ед.',data.insulin_total);
  renderNightFact(data.today);
- renderYesterdayMeal(data.yesterday_meal);
+ renderMealCards(data);
  const yesterday=document.getElementById('nightYesterday');
  if(yesterday){
   if(data.night_yesterday&&data.night_yesterday.value){
@@ -2165,7 +2188,7 @@ async function loadHomeCards(first){
    showMetricError(document.getElementById('sugarAverage'));
    showMetricError(document.getElementById('insulinTotal'));
    showMetricError(document.getElementById('nightFact'),true);
-   renderYesterdayMeal(null);
+   renderMealCards(null);
    ['sugarLatest','insulinLatest'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='Последнее: —';});
    const yesterday=document.getElementById('nightYesterday');
    if(yesterday)yesterday.textContent='Вчера: —';
@@ -3677,29 +3700,24 @@ function ydDuration(minutes){
  const hours=Math.round(minutes/30)/2;
  return String(hours).replace('.',',')+' ч';
 }
-function ydTile(kind,label,value,unit,time,extra){
+function ydTile(kind,label,value,unit,time,extra,emptyText){
  return '<div class="yd-tile '+kind+(value?'':' empty')+'"><div class="yd-label">'+label+'</div>'
   +'<div class="yd-value"><span>'+(value?escapeHtml(value):'—')+'</span>'+(value&&unit?'<small>'+unit+'</small>':'')+'</div>'
-  +'<div class="yd-time">'+(time?escapeHtml(time):'нет записи')+'</div>'+(extra||'')+'</div>';
+  +'<div class="yd-time">'+(time?escapeHtml(time):(emptyText||'нет записи'))+'</div>'+(extra||'')+'</div>';
 }
-function renderYesterdayMeal(data){
- const card=document.getElementById('yesterdayCard');
+function renderMealCard(card,data,when){
  if(!card)return;
- if(!data){card.style.display='none';return;}
- card.style.display='';
  card.classList.remove('loading');
  const dinner=data.meal==='dinner',mealName=dinner?'ужин':'завтрак';
- document.getElementById('ydIcon').textContent=dinner?'🍽️':'🍳';
- document.getElementById('ydTitle').textContent='Вчера на '+mealName;
- document.getElementById('ydSub').textContent=data.date?data.date.slice(0,5)+' · сахар в ммоль/л':'';
- const figure=document.getElementById('ydFigure'),strip=document.getElementById('ydStrip'),shots=document.getElementById('ydShots');
+ card.querySelector('.yd-icon').textContent=dinner?'🍽️':'🍳';
+ card.querySelector('.yd-title').textContent=when+' на '+mealName;
+ card.querySelector('.yd-sub').textContent=data.date?data.date.slice(0,5):'';
+ const strip=card.querySelector('.yd-strip'),shots=card.querySelector('.yd-shots');
  if(!data.found){
-  figure.innerHTML='<div class="value">—</div>';
-  strip.innerHTML='<div class="yd-empty" style="grid-column:1/-1">Вчера не было основного укола на '+mealName+'.</div>';
+  strip.innerHTML='<div class="yd-empty" style="grid-column:1/-1">'+(when==='Вчера'?'Вчера не было основного укола на ':'Сегодня пока нет основного укола на ')+mealName+'.</div>';
   shots.hidden=true;shots.innerHTML='';
   return;
  }
- figure.innerHTML='<div class="value">'+escapeHtml(data.bolus.value)+'</div><div class="unit">ед. на еду</div>';
  const before=data.before,after=data.after;
  let delta='';
  if(typeof data.delta==='number'&&data.delta!==0){
@@ -3708,7 +3726,7 @@ function renderYesterdayMeal(data){
  strip.innerHTML=
   ydTile('sugar','До еды',before&&before.value,'',before&&before.time)
   +ydTile('insulin','Укол',data.bolus.value,'ед.',data.bolus.time)
-  +ydTile('sugar',after?'Через '+ydDuration(after.after_min):'После',after&&after.value,'',after&&after.time,delta);
+  +ydTile('sugar',after?'Через '+ydDuration(after.after_min):'После',after&&after.value,'',after&&after.time,delta,when==='Сегодня'?'ещё нет':'нет записи');
  const pre=(data.pre_shots||[]).map(item=>'<span class="yd-shot"><small>до еды</small>+'+escapeHtml(item.value)+' ед. <small>'+escapeHtml(item.time)+'</small></span>');
  const post=(data.post_shots||[]).map(item=>'<span class="yd-shot">+'+escapeHtml(item.value)+' ед. <small>'+escapeHtml(item.time)+'</small></span>');
  if(pre.length||post.length){
@@ -3717,6 +3735,21 @@ function renderYesterdayMeal(data){
  }else{
   shots.hidden=true;shots.innerHTML='';
  }
+}
+function renderMealCards(data){
+ const group=document.getElementById('ydGroup');
+ if(!group)return;
+ if(!data||!data.yesterday_meal){group.style.display='none';group.classList.remove('open');return;}
+ group.style.display='';
+ renderMealCard(document.getElementById('yesterdayCard'),data.yesterday_meal,'Вчера');
+ if(data.today_meal)renderMealCard(document.getElementById('todayMealCard'),data.today_meal,'Сегодня');
+}
+function toggleTodayMeal(){
+ const group=document.getElementById('ydGroup'),card=document.getElementById('yesterdayCard');
+ if(!group||card.classList.contains('loading'))return;
+ const open=group.classList.toggle('open');
+ card.setAttribute('aria-expanded',String(open));
+ selectionHaptic();
 }
 </script>
 </body>
