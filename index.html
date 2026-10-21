@@ -722,9 +722,8 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .dose-limit-swatch{display:inline-block;width:16px;height:0;border-top:2px dashed #e5a13a;margin-right:6px;vertical-align:middle}
 
 /* --- Динамика средних --- */
-.trends-title{margin-top:8px}
 .trends-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
-.trend-tile{--accent:var(--pink);--accent-soft:rgba(238,111,156,.14);--accent-ink:#c94b7b;--icon-grad:#fff0f5;position:relative;display:flex;flex-direction:column;gap:8px;text-align:left;padding:13px 13px 12px;min-height:162px;background:var(--card);border:1px solid rgba(125,135,170,.12);border-radius:20px;box-shadow:var(--shadow);color:var(--text);font:inherit;cursor:pointer;overflow:hidden;-webkit-tap-highlight-color:transparent;transition:transform .3s cubic-bezier(.34,1.5,.4,1)}
+.trend-tile{--accent:var(--pink);--accent-soft:rgba(238,111,156,.14);--accent-ink:#c94b7b;--icon-grad:#fff0f5;position:relative;display:flex;flex-direction:column;gap:8px;text-align:left;padding:13px 13px 12px;min-height:140px;background:var(--card);border:1px solid rgba(125,135,170,.12);border-radius:20px;box-shadow:var(--shadow);color:var(--text);font:inherit;cursor:pointer;overflow:hidden;-webkit-tap-highlight-color:transparent;transition:transform .3s cubic-bezier(.34,1.5,.4,1)}
 .trend-tile:active{transform:scale(.98)}
 .trend-tile::before{content:"";position:absolute;inset:0 auto auto 0;width:78%;height:70%;background:radial-gradient(ellipse 100% 100% at 0 0,var(--accent-soft),transparent 100%);pointer-events:none}
 .trend-tile.insulin{--accent:var(--teal);--accent-soft:rgba(32,169,155,.15);--accent-ink:#17867b;--icon-grad:#e4faf6}
@@ -741,12 +740,12 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .trend-value{position:relative;display:flex;align-items:baseline;gap:5px;font-size:31px;font-weight:800;letter-spacing:-.6px;line-height:1.05;font-variant-numeric:tabular-nums}
 .trend-value small{font-size:12px;font-weight:650;color:var(--muted);letter-spacing:0}
 .trend-delta{position:relative;align-self:flex-start;display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:999px;font-size:12.5px;font-weight:750;font-variant-numeric:tabular-nums;background:var(--accent-soft);color:var(--accent-ink)}
+.trend-delta.good{background:rgba(31,157,98,.15);color:#13804d}
+.trend-delta.bad{background:rgba(229,72,77,.13);color:#d23a40}
+:root[data-theme="dark"] .trend-delta.good{background:rgba(72,214,142,.16);color:#6fe3a8}
+:root[data-theme="dark"] .trend-delta.bad{background:rgba(255,123,134,.16);color:#ff9aa2}
 .trend-delta.flat{background:rgba(125,135,170,.13);color:var(--muted);font-weight:650}
-.trend-bars{position:relative;display:flex;flex-direction:column;gap:4px;margin-top:auto}
-.trend-bar{height:6px;border-radius:99px;background:rgba(125,135,170,.14);overflow:hidden}
-.trend-bar i{display:block;height:100%;width:0;border-radius:99px;background:var(--accent);transition:width .7s cubic-bezier(.2,.8,.2,1)}
-.trend-bar.prev i{background:rgba(125,135,170,.5)}
-.trend-foot{position:relative;font-size:11.5px;color:var(--muted);line-height:1.3}
+.trend-foot{position:relative;margin-top:auto;font-size:11.5px;color:var(--muted);line-height:1.3}
 .trend-foot .warn{color:#e08a22;font-weight:700}
 .trend-detail{display:none;position:relative;font-size:11.5px;line-height:1.4;color:var(--muted);padding-top:7px;border-top:1px dashed rgba(125,135,170,.3)}
 .trend-tile.open .trend-detail{display:block}
@@ -754,8 +753,8 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .trend-tile.loading .sk.v{width:62%;height:30px}
 .trend-tile.loading .sk.d{width:46%;height:22px;border-radius:99px}
 .trend-tile.loading .sk.f{width:80%;height:10px;margin-top:auto}
+.trends-panel{padding-top:2px}
 @keyframes trendPulse{0%,100%{opacity:.55}50%{opacity:1}}
-.trends-note{margin:10px 4px 2px;font-size:11.5px;line-height:1.4;color:var(--muted);text-align:center}
 </style>
 </head>
 <body>
@@ -839,12 +838,6 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 </div>
 <div class="toast" id="nightToast"></div>
 </section>
-<div class="quick-title trends-title">
-<div class="section-title">Динамика средних</div>
-<span>полные дни, без сегодня</span>
-</div>
-<section class="trends-grid" id="trendsGrid" aria-label="Динамика средних значений"></section>
-<div class="trends-note">WoW — неделя к неделе, MoM — месяц к месяцу. Нажмите на квадрат, чтобы увидеть периоды.</div>
 <div class="quick-title">
 <div class="section-title">Быстрый доступ</div>
 <span></span>
@@ -883,6 +876,7 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 <button class="analytics-tab" type="button" role="tab" aria-label="Распределение измерений" title="Распределение измерений" data-mw data-mw-attrs="aria-label title" aria-selected="false" data-chart="distribution" onclick="selectChart('distribution')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="9" r="1.8" fill="currentColor" stroke="none"/><circle cx="11" cy="16" r="1.8" fill="currentColor" stroke="none"/><circle cx="14" cy="7" r="1.8" fill="currentColor" stroke="none"/><circle cx="18.5" cy="13" r="1.8" fill="currentColor" stroke="none"/><circle cx="7" cy="19" r="1.8" fill="currentColor" stroke="none"/><circle cx="19" cy="19" r="1.8" fill="currentColor" stroke="none"/></svg><span class="tab-label">Разброс</span></button>
 <button class="analytics-tab" type="button" role="tab" aria-label="Суточная сводка" title="Суточная сводка" aria-selected="false" data-chart="daily" onclick="selectChart('daily')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7v10M12 4v13M18 9v11"/><circle cx="6" cy="12" r="2" fill="currentColor" stroke="none"/><circle cx="12" cy="10" r="2" fill="currentColor" stroke="none"/><circle cx="18" cy="14" r="2" fill="currentColor" stroke="none"/></svg><span class="tab-label">Сводка</span></button>
 <button class="analytics-tab" type="button" role="tab" aria-label="Активность по времени" title="Активность по времени" aria-selected="false" data-chart="activity" onclick="selectChart('activity')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6" fill="currentColor" fill-opacity=".45"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6" fill="currentColor" fill-opacity=".45"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6" fill="currentColor"/></svg><span class="tab-label">Активность</span></button>
+<button class="analytics-tab" type="button" role="tab" aria-label="Тренды: неделя к неделе и месяц к месяцу" title="Тренды: неделя к неделе и месяц к месяцу" aria-selected="false" data-chart="dynamics" onclick="selectChart('dynamics')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 19V6M7 6 3.8 9.2M7 6l3.2 3.2"/><path d="M17 5v13M17 18l-3.2-3.2M17 18l3.2-3.2"/></svg><span class="tab-label">Тренды</span></button>
 </div>
 <div class="metric-switch" role="group" aria-label="Показатель" data-active="sugar">
 <span class="metric-pill" aria-hidden="true"></span>
@@ -977,6 +971,9 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 <div id="range-legend" class="range-legend"></div>
 <div id="range-compare" class="range-compare"></div>
 </section>
+<div class="analytics-panel trends-panel" data-panel="dynamics" hidden>
+<section class="trends-grid" id="trendsGrid" aria-label="Динамика средних значений"></section>
+</div>
 <section class="analytics-card analytics-panel" data-panel="activity" hidden>
 <div class="analytics-toolbar">
 <span class="analytics-toolbar-label">Активность за период</span>
@@ -2349,7 +2346,7 @@ function setMetricState(metric){
 function syncAnalyticsLayout(){
   const onRange=analyticsState.chart==='range';
   const sw=document.querySelector('.metric-switch');
-  if(sw){if(onRange)sw.setAttribute('data-night','1');else sw.removeAttribute('data-night');}
+  if(sw){if(onRange)sw.setAttribute('data-night','1');else sw.removeAttribute('data-night');sw.style.display=analyticsState.chart==='dynamics'?'none':'';}
   const nightButton=document.querySelector('[data-metric="night"]');
   if(nightButton)nightButton.style.display=onRange?'':'none';
   const showDose=onRange&&analyticsState.metric!=='sugar';
@@ -2367,6 +2364,7 @@ function selectChart(name){
    button.setAttribute('aria-selected',String(active));
   });
   syncAnalyticsLayout();
+  if(name==='dynamics')loadTrends(false);
   renderAnalytics();
 }
 function toInjectionWords(text){
@@ -2404,6 +2402,7 @@ function renderAnalytics(){
   else if(analyticsState.chart==='distribution')renderDistribution();
   else if(analyticsState.chart==='daily')renderDailySummary();
   else if(analyticsState.chart==='range'){if(analyticsState.metric==='sugar')renderRangeDonut();else renderDoseChart();}
+  else if(analyticsState.chart==='dynamics'){/* плитки грузятся отдельно: loadTrends */}
   else renderActivityHeatmap();
 }
 function metricMeasurements(){
@@ -2999,11 +2998,11 @@ function initPlaceholderMarquee(){
 updateEntryPlaceholders();
 initPlaceholderMarquee();
 window.addEventListener('pageshow',()=>{updateEntryPlaceholders();updateInsulinTimer();});
-document.addEventListener('visibilitychange',()=>{if(!document.hidden){updateEntryPlaceholders();updateInsulinTimer();syncInsulinTimer();loadHomeCards(false).finally(()=>loadTrends(false));loadReportSettings();}});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){updateEntryPlaceholders();updateInsulinTimer();syncInsulinTimer();loadHomeCards(false);loadReportSettings();}});
 if(tg)tg.onEvent?.('activated',()=>{updateEntryPlaceholders();updateInsulinTimer();});
 updateNightInputPlaceholder();
 setInterval(updateNightInputPlaceholder,60_000);
-loadHomeCards(true).finally(()=>loadTrends(true));
+loadHomeCards(true);
 
 // --- Инициализация пилюли навигации ---
 requestAnimationFrame(()=>{
@@ -3521,7 +3520,8 @@ function trendDelta(cfg,cur,prev){
  const diff=cur-prev,pct=prev?diff/prev*100:0;
  const flat=cfg.flat.abs!==undefined?Math.abs(diff)<cfg.flat.abs:Math.abs(pct)<cfg.flat.pct;
  if(flat)return {cls:'flat',text:'≈ без изменений'};
- return {cls:diff>0?'up':'down',text:(diff>0?'▲ ':'▼ ')+trendSigned(diff,1)+' · '+trendSigned(pct,0)+'%'};
+ const tone=cfg.kind==='sugar'?(diff>0?'bad':'good'):(diff>0?'up':'down');
+ return {cls:tone,text:(diff>0?'▲ ':'▼ ')+trendSigned(diff,1)+' · '+trendSigned(pct,0)+'%'};
 }
 function trendRange(stats){
  return stats&&stats.from&&stats.to?stats.from.slice(0,5)+'–'+stats.to.slice(0,5):'';
@@ -3553,10 +3553,8 @@ function renderTrends(data){
   const pair=cfg.pick(data)||{},cur=pair.cur||{},prev=pair.prev||{};
   const delta=trendDelta(cfg,cur.avg,prev.avg);
   const hasCur=cur.avg!==null&&cur.avg!==undefined,hasPrev=prev.avg!==null&&prev.avg!==undefined;
-  const max=Math.max(hasCur?cur.avg:0,hasPrev?prev.avg:0)||1;
-  const curW=hasCur?Math.max(4,cur.avg/max*100):0,prevW=hasPrev?Math.max(4,prev.avg/max*100):0;
   const low=pair.length&&cur.days<cfg.lowDays;
-  const coverage=hasCur?(low?'<span class="warn">мало данных · '+cur.days+' из '+pair.length+' дн.</span>':cur.days+' из '+pair.length+' дн.'):'';
+  const coverage=hasCur&&low?'<span class="warn">мало данных</span>':'';
   const was=hasPrev?'было '+trendNum(prev.avg):'';
   const foot=[was,coverage].filter(Boolean).join(' · ');
   const detail=trendRange(cur)?trendRange(cur)+'<br>против '+trendRange(prev)+'<br>'+cur.n+' '+cfg.daysLabel+' против '+(prev.n??0):'';
@@ -3566,13 +3564,9 @@ function renderTrends(data){
   tile.innerHTML=trendTileHead(cfg)
    +'<div class="trend-value"><span>'+trendNum(cur.avg)+'</span><small>'+cfg.unit+'</small></div>'
    +'<div class="trend-delta '+delta.cls+'">'+delta.text+'</div>'
-   +'<div class="trend-bars"><div class="trend-bar"><i data-w="'+curW+'"></i></div><div class="trend-bar prev"><i data-w="'+prevW+'"></i></div></div>'
    +'<div class="trend-foot">'+(foot||'&nbsp;')+'</div>'
    +'<div class="trend-detail">'+(detail||'нет данных')+'</div>';
  });
- requestAnimationFrame(()=>requestAnimationFrame(()=>{
-  document.querySelectorAll('#trendsGrid .trend-bar i').forEach(bar=>{bar.style.width=bar.dataset.w+'%';});
- }));
 }
 function showTrendsError(){
  TREND_TILES.forEach(cfg=>{
