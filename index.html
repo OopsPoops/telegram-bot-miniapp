@@ -2796,6 +2796,30 @@ function renderLegend(id,items){
    label.append(color,text);host.appendChild(label);
   });
 }
+// Плавная линия через точки: монотонная кубическая интерполяция (без «перелётов» выше/ниже реальных значений)
+function smoothPath(points){
+  const n=points.length;
+  const fmt=value=>value.toFixed(2);
+  if(n<3)return points.map((p,i)=>`${i?'L':'M'}${fmt(p[0])},${fmt(p[1])}`).join(' ');
+  const dx=[],slope=[],tangent=new Array(n);
+  for(let i=0;i<n-1;i++){
+   dx[i]=points[i+1][0]-points[i][0];
+   slope[i]=dx[i]===0?0:(points[i+1][1]-points[i][1])/dx[i];
+  }
+  tangent[0]=slope[0];
+  tangent[n-1]=slope[n-2];
+  for(let i=1;i<n-1;i++){
+   if(slope[i-1]*slope[i]<=0||dx[i]===0||dx[i-1]===0){tangent[i]=0;continue;}
+   const w1=2*dx[i]+dx[i-1],w2=dx[i]+2*dx[i-1];
+   tangent[i]=(w1+w2)/(w1/slope[i-1]+w2/slope[i]);
+  }
+  let d=`M${fmt(points[0][0])},${fmt(points[0][1])}`;
+  for(let i=0;i<n-1;i++){
+   const [x0,y0]=points[i],[x1,y1]=points[i+1],step=dx[i]/3;
+   d+=` C${fmt(x0+step)},${fmt(y0+tangent[i]*step)} ${fmt(x1-step)},${fmt(y1-tangent[i+1]*step)} ${fmt(x1)},${fmt(y1)}`;
+  }
+  return d;
+}
 function renderTimeChart(id,groups,{metric,tooltipId,connect=true,emptyText,weekLabels=false}){
   const [host,tooltip]=chartHosts(id,tooltipId),all=groups.flatMap(group=>group.points);
   tooltip.textContent='';
@@ -2835,7 +2859,7 @@ function renderTimeChart(id,groups,{metric,tooltipId,connect=true,emptyText,week
     let segment=[];
     const drawSegment=()=>{
      if(segment.length>1){
-      const path=segment.map((point,index)=>`${index?'L':'M'}${x(point.timeObj.minutes).toFixed(2)},${y(point.value).toFixed(2)}`).join(' ');
+      const path=smoothPath(segment.map(point=>[x(point.timeObj.minutes),y(point.value)]));
       svg+=`<path class="chart-line" pathLength="1" d="${path}" fill="none" stroke="${group.color}" stroke-width="${group.width||(weekLabels?1.35:1.7)}" stroke-opacity="${group.opacity||(weekLabels?.48:.72)}" stroke-linecap="round" stroke-linejoin="round"/>`;
      }
     };
