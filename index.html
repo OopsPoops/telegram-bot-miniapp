@@ -755,12 +755,51 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .trend-tile.loading .sk.f{width:80%;height:10px;margin-top:auto}
 .trends-panel{padding-top:2px}
 @keyframes trendPulse{0%,100%{opacity:.55}50%{opacity:1}}
+
+/* --- Карточка «Вчера» --- */
+.metric.yesterday{--glow:82,103,232}
+.metric.yesterday .metric-icon{background:linear-gradient(145deg,#f3f5ff,#d8defb)}
+:root[data-theme="dark"] .metric.yesterday .metric-icon{background:linear-gradient(145deg,rgba(130,150,255,.28),rgba(130,150,255,.1))}
+.metric.yesterday .metric-latest{color:var(--muted)}
+.yd-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.yd-tile{--tone:238,111,156;--ink:#c94b7b;position:relative;display:flex;flex-direction:column;gap:3px;min-width:0;padding:11px 10px 10px;border-radius:18px;background:linear-gradient(160deg,rgba(var(--tone),.17),rgba(var(--tone),.07));border:1px solid rgba(var(--tone),.2)}
+.yd-tile.insulin{--tone:32,169,155;--ink:#17867b}
+:root[data-theme="dark"] .yd-tile{--ink:#ff9ab9}
+:root[data-theme="dark"] .yd-tile.insulin{--ink:#6fe0d0}
+.yd-tile:not(:last-child)::after{content:"›";position:absolute;right:-15px;top:50%;width:18px;height:18px;margin-top:-9px;border-radius:50%;background:var(--card);box-shadow:0 1px 4px rgba(20,30,70,.18);display:grid;place-items:center;font-size:14px;font-weight:800;line-height:1;color:var(--muted);z-index:2;padding-bottom:1px;box-sizing:border-box}
+.yd-label{font-size:11.5px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.yd-value{display:flex;align-items:baseline;gap:3px;font-size:27px;font-weight:800;letter-spacing:-.7px;line-height:1.1;font-variant-numeric:tabular-nums}
+.yd-value small{font-size:11px;font-weight:650;color:var(--muted);letter-spacing:0}
+.yd-time{font-size:12px;font-weight:650;color:var(--muted);font-variant-numeric:tabular-nums}
+.yd-delta{align-self:flex-start;margin-top:2px;padding:2px 7px;border-radius:99px;font-size:11.5px;font-weight:750;font-variant-numeric:tabular-nums;background:rgba(125,135,170,.15);color:var(--muted)}
+.yd-tile.empty .yd-value{color:var(--muted)}
+.yd-tile.sk{min-height:92px;border-color:transparent;background:linear-gradient(90deg,var(--line) 25%,var(--nav-highlight) 50%,var(--line) 75%);background-size:200% 100%;animation:metricShimmer 1.2s linear infinite}
+.yd-tile.sk::after{display:none}
+.yd-shots{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-top:12px}
+.yd-shots-title{font-size:12px;font-weight:750;color:var(--muted);margin-right:2px}
+.yd-shot{display:inline-flex;align-items:baseline;gap:5px;padding:5px 10px;border-radius:99px;background:rgba(245,166,35,.15);color:#a9690a;font-size:12.5px;font-weight:700;font-variant-numeric:tabular-nums}
+.yd-shot small{font-size:11.5px;font-weight:600;opacity:.8}
+:root[data-theme="dark"] .yd-shot{background:rgba(255,196,107,.16);color:#ffc46b}
+.yd-empty{padding:14px 12px;border-radius:16px;background:rgba(125,135,170,.1);color:var(--muted);font-size:13.5px;line-height:1.4;text-align:center}
 </style>
 </head>
 <body>
 <main class="app">
 <!-- === ЭКРАН «ГЛАВНАЯ» === -->
 <section class="screen active" id="screen-home">
+<!-- --- Карточка: вчера (завтрак или ужин) --- -->
+<section class="metric yesterday loading" id="yesterdayCard" aria-live="polite">
+<div class="metric-head">
+<div class="metric-icon" id="ydIcon">🍽️</div>
+<div class="metric-copy">
+<div class="metric-name" id="ydTitle">Вчера</div>
+<div class="metric-latest" id="ydSub"><span class="metric-skeleton"></span></div>
+</div>
+<div class="metric-figure" id="ydFigure"><div class="metric-skeleton"></div></div>
+</div>
+<div class="yd-strip" id="ydStrip"><div class="yd-tile sk"></div><div class="yd-tile sk"></div><div class="yd-tile sk"></div></div>
+<div class="yd-shots" id="ydShots" hidden></div>
+</section>
 <!-- --- Карточка: сахар --- -->
 <section class="metric sugar">
 <div class="metric-head">
@@ -2089,6 +2128,7 @@ function applyHomeData(data){
  put('sugarAverage','ммоль/л',data.sugar_average);
  put('insulinTotal','ед.',data.insulin_total);
  renderNightFact(data.today);
+ renderYesterdayMeal(data.yesterday_meal);
  const yesterday=document.getElementById('nightYesterday');
  if(yesterday){
   if(data.night_yesterday&&data.night_yesterday.value){
@@ -2125,6 +2165,7 @@ async function loadHomeCards(first){
    showMetricError(document.getElementById('sugarAverage'));
    showMetricError(document.getElementById('insulinTotal'));
    showMetricError(document.getElementById('nightFact'),true);
+   renderYesterdayMeal(null);
    ['sugarLatest','insulinLatest'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='Последнее: —';});
    const yesterday=document.getElementById('nightYesterday');
    if(yesterday)yesterday.textContent='Вчера: —';
@@ -3628,6 +3669,55 @@ async function loadTrends(force){
 }
 
 initTrendTiles();
+
+// ============================================================
+// ГЛАВНАЯ: «Вчера» — сахар до еды, укол, подколки и сахар после
+// ============================================================
+function ydDuration(minutes){
+ const hours=Math.round(minutes/30)/2;
+ return String(hours).replace('.',',')+' ч';
+}
+function ydTile(kind,label,value,unit,time,extra){
+ return '<div class="yd-tile '+kind+(value?'':' empty')+'"><div class="yd-label">'+label+'</div>'
+  +'<div class="yd-value"><span>'+(value?escapeHtml(value):'—')+'</span>'+(value&&unit?'<small>'+unit+'</small>':'')+'</div>'
+  +'<div class="yd-time">'+(time?escapeHtml(time):'нет записи')+'</div>'+(extra||'')+'</div>';
+}
+function renderYesterdayMeal(data){
+ const card=document.getElementById('yesterdayCard');
+ if(!card)return;
+ if(!data){card.style.display='none';return;}
+ card.style.display='';
+ card.classList.remove('loading');
+ const dinner=data.meal==='dinner',mealName=dinner?'ужин':'завтрак';
+ document.getElementById('ydIcon').textContent=dinner?'🍽️':'🍳';
+ document.getElementById('ydTitle').textContent='Вчера на '+mealName;
+ document.getElementById('ydSub').textContent=data.date?data.date.slice(0,5)+' · сахар в ммоль/л':'';
+ const figure=document.getElementById('ydFigure'),strip=document.getElementById('ydStrip'),shots=document.getElementById('ydShots');
+ if(!data.found){
+  figure.innerHTML='<div class="value">—</div>';
+  strip.innerHTML='<div class="yd-empty" style="grid-column:1/-1">Вчера не было основного укола на '+mealName+'.</div>';
+  shots.hidden=true;shots.innerHTML='';
+  return;
+ }
+ figure.innerHTML='<div class="value">'+escapeHtml(data.bolus.value)+'</div><div class="unit">ед. на еду</div>';
+ const before=data.before,after=data.after;
+ let delta='';
+ if(typeof data.delta==='number'&&data.delta!==0){
+  delta='<div class="yd-delta">'+(data.delta>0?'▲ ':'▼ ')+trendSigned(data.delta,1)+'</div>';
+ }
+ strip.innerHTML=
+  ydTile('sugar','До еды',before&&before.value,'',before&&before.time)
+  +ydTile('insulin','Укол',data.bolus.value,'ед.',data.bolus.time)
+  +ydTile('sugar',after?'Через '+ydDuration(after.after_min):'После',after&&after.value,'',after&&after.time,delta);
+ const pre=(data.pre_shots||[]).map(item=>'<span class="yd-shot"><small>до еды</small>+'+escapeHtml(item.value)+' ед. <small>'+escapeHtml(item.time)+'</small></span>');
+ const post=(data.post_shots||[]).map(item=>'<span class="yd-shot">+'+escapeHtml(item.value)+' ед. <small>'+escapeHtml(item.time)+'</small></span>');
+ if(pre.length||post.length){
+  shots.innerHTML='<span class="yd-shots-title">💉 Подколка</span>'+pre.join('')+post.join('');
+  shots.hidden=false;
+ }else{
+  shots.hidden=true;shots.innerHTML='';
+ }
+}
 </script>
 </body>
 </html>
