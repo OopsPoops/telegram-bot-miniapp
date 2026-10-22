@@ -723,13 +723,17 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .nd-date{font-size:12px;color:var(--muted)}
 .nd-sum{margin-left:auto;display:flex;gap:10px;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
 .nd-sum b{color:var(--text);font-weight:750}
-.nd-body{flex:1;min-height:0;overflow-y:auto;scrollbar-width:none;display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);gap:12px;align-content:start}
-.nd-body::-webkit-scrollbar{display:none}
-.nd-col-title{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px}
-.nd-chips{display:flex;flex-wrap:wrap;gap:calc(4px*var(--s,1))}
-.nd-chip{display:inline-flex;align-items:baseline;gap:.3em;padding:.18em .5em;border-radius:.6em;background:var(--input-bg);font-size:calc(13px*var(--s,1));line-height:1.25;font-variant-numeric:tabular-nums}
-.nd-chip i{font-style:normal;font-size:.82em;color:var(--muted)}
-.nd-chip b{font-weight:750}
+.nd-body{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+.nd-col{min-width:0;min-height:0;display:flex;flex-direction:column}
+.nd-col-title{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:2px;flex:none}
+/* значения идут столбиками по 3 строки, время растёт сверху вниз и слева направо;
+   если столбцов больше двух, пролистывается только эта половина (инсулин или сахар) */
+.nd-grid{flex:1;min-height:0;display:grid;grid-template-rows:repeat(3,minmax(0,1fr));grid-auto-flow:column;grid-auto-columns:max-content;column-gap:14px;align-content:stretch;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.nd-grid::-webkit-scrollbar{display:none}
+.nd-cell{display:flex;align-items:center;gap:5px;white-space:nowrap;font-size:13px;font-variant-numeric:tabular-nums}
+.nd-cell:nth-child(3n+1){scroll-snap-align:start}
+.nd-cell i{font-style:normal;font-size:11px;color:var(--muted)}
+.nd-cell b{font-weight:750}
 .nd-ins b{color:var(--teal)}
 .nd-sug b{color:var(--pink)}
 .nd-empty{font-size:13px;color:var(--muted)}
@@ -933,8 +937,9 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 </section>
 <section class="metric insulin night night-day" id="nightDayToday"><div class="nd-empty">Загружаю…</div></section>
 <section class="metric insulin night night-day" id="nightDayYesterday"><div class="nd-empty">Загружаю…</div></section>
+<section class="metric insulin night night-day" id="nightDayBefore"><div class="nd-empty">Загружаю…</div></section>
 </div>
-<div class="carousel-dots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
+<div class="carousel-dots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i></div>
 <div class="quick-title">
 <div class="section-title">Быстрый доступ</div>
 <span></span>
@@ -2156,13 +2161,6 @@ function updateEntryPlaceholders(){
 // ============================================================
 // СВАЙП-КАРУСЕЛЬ (общая): высота подстраивается под текущую страницу
 // ============================================================
-function shrinkDayPage(page){
- const body=page.querySelector('.nd-body');
- if(!body)return;
- let k=1;
- page.style.setProperty('--s','1');
- while(body.scrollHeight>body.clientHeight+1&&k>0.7){k-=0.05;page.style.setProperty('--s',k.toFixed(2));}
-}
 function fitCarousel(scroller){
  if(!scroller||!scroller.children.length)return;
  const w=scroller.clientWidth;
@@ -2175,7 +2173,7 @@ function fitCarousel(scroller){
   const sig=w+'|'+h0+'|'+pages.map(p=>p.innerHTML.length).join(',');
   if(h0>0&&scroller._sig!==sig){
    scroller._sig=sig;
-   pages.slice(1).forEach(p=>{p.style.height=h0+'px';shrinkDayPage(p);});
+   pages.slice(1).forEach(p=>{p.style.height=h0+'px';});
   }
  }
  const dots=scroller.nextElementSibling;
@@ -2210,7 +2208,8 @@ function parseDayReport(text){
  const avg=/Среднее\s*=\s*([^\n]+)/.exec(sugarPart);
  let night=null;
  try{night=formatNightFact(t).text;}catch(error){night=null;}
- return {date:date?date[1]:'',insulin:grab(head),sugar:grab(sugarPart),total:total?total[1]:null,avg:avg?avg[1].trim():null,night};
+ const byTime=(x,y)=>x.t.padStart(5,'0')<y.t.padStart(5,'0')?-1:x.t.padStart(5,'0')>y.t.padStart(5,'0')?1:0;
+ return {date:date?date[1]:'',insulin:grab(head).sort(byTime),sugar:grab(sugarPart).sort(byTime),total:total?total[1]:null,avg:avg?avg[1].trim():null,night};
 }
 function renderNightDay(id,text,title){
  const el=document.getElementById(id);
@@ -2219,12 +2218,12 @@ function renderNightDay(id,text,title){
   el.innerHTML='<div class="nd-head"><span class="nd-title">'+escapeHtml(title)+'</span></div><div class="nd-empty">Нет данных</div>';
  }else{
   const d=parseDayReport(text);
-  const chips=(items,cls)=>items.length?'<div class="nd-chips">'+items.map(x=>'<span class="nd-chip '+cls+'"><i>'+escapeHtml(x.t)+'</i><b>'+escapeHtml(x.v)+'</b></span>').join('')+'</div>':'<div class="nd-empty">—</div>';
+  const chips=(items,cls)=>items.length?'<div class="nd-grid">'+items.map(x=>'<div class="nd-cell '+cls+'"><i>'+escapeHtml(x.t.padStart(5,'0'))+'</i><b>'+escapeHtml(x.v)+'</b></div>').join('')+'</div>':'<div class="nd-empty">—</div>';
   const shortDate=d.date?d.date.slice(0,5):'';
   el.innerHTML='<div class="nd-head"><span class="nd-title">'+escapeHtml(title)+'</span>'+(shortDate?'<span class="nd-date">'+escapeHtml(shortDate)+'</span>':'')
    +'<span class="nd-sum"><span>Итого <b>'+escapeHtml(d.total!==null?d.total:'—')+'</b></span><span>🌙 <b>'+escapeHtml(d.night!==null?d.night:'—')+'</b></span><span>Ср <b>'+escapeHtml(d.avg||'—')+'</b></span></span></div>'
-   +'<div class="nd-body"><div><div class="nd-col-title">💉 Инсулин</div>'+chips(d.insulin,'nd-ins')+'</div>'
-   +'<div><div class="nd-col-title">🍭 Сахар</div>'+chips(d.sugar,'nd-sug')+'</div></div>';
+   +'<div class="nd-body"><div class="nd-col"><div class="nd-col-title">💉 Инсулин</div>'+chips(d.insulin,'nd-ins')+'</div>'
+   +'<div class="nd-col"><div class="nd-col-title">🍭 Сахар</div>'+chips(d.sugar,'nd-sug')+'</div></div>';
  }
  const car=document.getElementById('nightCarousel');
  setupCarousel(car);
@@ -2266,6 +2265,7 @@ function applyHomeData(data){
  renderNightFact(data.today);
  renderNightDay('nightDayToday',data.today,'Сегодня');
  renderNightDay('nightDayYesterday',data.yesterday,'Вчера');
+ renderNightDay('nightDayBefore',data.day_before,'Позавчера');
  renderMealCards(data);
  const yesterday=document.getElementById('nightYesterday');
  if(yesterday){
