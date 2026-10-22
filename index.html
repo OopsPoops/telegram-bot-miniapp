@@ -241,6 +241,8 @@ button{-webkit-tap-highlight-color:transparent}
 .chart-point{cursor:pointer;stroke:var(--card);stroke-width:1.5}
 .chart-point:focus{outline:none;stroke:var(--text);stroke-width:2.5}
 .chart-tooltip{min-height:18px;margin-top:6px;color:var(--muted);font-size:12px;line-height:1.45}
+.effect-single{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);white-space:nowrap}
+.effect-single input{accent-color:#969baa}
 .analytics-note{font-size:11px;line-height:1.45;color:var(--muted);margin:8px 1px 0}
 .analytics-message{padding:28px 14px;text-align:center;color:var(--muted);font-size:13px;line-height:1.5}
 .analytics-retry{margin-top:11px;border:0;border-radius:11px;padding:9px 13px;background:var(--blue);color:white;font-weight:700;cursor:pointer}
@@ -979,6 +981,7 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 <button class="analytics-tab" type="button" role="tab" aria-label="Суточная сводка" title="Суточная сводка" aria-selected="false" data-chart="daily" onclick="selectChart('daily')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7v10M12 4v13M18 9v11"/><circle cx="6" cy="12" r="2" fill="currentColor" stroke="none"/><circle cx="12" cy="10" r="2" fill="currentColor" stroke="none"/><circle cx="18" cy="14" r="2" fill="currentColor" stroke="none"/></svg><span class="tab-label">Сводка</span></button>
 <button class="analytics-tab" type="button" role="tab" aria-label="Активность по времени" title="Активность по времени" aria-selected="false" data-chart="activity" onclick="selectChart('activity')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6" fill="currentColor" fill-opacity=".45"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6" fill="currentColor" fill-opacity=".45"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6" fill="currentColor"/></svg><span class="tab-label">Активность</span></button>
 <button class="analytics-tab" type="button" role="tab" aria-label="Тренды: неделя к неделе и месяц к месяцу" title="Тренды: неделя к неделе и месяц к месяцу" aria-selected="false" data-chart="dynamics" onclick="selectChart('dynamics')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 19V6M7 6 3.8 9.2M7 6l3.2 3.2"/><path d="M17 5v13M17 18l-3.2-3.2M17 18l3.2-3.2"/></svg><span class="tab-label">Тренды</span></button>
+<button class="analytics-tab" type="button" role="tab" aria-label="Укол и сахар через 2–3 часа" title="Укол и сахар через 2–3 часа" aria-selected="false" data-chart="effect" onclick="selectChart('effect')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4v16h16"/><circle cx="9" cy="9" r="1.6" fill="currentColor" stroke="none"/><circle cx="13" cy="12.5" r="1.6" fill="currentColor" stroke="none"/><circle cx="17" cy="15" r="1.6" fill="currentColor" stroke="none"/><path d="M7 7.5l11 8.5" stroke-dasharray="2 2.4"/></svg><span class="tab-label">Эффект</span></button>
 </div>
 <div class="metric-switch" role="group" aria-label="Показатель" data-active="sugar">
 <span class="metric-pill" aria-hidden="true"></span>
@@ -1090,6 +1093,25 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 <span class="analytics-legend-item" data-mw>Редкие измерения</span>
 <span class="analytics-legend-item" data-mw><span class="analytics-swatch" style="background:#dfe3ff"></span><span class="analytics-swatch" style="background:#5267e8"></span>Частые измерения</span>
 </div>
+</section>
+<section class="analytics-card analytics-panel" data-panel="effect" hidden>
+<div class="analytics-toolbar">
+<span class="analytics-toolbar-label">Укол → сахар</span>
+<select id="effect-period" aria-label="Период графика" onchange="renderEffectChart()">
+<option value="7">7 дней</option><option value="14">14 дней</option><option value="21">21 день</option><option value="30" selected>30 дней</option><option value="45">45 дней</option>
+</select>
+<label class="effect-single"><input type="checkbox" id="effect-single" checked onchange="renderEffectChart()">Только одиночные</label>
+<span class="toolbar-count" id="effect-count" role="status"></span>
+</div>
+<div id="effect-chart" class="chart-wrap"></div>
+<div id="effect-tooltip" class="chart-tooltip" role="status"></div>
+<div class="analytics-legend">
+<span class="analytics-legend-item"><span class="analytics-swatch" style="background:#f2a93b"></span>Утро 5–11</span>
+<span class="analytics-legend-item"><span class="analytics-swatch" style="background:#2ea66a"></span>День 11–16</span>
+<span class="analytics-legend-item"><span class="analytics-swatch" style="background:#5267e8"></span>Вечер 16–22</span>
+<span class="analytics-legend-item"><span class="analytics-swatch" style="background:#8a5cd6"></span>Ночь 22–5</span>
+</div>
+<div class="analytics-note" id="effect-note"></div>
 </section>
 </div>
 </section>
@@ -1997,6 +2019,7 @@ async function saveValue(type){
    await Promise.all([syncInsulinTimer(),loadInsulinTotal(),loadNightFact()]);
   }
   if(type==='fact')await loadNightFact();
+  refreshHomeAfterChange();
  }catch(error){
   setToast(toast,'Не удалось сохранить: '+error.message,'error');
   handleAccessError(error);
@@ -2096,6 +2119,7 @@ async function undoValue(type){
    await Promise.all([syncInsulinTimer(),loadInsulinTotal(),loadNightFact(),loadLatestMeasurements()]);
   }
   if(type==='fact')await loadNightFact();
+  refreshHomeAfterChange();
  }catch(error){
   setToast(toast,'Не удалось отменить: '+error.message,'error');
   handleAccessError(error);
@@ -2283,6 +2307,12 @@ function applyHomeData(data){
   else if(el)el.textContent='Последнее: —';
  });
 }
+// После записи или отмены значения подтягиваем все плитки главной заново, чтобы они были актуальны
+async function refreshHomeAfterChange(){
+ for(let i=0;i<30&&homeBusy;i++)await new Promise(resolve=>setTimeout(resolve,150));
+ lastHomeJson=null;
+ await loadHomeCards(false);
+}
 async function loadHomeCards(first){
  if(homeBusy)return;
  homeBusy=true;
@@ -2435,7 +2465,8 @@ const FS_CHARTS={
   distribution:{host:'distribution-chart',title:'Распределение'},
   daily:{host:'daily-chart',title:'Сводка'},
   activity:{host:'activity-chart',title:'Активность'},
-  dose:{host:'dose-chart',title:'ЦД'}
+  dose:{host:'dose-chart',title:'ЦД'},
+  effect:{host:'effect-chart',title:'Укол и сахар'}
 };
 function chartHosts(hostId,tooltipId){
   if(fsRedirect&&fsRedirect.from===hostId)return [document.getElementById('fs-chart'),document.getElementById('fs-tooltip')];
@@ -2473,7 +2504,7 @@ function openChartFullscreen(name){
   if(!cfg||!analyticsState.loaded)return;
   fsRedirect={from:cfg.host};
   const metricName={sugar:'Сахар',insulin:'Инсулин',night:'Ночной'}[analyticsState.metric]||'';
-  document.getElementById('fsTitle').textContent=`${cfg.title} · ${metricName}`;
+  document.getElementById('fsTitle').textContent=name==='effect'?cfg.title:`${cfg.title} · ${metricName}`;
   const staticLegend=document.querySelector(`.analytics-panel[data-panel="${name}"] > .analytics-legend:not([id])`);
   document.getElementById('fs-legend').innerHTML=staticLegend?staticLegend.innerHTML:'';
   document.getElementById('fs-chart').innerHTML='';
@@ -2526,7 +2557,7 @@ function setMetricState(metric){
 function syncAnalyticsLayout(){
   const onRange=analyticsState.chart==='range';
   const sw=document.querySelector('.metric-switch');
-  if(sw){if(onRange)sw.setAttribute('data-night','1');else sw.removeAttribute('data-night');sw.style.display=analyticsState.chart==='dynamics'?'none':'';}
+  if(sw){if(onRange)sw.setAttribute('data-night','1');else sw.removeAttribute('data-night');sw.style.display=(analyticsState.chart==='dynamics'||analyticsState.chart==='effect')?'none':'';}
   const nightButton=document.querySelector('[data-metric="night"]');
   if(nightButton)nightButton.style.display=onRange?'':'none';
   const showDose=onRange&&analyticsState.metric!=='sugar';
@@ -2582,6 +2613,7 @@ function renderAnalytics(){
   else if(analyticsState.chart==='distribution')renderDistribution();
   else if(analyticsState.chart==='daily')renderDailySummary();
   else if(analyticsState.chart==='range'){if(analyticsState.metric==='sugar')renderRangeDonut();else renderDoseChart();}
+  else if(analyticsState.chart==='effect')renderEffectChart();
   else if(analyticsState.chart==='dynamics'){/* плитки грузятся отдельно: loadTrends */}
   else renderActivityHeatmap();
 }
@@ -3743,6 +3775,116 @@ function renderDoseChart(){
   bar.addEventListener('click',activate);
   bar.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();activate();}});
  });
+}
+
+
+// ============================================================
+// ГРАФИК «УКОЛ → САХАР»: каждая точка — один укол. По горизонтали доза,
+// по вертикали изменение сахара: через 2–3 ч после укола минус перед уколом.
+// ============================================================
+const EFFECT_BANDS=[
+ {name:'Утро',color:'#f2a93b',test:m=>m>=300&&m<660},
+ {name:'День',color:'#2ea66a',test:m=>m>=660&&m<960},
+ {name:'Вечер',color:'#5267e8',test:m=>m>=960&&m<1320},
+ {name:'Ночь',color:'#8a5cd6',test:()=>true}
+];
+function effectPoints(days,single){
+ const cutoff=new Date();cutoff.setHours(0,0,0,0);cutoff.setDate(cutoff.getDate()-days+1);
+ const stamp=row=>Date.UTC(row.dateObj.getFullYear(),row.dateObj.getMonth(),row.dateObj.getDate())/60000+row.timeObj.minutes;
+ const sugar=[],shots=[];
+ analyticsState.measurements.forEach(row=>{
+  const item={row,t:stamp(row)};
+  if(row.type==='sugar')sugar.push(item);
+  else if(row.type==='insulin'&&row.value>0)shots.push(item);
+ });
+ const out=[];
+ shots.forEach(shot=>{
+  if(shot.row.dateObj<cutoff)return;
+  // «одиночный» укол: рядом (2 ч до и 3 ч после) нет других уколов, они бы исказили результат
+  if(single&&shots.some(other=>other!==shot&&other.t>shot.t-120&&other.t<shot.t+180))return;
+  let before=null,after=null;
+  sugar.forEach(item=>{
+   const off=item.t-shot.t;
+   if(off>=-60&&off<=10&&(!before||Math.abs(off)<Math.abs(before.off)))before={row:item.row,off};
+   if(off>=120&&off<=180&&(!after||Math.abs(off-150)<Math.abs(after.off-150)))after={row:item.row,off};
+  });
+  if(!before||!after)return;
+  const delta=Math.round((after.row.value-before.row.value)*10)/10;
+  const minutes=shot.row.timeObj.minutes;
+  out.push({dose:shot.row.value,delta,before:before.row.value,after:after.row.value,gap:after.off,dateKey:shot.row.dateKey,time:shot.row.timeObj.text,band:EFFECT_BANDS.find(band=>band.test(minutes))});
+ });
+ return out;
+}
+function effectNum(value,signed){
+ const text=Math.abs(value).toFixed(Number.isInteger(value)?0:1).replace('.',',');
+ if(!signed)return (value<0?'−':'')+text;
+ return value>0?'+'+text:value<0?'−'+text:'0';
+}
+function renderEffectChart(){
+ if(!analyticsState.loaded)return;
+ const [host,tooltip]=chartHosts('effect-chart','effect-tooltip');
+ const days=Number(document.getElementById('effect-period').value)||30;
+ const single=document.getElementById('effect-single').checked;
+ const points=effectPoints(days,single);
+ const count=document.getElementById('effect-count'),note=document.getElementById('effect-note');
+ if(count)count.textContent=points.length?points.length+' точ.':'';
+ tooltip.textContent='';
+ if(!points.length){
+  host.innerHTML='<div class="analytics-message">Не хватает данных: нужен укол, сахар рядом с ним и сахар через 2–3 часа.'+(single?'<br>Можно снять «Только одиночные».':'')+'</div>';
+  if(note)note.textContent='';
+  return;
+ }
+ const width=Math.max(240,Math.floor(host.clientWidth||320)),height=Number(host.dataset.height)||285;
+ const margin={left:43,right:14,top:12,bottom:40},plotW=width-margin.left-margin.right,plotH=height-margin.top-margin.bottom;
+ const doses=points.map(p=>p.dose),deltas=points.map(p=>p.delta);
+ const xMin=0,xMax=Math.max(5,Math.ceil(Math.max(...doses))+1);
+ const lo=Math.min(0,...deltas),hi=Math.max(0,...deltas),yStep=(hi-lo)>12?2:1;
+ const yMin=Math.floor((lo-0.3)/yStep)*yStep,yMax=Math.ceil((hi+0.3)/yStep)*yStep;
+ const x=value=>margin.left+(value-xMin)/(xMax-xMin)*plotW;
+ const y=value=>margin.top+plotH-(value-yMin)/(yMax-yMin)*plotH;
+ const clip='effect-clip-'+host.id;
+ let svg=`<svg class="chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="График: доза укола и изменение сахара"><defs><clipPath id="${clip}"><rect x="${margin.left}" y="${margin.top}" width="${plotW}" height="${plotH}"/></clipPath></defs>`;
+ for(let value=yMin;value<=yMax+yStep*.01;value+=yStep){
+  const py=y(value);
+  svg+=`<line class="chart-grid" x1="${margin.left}" y1="${py}" x2="${width-margin.right}" y2="${py}"/><text x="${margin.left-6}" y="${py+3}" text-anchor="end">${effectNum(value,true)}</text>`;
+ }
+ const xStep=xMax>12?2:1;
+ for(let value=xMin;value<=xMax;value+=xStep){
+  const px=x(value);
+  svg+=`<line class="chart-grid" x1="${px}" y1="${margin.top}" x2="${px}" y2="${margin.top+plotH}"/><text x="${px}" y="${margin.top+plotH+15}" text-anchor="middle">${value}</text>`;
+ }
+ svg+=`<line class="chart-axis" x1="${margin.left}" y1="${y(0)}" x2="${width-margin.right}" y2="${y(0)}" stroke-dasharray="4 3"/>`;
+ svg+=`<text x="${margin.left+plotW/2}" y="${height-3}" text-anchor="middle">Доза, ед.</text>`;
+ svg+=`<text transform="translate(11 ${margin.top+plotH/2}) rotate(-90)" text-anchor="middle">Δ сахара через 2–3 ч, ммоль/л</text>`;
+ // линия тренда (метод наименьших квадратов), если точек достаточно и дозы разные
+ let trend=null;
+ const n=points.length,mx=doses.reduce((a,b)=>a+b,0)/n,my=deltas.reduce((a,b)=>a+b,0)/n;
+ const sxx=doses.reduce((a,b)=>a+(b-mx)*(b-mx),0),sxy=points.reduce((a,p)=>a+(p.dose-mx)*(p.delta-my),0);
+ if(n>=5&&sxx>0){
+  trend={slope:sxy/sxx};trend.intercept=my-trend.slope*mx;
+  const x1=Math.min(...doses),x2=Math.max(...doses);
+  svg+=`<g clip-path="url(#${clip})"><line x1="${x(x1)}" y1="${y(trend.intercept+trend.slope*x1)}" x2="${x(x2)}" y2="${y(trend.intercept+trend.slope*x2)}" stroke="var(--text)" stroke-opacity=".55" stroke-width="1.6" stroke-dasharray="6 4" stroke-linecap="round"/></g>`;
+ }
+ points.forEach(p=>{
+  const gap=`${Math.floor(p.gap/60)} ч ${String(Math.round(p.gap%60)).padStart(2,'0')} мин`;
+  const label=`${formatFullDate(p.dateKey)} ${p.time} · ${effectNum(p.dose)} ед. · сахар ${effectNum(p.before)} → ${effectNum(p.after)} через ${gap} (${effectNum(p.delta,true)} ммоль/л)`;
+  svg+=`<circle class="chart-point" cx="${x(p.dose).toFixed(2)}" cy="${y(p.delta).toFixed(2)}" r="4.5" fill="${p.band.color}" fill-opacity=".88" tabindex="0" role="button" aria-label="${escapeHtml(label)}"/>`;
+ });
+ svg+='</svg>';
+ host.innerHTML=svg;
+ host.querySelectorAll('.chart-point').forEach(point=>{
+  const activate=()=>{tooltip.textContent=point.getAttribute('aria-label');};
+  point.addEventListener('click',activate);
+  point.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();activate();}});
+ });
+ if(note){
+  let text='';
+  if(trend){
+   const slope=trend.slope,abs=Math.abs(slope);
+   text=abs<0.05?'Линия тренда почти горизонтальна: единица инсулина в среднем почти не меняет сахар. ':`По линии тренда каждая единица в среднем ${slope<0?'снижает':'повышает'} сахар на ${abs.toFixed(1).replace('.',',')} ммоль/л. `;
+  }else if(n<5){text='Мало точек для линии тренда (нужно хотя бы 5). ';}
+  note.textContent=text+'Каждая точка — один укол: сахар перед уколом (±1 ч) и через 2–3 ч. На итог влияют еда, активность и другие факторы.';
+ }
 }
 
 syncAnalyticsLayout();
