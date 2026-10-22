@@ -241,8 +241,13 @@ button{-webkit-tap-highlight-color:transparent}
 .chart-point{cursor:pointer;stroke:var(--card);stroke-width:1.5}
 .chart-point:focus{outline:none;stroke:var(--text);stroke-width:2.5}
 .chart-tooltip{min-height:18px;margin-top:6px;color:var(--muted);font-size:12px;line-height:1.45}
-.effect-single{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);white-space:nowrap}
-.effect-single input{accent-color:#969baa}
+.effect-slots{display:flex;flex-direction:column;gap:3px;margin-bottom:10px}
+.effect-slot{display:grid;grid-template-columns:.9fr .8fr 1.5fr 1fr;gap:6px;align-items:center;width:100%;border:1px solid transparent;border-radius:12px;background:transparent;color:var(--text);padding:7px 9px;font:inherit;font-size:13px;text-align:left;cursor:pointer;font-variant-numeric:tabular-nums}
+.effect-slot.effect-head{cursor:default;color:var(--muted);font-size:11px;font-weight:700;padding:0 9px 2px}
+.effect-slot.active{background:var(--input-bg);border-color:var(--blue)}
+.effect-slot .es-name{font-weight:750}
+.effect-hit{fill:transparent;cursor:pointer;outline:none}
+.effect-hit:focus,.effect-hit.on{fill:var(--text);fill-opacity:.07}
 .analytics-note{font-size:11px;line-height:1.45;color:var(--muted);margin:8px 1px 0}
 .analytics-message{padding:28px 14px;text-align:center;color:var(--muted);font-size:13px;line-height:1.5}
 .analytics-retry{margin-top:11px;border:0;border-radius:11px;padding:9px 13px;background:var(--blue);color:white;font-weight:700;cursor:pointer}
@@ -981,7 +986,7 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 <button class="analytics-tab" type="button" role="tab" aria-label="Суточная сводка" title="Суточная сводка" aria-selected="false" data-chart="daily" onclick="selectChart('daily')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7v10M12 4v13M18 9v11"/><circle cx="6" cy="12" r="2" fill="currentColor" stroke="none"/><circle cx="12" cy="10" r="2" fill="currentColor" stroke="none"/><circle cx="18" cy="14" r="2" fill="currentColor" stroke="none"/></svg><span class="tab-label">Сводка</span></button>
 <button class="analytics-tab" type="button" role="tab" aria-label="Активность по времени" title="Активность по времени" aria-selected="false" data-chart="activity" onclick="selectChart('activity')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6" fill="currentColor" fill-opacity=".45"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6" fill="currentColor" fill-opacity=".45"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6" fill="currentColor"/></svg><span class="tab-label">Активность</span></button>
 <button class="analytics-tab" type="button" role="tab" aria-label="Тренды: неделя к неделе и месяц к месяцу" title="Тренды: неделя к неделе и месяц к месяцу" aria-selected="false" data-chart="dynamics" onclick="selectChart('dynamics')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 19V6M7 6 3.8 9.2M7 6l3.2 3.2"/><path d="M17 5v13M17 18l-3.2-3.2M17 18l3.2-3.2"/></svg><span class="tab-label">Тренды</span></button>
-<button class="analytics-tab" type="button" role="tab" aria-label="Укол и сахар через 2–3 часа" title="Укол и сахар через 2–3 часа" aria-selected="false" data-chart="effect" onclick="selectChart('effect')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4v16h16"/><circle cx="9" cy="9" r="1.6" fill="currentColor" stroke="none"/><circle cx="13" cy="12.5" r="1.6" fill="currentColor" stroke="none"/><circle cx="17" cy="15" r="1.6" fill="currentColor" stroke="none"/><path d="M7 7.5l11 8.5" stroke-dasharray="2 2.4"/></svg><span class="tab-label">Эффект</span></button>
+<button class="analytics-tab" type="button" role="tab" aria-label="Укол и сахар до и после" title="Укол и сахар до и после" aria-selected="false" data-chart="effect" onclick="selectChart('effect')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4v16h16"/><circle cx="9" cy="9" r="1.6" fill="currentColor" stroke="none"/><circle cx="13" cy="12.5" r="1.6" fill="currentColor" stroke="none"/><circle cx="17" cy="15" r="1.6" fill="currentColor" stroke="none"/><path d="M7 7.5l11 8.5" stroke-dasharray="2 2.4"/></svg><span class="tab-label">Эффект</span></button>
 </div>
 <div class="metric-switch" role="group" aria-label="Показатель" data-active="sugar">
 <span class="metric-pill" aria-hidden="true"></span>
@@ -1098,18 +1103,19 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 <div class="analytics-toolbar">
 <span class="analytics-toolbar-label">Укол → сахар</span>
 <select id="effect-period" aria-label="Период графика" onchange="renderEffectChart()">
-<option value="7">7 дней</option><option value="14">14 дней</option><option value="21">21 день</option><option value="30" selected>30 дней</option><option value="45">45 дней</option>
+<option value="14">14 дней</option><option value="30" selected>30 дней</option><option value="45">45 дней</option>
 </select>
-<label class="effect-single"><input type="checkbox" id="effect-single" checked onchange="renderEffectChart()">Только одиночные</label>
 <span class="toolbar-count" id="effect-count" role="status"></span>
 </div>
+<div id="effect-slots" class="effect-slots" role="group" aria-label="Приём пищи"></div>
 <div id="effect-chart" class="chart-wrap"></div>
 <div id="effect-tooltip" class="chart-tooltip" role="status"></div>
 <div class="analytics-legend">
-<span class="analytics-legend-item"><span class="analytics-swatch" style="background:#f2a93b"></span>Утро 5–11</span>
-<span class="analytics-legend-item"><span class="analytics-swatch" style="background:#2ea66a"></span>День 11–16</span>
-<span class="analytics-legend-item"><span class="analytics-swatch" style="background:#5267e8"></span>Вечер 16–22</span>
-<span class="analytics-legend-item"><span class="analytics-swatch" style="background:#8a5cd6"></span>Ночь 22–5</span>
+<span class="analytics-legend-item"><span class="analytics-swatch" style="background:var(--card);border:2px solid #8a90a8;box-sizing:border-box"></span>Сахар при уколе</span>
+<span class="analytics-legend-item"><span class="analytics-swatch" style="background:#2ea66a"></span>после: в цели</span>
+<span class="analytics-legend-item"><span class="analytics-swatch" style="background:#ee6b6b"></span>выше</span>
+<span class="analytics-legend-item"><span class="analytics-swatch" style="background:#f0a23a"></span>ниже</span>
+<span class="analytics-legend-item"><span class="analytics-swatch" style="background:#1f9d8f;border-radius:3px"></span>Доза</span>
 </div>
 <div class="analytics-note" id="effect-note"></div>
 </section>
@@ -3788,16 +3794,32 @@ function renderDoseChart(){
 
 
 // ============================================================
-// ГРАФИК «УКОЛ → САХАР»: каждая точка — один укол. По горизонтали доза,
-// по вертикали изменение сахара: через 2–3 ч после укола минус перед уколом.
+// ГРАФИК «УКОЛ → САХАР»
+// Приём = укол или несколько уколов с паузой до 2 часов (малая доза перед едой + основная). Сравниваем сахар
+// в момент укола и первое измерение через 1,5–7 ч (обычно это сахар перед следующим приёмом).
+// Уколы без сахара рядом (подколки) на графике не показываются.
 // ============================================================
-const EFFECT_BANDS=[
- {name:'Утро',color:'#f2a93b',test:m=>m>=300&&m<660},
- {name:'День',color:'#2ea66a',test:m=>m>=660&&m<960},
- {name:'Вечер',color:'#5267e8',test:m=>m>=960&&m<1320},
- {name:'Ночь',color:'#8a5cd6',test:()=>true}
+const EFFECT_SLOTS=[
+ {key:'morning',name:'Утро',hint:'5–11 ч',test:h=>h>=5&&h<11},
+ {key:'lunch',name:'Обед',hint:'11–15 ч',test:h=>h>=11&&h<15},
+ {key:'dinner',name:'Ужин',hint:'15–18 ч',test:h=>h>=15&&h<18},
+ {key:'evening',name:'Вечер',hint:'после 18 ч',test:()=>true}
 ];
-function effectPoints(days,single){
+const EFFECT_COLORS={low:'#f0a23a',in:'#2ea66a',high:'#ee6b6b'};
+let effectSlot='morning';
+function medianOf(values){
+ if(!values.length)return null;
+ const a=[...values].sort((x,y)=>x-y),m=Math.floor(a.length/2);
+ return a.length%2?a[m]:(a[m-1]+a[m])/2;
+}
+function effectStatus(value){return value<IDEAL_LOW?'low':value>IDEAL_HIGH?'high':'in';}
+function effectNum(value,signed){
+ const rounded=Math.round(value*10)/10;
+ const text=Math.abs(rounded).toFixed(Number.isInteger(rounded)?0:1).replace('.',',');
+ if(!signed)return (rounded<0?'−':'')+text;
+ return rounded>0?'+'+text:rounded<0?'−'+text:'0';
+}
+function effectMeals(days){
  const cutoff=new Date();cutoff.setHours(0,0,0,0);cutoff.setDate(cutoff.getDate()-days+1);
  const stamp=row=>Date.UTC(row.dateObj.getFullYear(),row.dateObj.getMonth(),row.dateObj.getDate())/60000+row.timeObj.minutes;
  const sugar=[],shots=[];
@@ -3806,93 +3828,124 @@ function effectPoints(days,single){
   if(row.type==='sugar')sugar.push(item);
   else if(row.type==='insulin'&&row.value>0)shots.push(item);
  });
- const out=[];
+ sugar.sort((a,b)=>a.t-b.t);shots.sort((a,b)=>a.t-b.t);
+ const meals=[];
  shots.forEach(shot=>{
-  if(shot.row.dateObj<cutoff)return;
-  // «одиночный» укол: рядом (2 ч до и 3 ч после) нет других уколов, они бы исказили результат
-  if(single&&shots.some(other=>other!==shot&&other.t>shot.t-120&&other.t<shot.t+180))return;
+  const last=meals[meals.length-1];
+  if(last&&shot.t-last.endT<=120){last.dose+=shot.row.value;last.endT=shot.t;}
+  else meals.push({startT:shot.t,endT:shot.t,dose:shot.row.value,row:shot.row});
+ });
+ const out=[];
+ meals.forEach((meal,index)=>{
+  if(meal.row.dateObj<cutoff)return;
+  const nextStart=index+1<meals.length?meals[index+1].startT:Infinity;
   let before=null,after=null;
   sugar.forEach(item=>{
-   const off=item.t-shot.t;
-   if(off>=-60&&off<=10&&(!before||Math.abs(off)<Math.abs(before.off)))before={row:item.row,off};
-   if(off>=120&&off<=180&&(!after||Math.abs(off-150)<Math.abs(after.off-150)))after={row:item.row,off};
+   const off=item.t-meal.startT;
+   if(off>=-60&&off<=10&&(!before||Math.abs(off)<Math.abs(before.off)))before={value:item.row.value,off};
+   if(!after&&item.t-meal.endT>=90&&off<=420&&item.t<=nextStart+10)after={value:item.row.value,off};
   });
-  if(!before||!after)return;
-  const delta=Math.round((after.row.value-before.row.value)*10)/10;
-  const minutes=shot.row.timeObj.minutes;
-  out.push({dose:shot.row.value,delta,before:before.row.value,after:after.row.value,gap:after.off,dateKey:shot.row.dateKey,time:shot.row.timeObj.text,band:EFFECT_BANDS.find(band=>band.test(minutes))});
+  const hour=Math.floor(meal.row.timeObj.minutes/60);
+  out.push({
+   dateKey:meal.row.dateKey,time:meal.row.timeObj.text,dose:meal.dose,
+   before:before?before.value:null,after:after?after.value:null,gap:after?after.off:null,
+   slot:EFFECT_SLOTS.find(slot=>slot.test(hour)).key
+  });
  });
  return out;
 }
-function effectNum(value,signed){
- const text=Math.abs(value).toFixed(Number.isInteger(value)?0:1).replace('.',',');
- if(!signed)return (value<0?'−':'')+text;
- return value>0?'+'+text:value<0?'−'+text:'0';
+function selectEffectSlot(key){effectSlot=key;renderEffectChart();}
+function renderEffectSlots(meals){
+ const host=document.getElementById('effect-slots');
+ if(!host)return;
+ let html='<div class="effect-slot effect-head"><span></span><span>Доза</span><span>Сахар до → после</span><span>После в цели</span></div>';
+ EFFECT_SLOTS.forEach(slot=>{
+  const mine=meals.filter(m=>m.slot===slot.key),paired=mine.filter(m=>m.before!==null&&m.after!==null);
+  const dose=medianOf(mine.map(m=>m.dose));
+  const before=medianOf(paired.map(m=>m.before)),after=medianOf(paired.map(m=>m.after));
+  const share=paired.length?Math.round(paired.filter(m=>effectStatus(m.after)==='in').length/paired.length*100):null;
+  html+=`<button type="button" class="effect-slot${slot.key===effectSlot?' active':''}" title="${slot.hint}" onclick="selectEffectSlot('${slot.key}')"><span class="es-name">${slot.name}</span><span>${dose===null?'—':effectNum(dose)+' ед.'}</span><span>${before===null?'—':fmtMmol(before)+' → <b>'+fmtMmol(after)+'</b>'}</span><span>${share===null?'—':share+'%'}</span></button>`;
+ });
+ host.innerHTML=html;
 }
 function renderEffectChart(){
  if(!analyticsState.loaded)return;
  const [host,tooltip]=chartHosts('effect-chart','effect-tooltip');
  const days=Number(document.getElementById('effect-period').value)||30;
- const single=document.getElementById('effect-single').checked;
- const points=effectPoints(days,single);
+ const meals=effectMeals(days);
+ renderEffectSlots(meals);
+ const slotInfo=EFFECT_SLOTS.find(slot=>slot.key===effectSlot);
+ const mine=meals.filter(m=>m.slot===effectSlot);
+ const paired=mine.filter(m=>m.before!==null&&m.after!==null);
  const count=document.getElementById('effect-count'),note=document.getElementById('effect-note');
- if(count)count.textContent=points.length?points.length+' точ.':'';
+ if(count)count.textContent=paired.length?paired.length+' приёмов':'';
  tooltip.textContent='';
- if(!points.length){
-  host.innerHTML='<div class="analytics-message">Не хватает данных: нужен укол, сахар рядом с ним и сахар через 2–3 часа.'+(single?'<br>Можно снять «Только одиночные».':'')+'</div>';
+ if(!paired.length){
+  host.innerHTML=`<div class="analytics-message">${slotInfo.name}: нет приёмов, где сахар измерен при уколе и через пару часов после него.</div>`;
   if(note)note.textContent='';
   return;
  }
- const width=Math.max(240,Math.floor(host.clientWidth||320)),height=Number(host.dataset.height)||285;
- const margin={left:43,right:14,top:12,bottom:40},plotW=width-margin.left-margin.right,plotH=height-margin.top-margin.bottom;
- const doses=points.map(p=>p.dose),deltas=points.map(p=>p.delta);
- const xMin=0,xMax=Math.max(5,Math.ceil(Math.max(...doses))+1);
- const lo=Math.min(0,...deltas),hi=Math.max(0,...deltas),yStep=(hi-lo)>12?2:1;
- const yMin=Math.floor((lo-0.3)/yStep)*yStep,yMax=Math.ceil((hi+0.3)/yStep)*yStep;
- const x=value=>margin.left+(value-xMin)/(xMax-xMin)*plotW;
- const y=value=>margin.top+plotH-(value-yMin)/(yMax-yMin)*plotH;
- const clip='effect-clip-'+host.id;
- let svg=`<svg class="chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="График: доза укола и изменение сахара"><defs><clipPath id="${clip}"><rect x="${margin.left}" y="${margin.top}" width="${plotW}" height="${plotH}"/></clipPath></defs>`;
- for(let value=yMin;value<=yMax+yStep*.01;value+=yStep){
+ const width=Math.max(240,Math.floor(host.clientWidth||320)),height=Number(host.dataset.height)||300;
+ const margin={left:43,right:14,top:12,bottom:24},gap=8,doseH=38;
+ const plotW=width-margin.left-margin.right,plotH=height-margin.top-margin.bottom-gap-doseH;
+ const plotBottom=margin.top+plotH,stripTop=plotBottom+gap,stripBottom=stripTop+doseH;
+ const values=[];paired.forEach(m=>values.push(m.before,m.after));
+ const yMin=Math.max(0,Math.floor(Math.min(...values,IDEAL_LOW)-0.3)),yMax=Math.ceil(Math.max(...values,IDEAL_HIGH)+0.3);
+ const yStep=(yMax-yMin)>12?2:1;
+ const y=value=>margin.top+plotH-((value-yMin)/(yMax-yMin))*plotH;
+ const today=new Date();today.setHours(12,0,0,0);
+ const keys=[];
+ for(let i=days-1;i>=0;i--){const d=new Date(today);d.setDate(d.getDate()-i);keys.push(dateKey(d));}
+ const colW=plotW/days,cx=index=>margin.left+(index+.5)*colW;
+ const clip='ideal-'+host.id;
+ let svg=`<svg class="chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="Сахар при уколе и после него, доза по дням">`;
+ svg+=idealZoneSvg(y,yMin,yMax,margin.left,width-margin.right,clip);
+ let idealLines='';
+ for(let value=Math.ceil(yMin/yStep)*yStep;value<=yMax+.01;value+=yStep){
   const py=y(value);
-  svg+=`<line class="chart-grid" x1="${margin.left}" y1="${py}" x2="${width-margin.right}" y2="${py}"/><text x="${margin.left-6}" y="${py+3}" text-anchor="end">${effectNum(value,true)}</text>`;
+  idealLines+=`<line class="chart-grid-ideal" x1="${margin.left}" y1="${py}" x2="${width-margin.right}" y2="${py}"/>`;
+  svg+=`<line class="chart-grid" x1="${margin.left}" y1="${py}" x2="${width-margin.right}" y2="${py}"/><text x="${margin.left-6}" y="${py+3}" text-anchor="end">${value}</text>`;
  }
- const xStep=xMax>12?2:1;
- for(let value=xMin;value<=xMax;value+=xStep){
-  const px=x(value);
-  svg+=`<line class="chart-grid" x1="${px}" y1="${margin.top}" x2="${px}" y2="${margin.top+plotH}"/><text x="${px}" y="${margin.top+plotH+15}" text-anchor="middle">${value}</text>`;
- }
- svg+=`<line class="chart-axis" x1="${margin.left}" y1="${y(0)}" x2="${width-margin.right}" y2="${y(0)}" stroke-dasharray="4 3"/>`;
- svg+=`<text x="${margin.left+plotW/2}" y="${height-3}" text-anchor="middle">Доза, ед.</text>`;
- svg+=`<text transform="translate(11 ${margin.top+plotH/2}) rotate(-90)" text-anchor="middle">Δ сахара через 2–3 ч, ммоль/л</text>`;
- // линия тренда (метод наименьших квадратов), если точек достаточно и дозы разные
- let trend=null;
- const n=points.length,mx=doses.reduce((a,b)=>a+b,0)/n,my=deltas.reduce((a,b)=>a+b,0)/n;
- const sxx=doses.reduce((a,b)=>a+(b-mx)*(b-mx),0),sxy=points.reduce((a,p)=>a+(p.dose-mx)*(p.delta-my),0);
- if(n>=5&&sxx>0){
-  trend={slope:sxy/sxx};trend.intercept=my-trend.slope*mx;
-  const x1=Math.min(...doses),x2=Math.max(...doses);
-  svg+=`<g clip-path="url(#${clip})"><line x1="${x(x1)}" y1="${y(trend.intercept+trend.slope*x1)}" x2="${x(x2)}" y2="${y(trend.intercept+trend.slope*x2)}" stroke="var(--text)" stroke-opacity=".55" stroke-width="1.6" stroke-dasharray="6 4" stroke-linecap="round"/></g>`;
- }
- points.forEach(p=>{
-  const gap=`${Math.floor(p.gap/60)} ч ${String(Math.round(p.gap%60)).padStart(2,'0')} мин`;
-  const label=`${formatFullDate(p.dateKey)} ${p.time} · ${effectNum(p.dose)} ед. · сахар ${effectNum(p.before)} → ${effectNum(p.after)} через ${gap} (${effectNum(p.delta,true)} ммоль/л)`;
-  svg+=`<circle class="chart-point" cx="${x(p.dose).toFixed(2)}" cy="${y(p.delta).toFixed(2)}" r="4.5" fill="${p.band.color}" fill-opacity=".88" tabindex="0" role="button" aria-label="${escapeHtml(label)}"/>`;
+ svg+=idealGridOverlay(clip,idealLines);
+ const step=Math.ceil(days/7);
+ keys.forEach((key,index)=>{
+  if((days-1-index)%step===0)svg+=`<text x="${cx(index)}" y="${height-6}" text-anchor="middle">${formatShortDate(key)}</text>`;
+ });
+ const maxDose=Math.max(...paired.map(m=>m.dose));
+ svg+=`<line class="chart-axis" x1="${margin.left}" y1="${stripBottom}" x2="${width-margin.right}" y2="${stripBottom}"/>`;
+ svg+=`<text x="${margin.left-6}" y="${stripTop+doseH/2+3}" text-anchor="end">доза</text>`;
+ // несколько приёмов одного слота в один день сдвигаем, чтобы не наложились
+ const perDay=new Map();
+ const gapText=minutes=>`${Math.floor(minutes/60)} ч ${String(Math.round(minutes%60)).padStart(2,'0')} мин`;
+ paired.forEach(m=>{
+  const index=keys.indexOf(m.dateKey);
+  if(index<0)return;
+  const nth=perDay.get(index)||0;perDay.set(index,nth+1);
+  const total=paired.filter(o=>o.dateKey===m.dateKey).length;
+  const x=cx(index)+(nth-(total-1)/2)*Math.min(6,colW/2);
+  const status=effectStatus(m.after),color=EFFECT_COLORS[status];
+  const barW=Math.max(3,Math.min(9,colW*.55)),barH=Math.max(2,m.dose/maxDose*(doseH-4));
+  const label=`${formatFullDate(m.dateKey)} ${m.time} · доза ${effectNum(m.dose)} ед. · сахар ${fmtMmol(m.before)} → ${fmtMmol(m.after)} (${effectNum(m.after-m.before,true)}) через ${gapText(m.gap)}`;
+  svg+=`<line x1="${x.toFixed(1)}" y1="${y(m.before).toFixed(1)}" x2="${x.toFixed(1)}" y2="${y(m.after).toFixed(1)}" stroke="#8a90a8" stroke-opacity=".6" stroke-width="2" stroke-linecap="round"/>`;
+  svg+=`<circle cx="${x.toFixed(1)}" cy="${y(m.before).toFixed(1)}" r="3.4" fill="var(--card)" stroke="#8a90a8" stroke-width="1.7"/>`;
+  svg+=`<circle cx="${x.toFixed(1)}" cy="${y(m.after).toFixed(1)}" r="4.2" fill="${color}" stroke="var(--card)" stroke-width="1.2"/>`;
+  svg+=`<rect x="${(x-barW/2).toFixed(1)}" y="${(stripBottom-barH).toFixed(1)}" width="${barW.toFixed(1)}" height="${barH.toFixed(1)}" rx="1.5" fill="#1f9d8f" fill-opacity=".85"/>`;
+  svg+=`<rect class="effect-hit" x="${(x-Math.max(colW/2,6)).toFixed(1)}" y="${margin.top}" width="${Math.max(colW,12).toFixed(1)}" height="${stripBottom-margin.top}" tabindex="0" role="button" aria-label="${escapeHtml(label)}"/>`;
  });
  svg+='</svg>';
  host.innerHTML=svg;
- host.querySelectorAll('.chart-point').forEach(point=>{
-  const activate=()=>{tooltip.textContent=point.getAttribute('aria-label');};
-  point.addEventListener('click',activate);
-  point.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();activate();}});
+ host.querySelectorAll('.effect-hit').forEach(hit=>{
+  const activate=()=>{
+   host.querySelectorAll('.effect-hit.on').forEach(el=>el.classList.remove('on'));
+   hit.classList.add('on');tooltip.textContent=hit.getAttribute('aria-label');
+  };
+  hit.addEventListener('click',activate);
+  hit.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();activate();}});
  });
  if(note){
-  let text='';
-  if(trend){
-   const slope=trend.slope,abs=Math.abs(slope);
-   text=abs<0.05?'Линия тренда почти горизонтальна: единица инсулина в среднем почти не меняет сахар. ':`По линии тренда каждая единица в среднем ${slope<0?'снижает':'повышает'} сахар на ${abs.toFixed(1).replace('.',',')} ммоль/л. `;
-  }else if(n<5){text='Мало точек для линии тренда (нужно хотя бы 5). ';}
-  note.textContent=text+'Каждая точка — один укол: сахар перед уколом (±1 ч) и через 2–3 ч. На итог влияют еда, активность и другие факторы.';
+  const skipped=mine.length-paired.length;
+  const typicalGap=medianOf(paired.map(m=>m.gap));
+  note.textContent=`Каждая вертикаль — один приём (${slotInfo.name.toLowerCase()}, ${slotInfo.hint}): ○ сахар при уколе, ● сахар примерно через ${gapText(typicalGap)}. Цвет точки показывает, попал ли сахар в цель. Столбики внизу — доза (самая большая здесь ${effectNum(maxDose)} ед.).`+(skipped>0?` Без сахара рядом с уколом (подколки и пропуски): ${skipped} — их тут нет.`:'')+' Нажми на день, чтобы увидеть детали.';
  }
 }
 
