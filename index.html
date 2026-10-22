@@ -705,31 +705,34 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .doctor-shot-note.error{color:#d23a40}
 
 /* --- Свайп-карусель (ночной на главной, «К врачу») --- */
-.carousel{display:flex;align-items:flex-start;box-sizing:border-box;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;overscroll-behavior-x:contain;transition:height .25s ease}
+.carousel{display:flex;align-items:stretch;box-sizing:border-box;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;overscroll-behavior-x:contain}
 .carousel::-webkit-scrollbar{display:none}
 .carousel.shadowfix{padding:6px 0 26px;margin:-6px 0 -26px}
 .carousel>*{flex:0 0 100%;min-width:0;box-sizing:border-box;scroll-snap-align:start;scroll-snap-stop:always}
 .carousel>.metric{margin-bottom:0}
-.carousel>.doctor-page{display:flow-root}
+.carousel>.doctor-page{display:flex;flex-direction:column}
+.doctor-page .doctor-comment-card{flex:1;min-height:56px}
+.doctor-comment-text.none{color:var(--muted)}
 .carousel-dots{display:flex;justify-content:center;gap:6px;margin:6px 0 8px}
 .carousel-dots i{width:6px;height:6px;border-radius:3px;background:var(--muted);opacity:.3;transition:opacity .2s,width .2s}
 .carousel-dots i.on{opacity:.85;width:16px}
-/* --- Карточка дня (сегодня/вчера) в карусели ночного --- */
-.metric.night-day{padding:15px 17px}
-.metric.night-day .metric-head{margin-bottom:10px;min-height:0}
-.nd-sum{margin-left:auto;text-align:right;line-height:1.1;font-variant-numeric:tabular-nums}
-.nd-sum b{display:block;font-size:24px;font-weight:800;letter-spacing:-.5px}
-.nd-sum small{font-size:12px;font-weight:600;color:var(--muted)}
-.nd-cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
-.nd-col-title{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:2px}
-.nd-row{display:flex;justify-content:space-between;gap:8px;padding:3px 0;border-top:1px solid var(--line);font-size:14px;font-variant-numeric:tabular-nums}
-.nd-row span{color:var(--muted)}
-.nd-row b{font-weight:750}
+/* --- Карточка дня (сегодня/вчера): та же высота, что у главной карточки ночного --- */
+.metric.night-day{padding:12px 14px;display:flex;flex-direction:column;overflow:hidden}
+.nd-head{display:flex;align-items:baseline;gap:8px;margin-bottom:8px;white-space:nowrap}
+.nd-title{font-size:16px;font-weight:750}
+.nd-date{font-size:12px;color:var(--muted)}
+.nd-sum{margin-left:auto;display:flex;gap:10px;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.nd-sum b{color:var(--text);font-weight:750}
+.nd-body{flex:1;min-height:0;overflow-y:auto;scrollbar-width:none;display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);gap:12px;align-content:start}
+.nd-body::-webkit-scrollbar{display:none}
+.nd-col-title{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px}
+.nd-chips{display:flex;flex-wrap:wrap;gap:calc(4px*var(--s,1))}
+.nd-chip{display:inline-flex;align-items:baseline;gap:.3em;padding:.18em .5em;border-radius:.6em;background:var(--input-bg);font-size:calc(13px*var(--s,1));line-height:1.25;font-variant-numeric:tabular-nums}
+.nd-chip i{font-style:normal;font-size:.82em;color:var(--muted)}
+.nd-chip b{font-weight:750}
 .nd-ins b{color:var(--teal)}
 .nd-sug b{color:var(--pink)}
-.nd-empty{padding:3px 0;border-top:1px solid var(--line);font-size:14px;color:var(--muted)}
-.nd-foot{display:flex;justify-content:space-between;gap:10px;margin-top:8px;padding-top:8px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
-.nd-foot b{color:var(--text);font-weight:750}
+.nd-empty{font-size:13px;color:var(--muted)}
 
 /* --- комментарий к визиту --- */
 .doctor-comment-card{background:var(--card-grad);border:1px solid var(--card-border);border-radius:21px;padding:10px 14px;margin-bottom:0;box-shadow:var(--shadow)}
@@ -907,7 +910,7 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 </div>
 </section>
 <!-- --- Карточка: инсулин (ночной) --- -->
-<div class="carousel shadowfix" id="nightCarousel">
+<div class="carousel shadowfix" id="nightCarousel" data-size="first">
 <section class="metric insulin night">
 <div class="metric-head">
 <div class="metric-icon">🌙</div>
@@ -1135,11 +1138,11 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 </div>
 <div class="timer-mode-options" role="radiogroup" aria-label="Режим таймера инсулина">
 <label class="timer-mode-option"><input type="radio" name="insulinTimerMode" value="always" onchange="updateTimerMode()">Всегда</label>
-<label class="timer-mode-option"><input type="radio" name="insulinTimerMode" value="threshold" onchange="updateTimerMode()">Выше дозы</label>
+<label class="timer-mode-option"><input type="radio" name="insulinTimerMode" value="threshold" onchange="updateTimerMode()">От дозы</label>
 <label class="timer-mode-option"><input type="radio" name="insulinTimerMode" value="off" onchange="updateTimerMode()">Выкл.</label>
 </div>
 <div class="timer-threshold" id="timerThresholdSetting" hidden>
-<label for="timerThresholdInput">Включать, если доза больше</label>
+<label for="timerThresholdInput">Включать, если доза от</label>
 <input id="timerThresholdInput" type="number" inputmode="decimal" min="0" max="15" step="0.1" value="5" onchange="updateTimerThreshold()" aria-label="Минимальная доза инсулина для таймера">
 <span>ед.</span>
 </div>
@@ -1326,7 +1329,7 @@ const TIMER_SETTINGS_KEY='sema-insulin-timer-settings';
 const TIMER_STATE_KEY_PREFIX='sema-insulin-timer-state';
 const TIMER_DURATION_MS=20*60*1000;
 const TIMER_REMINDERS_MS=[5*60*1000,10*60*1000];
-const defaultTimerSettings={mode:'always',threshold:5,sound:true,vibration:true,appSound:true,appVibration:true,vibrationLevel:3,appVibrationLevel:3,soundChoice:1};
+const defaultTimerSettings={mode:'threshold',threshold:5,sound:true,vibration:true,appSound:true,appVibration:true,vibrationLevel:3,appVibrationLevel:3,soundChoice:1};
 
 // ============================================================
 // ВИБРАЦИЯ, ЗВУК И ХАПТИК (настройки приложения и таймера)
@@ -1630,7 +1633,7 @@ function persistTimerState(){
 }
 function shouldRunInsulinTimer(dose){
  if(!Number.isFinite(dose)||dose<=0||insulinTimerSettings.mode==='off')return false;
- return insulinTimerSettings.mode==='always'||dose>insulinTimerSettings.threshold;
+ return insulinTimerSettings.mode==='always'||dose>=insulinTimerSettings.threshold;
 }
 function formatTimerElapsed(elapsedMs){
  const seconds=Math.min(20*60,Math.max(0,Math.floor(elapsedMs/1000)));
@@ -2153,16 +2156,28 @@ function updateEntryPlaceholders(){
 // ============================================================
 // СВАЙП-КАРУСЕЛЬ (общая): высота подстраивается под текущую страницу
 // ============================================================
+function shrinkDayPage(page){
+ const body=page.querySelector('.nd-body');
+ if(!body)return;
+ let k=1;
+ page.style.setProperty('--s','1');
+ while(body.scrollHeight>body.clientHeight+1&&k>0.7){k-=0.05;page.style.setProperty('--s',k.toFixed(2));}
+}
 function fitCarousel(scroller){
  if(!scroller||!scroller.children.length)return;
  const w=scroller.clientWidth;
  if(!w)return;
- const pages=scroller.children;
+ const pages=[...scroller.children];
  const i=Math.max(0,Math.min(pages.length-1,Math.round(scroller.scrollLeft/w)));
- const cs=getComputedStyle(scroller);
- const extra=(parseFloat(cs.paddingTop)||0)+(parseFloat(cs.paddingBottom)||0);
- const h=pages[i].offsetHeight;
- if(h>0){const px=(h+extra)+'px';if(scroller.style.height!==px)scroller.style.height=px;}
+ // Ночной: страницы дня строго той же высоты, что и главная карточка
+ if(scroller.dataset.size==='first'){
+  const h0=pages[0].offsetHeight;
+  const sig=w+'|'+h0+'|'+pages.map(p=>p.innerHTML.length).join(',');
+  if(h0>0&&scroller._sig!==sig){
+   scroller._sig=sig;
+   pages.slice(1).forEach(p=>{p.style.height=h0+'px';shrinkDayPage(p);});
+  }
+ }
  const dots=scroller.nextElementSibling;
  if(dots&&dots.classList.contains('carousel-dots'))[...dots.children].forEach((d,k)=>d.classList.toggle('on',k===i));
  if(scroller._ci!==undefined&&scroller._ci!==i&&typeof selectionHaptic==='function')selectionHaptic();
@@ -2201,19 +2216,19 @@ function renderNightDay(id,text,title){
  const el=document.getElementById(id);
  if(!el)return;
  if(text==null||String(text).trim()===''){
-  el.innerHTML='<div class="metric-head"><div class="metric-icon">📊</div><div class="metric-copy"><div class="metric-name">'+escapeHtml(title)+'</div></div></div><div class="nd-empty">Нет данных</div>';
+  el.innerHTML='<div class="nd-head"><span class="nd-title">'+escapeHtml(title)+'</span></div><div class="nd-empty">Нет данных</div>';
  }else{
   const d=parseDayReport(text);
-  const list=(items,cls)=>items.length?items.map(x=>'<div class="nd-row '+cls+'"><span>'+escapeHtml(x.t)+'</span><b>'+escapeHtml(x.v)+'</b></div>').join(''):'<div class="nd-empty">—</div>';
-  el.innerHTML='<div class="metric-head"><div class="metric-icon">📊</div><div class="metric-copy"><div class="metric-name">'+escapeHtml(title)+'</div>'
-   +(d.date?'<div class="metric-latest">'+escapeHtml(d.date)+'</div>':'')+'</div>'
-   +'<div class="nd-sum"><b>'+escapeHtml(d.total!==null?d.total:'—')+'</b><small>Итого, ед.</small></div></div>'
-   +'<div class="nd-cols"><div><div class="nd-col-title">💉 Инсулин</div>'+list(d.insulin,'nd-ins')+'</div>'
-   +'<div><div class="nd-col-title">🍭 Сахар</div>'+list(d.sugar,'nd-sug')+'</div></div>'
-   +'<div class="nd-foot"><span>🌙 Ночной <b>'+escapeHtml(d.night!==null?d.night+' ед.':'—')+'</b></span><span>Среднее <b>'+escapeHtml(d.avg||'—')+'</b></span></div>';
+  const chips=(items,cls)=>items.length?'<div class="nd-chips">'+items.map(x=>'<span class="nd-chip '+cls+'"><i>'+escapeHtml(x.t)+'</i><b>'+escapeHtml(x.v)+'</b></span>').join('')+'</div>':'<div class="nd-empty">—</div>';
+  const shortDate=d.date?d.date.slice(0,5):'';
+  el.innerHTML='<div class="nd-head"><span class="nd-title">'+escapeHtml(title)+'</span>'+(shortDate?'<span class="nd-date">'+escapeHtml(shortDate)+'</span>':'')
+   +'<span class="nd-sum"><span>Итого <b>'+escapeHtml(d.total!==null?d.total:'—')+'</b></span><span>🌙 <b>'+escapeHtml(d.night!==null?d.night:'—')+'</b></span><span>Ср <b>'+escapeHtml(d.avg||'—')+'</b></span></span></div>'
+   +'<div class="nd-body"><div><div class="nd-col-title">💉 Инсулин</div>'+chips(d.insulin,'nd-ins')+'</div>'
+   +'<div><div class="nd-col-title">🍭 Сахар</div>'+chips(d.sugar,'nd-sug')+'</div></div>';
  }
  const car=document.getElementById('nightCarousel');
  setupCarousel(car);
+ if(car)car._sig=null;
  fitCarousel(car);
 }
 function renderNightFact(rawValue, loading = false){
@@ -3278,7 +3293,7 @@ function doctorPageHtml(visit,dose,current){
   +doctorRowHtml('Всего ручек',doctorCell(s.total),doctorCell(n.total))
   +doctorRowHtml('Хватит до',doctorCell(s.until_date,hint(s.until_in_days,30),true),doctorCell(n.until_date,hint(n.until_in_days,30),true),true)
   +'</div></div>'
-  +(s.comment?'<div class="doctor-comment-card"><div class="doctor-comment-title">Комментарий</div><div class="doctor-comment-text">'+escapeHtml(s.comment)+'</div></div>':'')
+  +'<div class="doctor-comment-card"><div class="doctor-comment-title">Комментарий</div><div class="doctor-comment-text'+(s.comment?'':' none')+'">'+(s.comment?escapeHtml(s.comment):'—')+'</div></div>'
   +'</div>';
 }
 function doctorVisits(data){
