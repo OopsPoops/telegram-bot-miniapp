@@ -2012,14 +2012,13 @@ async function saveValue(type){
   uiHaptic('success');
   if(type==='sugar'){
    renderLatestMeasurement('sugar',value.replace(',','.'),formatLatestTime(new Date()));
-   await loadSugarAverage();
+   await refreshHomeAfterChange(type);
   }
   if(type==='insulin'){
    renderLatestMeasurement('insulin',value,formatLatestTime(new Date()));
-   await Promise.all([syncInsulinTimer(),loadInsulinTotal(),loadNightFact()]);
+   await Promise.all([syncInsulinTimer(),refreshHomeAfterChange(type)]);
   }
-  if(type==='fact')await loadNightFact();
-  refreshHomeAfterChange();
+  if(type==='fact')await refreshHomeAfterChange(type);
  }catch(error){
   setToast(toast,'Не удалось сохранить: '+error.message,'error');
   handleAccessError(error);
@@ -2114,12 +2113,9 @@ async function undoValue(type){
    ?`Ночное значение ${value} удалено`
    :`Удалено: ${value}${type==='insulin'?' ед.':''}${result.time?' в '+result.time:''}`;
   setToast(toast,'✓ '+text,'success');
-  if(type==='sugar')await Promise.all([loadSugarAverage(),loadLatestMeasurements()]);
-  if(type==='insulin'){
-   await Promise.all([syncInsulinTimer(),loadInsulinTotal(),loadNightFact(),loadLatestMeasurements()]);
-  }
-  if(type==='fact')await loadNightFact();
-  refreshHomeAfterChange();
+  if(type==='sugar')await refreshHomeAfterChange(type);
+  if(type==='insulin')await Promise.all([syncInsulinTimer(),refreshHomeAfterChange(type)]);
+  if(type==='fact')await refreshHomeAfterChange(type);
  }catch(error){
   setToast(toast,'Не удалось отменить: '+error.message,'error');
   handleAccessError(error);
@@ -2308,13 +2304,24 @@ function applyHomeData(data){
  });
 }
 // После записи или отмены значения подтягиваем все плитки главной заново, чтобы они были актуальны
-async function refreshHomeAfterChange(){
+// Один запрос «home» вместо отдельных загрузок среднего, суммы, ночного и «Последнее»
+async function refreshHomeAfterChange(type){
+ const sugarEl=document.getElementById('sugarAverage'),insulinEl=document.getElementById('insulinTotal');
+ if(type==='sugar')showMetricLoading(sugarEl);
+ if(type==='insulin'){showMetricLoading(insulinEl);renderNightFact(null,true);}
+ if(type==='fact')renderNightFact(null,true);
  for(let i=0;i<30&&homeBusy;i++)await new Promise(resolve=>setTimeout(resolve,150));
  lastHomeJson=null;
- await loadHomeCards(false);
+ const ok=await loadHomeCards(false);
+ if(!ok){
+  if(type==='sugar')showMetricError(sugarEl);
+  if(type==='insulin'){showMetricError(insulinEl);showMetricError(document.getElementById('nightFact'),true);}
+  if(type==='fact')showMetricError(document.getElementById('nightFact'),true);
+ }
+ return ok;
 }
 async function loadHomeCards(first){
- if(homeBusy)return;
+ if(homeBusy)return false;
  homeBusy=true;
  if(first){
   try{localStorage.removeItem(HOME_CACHE_KEY);}catch(error){}
@@ -2327,6 +2334,7 @@ async function loadHomeCards(first){
   setAccess(true,'Сервер подтвердил доступ');
   const json=JSON.stringify(data);
   if(first||json!==lastHomeJson){applyHomeData(data);lastHomeJson=json;}
+  return true;
  }catch(error){
   console.error('Ошибка загрузки карточек главной:',error);
   if(first){
@@ -2339,6 +2347,7 @@ async function loadHomeCards(first){
    if(yesterday)yesterday.textContent='Вчера: —';
   }
   handleAccessError(error);
+  return false;
  }finally{
   homeBusy=false;
  }
