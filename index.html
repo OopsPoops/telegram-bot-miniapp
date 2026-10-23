@@ -124,7 +124,6 @@ button{-webkit-tap-highlight-color:transparent}
 .quick-button:active{transform:scale(.98)}
 .quick-icon{width:40px;height:40px;flex-shrink:0;border-radius:13px;display:grid;place-items:center;font-size:19px}
 .quick-label{font-weight:700;font-size:14px}
-.quick-hint{font-size:11px;color:var(--muted);margin-top:4px}
 .arrow{margin-left:auto;color:var(--muted);font-size:19px}
 .blue{background:#edf0ff}.orange{background:#fff1df}.purple{background:#f1eaff}.green{background:#e4f8ee}.yellow{background:#fff5d7}.gray{background:#edf0f5}
 :root[data-theme="dark"] .blue{background:#2c3457}
@@ -489,11 +488,10 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .quick-big{flex-direction:row;align-items:center;gap:12px;min-height:104px;padding:14px 14px;border-radius:21px}
 .quick-big .quick-icon{width:44px;height:44px;border-radius:15px;font-size:21px;box-shadow:inset 0 1px 0 rgba(255,255,255,.7)}
 .quick-big .quick-label{font-size:16px}
-.quick-big .quick-hint{font-size:11px;line-height:1.25;margin-top:3px}
-.quick-big.q-today{background:linear-gradient(150deg,rgba(82,103,232,.12) 0%,transparent 62%),var(--card-grad)}
-.quick-big.q-yest{background:linear-gradient(150deg,rgba(236,148,56,.14) 0%,transparent 62%),var(--card-grad)}
-:root[data-theme="dark"] .quick-big.q-today{background:linear-gradient(150deg,rgba(143,155,255,.20) 0%,transparent 62%),var(--card-grad)}
-:root[data-theme="dark"] .quick-big.q-yest{background:linear-gradient(150deg,rgba(255,176,90,.18) 0%,transparent 62%),var(--card-grad)}
+.quick-chip.q-today{background:linear-gradient(150deg,rgba(82,103,232,.12) 0%,transparent 62%),var(--card-grad)}
+.quick-chip.q-yest{background:linear-gradient(150deg,rgba(236,148,56,.14) 0%,transparent 62%),var(--card-grad)}
+:root[data-theme="dark"] .quick-chip.q-today{background:linear-gradient(150deg,rgba(143,155,255,.20) 0%,transparent 62%),var(--card-grad)}
+:root[data-theme="dark"] .quick-chip.q-yest{background:linear-gradient(150deg,rgba(255,176,90,.18) 0%,transparent 62%),var(--card-grad)}
 .quick-chip{min-height:58px;padding:10px 12px;border-radius:17px;gap:10px}
 .quick-chip .quick-icon{width:34px;height:34px;border-radius:11px;font-size:17px}
 .quick-chip .quick-label{font-size:13px;line-height:1.25}
@@ -825,6 +823,7 @@ button.st-ico:active{transform:scale(.88)}
 .st-copy{flex:1;min-width:0}
 .st-t{flex:1;font-size:17px;line-height:22px}
 .st-s{font-size:15px;line-height:20px;color:var(--st-sub);margin-top:1px;overflow-wrap:anywhere}
+.st-s:empty{display:none}
 .st-val{font-size:17px;color:var(--st-sub);white-space:nowrap}
 .st-val.access-status{display:inline-flex;align-items:center;gap:6px;margin:0;font-size:17px;font-weight:400}
 .st-chev{width:8px;height:14px;flex:none;color:var(--st-chev)}
@@ -982,8 +981,8 @@ button.st-ico:active{transform:scale(.88)}
 </div>
 <!-- --- Быстрые кнопки --- -->
 <section class="quick-grid">
-<button class="quick-button quick-big q-today" onclick="openAction('today')"><span class="quick-icon blue">☀️</span><span><div class="quick-label">Сегодня</div><div class="quick-hint">За текущий день</div></span></button>
-<button class="quick-button quick-big q-yest" onclick="openAction('yesterday')"><span class="quick-icon orange">🌙</span><span><div class="quick-label">Вчера</div><div class="quick-hint">За прошлый день</div></span></button>
+<button class="quick-button quick-chip q-today" onclick="openAction('today')"><span class="quick-icon blue">☀️</span><span class="quick-label">Сегодня</span></button>
+<button class="quick-button quick-chip q-yest" onclick="openAction('yesterday')"><span class="quick-icon orange">🌙</span><span class="quick-label">Вчера</span></button>
 <button class="quick-button quick-chip" onclick="openAction('week')"><span class="quick-icon purple">📊</span><span class="quick-label">Среднее за неделю</span></button>
 <button class="quick-button quick-chip" onclick="openAction('month')"><span class="quick-icon green">🗓️</span><span class="quick-label">Среднее за месяц</span></button>
 <button class="quick-button quick-chip" onclick="openAction('excel')"><span class="quick-icon yellow">📗</span><span class="quick-label">Excel</span></button>
@@ -1170,7 +1169,7 @@ button.st-ico:active{transform:scale(.88)}
 <div class="st-bar"><div class="st-title">Настройки</div></div>
 <div class="st-card">
 <div class="st-row two has-ico"><span class="st-ico c-red"><svg class="g"><use href="#i-user"/></svg></span><div class="st-copy"><div class="st-t">Пользователь</div><div class="st-s" id="userName">Получаю данные из Telegram…</div></div></div>
-<div class="st-row two has-ico"><span class="st-ico c-green"><svg class="g"><use href="#i-shield"/></svg></span><div class="st-copy"><div class="st-t">Доступ к боту</div><div class="st-s" id="accessDescription">Статус доступа к Mini App</div></div><span class="st-val access-status" id="accessStatus"><span class="status-dot"></span><span id="accessText">Проверяется…</span></span></div>
+<div class="st-row has-ico"><span class="st-ico c-green"><svg class="g"><use href="#i-shield"/></svg></span><div class="st-copy"><div class="st-t">Доступ к боту</div><div class="st-s" id="accessDescription"></div></div><span class="st-val access-status" id="accessStatus"><span class="status-dot"></span><span id="accessText">Проверяется…</span></span></div>
 </div>
 <div class="st-card">
 <button class="st-row has-ico st-nav" type="button" onclick="stOpen('sound')"><span class="st-ico c-red"><svg class="g"><use href="#i-sound"/></svg></span><span class="st-t">Звук и вибрация</span><span class="st-val" id="stV-sound"></span><svg class="st-chev"><use href="#i-chev"/></svg></button>
@@ -1557,7 +1556,7 @@ document.querySelector('.bottom-nav-wrap').inert=denied;
 document.getElementById('modalBackdrop').inert=denied;
 if(allowed===true){
 text.textContent='Доступ разрешён';
-description.textContent=message||'Ты можешь пользоваться Mini App';
+description.textContent='';
 }else if(allowed===false){
 text.textContent='Доступ запрещён';
 description.textContent=message||'Обратись к администратору бота';
