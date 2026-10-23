@@ -832,6 +832,68 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .yd-today{display:none}
 .yd-group.open .yd-today{display:block;animation:ydDrop .38s cubic-bezier(.2,.8,.2,1)}
 @keyframes ydDrop{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+
+/* ===== НАСТРОЙКИ: визуальный стиль Telegram iOS ===== */
+:root:has(#screen-settings.active){--bg:#efeff4;--status-bar-bg:#efeff4;--status-bar-fade:#efeff4}
+:root[data-theme="dark"]:has(#screen-settings.active){--bg:#000;--status-bar-bg:#000;--status-bar-fade:#000}
+#screen-settings{--st-card:#fff;--st-text:#000;--st-sub:#8e8e93;--st-sep:rgba(60,60,67,.14);--st-chev:#b4b4b9;--st-fill:rgba(118,118,128,.12);--st-seg:#fff;--st-blue:#007aff;--st-off:#e9e9ea;--st-on:#34c759;--st-glass:rgba(255,255,255,.7);--st-ring:rgba(0,0,0,.06);color:var(--st-text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",system-ui,sans-serif;letter-spacing:-.02em}
+:root[data-theme="dark"] #screen-settings{--st-card:#1c1c1e;--st-text:#fff;--st-sep:rgba(84,84,88,.6);--st-chev:#5f5f64;--st-fill:rgba(118,118,128,.24);--st-seg:#636366;--st-blue:#0a84ff;--st-off:#39393d;--st-on:#30d158;--st-glass:rgba(58,58,62,.62);--st-ring:rgba(255,255,255,.1)}
+.st-page{display:none}
+.st-page.active{display:block;animation:stIn .32s cubic-bezier(.22,1,.36,1)}
+@keyframes stIn{from{opacity:0;transform:translateX(22px)}}
+@media (prefers-reduced-motion:reduce){.st-page.active{animation:none}}
+.st-bar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 42px);z-index:12;display:flex;align-items:center;justify-content:center;min-height:44px;margin-bottom:20px}
+.st-bar::before{content:"";position:absolute;z-index:-1;left:-18px;right:-18px;top:-14px;bottom:-12px;background:linear-gradient(var(--bg) 72%,transparent)}
+.st-title{font-size:17px;font-weight:600}
+.st-back{position:absolute;left:0;top:0;width:44px;height:44px;border:0;padding:0;border-radius:50%;display:grid;place-items:center;color:var(--st-text);background:var(--st-glass);-webkit-backdrop-filter:blur(20px) saturate(1.8);backdrop-filter:blur(20px) saturate(1.8);box-shadow:0 0 0 .5px var(--st-ring),0 4px 14px rgba(0,0,0,.08),inset 0 1px 0 rgba(255,255,255,.35);cursor:pointer;transition:transform .15s}
+.st-back:active{transform:scale(.92)}
+.st-back svg{width:10px;height:18px}
+.st-card{background:var(--st-card);border-radius:26px;margin:0 0 24px;overflow:hidden}
+.st-sec{font-size:13px;letter-spacing:0;text-transform:uppercase;color:var(--st-sub);padding:14px 15px 0;margin:0 0 8px}
+.st-foot{font-size:14px;line-height:1.3;letter-spacing:0;color:var(--st-sub);padding:0 15px;margin:-18px 0 24px}
+.st-row{position:relative;display:flex;align-items:center;gap:15px;width:100%;min-height:51px;padding:7px 15px;border:0;background:none;color:inherit;font:inherit;font-size:17px;text-align:left}
+.st-row:not(:first-child)::before{content:"";position:absolute;top:0;left:15px;right:15px;height:1px;background:var(--st-sep)}
+.st-row.has-ico:not(:first-child)::before{left:60px}
+.st-row.two{min-height:70px}
+.st-row[hidden]{display:none}
+.st-nav,.st-pick{cursor:pointer;transition:background .15s}
+.st-nav:active,.st-pick:active{background:var(--st-fill)}
+.st-ico{width:30px;height:30px;flex:none;border:0;padding:0;border-radius:8px;display:grid;place-items:center;color:#fff}
+button.st-ico{cursor:pointer;transition:transform .12s}
+button.st-ico:active{transform:scale(.88)}
+.st-ico .g{width:18px;height:18px}
+.c-red{background:linear-gradient(#ff6b5e,#f2493c);--ic:#f2493c}
+.c-green{background:linear-gradient(#4fd96d,#2fbf55);--ic:#2fbf55}
+.c-orange{background:linear-gradient(#ffb23f,#f5921d);--ic:#f5921d}
+.c-blue{background:linear-gradient(#4aa6ff,#1b84f5);--ic:#1b84f5}
+.c-sky{background:linear-gradient(#5cc4f7,#2fa8ee);--ic:#2fa8ee}
+.st-copy{flex:1;min-width:0}
+.st-t{flex:1;font-size:17px;line-height:22px}
+.st-s{font-size:15px;line-height:20px;color:var(--st-sub);margin-top:1px;overflow-wrap:anywhere}
+.st-val{font-size:17px;color:var(--st-sub);white-space:nowrap}
+.st-val.access-status{display:inline-flex;align-items:center;gap:6px;margin:0;font-size:17px;font-weight:400}
+.st-chev{width:8px;height:14px;flex:none;color:var(--st-chev)}
+.st-sw{position:relative;width:62px;height:28px;flex:none;border:0;border-radius:14px;padding:0;background:var(--st-off);cursor:pointer;transition:background .25s}
+.st-sw span{position:absolute;left:2px;top:2px;width:36px;height:24px;border-radius:12px;background:#fff;font-size:0;box-shadow:0 0 0 1px var(--st-ring),0 2px 5px rgba(0,0,0,.22);transition:transform .3s cubic-bezier(.34,1.4,.4,1)}
+.st-sw[aria-pressed="true"],:root[data-theme="dark"] #themeSwitch{background:var(--st-on)}
+.st-sw[aria-pressed="true"] span,:root[data-theme="dark"] #themeSwitch span{transform:translateX(22px)}
+.st-sw:disabled{opacity:.5}
+.st-row.muted-by-app .st-copy,.st-row.muted-by-app .st-sw{opacity:.45}
+.st-in{width:92px;min-height:34px;border:0;border-radius:10px;padding:6px 10px;background:var(--st-fill);color:var(--st-text);font:inherit;font-size:17px;text-align:right}
+.st-in[type="time"]{width:112px;text-align:center}
+.st-in:focus{outline:2px solid var(--st-blue)}
+.st-u{min-width:28px;color:var(--st-sub)}
+.st-pick input{position:absolute;opacity:0;pointer-events:none}
+.st-ck{width:16px;height:16px;flex:none;color:var(--st-blue);opacity:0}
+.st-pick input:checked~.st-ck{opacity:1}
+.st-segrow{padding:10px 15px}
+.st-seg{display:flex;gap:2px;padding:2px;border-radius:11px;background:var(--st-fill)}
+.st-seg .followup-preset{flex:1;border:0;border-radius:9px;background:transparent;color:var(--st-text);padding:7px 4px;font-size:15px;font-weight:500;letter-spacing:-.01em}
+.st-seg .followup-preset.active{background:var(--st-seg);color:var(--st-text);font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.18)}
+#reportOptions{margin-top:0}
+#targetSaveButton{width:100%;min-width:0;height:50px;margin:0 0 6px;border-radius:25px;font-size:17px;font-weight:600;letter-spacing:-.01em;color:#fff;background:var(--st-blue);box-shadow:none}
+#targetSaveButton.saved{background:#34c759!important;color:#fff!important;pointer-events:none}
+.st-toast{margin:6px 15px 0}
 </style>
 </head>
 <body>
@@ -1123,135 +1185,101 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 </section>
 <!-- === ЭКРАН «НАСТРОЙКИ» === -->
 <section class="screen" id="screen-settings">
-<div class="page-heading">Настройки</div>
-<div class="settings-card">
-<div class="setting-row">
-<div class="setting-icon">👤</div>
-<div class="setting-copy">
-<div class="setting-name">Пользователь</div>
-<div class="setting-description" id="userName">Получаю данные из Telegram…</div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4.2" fill="currentColor"/><path d="M3.8 21c.4-4.6 3.8-7 8.2-7s7.8 2.4 8.2 7z" fill="currentColor"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2.5l8 3v6.2c0 4.8-3.3 8.6-8 10.3-4.7-1.7-8-5.5-8-10.3V5.5z" fill="currentColor"/><path d="M8.3 12.2l2.5 2.5 4.9-5" fill="none" style="stroke:var(--ic)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-sound" viewBox="0 0 24 24"><path d="M3.5 9.5v5h3.8l5.2 4.2V5.3L7.3 9.5z" fill="currentColor"/><path d="M16 9.2a4.2 4.2 0 010 5.6M18.6 6.4a8 8 0 010 11.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+<symbol id="i-vib" viewBox="0 0 24 24"><rect x="8" y="3.5" width="8" height="17" rx="2.2" fill="currentColor"/><path d="M4.5 8v8M19.5 8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+<symbol id="i-bell" viewBox="0 0 24 24"><path d="M12 3a6 6 0 00-6 6v4l-2 3.2h16L18 13V9a6 6 0 00-6-6zM9.8 19h4.4a2.2 2.2 0 01-4.4 0z" fill="currentColor"/></symbol>
+<symbol id="i-timer" viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="7.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 9.5v4.5l2.8 1.6M9.5 3h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+<symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3.5" fill="currentColor"/><path d="M3.5 10h17" style="stroke:var(--ic)" stroke-width="1.6"/><path d="M8 3v4M16 3v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+<symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/></symbol>
+<symbol id="i-theme" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3.5a8.5 8.5 0 010 17z" fill="currentColor"/></symbol>
+<symbol id="i-chev" viewBox="0 0 8 14"><path d="M1 1l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-back" viewBox="0 0 10 18"><path d="M9 1L1 9l8 8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-check" viewBox="0 0 16 16"><path d="M2 8.5l4 4L14 3.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</defs></svg>
+<div class="st-page active" data-p="root">
+<div class="st-bar"><div class="st-title">Настройки</div></div>
+<div class="st-card">
+<div class="st-row two has-ico"><span class="st-ico c-red"><svg class="g"><use href="#i-user"/></svg></span><div class="st-copy"><div class="st-t">Пользователь</div><div class="st-s" id="userName">Получаю данные из Telegram…</div></div></div>
+<div class="st-row two has-ico"><span class="st-ico c-green"><svg class="g"><use href="#i-shield"/></svg></span><div class="st-copy"><div class="st-t">Доступ к боту</div><div class="st-s" id="accessDescription">Статус доступа к Mini App</div></div><span class="st-val access-status" id="accessStatus"><span class="status-dot"></span><span id="accessText">Проверяется…</span></span></div>
+</div>
+<div class="st-card">
+<button class="st-row has-ico st-nav" type="button" onclick="stOpen('sound')"><span class="st-ico c-red"><svg class="g"><use href="#i-sound"/></svg></span><span class="st-t">Звук и вибрация</span><span class="st-val" id="stV-sound"></span><svg class="st-chev"><use href="#i-chev"/></svg></button>
+<button class="st-row has-ico st-nav" type="button" onclick="stOpen('timer')"><span class="st-ico c-orange"><svg class="g"><use href="#i-timer"/></svg></span><span class="st-t">Таймер инсулина</span><span class="st-val" id="stV-timer"></span><svg class="st-chev"><use href="#i-chev"/></svg></button>
+<button class="st-row has-ico st-nav" type="button" onclick="stOpen('report')"><span class="st-ico c-blue"><svg class="g"><use href="#i-cal"/></svg></span><span class="st-t">Ежедневный отчёт</span><span class="st-val" id="stV-report"></span><svg class="st-chev"><use href="#i-chev"/></svg></button>
+<button class="st-row has-ico st-nav" type="button" onclick="stOpen('target')"><span class="st-ico c-green"><svg class="g"><use href="#i-target"/></svg></span><span class="st-t">Целевой диапазон</span><span class="st-val" id="stV-target"></span><svg class="st-chev"><use href="#i-chev"/></svg></button>
+</div>
+<div class="st-card">
+<button class="st-row has-ico st-nav" type="button" onclick="stOpen('theme')"><span class="st-ico c-sky"><svg class="g"><use href="#i-theme"/></svg></span><span class="st-t">Оформление</span><span class="st-val" id="stV-theme"></span><svg class="st-chev"><use href="#i-chev"/></svg></button>
 </div>
 </div>
-<div class="setting-divider"></div>
-<div class="setting-row">
-<div class="setting-icon">🛡️</div>
-<div class="setting-copy">
-<div class="setting-name">Доступ к боту</div>
-<div class="access-status" id="accessStatus"><span class="status-dot"></span><span id="accessText">Проверяется…</span></div>
-<div class="setting-description" id="accessDescription">Статус доступа к Mini App</div>
+
+<div class="st-page" data-p="sound">
+<div class="st-bar"><button class="st-back" type="button" onclick="stBack()" aria-label="Назад"><svg><use href="#i-back"/></svg></button><div class="st-title">Звук и вибрация</div></div>
+<div class="st-sec">Для всего приложения</div>
+<div class="st-card">
+<div class="st-row has-ico"><span class="st-ico c-red"><svg class="g"><use href="#i-sound"/></svg></span><div class="st-copy"><div class="st-t">Звук</div></div><button class="st-sw" id="appSoundSwitch" type="button" onclick="toggleTimerSetting('appSound')" aria-label="Звук приложения" aria-pressed="true"><span></span></button></div>
+<div class="st-row has-ico"><button class="st-ico c-orange" type="button" onclick="cycleAppVibrationLevel()" aria-label="Сменить силу вибрации"><svg class="g"><use href="#i-vib"/></svg></button><div class="st-copy"><div class="st-t" id="appVibrationName">Вибрация</div></div><button class="st-sw" id="appVibrationSwitch" type="button" onclick="toggleTimerSetting('appVibration')" aria-label="Вибрация приложения" aria-pressed="true"><span></span></button></div>
 </div>
+<div class="st-foot">Нажми на иконку вибрации, чтобы сменить силу.</div>
 </div>
+
+<div class="st-page" data-p="timer">
+<div class="st-bar"><button class="st-back" type="button" onclick="stBack()" aria-label="Назад"><svg><use href="#i-back"/></svg></button><div class="st-title">Таймер инсулина</div></div>
+<div class="st-sec">Режим</div>
+<div class="st-card" role="radiogroup" aria-label="Режим таймера инсулина">
+<label class="st-row st-pick"><span class="st-t">Всегда</span><input type="radio" name="insulinTimerMode" value="always" onchange="updateTimerMode()"><svg class="st-ck"><use href="#i-check"/></svg></label>
+<label class="st-row st-pick"><span class="st-t">От дозы</span><input type="radio" name="insulinTimerMode" value="threshold" onchange="updateTimerMode()"><svg class="st-ck"><use href="#i-check"/></svg></label>
+<label class="st-row st-pick"><span class="st-t">Выкл.</span><input type="radio" name="insulinTimerMode" value="off" onchange="updateTimerMode()"><svg class="st-ck"><use href="#i-check"/></svg></label>
+<div class="st-row" id="timerThresholdSetting" hidden><label class="st-t" for="timerThresholdInput">Включать, если доза от</label><input class="st-in" id="timerThresholdInput" type="number" inputmode="decimal" min="0" step="0.5" aria-label="Порог дозы в единицах"><span class="st-u">ед.</span></div>
 </div>
-<div class="settings-card">
-<div class="setting-row">
-<div class="setting-icon">🔊</div>
-<div class="setting-copy">
-<div class="setting-name">Звук</div>
-<div class="setting-description">Для всего приложения</div>
+<div class="st-sec">Напоминания</div>
+<div class="st-card">
+<div class="st-row two has-ico" id="timerSoundRow"><button class="st-ico c-red" type="button" onclick="cycleTimerSound()" aria-label="Сменить звук"><svg class="g"><use href="#i-bell"/></svg></button><div class="st-copy"><div class="st-t" id="timerSoundName">Звук</div><div class="st-s">Через 5 и 10 минут</div></div><button class="st-sw" id="timerSoundSwitch" type="button" onclick="toggleTimerSetting('timerSound')" aria-label="Звук таймера" aria-pressed="true"><span></span></button></div>
+<div class="st-row two has-ico" id="timerVibrationRow"><button class="st-ico c-orange" type="button" onclick="cycleVibrationLevel()" aria-label="Сменить силу вибрации"><svg class="g"><use href="#i-vib"/></svg></button><div class="st-copy"><div class="st-t" id="timerVibrationName">Вибрация</div><div class="st-s">Через 5 и 10 минут</div></div><button class="st-sw" id="timerVibrationSwitch" type="button" onclick="toggleTimerSetting('timerVibration')" aria-label="Вибрация таймера" aria-pressed="true"><span></span></button></div>
 </div>
-<button class="setting-switch" id="appSoundSwitch" type="button" onclick="toggleTimerSetting('appSound')" aria-label="Выключить звук приложения" aria-pressed="true"><span></span></button>
+<div class="st-foot">Нажми на иконку, чтобы сменить звук или силу вибрации.</div>
 </div>
-<div class="setting-divider"></div>
-<div class="setting-row">
-<button class="setting-icon setting-icon-button" type="button" onclick="cycleAppVibrationLevel()" aria-label="Сменить силу вибрации приложения">📲</button>
-<div class="setting-copy">
-<div class="setting-name" id="appVibrationName">Вибрация (3)</div>
-<div class="setting-description">Для всего приложения<br>Нажми на 📲, чтобы сменить силу</div>
-</div>
-<button class="setting-switch" id="appVibrationSwitch" type="button" onclick="toggleTimerSetting('appVibration')" aria-label="Выключить вибрацию приложения" aria-pressed="true"><span></span></button>
-</div>
-</div>
-<div class="settings-card">
-<div class="setting-row">
-<div class="setting-icon">⏱️</div>
-<div class="setting-copy">
-<div class="setting-name">Таймер инсулина</div>
-<div class="setting-description">Отсчёт 20 минут после сохранения дозы</div>
-</div>
-</div>
-<div class="timer-mode-options" role="radiogroup" aria-label="Режим таймера инсулина">
-<label class="timer-mode-option"><input type="radio" name="insulinTimerMode" value="always" onchange="updateTimerMode()">Всегда</label>
-<label class="timer-mode-option"><input type="radio" name="insulinTimerMode" value="threshold" onchange="updateTimerMode()">От дозы</label>
-<label class="timer-mode-option"><input type="radio" name="insulinTimerMode" value="off" onchange="updateTimerMode()">Выкл.</label>
-</div>
-<div class="timer-threshold" id="timerThresholdSetting" hidden>
-<label for="timerThresholdInput">Включать, если доза от</label>
-<input id="timerThresholdInput" type="number" inputmode="decimal" min="0" max="15" step="0.1" value="5" onchange="updateTimerThreshold()" aria-label="Минимальная доза инсулина для таймера">
-<span>ед.</span>
-</div>
-<div class="setting-divider"></div>
-<div class="setting-row" id="timerSoundRow">
-<button class="setting-icon setting-icon-button" type="button" onclick="cycleTimerSound()" aria-label="Сменить звук напоминаний">🔔</button>
-<div class="setting-copy">
-<div class="setting-name" id="timerSoundName">Звук напоминаний (1)</div>
-<div class="setting-description">Через 5 и 10 минут<br>Нажми на 🔔, чтобы сменить звук</div>
-</div>
-<button class="setting-switch" id="timerSoundSwitch" type="button" onclick="toggleTimerSetting('sound')" aria-label="Включить звук напоминаний" aria-pressed="true"><span></span></button>
-</div>
-<div class="setting-divider"></div>
-<div class="setting-row" id="timerVibrationRow">
-<button class="setting-icon setting-icon-button" type="button" onclick="cycleVibrationLevel()" aria-label="Сменить силу вибрации">📳</button>
-<div class="setting-copy">
-<div class="setting-name" id="timerVibrationName">Вибрация (3)</div>
-<div class="setting-description">Через 5 и 10 минут<br>Нажми на 📳, чтобы сменить силу</div>
-</div>
-<button class="setting-switch" id="timerVibrationSwitch" type="button" onclick="toggleTimerSetting('vibration')" aria-label="Включить вибрацию напоминаний" aria-pressed="true"><span></span></button>
-</div>
-</div>
-<div class="settings-card">
-<div class="setting-row">
-<div class="setting-icon">📅</div>
-<div class="setting-copy">
-<div class="setting-name">Ежедневный отчёт</div>
-<div class="setting-description" id="reportDescription">Общая настройка для всех пользователей бота</div>
-</div>
-<button class="setting-switch" id="reportEnabledSwitch" type="button" onclick="toggleReportEnabled()" aria-label="Включить ежедневный отчёт" aria-pressed="true" disabled><span></span></button>
+
+<div class="st-page" data-p="report">
+<div class="st-bar"><button class="st-back" type="button" onclick="stBack()" aria-label="Назад"><svg><use href="#i-back"/></svg></button><div class="st-title">Ежедневный отчёт</div></div>
+<div class="st-card">
+<div class="st-row two has-ico"><span class="st-ico c-blue"><svg class="g"><use href="#i-cal"/></svg></span><div class="st-copy"><div class="st-t">Ежедневный отчёт</div><div class="st-s" id="reportDescription">Загружаю настройки…</div></div><button class="st-sw" id="reportEnabledSwitch" type="button" onclick="toggleReportEnabled()" aria-label="Ежедневный отчёт" aria-pressed="true" disabled><span></span></button></div>
 </div>
 <div class="report-options" id="reportOptions">
-<div class="report-field">
-<label for="reportTimeInput">Время отправки (МСК)</label>
-<input id="reportTimeInput" type="time" value="21:00" onchange="saveReportTime()" aria-label="Время ежедневного отчёта по Москве">
+<div class="st-card"><label class="st-row" for="reportTimeInput"><span class="st-t">Время отправки (МСК)</span><input class="st-in" id="reportTimeInput" type="time" value="21:00" onchange="saveReportTime()" aria-label="Время отправки отчёта по Москве"></label></div>
+<div class="st-sec">Вопрос «Сделяля?»</div>
+<div class="st-card">
+<div class="st-segrow"><div class="st-seg" id="followupPresets">
+<button class="followup-preset" type="button" data-minutes="10" onclick="setFollowupPreset(10)">10 мин</button>
+<button class="followup-preset" type="button" data-minutes="20" onclick="setFollowupPreset(20)">20 мин</button>
+<button class="followup-preset" type="button" data-minutes="30" onclick="setFollowupPreset(30)">30 мин</button>
+</div></div>
+<label class="st-row" for="followupInput"><span class="st-t">Своё время</span><input class="st-in" id="followupInput" type="number" inputmode="numeric" min="0" max="180" step="1" onchange="saveFollowupMinutes()" aria-label="Минуты до вопроса Сделяля"><span class="st-u">мин</span></label>
 </div>
-<div class="setting-divider"></div>
-<div class="setting-name">Вопрос «Сделяля?»</div>
-<div class="setting-description">Приходит через выбранное время после отчёта. 0 минут — не приходит</div>
-<div class="followup-presets" id="followupPresets">
-<button class="followup-preset" type="button" data-minutes="10" onclick="saveFollowupMinutes(10)">10 мин</button>
-<button class="followup-preset" type="button" data-minutes="20" onclick="saveFollowupMinutes(20)">20 мин</button>
-<button class="followup-preset" type="button" data-minutes="30" onclick="saveFollowupMinutes(30)">30 мин</button>
+<div class="st-foot">Приходит через выбранное время после отчёта. 0 минут — вопрос не приходит.</div>
 </div>
-<div class="report-field">
-<label for="followupInput">Своё время (0–180 минут, 0 — не спрашивать)</label>
-<input id="followupInput" type="number" inputmode="numeric" min="0" max="180" step="1" value="20" onchange="saveFollowupMinutes(Number(this.value))" aria-label="Через сколько минут после отчёта спросить Сделяля">
-<span>мин</span>
+<div class="toast st-toast" id="reportToast"></div>
 </div>
+
+<div class="st-page" data-p="target">
+<div class="st-bar"><button class="st-back" type="button" onclick="stBack()" aria-label="Назад"><svg><use href="#i-back"/></svg></button><div class="st-title">Целевой диапазон</div></div>
+<div class="st-sec">ммоль/л</div>
+<div class="st-card">
+<label class="st-row" for="targetLowInput"><span class="st-t">Минимум</span><input class="st-in" id="targetLowInput" type="text" inputmode="decimal" autocomplete="off" aria-label="Минимум целевого диапазона"></label>
+<label class="st-row" for="targetHighInput"><span class="st-t">Максимум</span><input class="st-in" id="targetHighInput" type="text" inputmode="decimal" autocomplete="off" aria-label="Максимум целевого диапазона"></label>
 </div>
-<div class="toast" id="reportToast"></div>
-</div>
-<div class="settings-card">
-<div class="setting-row">
-<div class="setting-icon">🎯</div>
-<div class="setting-copy">
-<div class="setting-name">Целевой диапазон сахара</div>
-<div class="setting-description" id="targetDescription">Общая настройка для всех пользователей бота</div>
-</div>
-</div>
-<div class="target-fields">
-<div class="target-field"><label for="targetLowInput">Минимум</label><input id="targetLowInput" type="text" inputmode="decimal" value="4,0" aria-label="Минимум целевого диапазона сахара"></div>
-<div class="target-field"><label for="targetHighInput">Максимум</label><input id="targetHighInput" type="text" inputmode="decimal" value="9,0" aria-label="Максимум целевого диапазона сахара"></div>
-</div>
-<div class="target-unit">ммоль/л · зелёная полоса на графиках и расчёт «в цели»</div>
+<div class="st-foot"><span id="targetDescription">Общая настройка для всех пользователей бота</span><br>Зелёная полоса на графиках и расчёт «в цели».</div>
 <button class="save-button target-save" id="targetSaveButton" type="button" onclick="saveTargetRange()">Сохранить</button>
-<div class="toast" id="targetToast"></div>
+<div class="toast st-toast" id="targetToast"></div>
 </div>
-<div class="settings-card">
-<div class="setting-row">
-<div class="setting-icon" id="themeIcon">🌙</div>
-<div class="setting-copy">
-<div class="setting-name">Тёмная тема</div>
-<div class="setting-description" id="themeDescription">Комфортное оформление в темноте</div>
-</div>
-<button class="theme-switch" id="themeSwitch" type="button" onclick="toggleTheme()" aria-label="Переключить тему"><span id="themeSwitchIcon">🌙</span></button>
+
+<div class="st-page" data-p="theme">
+<div class="st-bar"><button class="st-back" type="button" onclick="stBack()" aria-label="Назад"><svg><use href="#i-back"/></svg></button><div class="st-title">Оформление</div></div>
+<div class="st-card">
+<div class="st-row two has-ico"><span class="st-ico c-sky"><svg class="g"><use href="#i-theme"/></svg><span id="themeIcon" hidden></span></span><div class="st-copy"><div class="st-t">Тёмная тема</div><div class="st-desc st-s" id="themeDescription">Комфортное оформление в темноте</div></div><button class="st-sw" id="themeSwitch" type="button" onclick="toggleTheme()" aria-label="Переключить тему"><span id="themeSwitchIcon"></span></button></div>
 </div>
 </div>
 </section>
@@ -4116,6 +4144,31 @@ function toggleTodayMeal(){
  card.setAttribute('aria-expanded',String(open));
  selectionHaptic();
 }
+</script>
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+window.stRefresh=function(){
+  const on=id=>$(id)&&$(id).getAttribute('aria-pressed')==='true';
+  const set=(id,t)=>{const e=$(id);if(e&&e.textContent!==t)e.textContent=t;};
+  set('stV-sound',on('appSoundSwitch')||on('appVibrationSwitch')?'Вкл.':'Выкл.');
+  const m=document.querySelector('input[name="insulinTimerMode"]:checked');
+  set('stV-timer',{always:'Всегда',threshold:'От дозы',off:'Выкл.'}[m&&m.value]||'');
+  const r=$('reportEnabledSwitch');
+  set('stV-report',r.disabled?'':(on('reportEnabledSwitch')?$('reportTimeInput').value:'Выкл.'));
+  set('stV-target',$('targetLowInput').value&&$('targetHighInput').value?$('targetLowInput').value+'–'+$('targetHighInput').value:'');
+  set('stV-theme',document.documentElement.dataset.theme==='dark'?'Тёмная':'Светлая');
+};
+window.stOpen=function(name){
+  document.querySelectorAll('#screen-settings .st-page').forEach(p=>p.classList.toggle('active',p.dataset.p===name));
+  window.scrollTo(0,0);
+  if(typeof selectionHaptic==='function')selectionHaptic();
+  stRefresh();
+};
+window.stBack=function(){stOpen('root');};
+setInterval(()=>{if($('screen-settings').classList.contains('active'))stRefresh();},600);
+stRefresh();
+})();
 </script>
 </body>
 </html>
