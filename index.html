@@ -4324,9 +4324,11 @@ function renderMealCards(data){
 function toggleTodayMeal(){
  const group=document.getElementById('ydGroup'),card=document.getElementById('yesterdayCard');
  if(!group||card.classList.contains('loading'))return;
- if(group.classList.contains('collapsed')){group.classList.remove('collapsed');selectionHaptic();return;}
- const open=group.classList.toggle('open');
- card.setAttribute('aria-expanded',String(open));
+ /* три состояния по кругу: свёрнуто → «Вчера» → «Вчера» + «Сегодня» → свёрнуто */
+ if(group.classList.contains('collapsed'))group.classList.remove('collapsed');
+ else if(group.classList.contains('open')){group.classList.remove('open');group.classList.add('collapsed');}
+ else group.classList.add('open');
+ card.setAttribute('aria-expanded',String(group.classList.contains('open')));
  selectionHaptic();
 }
 function collapseYesterdayCard(){
