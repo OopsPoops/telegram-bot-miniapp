@@ -776,7 +776,7 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 :root[data-theme="dark"] .yd-shot{background:rgba(255,196,107,.16);color:#ffc46b}
 .yd-empty{padding:14px 12px;border-radius:16px;background:rgba(125,135,170,.1);color:var(--muted);font-size:13.5px;line-height:1.4;text-align:center}
 .yd-card{cursor:default}
-#yesterdayCard{cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .3s cubic-bezier(.34,1.5,.4,1)}
+#yesterdayCard{cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:pan-y;transition:transform .3s cubic-bezier(.34,1.5,.4,1)}
 #yesterdayCard:active{transform:scale(.99)}
 #yesterdayCard:focus-visible{outline:2px solid rgba(82,103,232,.55);outline-offset:2px}
 .yd-chevron{flex-shrink:0;width:30px;height:30px;margin-left:auto;border-radius:50%;display:grid;place-items:center;background:rgba(125,135,170,.14);color:var(--muted);transition:transform .35s cubic-bezier(.34,1.4,.4,1),background .2s}
@@ -789,6 +789,11 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .yd-group.collapsed .yd-chevron{transform:rotate(-90deg)}
 .yd-group.open .yd-today{display:block;animation:ydDrop .38s cubic-bezier(.2,.8,.2,1)}
 @keyframes ydDrop{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+/* листание приёмов пищи свайпом: новая карточка въезжает со стороны жеста */
+.yd-card.yd-in-left{animation:ydInLeft .3s cubic-bezier(.2,.8,.2,1)}
+.yd-card.yd-in-right{animation:ydInRight .3s cubic-bezier(.2,.8,.2,1)}
+@keyframes ydInLeft{from{opacity:0;transform:translateX(34px)}to{opacity:1;transform:none}}
+@keyframes ydInRight{from{opacity:0;transform:translateX(-34px)}to{opacity:1;transform:none}}
 
 /* ===== НАСТРОЙКИ: визуальный стиль Telegram iOS ===== */
 :root:has(#screen-settings.active){--bg:#efeff4;--status-bar-bg:#efeff4;--status-bar-fade:#efeff4}
@@ -4291,7 +4296,9 @@ function renderMealCard(card,data,when){
  card.querySelector('.yd-sub').textContent=data.date?data.date.slice(0,5):'';
  const strip=card.querySelector('.yd-strip'),shots=card.querySelector('.yd-shots');
  if(!data.found){
-  strip.innerHTML='<div class="yd-empty" style="grid-column:1/-1">'+(when==='Вчера'?'Вчера не было основного укола на ':'Сегодня пока нет основного укола на ')+mealName+'.</div>';
+  const emptyText=when==='Сегодня'?'Сегодня пока нет основного укола на '+mealName+'.'
+   :(when==='Вчера'||when==='Позавчера'?when+' не было основного укола на '+mealName+'.':'Не было основного укола на '+mealName+'.');
+  strip.innerHTML='<div class="yd-empty" style="grid-column:1/-1">'+emptyText+'</div>';
   shots.hidden=true;shots.innerHTML='';
   return;
  }
@@ -4313,31 +4320,177 @@ function renderMealCard(card,data,when){
   shots.hidden=true;shots.innerHTML='';
  }
 }
+
+// ---- Листание приёмов пищи ----
+// События идут по порядку: завтрак → ужин → завтрак → … Показ по умолчанию (k=0) — «вчера» на завтрак или ужин
+// (по времени суток). Свайп влево — следующее событие (k+1), свайп вправо — предыдущее (k-1).
+// Дальше всего вперёд — сегодняшний приём той же части дня (k=2). Для k≤0 под карточкой доступна
+// вторая плашка — то же событие на следующие сутки (k+2): для k=0 это «Сегодня».
+const YD_MEALS=['breakfast','dinner'];
+const YD_KMIN=-60,YD_KMAX=2;
+const YD_WEEKDAYS=['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
+const ydNav={k:0,anchor:null,cache:new Map(),pending:new Set(),failed:new Set(),token:0,swiped:false};
+function ydKey(ev){return ev.date+'|'+ev.meal;}
+function ydFormatDate(day){
+ const date=new Date(day*86400000);
+ return String(date.getUTCDate()).padStart(2,'0')+'.'+String(date.getUTCMonth()+1).padStart(2,'0')+'.'+date.getUTCFullYear();
+}
+function ydEvent(k){
+ const index=ydNav.anchor.day*2+ydNav.anchor.meal+k;
+ const day=Math.floor(index/2);
+ return {day,date:ydFormatDate(day),meal:YD_MEALS[index-day*2]};
+}
+function ydLabel(ev){
+ const diff=ev.day-(ydNav.anchor.day+1);
+ if(diff===0)return 'Сегодня';
+ if(diff===-1)return 'Вчера';
+ if(diff===-2)return 'Позавчера';
+ return YD_WEEKDAYS[new Date(ev.day*86400000).getUTCDay()];
+}
+function ydFillCard(card,ev){
+ if(!card)return;
+ const label=ydLabel(ev),key=ydKey(ev),data=ydNav.cache.get(key);
+ if(data){renderMealCard(card,data,label);return;}
+ const dinner=ev.meal==='dinner',mealName=dinner?'ужин':'завтрак';
+ card.querySelector('.yd-icon').textContent=dinner?'🍽️':'🍳';
+ card.querySelector('.yd-title').textContent=label+' на '+mealName;
+ card.querySelector('.yd-sub').textContent=ev.date.slice(0,5);
+ const strip=card.querySelector('.yd-strip'),shots=card.querySelector('.yd-shots');
+ shots.hidden=true;shots.innerHTML='';
+ strip.innerHTML=ydNav.failed.has(key)
+  ?'<div class="yd-empty" style="grid-column:1/-1">Не удалось загрузить. Смахните туда-обратно, чтобы повторить.</div>'
+  :'<div class="yd-tile sk"></div><div class="yd-tile sk"></div><div class="yd-tile sk"></div>';
+}
+function ydPaint(direction){
+ if(!ydNav.anchor)return;
+ const top=document.getElementById('yesterdayCard'),second=document.getElementById('todayMealCard');
+ ydFillCard(top,ydEvent(ydNav.k));
+ if(ydNav.k<=0)ydFillCard(second,ydEvent(ydNav.k+2));
+ if(direction){
+  const cls=direction==='left'?'yd-in-left':'yd-in-right';
+  top.classList.remove('yd-in-left','yd-in-right');
+  void top.offsetWidth;
+  top.classList.add(cls);
+ }
+}
+async function ydEnsure(events){
+ const missing=events.filter(ev=>ev&&!ydNav.cache.has(ydKey(ev))&&!ydNav.pending.has(ydKey(ev)));
+ if(!missing.length)return;
+ missing.forEach(ev=>ydNav.pending.add(ydKey(ev)));
+ try{
+  const result=await api('meals',{events:missing.map(ev=>({date:ev.date,meal:ev.meal}))});
+  result.forEach(item=>ydNav.cache.set(item.date+'|'+item.meal,item));
+  missing.forEach(ev=>ydNav.failed.delete(ydKey(ev)));
+ }catch(error){
+  console.error('Ошибка загрузки приёма пищи:',error);
+  missing.forEach(ev=>ydNav.failed.add(ydKey(ev)));
+ }finally{
+  missing.forEach(ev=>ydNav.pending.delete(ydKey(ev)));
+ }
+}
+function ydRender(direction){
+ const group=document.getElementById('ydGroup'),top=document.getElementById('yesterdayCard');
+ if(!group||!top||!ydNav.anchor)return;
+ const hasSecond=ydNav.k<=0;
+ if(!hasSecond){group.classList.remove('open');top.setAttribute('aria-expanded','false');}
+ ydPaint(direction);
+ const token=++ydNav.token;
+ const need=[ydEvent(ydNav.k)];
+ if(hasSecond)need.push(ydEvent(ydNav.k+2));
+ const near=[];
+ if(ydNav.k-1>=YD_KMIN)near.push(ydEvent(ydNav.k-1));
+ if(ydNav.k+1<=YD_KMAX)near.push(ydEvent(ydNav.k+1));
+ ydEnsure(need).then(()=>{
+  if(token!==ydNav.token)return;
+  ydPaint();
+  return ydEnsure(near);
+ });
+}
+function ydStep(delta){
+ if(!ydNav.anchor)return false;
+ const next=ydNav.k+delta;
+ if(next<YD_KMIN||next>YD_KMAX)return false;
+ ydNav.k=next;
+ ydNav.failed.delete(ydKey(ydEvent(next)));
+ ydRender(delta>0?'left':'right');
+ selectionHaptic();
+ return true;
+}
 function renderMealCards(data){
  const group=document.getElementById('ydGroup');
  if(!group)return;
  if(!data||!data.yesterday_meal){group.style.display='none';group.classList.remove('open');return;}
  group.style.display='';
- renderMealCard(document.getElementById('yesterdayCard'),data.yesterday_meal,'Вчера');
- if(data.today_meal)renderMealCard(document.getElementById('todayMealCard'),data.today_meal,'Сегодня');
+ const base=data.yesterday_meal;
+ const [d,m,y]=base.date.split('.').map(Number);
+ const day=Math.round(Date.UTC(y,m-1,d)/86400000),meal=base.meal==='dinner'?1:0;
+ const prev=ydNav.anchor;
+ if(!prev||prev.day!==day||prev.meal!==meal){ydNav.cache.clear();ydNav.k=0;}
+ ydNav.anchor={day,meal};
+ // события сегодняшнего дня могли измениться — перечитываем, прошлые держим в кэше
+ const todayText=ydFormatDate(day+1);
+ [...ydNav.cache.keys()].forEach(key=>{if(key.startsWith(todayText))ydNav.cache.delete(key);});
+ ydNav.cache.set(base.date+'|'+base.meal,base);
+ if(data.today_meal)ydNav.cache.set(data.today_meal.date+'|'+data.today_meal.meal,data.today_meal);
+ ydRender();
 }
 function toggleTodayMeal(){
  const group=document.getElementById('ydGroup'),card=document.getElementById('yesterdayCard');
  if(!group||card.classList.contains('loading'))return;
- /* три состояния по кругу: свёрнуто → «Вчера» → «Вчера» + «Сегодня» → свёрнуто */
+ if(ydNav.swiped)return; // тап, оставшийся после свайпа
+ const hasSecond=ydNav.k<=0;
+ /* состояния по кругу: свёрнуто → развёрнуто → (если есть вторая плашка) + «Сегодня» → свёрнуто */
  if(group.classList.contains('collapsed'))group.classList.remove('collapsed');
- else if(group.classList.contains('open')){group.classList.remove('open');group.classList.add('collapsed');}
- else group.classList.add('open');
+ else if(hasSecond&&!group.classList.contains('open'))group.classList.add('open');
+ else{group.classList.remove('open');group.classList.add('collapsed');}
  card.setAttribute('aria-expanded',String(group.classList.contains('open')));
  selectionHaptic();
 }
 function collapseYesterdayCard(){
  const group=document.getElementById('ydGroup'),card=document.getElementById('yesterdayCard');
- if(!group||group.classList.contains('collapsed'))return;
+ if(!group)return;
+ if(ydNav.anchor&&ydNav.k!==0){ydNav.k=0;ydRender('right');} // после запуска таймера возвращаемся к «вчера»
+ if(group.classList.contains('collapsed'))return;
  group.classList.remove('open');
  if(card)card.setAttribute('aria-expanded','false');
  group.classList.add('collapsed');
 }
+function initYdSwipe(){
+ const card=document.getElementById('yesterdayCard');
+ if(!card)return;
+ let gesture=null;
+ card.addEventListener('pointerdown',event=>{
+  if(event.pointerType==='mouse'&&event.button!==0)return;
+  gesture={x:event.clientX,y:event.clientY,id:event.pointerId,dx:0,active:false};
+ });
+ card.addEventListener('pointermove',event=>{
+  if(!gesture||event.pointerId!==gesture.id)return;
+  const dx=event.clientX-gesture.x,dy=event.clientY-gesture.y;
+  if(!gesture.active){
+   if(Math.abs(dx)<8||Math.abs(dx)<Math.abs(dy)*1.2)return;
+   gesture.active=true;
+   try{card.setPointerCapture(event.pointerId);}catch(_){}
+   card.style.transition='none';
+  }
+  gesture.dx=dx;
+  card.style.transform='translateX('+(dx*.35)+'px)';
+ });
+ const finish=event=>{
+  if(!gesture||event.pointerId!==gesture.id)return;
+  const done=gesture;gesture=null;
+  if(!done.active)return;
+  ydNav.swiped=true;setTimeout(()=>{ydNav.swiped=false;},400);
+  card.style.transition='';card.style.transform='';
+  if(event.type==='pointerup'&&Math.abs(done.dx)>=44)ydStep(done.dx<0?1:-1);
+ };
+ card.addEventListener('pointerup',finish);
+ card.addEventListener('pointercancel',finish);
+ card.addEventListener('keydown',event=>{
+  if(event.key==='ArrowLeft'){event.preventDefault();ydStep(-1);}
+  else if(event.key==='ArrowRight'){event.preventDefault();ydStep(1);}
+ });
+}
+initYdSwipe();
 </script>
 <script>
 (function(){
