@@ -1016,6 +1016,7 @@ button.st-ico:active{transform:scale(.88)}
 <button class="analytics-tab" type="button" role="tab" aria-label="Активность по времени" title="Активность по времени" aria-selected="false" data-chart="activity" onclick="selectChart('activity')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6" fill="currentColor" fill-opacity=".45"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6" fill="currentColor" fill-opacity=".45"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6" fill="currentColor"/></svg><span class="tab-label">Активность</span></button>
 <button class="analytics-tab" type="button" role="tab" aria-label="Тренды: неделя к неделе и месяц к месяцу" title="Тренды: неделя к неделе и месяц к месяцу" aria-selected="false" data-chart="dynamics" onclick="selectChart('dynamics')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 19V6M7 6 3.8 9.2M7 6l3.2 3.2"/><path d="M17 5v13M17 18l-3.2-3.2M17 18l3.2-3.2"/></svg><span class="tab-label">Тренды</span></button>
 <button class="analytics-tab" type="button" role="tab" aria-label="Укол и сахар до и после" title="Укол и сахар до и после" aria-selected="false" data-chart="effect" onclick="selectChart('effect')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4v16h16"/><circle cx="9" cy="9" r="1.6" fill="currentColor" stroke="none"/><circle cx="13" cy="12.5" r="1.6" fill="currentColor" stroke="none"/><circle cx="17" cy="15" r="1.6" fill="currentColor" stroke="none"/><path d="M7 7.5l11 8.5" stroke-dasharray="2 2.4"/></svg><span class="tab-label">Эффект</span></button>
+<button class="analytics-tab" type="button" role="tab" aria-label="Итоги по дням, неделям и месяцам" title="Итоги по дням, неделям и месяцам" aria-selected="false" data-chart="summary" onclick="selectChart('summary')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 20h17"/><path d="M6.5 20v-6M12 20V6M17.5 20v-9"/></svg><span class="tab-label">Итоги</span></button>
 </div>
 <div class="metric-switch" role="group" aria-label="Показатель" data-active="sugar">
 <span class="metric-pill" aria-hidden="true"></span>
@@ -1127,6 +1128,20 @@ button.st-ico:active{transform:scale(.88)}
 <span class="analytics-legend-item" data-mw>Редкие измерения</span>
 <span class="analytics-legend-item" data-mw><span class="analytics-swatch" style="background:#dfe3ff"></span><span class="analytics-swatch" style="background:#5267e8"></span>Частые измерения</span>
 </div>
+</section>
+<section class="analytics-card analytics-panel" data-panel="summary" hidden>
+<div class="analytics-toolbar">
+<span class="analytics-toolbar-label">Итоги</span>
+<select id="summary-group" aria-label="Группировка итогов" onchange="onSummaryGroup()">
+<option value="days" selected>По дням</option><option value="weeks">По неделям</option><option value="months">По месяцам</option>
+</select>
+<select id="summary-period" aria-label="Период итогов" onchange="renderSummary()"></select>
+<span class="toolbar-count" id="summary-count" role="status"></span>
+</div>
+<div id="summary-chart" class="chart-wrap"></div>
+<div id="summary-summary" class="dose-summary"></div>
+<div id="summary-tooltip" class="chart-tooltip" role="status"></div>
+<div class="analytics-legend"></div>
 </section>
 <section class="analytics-card analytics-panel" data-panel="effect" hidden>
 <div class="analytics-toolbar">
@@ -2476,7 +2491,8 @@ const FS_CHARTS={
   daily:{host:'daily-chart',title:'Сводка'},
   activity:{host:'activity-chart',title:'Активность'},
   dose:{host:'dose-chart',title:'ЦД'},
-  effect:{host:'effect-chart',title:'Укол и сахар'}
+  effect:{host:'effect-chart',title:'Укол и сахар'},
+  summary:{host:'summary-chart',title:'Итоги'}
 };
 function chartHosts(hostId,tooltipId){
   if(fsRedirect&&fsRedirect.from===hostId)return [document.getElementById('fs-chart'),document.getElementById('fs-tooltip')];
@@ -2566,10 +2582,11 @@ function setMetricState(metric){
 // «Ночной» есть только у вкладки ЦД; панель «доза за день» заменяет бублик сахара для инсулина и ночного
 function syncAnalyticsLayout(){
   const onRange=analyticsState.chart==='range';
+  const withNight=onRange||analyticsState.chart==='summary';
   const sw=document.querySelector('.metric-switch');
-  if(sw){if(onRange)sw.setAttribute('data-night','1');else sw.removeAttribute('data-night');sw.style.display=(analyticsState.chart==='dynamics'||analyticsState.chart==='effect')?'none':'';}
+  if(sw){if(withNight)sw.setAttribute('data-night','1');else sw.removeAttribute('data-night');sw.style.display=(analyticsState.chart==='dynamics'||analyticsState.chart==='effect')?'none':'';}
   const nightButton=document.querySelector('[data-metric="night"]');
-  if(nightButton)nightButton.style.display=onRange?'':'none';
+  if(nightButton)nightButton.style.display=withNight?'':'none';
   const showDose=onRange&&analyticsState.metric!=='sugar';
   document.querySelectorAll('.analytics-panel').forEach(panel=>{
    const name=panel.dataset.panel;
@@ -2578,7 +2595,7 @@ function syncAnalyticsLayout(){
 }
 function selectChart(name){
   analyticsState.chart=name;
-  if(name!=='range'&&analyticsState.metric==='night'){setMetricState('sugar');applyMetricWording();}
+  if(name!=='range'&&name!=='summary'&&analyticsState.metric==='night'){setMetricState('sugar');applyMetricWording();}
   document.querySelectorAll('.analytics-tab').forEach(button=>{
    const active=button.dataset.chart===name;
    button.classList.toggle('active',active);
@@ -2586,6 +2603,7 @@ function selectChart(name){
   });
   syncAnalyticsLayout();
   if(name==='dynamics')loadTrends(false);
+  if(name==='summary')loadSummary(false);
   renderAnalytics();
 }
 function toInjectionWords(text){
@@ -2624,6 +2642,7 @@ function renderAnalytics(){
   else if(analyticsState.chart==='daily')renderDailySummary();
   else if(analyticsState.chart==='range'){if(analyticsState.metric==='sugar')renderRangeDonut();else renderDoseChart();}
   else if(analyticsState.chart==='effect')renderEffectChart();
+  else if(analyticsState.chart==='summary')renderSummary();
   else if(analyticsState.chart==='dynamics'){/* плитки грузятся отдельно: loadTrends */}
   else renderActivityHeatmap();
 }
@@ -4050,6 +4069,194 @@ async function loadTrends(force){
   trendsBusy=false;
  }
 }
+
+// ============================================================
+// ИТОГИ: сахар / инсулин / ночной по дням, неделям и месяцам (логика /week и /month)
+// Дни — значение дня (инсулин — сумма за сутки). Недели (пн–вс) и месяцы — среднее в сутки
+// по дням с данными; сахар — среднее по всем измерениям. Данные считает сервер (action summary).
+// ============================================================
+const summaryState={data:null,busy:false,at:0,error:null};
+const SUMMARY_PERIODS={
+ days:[[7,'7 дней'],[14,'14 дней'],[30,'30 дней']],
+ weeks:[[4,'4 недели'],[8,'8 недель'],[12,'12 недель']],
+ months:[[3,'3 месяца'],[6,'6 месяцев'],[12,'12 месяцев']]
+};
+const SUMMARY_DEFAULT_PERIOD={days:7,weeks:8,months:12};
+const SUMMARY_MONTHS=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+const SUMMARY_WEEKDAYS=['вс','пн','вт','ср','чт','пт','сб'];
+const SUMMARY_COLORS={sugar:'#5267e8',insulin:'#1f9d8f',night:'#8b6ee0'};
+function fillSummaryPeriods(){
+ const group=document.getElementById('summary-group').value;
+ document.getElementById('summary-period').innerHTML=SUMMARY_PERIODS[group]
+  .map(([value,label])=>`<option value="${value}"${value===SUMMARY_DEFAULT_PERIOD[group]?' selected':''}>${label}</option>`).join('');
+}
+function onSummaryGroup(){fillSummaryPeriods();renderSummary();}
+async function loadSummary(force){
+ if(summaryState.busy)return;
+ if(!force&&summaryState.data&&Date.now()-summaryState.at<60000)return;
+ summaryState.busy=true;summaryState.error=null;
+ try{
+  summaryState.data=await api('summary');
+  summaryState.at=Date.now();
+ }catch(error){
+  console.error('Ошибка загрузки итогов:',error);
+  summaryState.error=error.message||'Не удалось загрузить итоги';
+  handleAccessError(error);
+ }finally{
+  summaryState.busy=false;
+  if(analyticsState.chart==='summary')renderSummary();
+ }
+}
+function summaryDate(text){const [d,m,y]=text.split('.').map(Number);return new Date(y,m-1,d);}
+function summaryLabel(group,bucket){
+ const [d,m,y]=bucket.from.split('.');
+ return group==='months'?SUMMARY_MONTHS[Number(m)-1]+' ’'+y.slice(2):d+'.'+m;
+}
+function summaryWhen(group,bucket){
+ if(group==='days')return SUMMARY_WEEKDAYS[summaryDate(bucket.from).getDay()]+', '+bucket.from;
+ return bucket.from.slice(0,5)+'–'+bucket.to;
+}
+function summaryDaysIn(bucket){return Math.round((summaryDate(bucket.to)-summaryDate(bucket.from))/86400000)+1;}
+function summaryTip(group,bucket,metric){
+ const when=summaryWhen(group,bucket),tail=bucket.partial&&group!=='days'?' · период не завершён':(bucket.partial?' · день не завершён':'');
+ const item=bucket[metric];
+ if(metric==='sugar')return `${when} · сахар: среднее ${fmtDose(item.avg)} · мин ${fmtDose(item.min)} – макс ${fmtDose(item.max)} · ${item.n} ${ruPlural(item.n,'измерение','измерения','измерений')}${tail}`;
+ if(metric==='insulin'){
+  if(group==='days')return `${when} · ${fmtDose(item.avg)} ед. за сутки · ${item.n} ${ruPlural(item.n,'инъекция','инъекции','инъекций')}${tail}`;
+  return `${when} · в среднем ${fmtDose(item.avg)} ед. в сутки · дней с данными: ${item.days} из ${summaryDaysIn(bucket)}${tail}`;
+ }
+ if(group==='days')return `${when} · ночной ${fmtDose(item.avg)} ед.${item.approx?' (≈ по сумме за день)':' (факт)'}${tail}`;
+ return `${when} · ночной в среднем ${fmtDose(item.avg)} ед. · дней с данными: ${item.days} из ${summaryDaysIn(bucket)}${item.approx?' · ≈ по сумме: '+item.approx:''}${tail}`;
+}
+function renderSummary(){
+ const [host,tooltip]=chartHosts('summary-chart','summary-tooltip');
+ const summary=document.getElementById('summary-summary');
+ const count=document.getElementById('summary-count');
+ const legendEl=document.querySelector('.analytics-panel[data-panel="summary"] > .analytics-legend');
+ const metric=analyticsState.metric;
+ const group=document.getElementById('summary-group').value;
+ const periodCount=Number(document.getElementById('summary-period').value)||7;
+ tooltip.textContent='';
+ if(!summaryState.data){
+  count.textContent='';summary.innerHTML='';
+  if(summaryState.error){
+   host.innerHTML='<div class="analytics-message">'+escapeHtml(summaryState.error)+'<br><button class="analytics-retry" type="button" onclick="summaryState.error=null;renderSummary()">Повторить</button></div>';
+  }else{
+   host.innerHTML='<div class="analytics-message">Загружаю итоги…</div>';
+   loadSummary(false);
+  }
+  return;
+ }
+ const items=(summaryState.data[group]||[]).slice(-periodCount).map(bucket=>({bucket,item:bucket[metric]}));
+ const filled=items.filter(entry=>entry.item);
+ count.textContent=filled.length?filled.length+{days:' дн.',weeks:' нед.',months:' мес.'}[group]:'';
+ if(!filled.length){
+  host.innerHTML='<div class="analytics-message">За этот период нет данных.</div>';
+  summary.innerHTML='';
+  if(legendEl)legendEl.innerHTML='';
+  return;
+ }
+ const color=SUMMARY_COLORS[metric];
+ const groupWord={days:'за день',weeks:'за неделю',months:'за месяц'}[group];
+ // среднее за период: сахар по дням — как в /week (среднее дневных средних), иначе с весами
+ let num=0,den=0;
+ filled.forEach(({item})=>{
+  const weight=metric==='sugar'?(group==='days'?1:item.n):(item.days||1);
+  num+=item.avg*weight;den+=weight;
+ });
+ const average=num/den;
+ const width=Math.max(240,Math.floor(host.clientWidth||320)),height=Number(host.dataset.height)||285;
+ const margin={left:43,right:16,top:20,bottom:58},plotW=width-margin.left-margin.right,plotH=height-margin.top-margin.bottom;
+ const slot=plotW/items.length,values=filled.map(entry=>entry.item.avg);
+ let yMin=0,yMax,step,y;
+ if(metric==='sugar'){
+  let low=Math.min(...values,IDEAL_LOW),high=Math.max(...values,IDEAL_HIGH);
+  const pad=(high-low)*.08;low-=pad;high+=pad;
+  step=(high-low)>12?2:1;
+  yMin=Math.max(0,Math.floor(low/step)*step);yMax=Math.ceil(high/step)*step;
+  y=value=>margin.top+plotH-((value-yMin)/(yMax-yMin))*plotH;
+ }else{
+  const maxValue=Math.max(...values);
+  step=[1,2,5,10,20,50,100].find(candidate=>candidate>=maxValue*1.18/5)||100;
+  yMax=Math.ceil(maxValue*1.12/step)*step||step;
+  y=value=>margin.top+plotH-(value/yMax)*plotH;
+ }
+ let svg=`<svg class="chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="Итоги: ${{sugar:'сахар',insulin:'инсулин',night:'ночной'}[metric]}">`;
+ const clipId='ideal-'+host.id;
+ if(metric==='sugar')svg+=idealZoneSvg(y,yMin,yMax,margin.left,width-margin.right,clipId);
+ let idealLines='';
+ for(let value=yMin;value<=yMax+step*.01;value+=step){
+  const py=y(value);
+  idealLines+=`<line class="chart-grid-ideal" x1="${margin.left}" y1="${py}" x2="${width-margin.right}" y2="${py}"/>`;
+  svg+=`<line class="chart-grid" x1="${margin.left}" y1="${py}" x2="${width-margin.right}" y2="${py}"/><text x="${margin.left-6}" y="${py+4}" text-anchor="end">${formatAxisValue(value)}</text>`;
+ }
+ if(metric==='sugar')svg+=idealGridOverlay(clipId,idealLines);
+ const baseY=margin.top+plotH,barW=Math.min(30,Math.max(6,slot*.62));
+ if(metric==='sugar'){
+  let path='',connected=false;
+  items.forEach((entry,index)=>{
+   if(!entry.item){connected=false;return;}
+   path+=`${connected?'L':'M'}${(margin.left+slot*(index+.5)).toFixed(1)} ${y(entry.item.avg).toFixed(1)} `;
+   connected=true;
+  });
+  svg+=`<path d="${path}" fill="none" stroke="${color}" stroke-opacity=".5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+ }
+ items.forEach((entry,index)=>{
+  const x=margin.left+slot*(index+.5);
+  if(entry.item){
+   const tip=escapeHtml(summaryTip(group,entry.bucket,metric));
+   const approx=metric==='night'&&group==='days'&&entry.item.approx;
+   const top=y(entry.item.avg);
+   if(metric==='sugar'){
+    const style=entry.bucket.partial?`fill:var(--card);stroke:${color};stroke-width:2.5`:`fill:${color}`;
+    svg+=`<circle class="chart-point" data-sum="1" cx="${x}" cy="${top}" r="5" style="${style}" tabindex="0" aria-label="${tip}"/>`;
+    if(slot>=30)svg+=`<text x="${x}" y="${top-9}" text-anchor="middle" font-size="10" font-weight="700">${fmtDose(entry.item.avg)}</text>`;
+   }else{
+    const opacity=entry.bucket.partial?.45:(approx?.6:1);
+    svg+=`<rect class="dose-bar" data-sum="1" x="${x-barW/2}" y="${top}" width="${barW}" height="${Math.max(1,baseY-top)}" rx="${Math.min(5,barW/3)}" fill="${color}" fill-opacity="${opacity}" tabindex="0" aria-label="${tip}"/>`;
+    if(slot>=22)svg+=`<text x="${x}" y="${top-4}" text-anchor="middle" font-size="10" font-weight="700">${approx?'≈':''}${fmtDose(entry.item.avg)}</text>`;
+   }
+  }
+  svg+=`<text transform="rotate(-90 ${x+4} ${baseY+6})" x="${x+4}" y="${baseY+6}" text-anchor="end">${summaryLabel(group,entry.bucket)}</text>`;
+ });
+ const ay=y(average);
+ svg+=`<line x1="${margin.left}" y1="${ay}" x2="${width-margin.right}" y2="${ay}" stroke="#8a90a8" stroke-width="2" stroke-dasharray="6 4"/><text x="${width-margin.right}" y="${ay-5}" text-anchor="end" font-size="11" font-weight="800" fill="#6b7390" stroke="var(--card)" stroke-width="4" paint-order="stroke" stroke-linejoin="round">ср. ${fmtDose(average)}</text>`;
+ svg+=`<line class="chart-axis" x1="${margin.left}" y1="${baseY}" x2="${width-margin.right}" y2="${baseY}"/></svg>`;
+ host.innerHTML=svg;
+ host.querySelectorAll('[data-sum]').forEach(element=>{
+  const activate=()=>{tooltip.textContent=element.getAttribute('aria-label');};
+  element.addEventListener('click',activate);
+  element.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();activate();}});
+ });
+ // подпись под графиком
+ let text;
+ if(metric==='sugar'){
+  const low=Math.min(...filled.map(entry=>entry.item.min)),high=Math.max(...filled.map(entry=>entry.item.max));
+  text=`Среднее за период: <b>${fmtDose(average)}</b> · мин ${fmtDose(low)} – макс ${fmtDose(high)}`;
+ }else{
+  text=`${group==='days'?'Среднее в сутки':'Среднее в сутки за период'}: <b>${fmtDose(average)}</b> ед.`;
+ }
+ if(group!=='days'){
+  const complete=filled.filter(entry=>!entry.bucket.partial);
+  if(complete.length>=2){
+   const last=complete[complete.length-1],before=complete[complete.length-2];
+   text+=` · к ${group==='weeks'?'прошлой неделе':'прошлому месяцу'}: <b>${effectNum(last.item.avg-before.item.avg,true)}</b>`;
+  }
+ }
+ summary.innerHTML=text;
+ // легенда
+ const partialMark=metric==='sugar'
+  ?`<span class="analytics-swatch" style="background:var(--card);border:2px solid ${color};box-sizing:border-box"></span>`
+  :`<span class="analytics-swatch" style="background:${color};border-radius:3px;opacity:.45"></span>`;
+ let legend=metric==='sugar'
+  ?`<span class="analytics-legend-item"><span class="analytics-swatch" style="background:${color}"></span>Среднее ${groupWord}</span><span class="analytics-legend-item"><span class="analytics-swatch" style="background:#2ea66a;opacity:.35;border-radius:3px"></span>Целевой диапазон</span>`
+  :`<span class="analytics-legend-item"><span class="analytics-swatch" style="background:${color};border-radius:3px"></span>${group==='days'?(metric==='night'?'Ночная доза':'Сумма за сутки'):'Среднее в сутки'}</span>`;
+ legend+=`<span class="analytics-legend-item"><span class="dose-limit-swatch" style="border-top-color:#8a90a8"></span>Среднее за период</span>`;
+ if(filled.some(entry=>entry.bucket.partial))legend+=`<span class="analytics-legend-item">${partialMark}Не завершён</span>`;
+ if(metric==='night'&&group==='days'&&filled.some(entry=>entry.item.approx))legend+=`<span class="analytics-legend-item"><span class="analytics-swatch" style="background:${color};border-radius:3px;opacity:.6"></span>≈ по сумме за день</span>`;
+ if(legendEl)legendEl.innerHTML=legend;
+}
+fillSummaryPeriods();
 
 initTrendTiles();
 
