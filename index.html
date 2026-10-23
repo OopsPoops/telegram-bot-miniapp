@@ -824,6 +824,7 @@ button.st-ico:active{transform:scale(.88)}
 .st-t{flex:1;font-size:17px;line-height:22px}
 .st-s{font-size:15px;line-height:20px;color:var(--st-sub);margin-top:1px;overflow-wrap:anywhere}
 .st-s:empty{display:none}
+#userName{min-width:0;overflow:hidden;text-overflow:ellipsis}
 .st-val{font-size:17px;color:var(--st-sub);white-space:nowrap}
 .st-val.access-status{display:inline-flex;align-items:center;gap:6px;margin:0;font-size:17px;font-weight:400}
 .st-chev{width:8px;height:14px;flex:none;color:var(--st-chev)}
@@ -1168,7 +1169,7 @@ button.st-ico:active{transform:scale(.88)}
 <div class="st-page active" data-p="root">
 <div class="st-bar"><div class="st-title">Настройки</div></div>
 <div class="st-card">
-<div class="st-row two has-ico"><span class="st-ico c-red"><svg class="g"><use href="#i-user"/></svg></span><div class="st-copy"><div class="st-t">Пользователь</div><div class="st-s" id="userName">Получаю данные из Telegram…</div></div></div>
+<div class="st-row has-ico"><span class="st-ico c-red"><svg class="g"><use href="#i-user"/></svg></span><div class="st-t">Пользователь</div><span class="st-val" id="userName">Получаю данные из Telegram…</span></div>
 <div class="st-row has-ico"><span class="st-ico c-green"><svg class="g"><use href="#i-shield"/></svg></span><div class="st-copy"><div class="st-t">Доступ к боту</div><div class="st-s" id="accessDescription"></div></div><span class="st-val access-status" id="accessStatus"><span class="status-dot"></span><span id="accessText">Проверяется…</span></span></div>
 </div>
 <div class="st-card">
