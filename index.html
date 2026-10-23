@@ -143,49 +143,13 @@ button{-webkit-tap-highlight-color:transparent}
    ============================================================ */
 .page-heading{font-size:25px;font-weight:800;letter-spacing:-.7px;margin:8px 2px 5px}
 .page-description{font-size:13px;color:var(--muted);margin:0 2px 22px}
-.settings-card{background:var(--card);border:1px solid rgba(125,135,170,.12);border-radius:21px;padding:17px;margin-bottom:13px;box-shadow:var(--shadow)}
-.setting-row{display:flex;align-items:center;gap:13px;min-height:53px}
-.setting-icon{width:43px;height:43px;border-radius:15px;background:var(--icon-bg);display:grid;place-items:center;font-size:21px;flex-shrink:0}
-.setting-icon-button{border:0;padding:0;color:inherit;font:inherit;font-size:21px;cursor:pointer;transition:transform .12s}
-.setting-icon-button:active{transform:scale(.9)}
-.setting-icon-button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
-.setting-row.muted-by-app .setting-copy,.setting-row.muted-by-app .setting-switch{opacity:.45}
-.setting-copy{flex:1;min-width:0}
-.setting-name{font-size:15px;font-weight:700}
-.setting-description{font-size:12px;color:var(--muted);margin-top:4px;overflow-wrap:anywhere}
-.setting-divider{height:1px;background:var(--line);margin:14px 0}
 .access-status{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;margin-top:6px}
 .status-dot{width:8px;height:8px;border-radius:50%;background:#20b981}
 .access-status.denied .status-dot{background:#ed6f6f}
-.theme-switch{width:54px;height:32px;border:0;border-radius:20px;background:#d7dbe6;padding:3px;cursor:pointer;flex-shrink:0;transition:background .2s}
-.theme-switch span{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 2px 5px #0002;transition:transform .2s;font-size:14px}
-:root[data-theme="dark"] .theme-switch{background:#34c759}
-:root[data-theme="dark"] .theme-switch span{transform:translateX(22px)}
-.setting-switch{width:54px;height:32px;border:0;border-radius:20px;background:#d7dbe6;padding:3px;cursor:pointer;flex-shrink:0;transition:background .2s}
-.setting-switch span{display:block;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 2px 5px #0002;transition:transform .2s}
-.setting-switch[aria-pressed="true"]{background:#34c759}
-.setting-switch[aria-pressed="true"] span{transform:translateX(22px)}
-
-/* --- Настройки таймера: режимы и порог --- */
-.timer-mode-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:12px}
-.timer-mode-option{position:relative;display:grid;place-items:center;min-height:50px;padding:7px 5px;border:1px solid var(--line);border-radius:11px;color:var(--muted);font-size:11px;font-weight:700;text-align:center;cursor:pointer}
-.timer-mode-option input{position:absolute;opacity:0;pointer-events:none}
-.timer-mode-option:has(input:checked){border-color:var(--blue);background:var(--nav-active);color:var(--text)}
-.timer-mode-option:has(input:focus-visible){outline:2px solid var(--blue);outline-offset:2px}
-.timer-threshold{display:flex;align-items:center;gap:10px;margin-top:12px}
-.timer-threshold label{font-size:12px;color:var(--muted);flex:1}
-.timer-threshold input{width:86px;border:1px solid var(--line);border-radius:10px;padding:9px;background:var(--input-bg);color:var(--input-text);font-size:14px}
-.timer-threshold[hidden]{display:none}
 
 /* --- Настройки ежедневного отчёта и напоминаний --- */
 .report-options{margin-top:12px;transition:opacity .2s}
 .report-options.off{opacity:.45}
-.report-field{display:flex;align-items:center;gap:10px;margin-top:12px}
-.report-field label{font-size:12px;color:var(--muted);flex:1}
-.report-field input{border:1px solid var(--line);border-radius:10px;padding:9px;background:var(--input-bg);color:var(--input-text);font-size:14px}
-.report-field input[type="time"]{width:110px}
-.report-field input[type="number"]{width:72px}
-.followup-presets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:10px}
 .followup-preset{border:1px solid var(--line);border-radius:11px;background:transparent;color:var(--muted);padding:11px 4px;font-size:12px;font-weight:700;cursor:pointer}
 .followup-preset.active{border-color:var(--blue);background:var(--nav-active);color:var(--text)}
 .report-options.off input,.report-options.off button{pointer-events:none}
@@ -466,7 +430,7 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 }
 
 /* --- Карточки: градиент, мягкие слои тени, верхний блик --- */
-.metric,.quick-button,.settings-card,.analytics-card,.graph-placeholder{background:var(--card-grad);border-color:var(--card-border)}
+.metric,.quick-button,.analytics-card,.graph-placeholder{background:var(--card-grad);border-color:var(--card-border)}
 .access-denied-dialog,.modal{border:1px solid var(--card-border)}
 .metric.sugar{--glow:238,111,156}
 .metric.insulin{--glow:32,169,155}
@@ -564,18 +528,9 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 @keyframes cellIn{from{opacity:0;transform:scale(.55)}to{opacity:1;transform:scale(1)}}
 
 /* --- Пружинный отклик на нажатие --- */
-.analytics-tab,.followup-preset,.chart-expand,.access-denied-close,.modal-close,.setting-switch span{transition:transform .38s cubic-bezier(.34,1.5,.4,1),background .25s,color .2s,border-color .2s,box-shadow .2s}
+.analytics-tab,.followup-preset,.chart-expand,.access-denied-close,.modal-close{transition:transform .38s cubic-bezier(.34,1.5,.4,1),background .25s,color .2s,border-color .2s,box-shadow .2s}
 .analytics-tab:active,.followup-preset:active{transform:scale(.94)}
-
-/* --- Целевой диапазон: настройки --- */
-.target-fields{display:flex;gap:10px;margin-top:12px}
-.target-field{flex:1;display:flex;flex-direction:column;gap:6px}
-.target-field label{font-size:12px;color:var(--muted)}
-.target-field input{width:100%;border:1px solid var(--line);border-radius:12px;padding:11px 10px;background:var(--input-bg);color:var(--input-text);font-size:17px;font-weight:700;text-align:center;font-variant-numeric:tabular-nums}
-.target-field input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--nav-active)}
-.target-unit{font-size:11px;color:var(--muted);margin-top:8px}
 .target-save{margin-top:12px;width:100%;height:44px;background:linear-gradient(180deg,#3fcb92 0%,#25a46c 100%);--glow:37,164,108}
-.settings-card .save-button.saved{background:linear-gradient(180deg,#4bdc8e 0%,#25b565 100%)!important;color:#fff!important;pointer-events:none;animation:savePop .55s cubic-bezier(.34,1.56,.4,1)}
 
 /* --- Полоска «в цели» под графиками сахара --- */
 .range-summary{margin-top:10px;padding:11px 12px 11px;border:1px solid var(--card-border);border-radius:15px;background:var(--input-bg)}
@@ -894,6 +849,18 @@ button.st-ico:active{transform:scale(.88)}
 #targetSaveButton{width:100%;min-width:0;height:50px;margin:0 0 6px;border-radius:25px;font-size:17px;font-weight:600;letter-spacing:-.01em;color:#fff;background:var(--st-blue);box-shadow:none}
 #targetSaveButton.saved{background:#34c759!important;color:#fff!important;pointer-events:none}
 .st-toast{margin:6px 15px 0}
+
+/* ===== Свайп назад от левого края ===== */
+#screen-settings{position:relative}
+.st-page.st-under{display:block;position:absolute;left:0;right:0;top:0;z-index:1;pointer-events:none;will-change:transform}
+.st-page.st-drag{position:relative;z-index:2;min-height:100dvh;background:var(--bg);box-shadow:-10px 0 30px rgba(0,0,0,.14);will-change:transform}
+/* ===== Нижняя навигация: стеклянная капсула с пружинным движением ===== */
+.bottom-nav .nav-pill{top:3px;left:0;height:calc(100% - 6px);overflow:hidden;transition:transform .55s cubic-bezier(.22,1.5,.35,1),width .45s cubic-bezier(.22,1.3,.35,1)}
+:root:not(#x) .bottom-nav .nav-pill{background:linear-gradient(145deg,rgba(255,255,255,.84),rgba(255,255,255,.3));border:1px solid rgba(255,255,255,.85);box-shadow:0 3px 12px #607da51c,inset 0 1px 2px #fff;-webkit-backdrop-filter:blur(15px) brightness(1.08) saturate(160%);backdrop-filter:blur(15px) brightness(1.08) saturate(160%)}
+:root[data-theme="dark"]:not(#x) .bottom-nav .nav-pill{background:linear-gradient(145deg,rgba(255,255,255,.24),rgba(255,255,255,.07));border-color:rgba(255,255,255,.2);box-shadow:0 3px 12px rgba(0,0,0,.35),inset 0 1px 2px rgba(255,255,255,.28)}
+.bottom-nav .nav-pill::before{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(ellipse at 25% 0%,rgba(255,255,255,.6),transparent 60%);pointer-events:none}
+:root[data-theme="dark"] .bottom-nav .nav-pill::before{opacity:.35}
+@media(prefers-reduced-motion:reduce){.bottom-nav .nav-pill{transition:none}}
 </style>
 </head>
 <body>
@@ -4160,12 +4127,58 @@ window.stRefresh=function(){
   set('stV-theme',document.documentElement.dataset.theme==='dark'?'Тёмная':'Светлая');
 };
 window.stOpen=function(name){
-  document.querySelectorAll('#screen-settings .st-page').forEach(p=>p.classList.toggle('active',p.dataset.p===name));
+  document.querySelectorAll('#screen-settings .st-page').forEach(p=>{p.style.animation='';p.classList.toggle('active',p.dataset.p===name);});
   window.scrollTo(0,0);
   if(typeof selectionHaptic==='function')selectionHaptic();
   stRefresh();
 };
 window.stBack=function(){stOpen('root');};
+const sec=$('screen-settings');
+let g=null,busy=false;
+const clean=s=>{s.page.classList.remove('st-drag');s.page.style.cssText='';s.under.classList.remove('st-under');s.under.style.cssText='';};
+document.addEventListener('touchstart',e=>{
+  g=null;
+  if(busy||e.touches.length!==1||!sec.classList.contains('active'))return;
+  const page=sec.querySelector('.st-page.active');
+  if(!page||page.dataset.p==='root')return;
+  const t=e.touches[0];
+  if(t.clientX>24)return;
+  g={page,under:sec.querySelector('[data-p="root"]'),x:t.clientX,y:t.clientY,t:Date.now(),dx:0,on:false,w:window.innerWidth};
+},{passive:true});
+document.addEventListener('touchmove',e=>{
+  if(!g)return;
+  const t=e.touches[0],dx=t.clientX-g.x,dy=t.clientY-g.y;
+  if(!g.on){
+    if(Math.abs(dy)>10&&Math.abs(dy)>Math.abs(dx)){g=null;return;}
+    if(dx<8)return;
+    g.on=true;g.under.classList.add('st-under');g.under.style.top=window.scrollY+'px';g.page.classList.add('st-drag');
+  }
+  e.preventDefault();
+  g.dx=Math.max(0,dx);
+  g.page.style.transform='translateX('+g.dx+'px)';
+  g.under.style.transform='translateX('+(-(g.w-g.dx)*.28)+'px)';
+  g.under.style.opacity=.55+.45*g.dx/g.w;
+},{passive:false});
+const finish=()=>{
+  const s=g;g=null;
+  if(!s||!s.on)return;
+  busy=true;
+  const ok=s.dx>s.w*.4||(s.dx/Math.max(1,Date.now()-s.t)>.5&&s.dx>40);
+  const ease='transform .3s cubic-bezier(.22,1,.36,1)';
+  s.page.style.transition=ease;
+  s.under.style.transition=ease+',opacity .3s';
+  s.page.style.transform='translateX('+(ok?s.w:0)+'px)';
+  s.under.style.transform='translateX('+(ok?0:-s.w*.28)+'px)';
+  s.under.style.opacity=ok?1:.55;
+  setTimeout(()=>{
+    if(ok){stBack();s.under.style.animation='none';}
+    clean(s);
+    if(ok)s.under.style.animation='none';
+    busy=false;
+  },310);
+};
+document.addEventListener('touchend',finish,{passive:true});
+document.addEventListener('touchcancel',finish,{passive:true});
 setInterval(()=>{if($('screen-settings').classList.contains('active'))stRefresh();},600);
 stRefresh();
 })();
