@@ -1131,7 +1131,6 @@ button.st-ico:active{transform:scale(.88)}
 </section>
 <section class="analytics-card analytics-panel" data-panel="summary" hidden>
 <div class="analytics-toolbar">
-<span class="analytics-toolbar-label">Итоги</span>
 <select id="summary-group" aria-label="Группировка итогов" onchange="onSummaryGroup()">
 <option value="days" selected>По дням</option><option value="weeks">По неделям</option><option value="months">По месяцам</option>
 </select>
@@ -3228,22 +3227,26 @@ function initPlaceholderMarquee(){
    const visible=!!value&&!input.value&&document.activeElement!==input;
    overlay.hidden=!visible;
    if(!visible){stop();lastText=null;return;}
-   const boxWidth=overlay.clientWidth-28;
+   /* экран с полем скрыт (display:none) — размеров нет, меряем позже, когда появится (ResizeObserver) */
+   if(overlay.clientWidth<=0){stop();lastText=null;return;}
+   /* видимая область: слева отступ 14px, справа оставляем 10px — фраза, которая туда помещается, не бежит */
+   const boxWidth=overlay.clientWidth-24;
    if(value===lastText&&boxWidth===lastWidth)return;
    lastText=value;lastWidth=boxWidth;
    text.textContent=value;
    stop();
    overlay.classList.remove('static');
-   const overflow=text.scrollWidth-boxWidth;
-   if(overflow<=2)return;
+   /* без анимации и transform: точная (дробная) ширина текста */
+   const overflow=text.getBoundingClientRect().width-boxWidth;
+   if(overflow<=0.5)return;
    if(reduceMotion){overlay.classList.add('static');return;}
    const pauseStart=2500,pauseEnd=1800,scroll=Math.max(1500,overflow/0.04);
    const total=pauseStart+scroll+pauseEnd;
    animation=text.animate([
     {transform:'translateX(0)',offset:0},
     {transform:'translateX(0)',offset:pauseStart/total,easing:'linear'},
-    {transform:`translateX(${-overflow-4}px)`,offset:(pauseStart+scroll)/total},
-    {transform:`translateX(${-overflow-4}px)`,offset:1}
+    {transform:`translateX(${-overflow}px)`,offset:(pauseStart+scroll)/total},
+    {transform:`translateX(${-overflow}px)`,offset:1}
    ],{duration:total,iterations:Infinity});
   };
   new MutationObserver(layout).observe(input,{attributes:true,attributeFilter:['placeholder']});
@@ -3252,6 +3255,8 @@ function initPlaceholderMarquee(){
   input.addEventListener('blur',layout);
   window.addEventListener('resize',()=>{lastText=null;layout();});
   window.addEventListener('pageshow',()=>{lastText=null;layout();});
+  if(window.ResizeObserver)new ResizeObserver(()=>{lastText=null;layout();}).observe(overlay);
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{lastText=null;layout();});
   layout();
   setTimeout(()=>{lastText=null;layout();},300);
  });
