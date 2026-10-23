@@ -680,7 +680,7 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .carousel-dots i.on{opacity:.85;width:16px}
 /* --- Карточка дня (сегодня/вчера): та же высота, что у главной карточки ночного --- */
 .metric.night-day{padding:12px 14px;display:flex;flex-direction:column;overflow:hidden}
-.nd-head{display:flex;align-items:baseline;gap:8px;margin-bottom:8px;white-space:nowrap}
+.nd-head{display:flex;align-items:baseline;gap:8px;margin-bottom:6px;white-space:nowrap}
 .nd-title{font-size:16px;font-weight:750}
 .nd-date{font-size:12px;color:var(--muted)}
 .nd-sum{margin-left:auto;display:flex;gap:10px;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
@@ -690,10 +690,10 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .nd-col-title{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:2px;flex:none}
 /* значения идут столбиками по 3 строки, время растёт сверху вниз и слева направо;
    если столбцов больше двух, пролистывается только эта половина (инсулин или сахар) */
-.nd-grid{flex:1;min-height:0;display:grid;grid-template-rows:repeat(3,minmax(0,1fr));grid-auto-flow:column;grid-auto-columns:max-content;column-gap:14px;align-content:stretch;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.nd-grid{flex:1;min-height:0;display:grid;grid-template-rows:repeat(5,minmax(0,auto));grid-auto-flow:column;grid-auto-columns:max-content;column-gap:14px;align-content:start;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .nd-grid::-webkit-scrollbar{display:none}
-.nd-cell{display:flex;align-items:center;gap:5px;white-space:nowrap;font-size:13px;font-variant-numeric:tabular-nums}
-.nd-cell:nth-child(3n+1){scroll-snap-align:start}
+.nd-cell{display:flex;align-items:center;gap:5px;white-space:nowrap;font-size:13px;line-height:1.15;font-variant-numeric:tabular-nums}
+.nd-cell:nth-child(5n+1){scroll-snap-align:start}
 .nd-cell i{font-style:normal;font-size:11px;color:var(--muted)}
 .nd-cell b{font-weight:750}
 .nd-ins b{color:var(--teal)}
@@ -851,11 +851,11 @@ button.st-ico:active{transform:scale(.88)}
 .st-toast{margin:6px 15px 0}
 
 /* ===== Свайп назад от левого края ===== */
-#screen-settings{position:relative}
-.st-page.st-under{display:block;position:absolute;left:0;right:0;top:0;z-index:1;pointer-events:none;will-change:transform}
-.st-page.st-drag{position:relative;z-index:2;min-height:100dvh;background:var(--bg);box-shadow:-10px 0 30px rgba(0,0,0,.14);will-change:transform}
+#screen-settings,.app{position:relative}
+.st-under{display:block;position:absolute;z-index:1;pointer-events:none;will-change:transform}
+.st-drag{position:relative;z-index:2;min-height:100dvh;background:var(--bg);box-shadow:-10px 0 30px rgba(0,0,0,.14);will-change:transform}
 /* ===== Нижняя навигация: стеклянная капсула с пружинным движением ===== */
-.bottom-nav .nav-pill{top:3px;left:0;height:calc(100% - 6px);overflow:hidden;transition:transform .55s cubic-bezier(.22,1.5,.35,1),width .45s cubic-bezier(.22,1.3,.35,1)}
+.bottom-nav .nav-pill{top:3px;left:0;height:calc(100% - 6px);overflow:hidden;transition:transform .55s cubic-bezier(.22,1.3,.35,1),width .45s cubic-bezier(.22,1.3,.35,1)}
 :root:not(#x) .bottom-nav .nav-pill{background:linear-gradient(145deg,rgba(255,255,255,.84),rgba(255,255,255,.3));border:1px solid rgba(255,255,255,.85);box-shadow:0 3px 12px #607da51c,inset 0 1px 2px #fff;-webkit-backdrop-filter:blur(15px) brightness(1.08) saturate(160%);backdrop-filter:blur(15px) brightness(1.08) saturate(160%)}
 :root[data-theme="dark"]:not(#x) .bottom-nav .nav-pill{background:linear-gradient(145deg,rgba(255,255,255,.24),rgba(255,255,255,.07));border-color:rgba(255,255,255,.2);box-shadow:0 3px 12px rgba(0,0,0,.35),inset 0 1px 2px rgba(255,255,255,.28)}
 .bottom-nav .nav-pill::before{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(ellipse at 25% 0%,rgba(255,255,255,.6),transparent 60%);pointer-events:none}
@@ -1492,7 +1492,7 @@ function moveNavPill(){
  const navRect=nav.getBoundingClientRect();
  const btnRect=active.getBoundingClientRect();
  const offsetX=btnRect.left-navRect.left;
- const inset=4;
+ const inset=7;
  pill.style.width=Math.max(0,btnRect.width-inset*2)+'px';
  pill.style.transform=`translateX(${offsetX+inset}px)`;
 }
@@ -4134,51 +4134,87 @@ window.stOpen=function(name){
 };
 window.stBack=function(){stOpen('root');};
 const sec=$('screen-settings');
-let g=null,busy=false;
-const clean=s=>{s.page.classList.remove('st-drag');s.page.style.cssText='';s.under.classList.remove('st-under');s.under.style.cssText='';};
-document.addEventListener('touchstart',e=>{
-  g=null;
-  if(busy||e.touches.length!==1||!sec.classList.contains('active'))return;
-  const page=sec.querySelector('.st-page.active');
-  if(!page||page.dataset.p==='root')return;
-  const t=e.touches[0];
-  if(t.clientX>24)return;
-  g={page,under:sec.querySelector('[data-p="root"]'),x:t.clientX,y:t.clientY,t:Date.now(),dx:0,on:false,w:window.innerWidth};
-},{passive:true});
-document.addEventListener('touchmove',e=>{
-  if(!g)return;
-  const t=e.touches[0],dx=t.clientX-g.x,dy=t.clientY-g.y;
-  if(!g.on){
-    if(Math.abs(dy)>10&&Math.abs(dy)>Math.abs(dx)){g=null;return;}
-    if(dx<8)return;
-    g.on=true;g.under.classList.add('st-under');g.under.style.top=window.scrollY+'px';g.page.classList.add('st-drag');
-  }
-  e.preventDefault();
-  g.dx=Math.max(0,dx);
-  g.page.style.transform='translateX('+g.dx+'px)';
-  g.under.style.transform='translateX('+(-(g.w-g.dx)*.28)+'px)';
-  g.under.style.opacity=.55+.45*g.dx/g.w;
-},{passive:false});
-const finish=()=>{
-  const s=g;g=null;
-  if(!s||!s.on)return;
-  busy=true;
-  const ok=s.dx>s.w*.4||(s.dx/Math.max(1,Date.now()-s.t)>.5&&s.dx>40);
-  const ease='transform .3s cubic-bezier(.22,1,.36,1)';
-  s.page.style.transition=ease;
-  s.under.style.transition=ease+',opacity .3s';
-  s.page.style.transform='translateX('+(ok?s.w:0)+'px)';
-  s.under.style.transform='translateX('+(ok?0:-s.w*.28)+'px)';
-  s.under.style.opacity=ok?1:.55;
-  setTimeout(()=>{
-    if(ok){stBack();s.under.style.animation='none';}
-    clean(s);
-    if(ok)s.under.style.animation='none';
-    busy=false;
-  },310);
+function edgeBack(get){
+  let g=null,busy=false;
+  const clean=x=>{x.top.classList.remove('st-drag');x.top.style.cssText='';x.under.classList.remove('st-under');x.under.style.cssText='';};
+  document.addEventListener('touchstart',e=>{
+    g=null;
+    if(busy||e.touches.length!==1||document.querySelector('.modal-backdrop.visible'))return;
+    const c=get();
+    if(!c)return;
+    const t=e.touches[0];
+    if(t.clientX>24)return;
+    g=Object.assign({x:t.clientX,y:t.clientY,t:Date.now(),dx:0,on:false,w:window.innerWidth},c);
+  },{passive:true});
+  document.addEventListener('touchmove',e=>{
+    if(!g)return;
+    const t=e.touches[0],dx=t.clientX-g.x,dy=t.clientY-g.y;
+    if(!g.on){
+      if(Math.abs(dy)>10&&Math.abs(dy)>Math.abs(dx)){g=null;return;}
+      if(dx<8)return;
+      g.on=true;
+      g.under.classList.add('st-under');
+      g.under.style.top=(g.top.offsetTop+window.scrollY)+'px';
+      g.under.style.left=g.top.offsetLeft+'px';
+      g.under.style.width=g.top.offsetWidth+'px';
+      g.top.classList.add('st-drag');
+    }
+    e.preventDefault();
+    g.dx=Math.max(0,dx);
+    g.top.style.transform='translateX('+g.dx+'px)';
+    g.under.style.transform='translateX('+(-(g.w-g.dx)*.28)+'px)';
+    g.under.style.opacity=.55+.45*g.dx/g.w;
+  },{passive:false});
+  const finish=()=>{
+    const x=g;g=null;
+    if(!x||!x.on)return;
+    busy=true;
+    const ok=x.dx>x.w*.4||(x.dx/Math.max(1,Date.now()-x.t)>.5&&x.dx>40);
+    const ease='transform .3s cubic-bezier(.22,1,.36,1)';
+    x.top.style.transition=ease;
+    x.under.style.transition=ease+',opacity .3s';
+    x.top.style.transform='translateX('+(ok?x.w:0)+'px)';
+    x.under.style.transform='translateX('+(ok?0:-x.w*.28)+'px)';
+    x.under.style.opacity=ok?1:.55;
+    setTimeout(()=>{
+      if(ok)x.back();
+      clean(x);
+      if(ok)x.under.style.animation='none';
+      busy=false;
+    },310);
+  };
+  document.addEventListener('touchend',finish,{passive:true});
+  document.addEventListener('touchcancel',finish,{passive:true});
+}
+edgeBack(()=>{
+  if(!sec.classList.contains('active'))return null;
+  const top=sec.querySelector('.st-page.active');
+  if(!top||top.dataset.p==='root')return null;
+  return {top,under:sec.querySelector('[data-p="root"]'),back:stBack};
+});
+edgeBack(()=>{
+  const top=$('screen-doctor');
+  if(!top||!top.classList.contains('active'))return null;
+  return {top,under:$('screen-home'),back:()=>switchTab('home')};
+});
+const swTab=window.switchTab;
+if(typeof swTab==='function')window.switchTab=function(){
+  document.querySelectorAll('.screen').forEach(el=>{el.style.animation='';});
+  return swTab.apply(this,arguments);
 };
-document.addEventListener('touchend',finish,{passive:true});
-document.addEventListener('touchcancel',finish,{passive:true});
+/* запоминаем выбранные периоды графиков */
+const PK='sema-periods';
+let saved={};
+try{saved=JSON.parse(localStorage.getItem(PK)||'{}')||{};}catch(e){}
+document.querySelectorAll('select[id$="-period"]').forEach(sel=>{
+  const v=saved[sel.id];
+  if(v&&[].some.call(sel.options,o=>o.value===v))sel.value=v;
+  sel.addEventListener('change',()=>{
+    saved[sel.id]=sel.value;
+    try{localStorage.setItem(PK,JSON.stringify(saved));}catch(e){}
+  });
+});
+if(saved['trend-period']&&typeof analyticsState!=='undefined')analyticsState.trendDays=Number($('trend-period').value);
 setInterval(()=>{if($('screen-settings').classList.contains('active'))stRefresh();},600);
 stRefresh();
 })();
