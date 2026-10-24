@@ -752,48 +752,75 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 
 /* --- Карточка «Вчера» --- */
 .metric.yesterday{--glow:82,103,232}
-.metric.yesterday .metric-icon{background:linear-gradient(145deg,#f3f5ff,#d8defb)}
-:root[data-theme="dark"] .metric.yesterday .metric-icon{background:linear-gradient(145deg,rgba(130,150,255,.28),rgba(130,150,255,.1))}
 .metric.yesterday .metric-latest{color:var(--muted)}
-.yd-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-.yd-tile{--tone:238,111,156;--ink:#c94b7b;position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:3px;min-width:0;padding:11px 10px 10px;border-radius:18px;background:linear-gradient(160deg,rgba(var(--tone),.17),rgba(var(--tone),.07));border:1px solid rgba(var(--tone),.2)}
+/* --- Карточки «Вчера / Сегодня»: одна карточка = две стороны (завтрак / ужин) --- */
+.yd-group{--yd-h:228px;--yd-hc:76px;--yd-ease:cubic-bezier(.22,1,.36,1)}
+.yd-carousel{align-items:flex-start;touch-action:pan-x;-webkit-user-select:none;user-select:none}
+.yd-page{display:flex;flex-direction:column}
+.yd-card{position:relative;perspective:1300px;-webkit-perspective:1300px;-webkit-tap-highlight-color:transparent;cursor:default}
+.yd-top{cursor:pointer}
+.yd-top:focus-visible{outline:2px solid rgba(82,103,232,.55);outline-offset:3px;border-radius:24px}
+.yd-flipper{display:grid;transform-style:preserve-3d;-webkit-transform-style:preserve-3d;transform:rotateX(var(--yd-rot,0deg))}
+.yd-card .yd-face{--tint:255,170,80;--glow:240,160,70;grid-area:1/1;display:flex;flex-direction:column;height:var(--yd-h);margin:0;padding:15px 16px 14px;overflow:hidden;border-radius:23px;-webkit-backface-visibility:hidden;backface-visibility:hidden;background:radial-gradient(120% 95% at 0% 0%,rgba(var(--tint),.18),transparent 62%),var(--card-grad);transition:height .55s var(--yd-ease)}
+.yd-card .yd-face[data-meal="dinner"]{--tint:112,100,235;--glow:112,100,235;transform:rotateX(180deg)}
+:root[data-theme="dark"] .yd-card .yd-face{--tint:255,170,80;--glow:255,180,90}
+:root[data-theme="dark"] .yd-card .yd-face[data-meal="dinner"]{--tint:130,120,255;--glow:150,140,255}
+.yd-face[data-meal="breakfast"] .yd-icon{background:linear-gradient(145deg,#fff3dc,#ffdca6)}
+.yd-face[data-meal="dinner"] .yd-icon{background:linear-gradient(145deg,#eceaff,#d3cdfb)}
+:root[data-theme="dark"] .yd-face[data-meal="breakfast"] .yd-icon{background:linear-gradient(145deg,rgba(255,190,100,.30),rgba(255,190,100,.10))}
+:root[data-theme="dark"] .yd-face[data-meal="dinner"] .yd-icon{background:linear-gradient(145deg,rgba(150,140,255,.32),rgba(150,140,255,.10))}
+.yd-group.collapsed .yd-face{height:var(--yd-hc)}
+.yd-head{display:flex;align-items:center;gap:12px;height:46px;flex:none;margin-bottom:10px;padding-right:76px}
+.yd-top .yd-head{padding-right:114px}
+.yd-hcopy{flex:1;min-width:0}
+.yd-title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.yd-card .yd-sub{margin-top:3px;min-height:0;color:var(--muted)}
+.yd-body{flex:1;min-height:0;display:flex;flex-direction:column;transition:opacity .3s ease}
+.yd-group.collapsed .yd-body{opacity:0;pointer-events:none}
+/* переключатель завтрак | ужин и шеврон лежат поверх и не переворачиваются */
+.yd-ctrl{position:absolute;z-index:3;top:15px;right:16px;height:46px;display:flex;align-items:center;gap:8px}
+.yd-mealsw{position:relative;isolation:isolate;display:grid;grid-template-columns:1fr 1fr;width:64px;height:32px;padding:3px;border-radius:99px;background:rgba(125,135,170,.15);cursor:pointer;transition:transform .25s var(--yd-ease)}
+.yd-mealsw:active{transform:scale(.93)}
+.yd-mealsw::before{content:"";position:absolute;z-index:-1;top:3px;left:3px;width:calc(50% - 3px);height:calc(100% - 6px);border-radius:99px;background:var(--card);box-shadow:0 1px 5px rgba(20,30,70,.22);transition:transform .55s cubic-bezier(.34,1.45,.4,1)}
+.yd-group[data-meal="dinner"] .yd-mealsw::before{transform:translateX(100%)}
+.yd-mealsw>span{display:grid;place-items:center;font-size:14px;opacity:.45;transition:opacity .3s,transform .45s cubic-bezier(.34,1.5,.4,1)}
+.yd-group[data-meal="breakfast"] .yd-mealsw>span:nth-child(1),.yd-group[data-meal="dinner"] .yd-mealsw>span:nth-child(2){opacity:1;transform:scale(1.12)}
+.yd-chevron{flex-shrink:0;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:rgba(125,135,170,.14);color:var(--muted);transition:transform .45s cubic-bezier(.34,1.4,.4,1),background .25s,color .25s}
+.yd-chevron svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.yd-top:active .yd-chevron{transform:scale(.88)}
+.yd-group.open .yd-chevron{transform:rotate(180deg);background:rgba(82,103,232,.16);color:#5267e8}
+.yd-group.collapsed .yd-chevron{transform:rotate(-90deg)}
+/* «Сегодня» выезжает плавно; тень обрезается только на время анимации */
+.yd-today-wrap{display:grid;grid-template-rows:0fr;margin-top:0;visibility:hidden;transition:grid-template-rows .55s var(--yd-ease),margin-top .55s var(--yd-ease),visibility 0s .55s}
+.yd-group.open .yd-today-wrap{grid-template-rows:1fr;margin-top:13px;visibility:visible;transition:grid-template-rows .55s var(--yd-ease),margin-top .55s var(--yd-ease),visibility 0s 0s}
+.yd-today-in{min-height:0;overflow:hidden;opacity:0;transform:translateY(-10px);transition:opacity .4s ease,transform .55s var(--yd-ease)}
+.yd-group.open .yd-today-in{opacity:1;transform:none}
+.yd-group.open.settled .yd-today-in{overflow:visible}
+/* значения */
+.yd-strip{flex:1;min-height:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.yd-tile{--tone:238,111,156;--ink:#c94b7b;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:2px;min-width:0;padding:8px 6px;border-radius:18px;background:linear-gradient(160deg,rgba(var(--tone),.17),rgba(var(--tone),.07));border:1px solid rgba(var(--tone),.2);animation:ydTileIn .55s var(--yd-ease) backwards;animation-delay:calc(var(--i,0)*70ms)}
 .yd-tile.insulin{--tone:32,169,155;--ink:#17867b}
 :root[data-theme="dark"] .yd-tile{--ink:#ff9ab9}
 :root[data-theme="dark"] .yd-tile.insulin{--ink:#6fe0d0}
-.yd-tile:not(:last-child)::after{content:"›";position:absolute;right:-15px;top:50%;width:18px;height:18px;margin-top:-9px;border-radius:50%;background:var(--card);box-shadow:0 1px 4px rgba(20,30,70,.18);display:grid;place-items:center;font-size:14px;font-weight:800;line-height:1;color:var(--muted);z-index:2;padding-bottom:1px;box-sizing:border-box}
-.yd-label{max-width:100%;font-size:11.5px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.yd-value{display:flex;align-items:baseline;justify-content:center;gap:3px;font-size:27px;font-weight:800;letter-spacing:-.7px;line-height:1.1;font-variant-numeric:tabular-nums}
+@keyframes ydTileIn{from{opacity:0;transform:translateY(8px) scale(.96)}to{opacity:1;transform:none}}
+.yd-tile:not(:last-child)::after{content:"›";position:absolute;right:-15px;top:50%;width:18px;height:18px;margin-top:-9px;border-radius:50%;background:var(--card);box-shadow:0 1px 4px rgba(20,30,70,.18);display:grid;place-items:center;font-size:14px;font-weight:800;line-height:1;color:var(--muted);z-index:2;padding-bottom:1px}
+.yd-label{max-width:100%;font-size:11.5px;font-weight:700;line-height:1.2;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.yd-value{display:flex;align-items:baseline;justify-content:center;gap:3px;font-size:27px;font-weight:800;letter-spacing:-.7px;line-height:1.05;font-variant-numeric:tabular-nums}
 .yd-value small{font-size:11px;font-weight:650;color:var(--muted);letter-spacing:0}
-.yd-time{font-size:12px;font-weight:650;color:var(--muted);font-variant-numeric:tabular-nums}
+.yd-time{font-size:12px;font-weight:650;line-height:1.2;color:var(--muted);font-variant-numeric:tabular-nums}
 .yd-delta{align-self:center;margin-top:2px;padding:2px 7px;border-radius:99px;font-size:11.5px;font-weight:750;font-variant-numeric:tabular-nums;background:rgba(125,135,170,.15);color:var(--muted)}
 .yd-tile.empty .yd-value{color:var(--muted)}
 .yd-tile.sk{min-height:92px;border-color:transparent;background:linear-gradient(90deg,var(--line) 25%,var(--nav-highlight) 50%,var(--line) 75%);background-size:200% 100%;animation:metricShimmer 1.2s linear infinite}
 .yd-tile.sk::after{display:none}
-.yd-shots{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-top:12px}
-.yd-shots-title{font-size:12px;font-weight:750;color:var(--muted);margin-right:2px}
-.yd-shot{display:inline-flex;align-items:baseline;gap:5px;padding:5px 10px;border-radius:99px;background:rgba(245,166,35,.15);color:#a9690a;font-size:12.5px;font-weight:700;font-variant-numeric:tabular-nums}
+.yd-foot{flex:none;height:28px;margin-top:9px;display:flex;align-items:center;gap:7px;overflow:hidden;white-space:nowrap;-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 24px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 24px),transparent)}
+.yd-foot-title{font-size:12px;font-weight:750;color:var(--muted);margin-right:2px;flex:none}
+.yd-foot-none{font-size:12px;font-weight:650;color:var(--muted);opacity:.75}
+.yd-shot{flex:none;display:inline-flex;align-items:baseline;gap:5px;padding:5px 10px;border-radius:99px;background:rgba(245,166,35,.15);color:#a9690a;font-size:12.5px;font-weight:700;font-variant-numeric:tabular-nums}
 .yd-shot small{font-size:11.5px;font-weight:600;opacity:.8}
 :root[data-theme="dark"] .yd-shot{background:rgba(255,196,107,.16);color:#ffc46b}
-.yd-empty{padding:14px 12px;border-radius:16px;background:rgba(125,135,170,.1);color:var(--muted);font-size:13.5px;line-height:1.4;text-align:center}
-.yd-card{cursor:default}
-.yd-top{cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .3s cubic-bezier(.34,1.5,.4,1)}
-.yd-top:active{transform:scale(.99)}
-.yd-top:focus-visible{outline:2px solid rgba(82,103,232,.55);outline-offset:2px}
-.yd-chevron{flex-shrink:0;width:30px;height:30px;margin-left:auto;border-radius:50%;display:grid;place-items:center;background:rgba(125,135,170,.14);color:var(--muted);transition:transform .35s cubic-bezier(.34,1.4,.4,1),background .2s}
-.yd-chevron svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
-.yd-group.open .yd-chevron{transform:rotate(180deg);background:rgba(82,103,232,.16);color:#5267e8}
-.yd-today{display:none}
-/* свёрнутая карточка «Вчера»: остаётся только заголовок, чтобы на экран помещался таймер */
-.yd-group.collapsed .yd-top .yd-strip,.yd-group.collapsed .yd-top .yd-shots{display:none}
-.yd-group.collapsed .yd-today{display:none!important}
-.yd-group.collapsed .yd-chevron{transform:rotate(-90deg)}
-.yd-group.open .yd-today{display:block;animation:ydDrop .38s cubic-bezier(.2,.8,.2,1)}
-@keyframes ydDrop{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
-/* карусель «завтрак | ужин» (механика как у карточки ночного): на странице сверху «Вчера», снизу «Сегодня» */
-.yd-carousel{align-items:flex-start}
-.carousel>.yd-page{display:flex;flex-direction:column}
-.yd-page>.metric{margin-bottom:0}
-.yd-page>.yd-today{margin-top:13px}
+.yd-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:10px 18px;border-radius:18px;background:rgba(125,135,170,.08);border:1px dashed rgba(125,135,170,.28);color:var(--muted);font-size:13.5px;line-height:1.35;text-align:center;animation:ydTileIn .55s var(--yd-ease) backwards}
+.yd-empty-ico{font-size:22px}
+@media (prefers-reduced-motion:reduce){.yd-tile,.yd-empty{animation:none}.yd-card .yd-face,.yd-today-wrap,.yd-today-in{transition:none}}
 
 /* ===== НАСТРОЙКИ: визуальный стиль Telegram iOS ===== */
 :root:has(#screen-settings.active){--bg:#efeff4;--status-bar-bg:#efeff4;--status-bar-fade:#efeff4}
@@ -877,32 +904,15 @@ button.st-ico:active{transform:scale(.88)}
 <!-- === ЭКРАН «ГЛАВНАЯ» === -->
 <section class="screen active" id="screen-home">
 <!-- --- Карточки: вчера, а по нажатию ниже — сегодня --- -->
-<div class="yd-group" id="ydGroup">
+<div class="yd-group" id="ydGroup" data-meal="breakfast">
 <div class="carousel shadowfix yd-carousel" id="ydCarousel">
 <div class="yd-page" id="ydSkeleton">
-<section class="metric yesterday yd-card yd-top loading" role="button" tabindex="0" aria-expanded="false" aria-label="Приём пищи за вчера. Нажмите, чтобы показать сегодняшний. Листайте вбок: завтрак или ужин" onclick="toggleTodayMeal()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleTodayMeal();}">
-<div class="metric-head">
-<div class="metric-icon yd-icon">🍽️</div>
-<div class="metric-copy">
-<div class="metric-name yd-title">Вчера</div>
-<div class="metric-latest yd-sub"><span class="metric-skeleton"></span></div>
-</div>
-<span class="yd-chevron" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
-</div>
-<div class="yd-strip"><div class="yd-tile sk"></div><div class="yd-tile sk"></div><div class="yd-tile sk"></div></div>
-<div class="yd-shots" hidden></div>
-</section>
-<section class="metric yesterday yd-card yd-today loading" aria-live="polite">
-<div class="metric-head">
-<div class="metric-icon yd-icon">🍽️</div>
-<div class="metric-copy">
-<div class="metric-name yd-title">Сегодня</div>
-<div class="metric-latest yd-sub"><span class="metric-skeleton"></span></div>
-</div>
-</div>
-<div class="yd-strip"><div class="yd-tile sk"></div><div class="yd-tile sk"></div><div class="yd-tile sk"></div></div>
-<div class="yd-shots" hidden></div>
-</section>
+<section class="yd-card yd-top loading" aria-label="Загружаю приём пищи">
+<div class="yd-flipper"><div class="yd-face metric yesterday" data-meal="breakfast">
+<div class="yd-head"><div class="metric-icon yd-icon">🍳</div><div class="yd-hcopy"><div class="metric-name yd-title">Вчера</div><div class="metric-latest yd-sub"><span class="metric-skeleton"></span></div></div></div>
+<div class="yd-body"><div class="yd-strip"><div class="yd-tile sk"></div><div class="yd-tile sk"></div><div class="yd-tile sk"></div></div><div class="yd-foot"></div></div>
+</div></div></section>
+<div class="yd-today-wrap"><div class="yd-today-in"></div></div>
 </div>
 </div>
 <div class="carousel-dots" id="ydDots" aria-hidden="true"></div>
@@ -4287,70 +4297,42 @@ function ydDuration(minutes){
  const hours=Math.round(minutes/30)/2;
  return String(hours).replace('.',',')+' ч';
 }
-function ydTile(kind,label,value,unit,time,extra,emptyText){
- return '<div class="yd-tile '+kind+(value?'':' empty')+'"><div class="yd-label">'+label+'</div>'
+function ydTile(kind,label,value,unit,time,extra,emptyText,i){
+ return '<div class="yd-tile '+kind+(value?'':' empty')+'" style="--i:'+(i||0)+'"><div class="yd-label">'+label+'</div>'
   +'<div class="yd-value"><span>'+(value?escapeHtml(value):'—')+'</span>'+(value&&unit?'<small>'+unit+'</small>':'')+'</div>'
   +'<div class="yd-time">'+(time?escapeHtml(time):(emptyText||'нет записи'))+'</div>'+(extra||'')+'</div>';
 }
-function renderMealCard(card,data,when){
- if(!card)return;
- card.classList.remove('loading');
- const dinner=data.meal==='dinner',mealName=dinner?'ужин':'завтрак';
- card.querySelector('.yd-icon').textContent=dinner?'🍽️':'🍳';
- card.querySelector('.yd-title').textContent=when+' на '+mealName;
- card.querySelector('.yd-sub').textContent=data.date?data.date.slice(0,5):'';
- const strip=card.querySelector('.yd-strip'),shots=card.querySelector('.yd-shots');
- if(!data.found){
-  const emptyText=when==='Сегодня'?'Сегодня пока нет основного укола на '+mealName+'.'
-   :(when==='Вчера'||when==='Позавчера'?when+' не было основного укола на '+mealName+'.':'Не было основного укола на '+mealName+'.');
-  strip.innerHTML='<div class="yd-empty" style="grid-column:1/-1">'+emptyText+'</div>';
-  shots.hidden=true;shots.innerHTML='';
-  return;
- }
- const before=data.before,after=data.after;
- let delta='';
- if(typeof data.delta==='number'&&data.delta!==0){
-  delta='<div class="yd-delta">'+(data.delta>0?'▲ ':'▼ ')+trendSigned(data.delta,1)+'</div>';
- }
- strip.innerHTML=
-  ydTile('sugar','До еды',before&&before.value,'',before&&before.time)
-  +ydTile('insulin','Укол',data.bolus.value,'ед.',data.bolus.time)
-  +ydTile('sugar',after?'Через '+ydDuration(after.after_min):'После',after&&after.value,'',after&&after.time,delta,when==='Сегодня'?'ещё нет':'нет записи');
- const pre=(data.pre_shots||[]).map(item=>'<span class="yd-shot"><small>до еды</small>+'+escapeHtml(item.value)+' ед. <small>'+escapeHtml(item.time)+'</small></span>');
- const post=(data.post_shots||[]).map(item=>'<span class="yd-shot">+'+escapeHtml(item.value)+' ед. <small>'+escapeHtml(item.time)+'</small></span>');
- if(pre.length||post.length){
-  shots.innerHTML='<span class="yd-shots-title">💉 Подколка</span>'+pre.join('')+post.join('');
-  shots.hidden=false;
- }else{
-  shots.hidden=true;shots.innerHTML='';
- }
-}
 
-// ---- Карусель приёмов пищи (механика как у карточки ночного) ----
-// Страницы идут по порядку событий: … завтрак → ужин → завтрак → ужин. На странице сверху событие
-// (вчера на завтрак/ужин по времени суток — страница по умолчанию), снизу то же на следующие сутки («Сегодня»).
-// Вправо — будущее (дальше сегодняшнего ужина нельзя), влево — прошлое: ближайшие дни приходят с главной,
-// более старые подгружаются пачками, когда листаешь к левому краю.
+// ============================================================
+// Карточки приёма пищи. Одна карточка = две стороны: завтрак и ужин.
+// Вбок — по дням (страница = пара «день−1 сверху, день снизу», по умолчанию «вчера» и «сегодня»),
+// вверх/вниз по карточке — переворот на другой приём пищи (сразу на всех карточках).
+// ============================================================
 const YD_MEALS=['breakfast','dinner'];
+const YD_MEAL_NAME={breakfast:'Завтрак',dinner:'Ужин'};
+const YD_MEAL_LOW={breakfast:'завтрак',dinner:'ужин'};
+const YD_MEAL_ICON={breakfast:'🍳',dinner:'🍽️'};
 const YD_WEEKDAYS=['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
-const YD_BATCH=14,YD_MAX_DAYS=120,YD_SHEET_PAD=32;
-const yd={anchor:null,cache:new Map(),oldest:null,kmin:0,kmax:0,built:false,idx:null,loading:false,exhausted:false};
+const YD_BATCH=14,YD_MAX_DAYS=120;
+const YD_CHEV='<span class="yd-chevron" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>';
+const YD_SW='<span class="yd-mealsw" role="button" aria-label="Переключить завтрак и ужин"><span>🍳</span><span>🍽️</span></span>';
+const yd={anchor:null,cache:new Map(),oldest:null,kmin:0,built:false,idx:null,loading:false,exhausted:false,
+ rot:0,cur:0,target:0,raf:0,live:[],settleT:0};
+function ydGroup(){return document.getElementById('ydGroup');}
 function ydCarousel(){return document.getElementById('ydCarousel');}
 function ydDayNumber(text){const [d,m,y]=text.split('.').map(Number);return Math.round(Date.UTC(y,m-1,d)/86400000);}
 function ydFormatDate(day){
  const date=new Date(day*86400000);
  return String(date.getUTCDate()).padStart(2,'0')+'.'+String(date.getUTCMonth()+1).padStart(2,'0')+'.'+date.getUTCFullYear();
 }
-function ydEvent(k){
- const index=yd.anchor.day*2+yd.anchor.meal+k,day=Math.floor(index/2);
- return {day,date:ydFormatDate(day),meal:YD_MEALS[index-day*2]};
-}
-function ydLabel(ev){
- const diff=ev.day-(yd.anchor.day+1);
+function ydToday(){return yd.anchor.day+1;}
+function ydLabel(day){
+ const diff=day-ydToday();
+ if(diff===1)return 'Завтра';
  if(diff===0)return 'Сегодня';
  if(diff===-1)return 'Вчера';
  if(diff===-2)return 'Позавчера';
- return YD_WEEKDAYS[new Date(ev.day*86400000).getUTCDay()];
+ return YD_WEEKDAYS[new Date(day*86400000).getUTCDay()];
 }
 function ydStore(days){
  days.forEach(item=>{
@@ -4359,42 +4341,182 @@ function ydStore(days){
   if(yd.oldest===null||day<yd.oldest)yd.oldest=day;
  });
 }
-function ydBounds(){
- yd.kmax=1-yd.anchor.meal;                                  // последняя страница: снизу сегодняшний ужин
- return {kmin:(yd.oldest-yd.anchor.day)*2-yd.anchor.meal,kmax:yd.kmax};
+// страница k: сверху день (сегодня+k−1), снизу день (сегодня+k); k=0 — «вчера / сегодня», k=1 — «сегодня / завтра»
+function ydBounds(){return {kmin:Math.min(0,yd.oldest-yd.anchor.day),kmax:1};}
+
+// ---------- разметка ----------
+function ydFaceHtml(meal){
+ return '<div class="yd-face metric yesterday" data-meal="'+meal+'"><div class="yd-head"><div class="metric-icon yd-icon">'+YD_MEAL_ICON[meal]+'</div>'
+  +'<div class="yd-hcopy"><div class="metric-name yd-title"></div><div class="metric-latest yd-sub"></div></div></div><div class="yd-body"></div></div>';
+}
+function ydCardHtml(top,expanded){
+ const attrs=top?' role="button" tabindex="0" aria-expanded="'+expanded+'" aria-label="Приём пищи. Нажмите, чтобы показать следующие сутки. Проведите вверх или вниз, чтобы перевернуть на ужин или завтрак. Листайте вбок по дням"':' aria-live="polite"';
+ return '<section class="yd-card '+(top?'yd-top':'yd-today')+'"'+attrs+'><div class="yd-flipper">'+ydFaceHtml('breakfast')+ydFaceHtml('dinner')+'</div>'
+  +'<div class="yd-ctrl">'+YD_SW+(top?YD_CHEV:'')+'</div></section>';
 }
 function ydPageHtml(k,expanded){
- const chev='<span class="yd-chevron" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>';
- const head=(title,extra)=>'<div class="metric-head"><div class="metric-icon yd-icon">🍽️</div><div class="metric-copy"><div class="metric-name yd-title">'+title+'</div><div class="metric-latest yd-sub"></div></div>'+extra+'</div><div class="yd-strip"></div><div class="yd-shots" hidden></div>';
- return '<div class="yd-page" data-k="'+k+'">'
-  +'<section class="metric yesterday yd-card yd-top" role="button" tabindex="0" aria-expanded="'+expanded+'" aria-label="Приём пищи. Нажмите, чтобы показать следующие сутки. Листайте вбок: прошлое и будущее" onclick="toggleTodayMeal()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();toggleTodayMeal();}">'+head('',chev)+'</section>'
-  +'<section class="metric yesterday yd-card yd-today" aria-live="polite">'+head('','')+'</section></div>';
+ return '<div class="yd-page" data-k="'+k+'">'+ydCardHtml(true,expanded)+'<div class="yd-today-wrap"><div class="yd-today-in">'+ydCardHtml(false)+'</div></div></div>';
 }
-function ydPaintCard(card,ev){
- const data=yd.cache.get(ev.date+'|'+ev.meal)||{meal:ev.meal,date:ev.date,found:false};
- const label=ydLabel(ev),sig=label+JSON.stringify(data);
- if(card._sig===sig)return;
- card._sig=sig;
- renderMealCard(card,data,label);
+
+// ---------- отрисовка сторон ----------
+function ydRenderFace(face,data,label,day){
+ const meal=face.dataset.meal,low=YD_MEAL_LOW[meal],rel=day-ydToday();
+ face.querySelector('.yd-title').textContent=label;
+ face.querySelector('.yd-sub').textContent=YD_MEAL_NAME[meal]+' · '+ydFormatDate(day).slice(0,5);
+ const body=face.querySelector('.yd-body');
+ if(!data.found){
+  let ico='🌿',text='Не было основного укола на '+low+'.';
+  if(rel===0){ico='⏳';text='Сегодня пока нет основного укола на '+low+'.';}
+  else if(rel>0){ico='✨';text='Запись появится '+(rel===1?'завтра':'позже')+'.';}
+  else if(rel===-1||rel===-2)text=label+' не было основного укола на '+low+'.';
+  body.innerHTML='<div class="yd-empty"><span class="yd-empty-ico">'+ico+'</span><span>'+text+'</span></div>';
+  return;
+ }
+ const before=data.before,after=data.after;
+ let delta='';
+ if(typeof data.delta==='number'&&data.delta!==0){
+  delta='<div class="yd-delta">'+(data.delta>0?'▲ ':'▼ ')+trendSigned(data.delta,1)+'</div>';
+ }
+ const tiles=ydTile('sugar','До еды',before&&before.value,'',before&&before.time,'','',0)
+  +ydTile('insulin','Укол',data.bolus.value,'ед.',data.bolus.time,'','',1)
+  +ydTile('sugar',after?'Через '+ydDuration(after.after_min):'После',after&&after.value,'',after&&after.time,delta,rel===0?'ещё нет':'нет записи',2);
+ const pre=(data.pre_shots||[]).map(item=>'<span class="yd-shot"><small>до еды</small>+'+escapeHtml(item.value)+' ед. <small>'+escapeHtml(item.time)+'</small></span>');
+ const post=(data.post_shots||[]).map(item=>'<span class="yd-shot">+'+escapeHtml(item.value)+' ед. <small>'+escapeHtml(item.time)+'</small></span>');
+ const foot=(pre.length||post.length)?'<span class="yd-foot-title">💉 Подколка</span>'+pre.join('')+post.join(''):'<span class="yd-foot-none">💉 Без подколок</span>';
+ body.innerHTML='<div class="yd-strip">'+tiles+'</div><div class="yd-foot">'+foot+'</div>';
+}
+function ydPaintCard(card,day){
+ const date=ydFormatDate(day),label=ydLabel(day);
+ YD_MEALS.forEach(meal=>{
+  const face=card.querySelector('.yd-face[data-meal="'+meal+'"]');
+  const data=yd.cache.get(date+'|'+meal)||{meal,date,found:false};
+  const sig=label+'|'+JSON.stringify(data);
+  if(face._sig===sig)return;
+  face._sig=sig;
+  ydRenderFace(face,data,label,day);
+ });
 }
 function ydPaintPage(page){
- const k=Number(page.dataset.k);
- ydPaintCard(page.querySelector('.yd-top'),ydEvent(k));
- ydPaintCard(page.querySelector('.yd-today'),ydEvent(k+2));
+ const day=ydToday()+Number(page.dataset.k);
+ ydPaintCard(page.querySelector('.yd-top'),day-1);
+ ydPaintCard(page.querySelector('.yd-today'),day);
 }
-// высота карусели плавно подстраивается под страницу (пока листаем — между двумя соседними)
-function ydFitHeight(car,animate){
- if(!car||!car.children.length)return;
- const w=car.clientWidth;
- if(!w)return;
- const pages=car.children;
- const pos=Math.max(0,Math.min(pages.length-1,car.scrollLeft/w));
- const i0=Math.floor(pos),i1=Math.min(pages.length-1,i0+1),f=pos-i0;
- const h=pages[i0].offsetHeight*(1-f)+pages[i1].offsetHeight*f;
- if(!h)return;
- car.style.transition=animate?'height .3s cubic-bezier(.2,.8,.2,1)':'none';
- car.style.height=Math.round(h+YD_SHEET_PAD)+'px'; // 32 = отступы .shadowfix (6 + 26)
+
+// ---------- переворот ----------
+function ydNormRot(a){return (((Math.round(a/180)%2)+2)%2)*180;}
+function ydMealAt(a){return ydNormRot(a)===180?'dinner':'breakfast';}
+function ydSetMealAttr(meal,haptic){
+ const g=ydGroup();
+ if(!g||g.dataset.meal===meal)return;
+ g.dataset.meal=meal;
+ if(haptic&&typeof selectionHaptic==='function')selectionHaptic();
 }
+function ydSetRest(rot){
+ const g=ydGroup();
+ if(!g)return;
+ yd.rot=ydNormRot(rot);yd.cur=yd.rot;
+ g.style.setProperty('--yd-rot',yd.rot+'deg');
+ ydSetMealAttr(ydMealAt(yd.rot),false);
+}
+function ydLiveCards(){
+ const car=ydCarousel();
+ if(!car||!car.clientWidth)return [];
+ const x=car.scrollLeft/car.clientWidth,idx=new Set([Math.floor(x+.001),Math.ceil(x-.001)]),cards=[];
+ idx.forEach(i=>{const page=car.children[i];if(page)page.querySelectorAll('.yd-card').forEach(c=>cards.push(c));});
+ return cards;
+}
+function ydRender(angle){
+ const scale=1-.055*Math.abs(Math.sin(angle*Math.PI/180)); // карточка чуть «приподнимается» посередине переворота
+ yd.live.forEach(card=>{card.style.transform='scale('+scale.toFixed(4)+')';card.firstElementChild.style.transform='rotateX('+angle.toFixed(2)+'deg)';});
+ yd.cur=angle;
+ ydSetMealAttr(ydMealAt(angle),true);
+}
+function ydEnd(target){
+ cancelAnimationFrame(yd.raf);yd.raf=0;
+ ydSetRest(target);
+ yd.live.forEach(card=>{card.style.transform='';if(card.firstElementChild)card.firstElementChild.style.transform='';});
+ yd.live=[];
+}
+function ydSpring(target,v0){
+ cancelAnimationFrame(yd.raf);
+ if(!yd.live.length)yd.live=ydLiveCards();
+ yd.target=target;
+ if(!yd.live.length||(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)){ydEnd(target);return;}
+ let x=yd.cur,v=v0||0,last=performance.now();const t0=last,K=150,C=17;
+ const step=now=>{
+  const dt=Math.min(.05,(now-last)/1000);last=now;
+  const n=Math.max(1,Math.ceil(dt/.004)),h=dt/n;
+  for(let i=0;i<n;i++){v+=(-K*(x-target)-C*v)*h;x+=v*h;}
+  ydRender(x);
+  if((Math.abs(x-target)<.35&&Math.abs(v)<6)||now-t0>1400){ydEnd(target);return;}
+  yd.raf=requestAnimationFrame(step);
+ };
+ yd.raf=requestAnimationFrame(step);
+}
+function ydFlip(dir,v0){
+ if(!yd.built)return;
+ if(yd.raf)ydEnd(yd.target);
+ ydSpring(yd.rot+dir*180,v0||dir*450);
+}
+function initYdGestures(car){
+ let d=null;
+ const swipes=on=>{try{on?tg?.enableVerticalSwipes?.():tg?.disableVerticalSwipes?.();}catch(e){}};
+ car.addEventListener('pointerdown',e=>{
+  if(!yd.built||e.button>0||e.target.closest('.yd-mealsw'))return;
+  if(yd.raf)ydEnd(yd.target);
+  d={id:e.pointerId,x:e.clientX,y:e.clientY,mode:null,a:yd.rot,s:[{t:e.timeStamp,a:yd.rot}]};
+ });
+ car.addEventListener('pointermove',e=>{
+  if(!d||e.pointerId!==d.id)return;
+  const dx=e.clientX-d.x,dy=e.clientY-d.y;
+  if(!d.mode){
+   if(Math.abs(dx)<7&&Math.abs(dy)<7)return;
+   if(Math.abs(dy)>Math.abs(dx)*1.15){
+    d.mode='v';car._dragged=true;yd.live=ydLiveCards();swipes(false);
+    try{car.setPointerCapture(d.id);}catch(_){}
+   }else{d.mode='h';return;}
+  }
+  if(d.mode!=='v')return;
+  let delta=-dy*(180/150);
+  if(Math.abs(delta)>180)delta=Math.sign(delta)*(180+(Math.abs(delta)-180)*.18); // резинка у края
+  d.a=yd.rot+delta;
+  d.s.push({t:e.timeStamp,a:d.a});if(d.s.length>6)d.s.shift();
+  ydRender(d.a);
+ });
+ const finish=(e,cancelled)=>{
+  if(!d||e.pointerId!==d.id)return;
+  const g=d;d=null;
+  if(g.mode==='v'){
+   try{car.releasePointerCapture(g.id);}catch(_){}
+   swipes(true);
+   const last=g.s[g.s.length-1],ref=g.s.find(p=>last.t-p.t<=90)||g.s[0];
+   let v=(last.a-ref.a)/Math.max(16,last.t-ref.t)*1000;v=Math.max(-1800,Math.min(1800,v));
+   const delta=g.a-yd.rot;let dir=0;
+   if(!cancelled){
+    if(Math.abs(delta)>=55)dir=Math.sign(delta);
+    else if(Math.abs(v)>380&&Math.abs(delta)>10)dir=Math.sign(v);
+    if(dir&&Math.sign(v)===-dir&&Math.abs(v)>600)dir=0; // резкий возврат — отмена
+   }
+   ydSpring(yd.rot+dir*180,v);
+   setTimeout(()=>{car._dragged=false;},80);
+  }
+ };
+ car.addEventListener('pointerup',e=>finish(e,false));
+ car.addEventListener('pointercancel',e=>finish(e,true));
+ car.addEventListener('click',e=>{
+  if(car._dragged)return;
+  if(e.target.closest('.yd-mealsw')){ydFlip(1);return;}
+  if(e.target.closest('.yd-top'))toggleTodayMeal();
+ });
+ car.addEventListener('keydown',e=>{
+  if(!e.target.closest||!e.target.closest('.yd-top'))return;
+  if(e.key==='Enter'||e.key===' '){e.preventDefault();toggleTodayMeal();}
+  else if(e.key==='ArrowUp'){e.preventDefault();ydFlip(1);}
+  else if(e.key==='ArrowDown'){e.preventDefault();ydFlip(-1);}
+ });
+}
+
+// ---------- карусель по дням ----------
 function ydApplyPending(car){
  if(car._pending==null||!car.clientWidth)return;
  yd.idx=car._pending;
@@ -4408,7 +4530,7 @@ function ydUpdateDots(){
  if(!dots||!car)return;
  const total=car.children.length,n=Math.min(5,total);
  if(total<2){dots.innerHTML='';return;}
- const first=total-n,active=Math.max(0,(yd.idx==null?total-1:yd.idx)-first);
+ const first=total-n,active=Math.max(0,(yd.idx==null?total-2:yd.idx)-first);
  if(dots.children.length!==n)dots.innerHTML='<i></i>'.repeat(n);
  [...dots.children].forEach((dot,i)=>dot.classList.toggle('on',i===active));
 }
@@ -4420,7 +4542,6 @@ function ydWhenIdle(fn){ // не трогаем прокрутку, пока п�
  });
 }
 function ydOnScroll(car){
- ydFitHeight(car,false);
  const w=car.clientWidth;
  if(!w)return;
  const i=Math.max(0,Math.min(car.children.length-1,Math.round(car.scrollLeft/w)));
@@ -4438,14 +4559,12 @@ function initYdCarousel(){
   if(raf)return;
   raf=requestAnimationFrame(()=>{raf=0;ydOnScroll(car);});
  },{passive:true});
- if(typeof ResizeObserver==='function'){
-  car._ro=new ResizeObserver(()=>{ydApplyPending(car);ydFitHeight(car,true);});
-  car._ro.observe(car);
- }
+ if(typeof ResizeObserver==='function')new ResizeObserver(()=>ydApplyPending(car)).observe(car);
+ initYdGestures(car);
 }
 // создаёт страницы (первый раз — все, потом — только новые слева) и перерисовывает карточки
 function ydSync(){
- const car=ydCarousel(),group=document.getElementById('ydGroup');
+ const car=ydCarousel(),group=ydGroup();
  if(!car||!yd.anchor||yd.oldest===null)return;
  const {kmin,kmax}=ydBounds();
  const expanded=String(group.classList.contains('open'));
@@ -4464,15 +4583,13 @@ function ydSync(){
   yd.kmin=kmin;
   if(w){yd.idx=(yd.idx==null?0:yd.idx)+added;car.scrollLeft=before+added*w;}
  }
- if(car._ro)[...car.children].forEach(page=>car._ro.observe(page));
  car.querySelectorAll('.yd-page').forEach(ydPaintPage);
  ydApplyPending(car);
- ydFitHeight(car,false);
  ydUpdateDots();
 }
 async function ydLoadMore(){
  if(yd.loading||yd.exhausted||!yd.anchor||yd.oldest===null)return;
- if(yd.anchor.day+1-yd.oldest>=YD_MAX_DAYS){yd.exhausted=true;return;}
+ if(ydToday()-yd.oldest>=YD_MAX_DAYS){yd.exhausted=true;return;}
  yd.loading=true;
  try{
   const days=await api('meals',{before:ydFormatDate(yd.oldest),days:YD_BATCH});
@@ -4486,32 +4603,36 @@ async function ydLoadMore(){
  }
 }
 function renderMealCards(data){
- const group=document.getElementById('ydGroup');
+ const group=ydGroup();
  if(!group)return;
- if(!data||!data.yesterday_meal||!data.meal_days){group.style.display='none';group.classList.remove('open');return;}
+ if(!data||!data.yesterday_meal||!data.meal_days){group.style.display='none';group.classList.remove('open','settled');return;}
  group.style.display='';
  const base=data.yesterday_meal;
  const day=ydDayNumber(base.date),meal=base.meal==='dinner'?1:0;
  if(!yd.anchor||yd.anchor.day!==day||yd.anchor.meal!==meal){ // новый день или завтрак сменился ужином — начинаем заново
+  if(yd.raf)ydEnd(yd.target);
   yd.anchor={day,meal};yd.cache.clear();yd.oldest=null;yd.built=false;yd.exhausted=false;yd.loading=false;
+  ydSetRest(meal?180:0);
  }
  initYdCarousel();
  ydStore(data.meal_days);
  ydSync();
 }
 function toggleTodayMeal(){
- const group=document.getElementById('ydGroup');
+ const group=ydGroup();
  if(!group||group.querySelector('.yd-top.loading')||!yd.built)return;
- /* состояния по кругу: свёрнуто → развёрнуто → + следующие сутки («Сегодня») → свёрнуто */
+ clearTimeout(yd.settleT);
+ /* состояния по кругу: только вчера → + сегодня → свёрнуто → только вчера */
  if(group.classList.contains('collapsed'))group.classList.remove('collapsed');
  else if(!group.classList.contains('open'))group.classList.add('open');
- else{group.classList.remove('open');group.classList.add('collapsed');}
+ else{group.classList.remove('open','settled');group.classList.add('collapsed');}
+ if(group.classList.contains('open'))yd.settleT=setTimeout(()=>group.classList.add('settled'),600);
  const open=String(group.classList.contains('open'));
  group.querySelectorAll('.yd-top').forEach(card=>card.setAttribute('aria-expanded',open));
  selectionHaptic();
 }
 function collapseYesterdayCard(){
- const group=document.getElementById('ydGroup');
+ const group=ydGroup();
  if(!group)return;
  const car=ydCarousel();
  // после запуска таймера возвращаемся на страницу «сейчас»
@@ -4519,7 +4640,8 @@ function collapseYesterdayCard(){
   car.scrollTo({left:-yd.kmin*car.clientWidth,behavior:'smooth'});
  }
  if(group.classList.contains('collapsed'))return;
- group.classList.remove('open');
+ clearTimeout(yd.settleT);
+ group.classList.remove('open','settled');
  group.querySelectorAll('.yd-top').forEach(card=>card.setAttribute('aria-expanded','false'));
  group.classList.add('collapsed');
 }
