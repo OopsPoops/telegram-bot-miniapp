@@ -776,24 +776,24 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 :root[data-theme="dark"] .yd-shot{background:rgba(255,196,107,.16);color:#ffc46b}
 .yd-empty{padding:14px 12px;border-radius:16px;background:rgba(125,135,170,.1);color:var(--muted);font-size:13.5px;line-height:1.4;text-align:center}
 .yd-card{cursor:default}
-#yesterdayCard{cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:pan-y;transition:transform .3s cubic-bezier(.34,1.5,.4,1)}
-#yesterdayCard:active{transform:scale(.99)}
-#yesterdayCard:focus-visible{outline:2px solid rgba(82,103,232,.55);outline-offset:2px}
+.yd-top{cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .3s cubic-bezier(.34,1.5,.4,1)}
+.yd-top:active{transform:scale(.99)}
+.yd-top:focus-visible{outline:2px solid rgba(82,103,232,.55);outline-offset:2px}
 .yd-chevron{flex-shrink:0;width:30px;height:30px;margin-left:auto;border-radius:50%;display:grid;place-items:center;background:rgba(125,135,170,.14);color:var(--muted);transition:transform .35s cubic-bezier(.34,1.4,.4,1),background .2s}
 .yd-chevron svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 .yd-group.open .yd-chevron{transform:rotate(180deg);background:rgba(82,103,232,.16);color:#5267e8}
 .yd-today{display:none}
 /* свёрнутая карточка «Вчера»: остаётся только заголовок, чтобы на экран помещался таймер */
-.yd-group.collapsed #yesterdayCard .yd-strip,.yd-group.collapsed #yesterdayCard .yd-shots{display:none}
+.yd-group.collapsed .yd-top .yd-strip,.yd-group.collapsed .yd-top .yd-shots{display:none}
 .yd-group.collapsed .yd-today{display:none!important}
 .yd-group.collapsed .yd-chevron{transform:rotate(-90deg)}
 .yd-group.open .yd-today{display:block;animation:ydDrop .38s cubic-bezier(.2,.8,.2,1)}
 @keyframes ydDrop{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
-/* листание приёмов пищи свайпом: новая карточка въезжает со стороны жеста */
-.yd-card.yd-in-left{animation:ydInLeft .3s cubic-bezier(.2,.8,.2,1)}
-.yd-card.yd-in-right{animation:ydInRight .3s cubic-bezier(.2,.8,.2,1)}
-@keyframes ydInLeft{from{opacity:0;transform:translateX(34px)}to{opacity:1;transform:none}}
-@keyframes ydInRight{from{opacity:0;transform:translateX(-34px)}to{opacity:1;transform:none}}
+/* карусель «завтрак | ужин» (механика как у карточки ночного): на странице сверху «Вчера», снизу «Сегодня» */
+.yd-carousel{align-items:flex-start}
+.carousel>.yd-page{display:flex;flex-direction:column}
+.yd-page>.metric{margin-bottom:0}
+.yd-page>.yd-today{margin-top:13px}
 
 /* ===== НАСТРОЙКИ: визуальный стиль Telegram iOS ===== */
 :root:has(#screen-settings.active){--bg:#efeff4;--status-bar-bg:#efeff4;--status-bar-fade:#efeff4}
@@ -878,7 +878,9 @@ button.st-ico:active{transform:scale(.88)}
 <section class="screen active" id="screen-home">
 <!-- --- Карточки: вчера, а по нажатию ниже — сегодня --- -->
 <div class="yd-group" id="ydGroup">
-<section class="metric yesterday yd-card loading" id="yesterdayCard" role="button" tabindex="0" aria-expanded="false" aria-label="Вчерашний приём пищи. Нажмите, чтобы показать сегодняшний" onclick="toggleTodayMeal()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleTodayMeal();}">
+<div class="carousel shadowfix yd-carousel" id="ydCarousel">
+<div class="yd-page" data-meal="breakfast">
+<section class="metric yesterday yd-card yd-top loading" role="button" tabindex="0" aria-expanded="false" aria-label="Приём пищи за вчера. Нажмите, чтобы показать сегодняшний. Листайте вбок: завтрак или ужин" onclick="toggleTodayMeal()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleTodayMeal();}">
 <div class="metric-head">
 <div class="metric-icon yd-icon">🍽️</div>
 <div class="metric-copy">
@@ -890,7 +892,7 @@ button.st-ico:active{transform:scale(.88)}
 <div class="yd-strip"><div class="yd-tile sk"></div><div class="yd-tile sk"></div><div class="yd-tile sk"></div></div>
 <div class="yd-shots" hidden></div>
 </section>
-<section class="metric yesterday yd-card yd-today loading" id="todayMealCard" aria-live="polite">
+<section class="metric yesterday yd-card yd-today loading" aria-live="polite">
 <div class="metric-head">
 <div class="metric-icon yd-icon">🍽️</div>
 <div class="metric-copy">
@@ -901,6 +903,34 @@ button.st-ico:active{transform:scale(.88)}
 <div class="yd-strip"><div class="yd-tile sk"></div><div class="yd-tile sk"></div><div class="yd-tile sk"></div></div>
 <div class="yd-shots" hidden></div>
 </section>
+</div>
+<div class="yd-page" data-meal="dinner">
+<section class="metric yesterday yd-card yd-top loading" role="button" tabindex="0" aria-expanded="false" aria-label="Приём пищи за вчера. Нажмите, чтобы показать сегодняшний. Листайте вбок: завтрак или ужин" onclick="toggleTodayMeal()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleTodayMeal();}">
+<div class="metric-head">
+<div class="metric-icon yd-icon">🍽️</div>
+<div class="metric-copy">
+<div class="metric-name yd-title">Вчера</div>
+<div class="metric-latest yd-sub"><span class="metric-skeleton"></span></div>
+</div>
+<span class="yd-chevron" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+</div>
+<div class="yd-strip"><div class="yd-tile sk"></div><div class="yd-tile sk"></div><div class="yd-tile sk"></div></div>
+<div class="yd-shots" hidden></div>
+</section>
+<section class="metric yesterday yd-card yd-today loading" aria-live="polite">
+<div class="metric-head">
+<div class="metric-icon yd-icon">🍽️</div>
+<div class="metric-copy">
+<div class="metric-name yd-title">Сегодня</div>
+<div class="metric-latest yd-sub"><span class="metric-skeleton"></span></div>
+</div>
+</div>
+<div class="yd-strip"><div class="yd-tile sk"></div><div class="yd-tile sk"></div><div class="yd-tile sk"></div></div>
+<div class="yd-shots" hidden></div>
+</section>
+</div>
+</div>
+<div class="carousel-dots" aria-hidden="true"><i></i><i></i></div>
 </div>
 <!-- --- Карточка: сахар --- -->
 <section class="metric sugar">
@@ -4321,176 +4351,86 @@ function renderMealCard(card,data,when){
  }
 }
 
-// ---- Листание приёмов пищи ----
-// События идут по порядку: завтрак → ужин → завтрак → … Показ по умолчанию (k=0) — «вчера» на завтрак или ужин
-// (по времени суток). Свайп влево — следующее событие (k+1), свайп вправо — предыдущее (k-1).
-// Дальше всего вперёд — сегодняшний приём той же части дня (k=2). Для k≤0 под карточкой доступна
-// вторая плашка — то же событие на следующие сутки (k+2): для k=0 это «Сегодня».
-const YD_MEALS=['breakfast','dinner'];
-const YD_KMIN=-60,YD_KMAX=2;
-const YD_WEEKDAYS=['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
-const ydNav={k:0,anchor:null,cache:new Map(),pending:new Set(),failed:new Set(),token:0,swiped:false};
-function ydKey(ev){return ev.date+'|'+ev.meal;}
-function ydFormatDate(day){
- const date=new Date(day*86400000);
- return String(date.getUTCDate()).padStart(2,'0')+'.'+String(date.getUTCMonth()+1).padStart(2,'0')+'.'+date.getUTCFullYear();
+// ---- Карусель приёмов пищи (механика как у карточки ночного) ----
+// Две страницы: завтрак | ужин. На странице сверху «Вчера», снизу «Сегодня» (раскрывается тапом).
+// Стартовая страница — по времени суток; вторая рядом: свайп вправо — завтрак, влево — ужин.
+const YD_PAGES=['breakfast','dinner'];
+function ydCarousel(){return document.getElementById('ydCarousel');}
+// высота карусели плавно подстраивается под страницу (пока листаем — между двумя соседними)
+function ydFitHeight(car,animate){
+ if(!car||!car.children.length)return;
+ const w=car.clientWidth;
+ if(!w)return;
+ const pages=[...car.children];
+ const pos=Math.max(0,Math.min(pages.length-1,car.scrollLeft/w));
+ const i0=Math.floor(pos),i1=Math.min(pages.length-1,i0+1),f=pos-i0;
+ const h=pages[i0].offsetHeight*(1-f)+pages[i1].offsetHeight*f;
+ if(!h)return;
+ car.style.transition=animate?'height .3s cubic-bezier(.2,.8,.2,1)':'none';
+ car.style.height=Math.round(h+32)+'px'; // 32 = отступы .shadowfix (6 + 26)
 }
-function ydEvent(k){
- const index=ydNav.anchor.day*2+ydNav.anchor.meal+k;
- const day=Math.floor(index/2);
- return {day,date:ydFormatDate(day),meal:YD_MEALS[index-day*2]};
+function ydApplyPending(car){
+ if(car._pending==null||!car.clientWidth)return;
+ car.scrollLeft=car._pending*car.clientWidth;
+ car._pending=null;
 }
-function ydLabel(ev){
- const diff=ev.day-(ydNav.anchor.day+1);
- if(diff===0)return 'Сегодня';
- if(diff===-1)return 'Вчера';
- if(diff===-2)return 'Позавчера';
- return YD_WEEKDAYS[new Date(ev.day*86400000).getUTCDay()];
-}
-function ydFillCard(card,ev){
- if(!card)return;
- const label=ydLabel(ev),key=ydKey(ev),data=ydNav.cache.get(key);
- if(data){renderMealCard(card,data,label);return;}
- const dinner=ev.meal==='dinner',mealName=dinner?'ужин':'завтрак';
- card.querySelector('.yd-icon').textContent=dinner?'🍽️':'🍳';
- card.querySelector('.yd-title').textContent=label+' на '+mealName;
- card.querySelector('.yd-sub').textContent=ev.date.slice(0,5);
- const strip=card.querySelector('.yd-strip'),shots=card.querySelector('.yd-shots');
- shots.hidden=true;shots.innerHTML='';
- strip.innerHTML=ydNav.failed.has(key)
-  ?'<div class="yd-empty" style="grid-column:1/-1">Не удалось загрузить. Смахните туда-обратно, чтобы повторить.</div>'
-  :'<div class="yd-tile sk"></div><div class="yd-tile sk"></div><div class="yd-tile sk"></div>';
-}
-function ydPaint(direction){
- if(!ydNav.anchor)return;
- const top=document.getElementById('yesterdayCard'),second=document.getElementById('todayMealCard');
- ydFillCard(top,ydEvent(ydNav.k));
- if(ydNav.k<=0)ydFillCard(second,ydEvent(ydNav.k+2));
- if(direction){
-  const cls=direction==='left'?'yd-in-left':'yd-in-right';
-  top.classList.remove('yd-in-left','yd-in-right');
-  void top.offsetWidth;
-  top.classList.add(cls);
+function initYdCarousel(){
+ const car=ydCarousel();
+ if(!car||car._ydReady)return;
+ car._ydReady=true;
+ setupCarousel(car);
+ let raf=0;
+ car.addEventListener('scroll',()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;ydFitHeight(car,false);});},{passive:true});
+ if(typeof ResizeObserver==='function'){
+  const ro=new ResizeObserver(()=>{ydApplyPending(car);ydFitHeight(car,true);});
+  ro.observe(car);
+  [...car.children].forEach(page=>ro.observe(page));
  }
-}
-async function ydEnsure(events){
- const missing=events.filter(ev=>ev&&!ydNav.cache.has(ydKey(ev))&&!ydNav.pending.has(ydKey(ev)));
- if(!missing.length)return;
- missing.forEach(ev=>ydNav.pending.add(ydKey(ev)));
- try{
-  const result=await api('meals',{events:missing.map(ev=>({date:ev.date,meal:ev.meal}))});
-  result.forEach(item=>ydNav.cache.set(item.date+'|'+item.meal,item));
-  missing.forEach(ev=>ydNav.failed.delete(ydKey(ev)));
- }catch(error){
-  console.error('Ошибка загрузки приёма пищи:',error);
-  missing.forEach(ev=>ydNav.failed.add(ydKey(ev)));
- }finally{
-  missing.forEach(ev=>ydNav.pending.delete(ydKey(ev)));
- }
-}
-function ydRender(direction){
- const group=document.getElementById('ydGroup'),top=document.getElementById('yesterdayCard');
- if(!group||!top||!ydNav.anchor)return;
- const hasSecond=ydNav.k<=0;
- if(!hasSecond){group.classList.remove('open');top.setAttribute('aria-expanded','false');}
- ydPaint(direction);
- const token=++ydNav.token;
- const need=[ydEvent(ydNav.k)];
- if(hasSecond)need.push(ydEvent(ydNav.k+2));
- const near=[];
- if(ydNav.k-1>=YD_KMIN)near.push(ydEvent(ydNav.k-1));
- if(ydNav.k+1<=YD_KMAX)near.push(ydEvent(ydNav.k+1));
- ydEnsure(need).then(()=>{
-  if(token!==ydNav.token)return;
-  ydPaint();
-  return ydEnsure(near);
- });
-}
-function ydStep(delta){
- if(!ydNav.anchor)return false;
- const next=ydNav.k+delta;
- if(next<YD_KMIN||next>YD_KMAX)return false;
- ydNav.k=next;
- ydNav.failed.delete(ydKey(ydEvent(next)));
- ydRender(delta>0?'left':'right');
- selectionHaptic();
- return true;
 }
 function renderMealCards(data){
  const group=document.getElementById('ydGroup');
  if(!group)return;
- if(!data||!data.yesterday_meal){group.style.display='none';group.classList.remove('open');return;}
+ if(!data||!data.yesterday_meal||!data.meals){group.style.display='none';group.classList.remove('open');return;}
  group.style.display='';
- const base=data.yesterday_meal;
- const [d,m,y]=base.date.split('.').map(Number);
- const day=Math.round(Date.UTC(y,m-1,d)/86400000),meal=base.meal==='dinner'?1:0;
- const prev=ydNav.anchor;
- if(!prev||prev.day!==day||prev.meal!==meal){ydNav.cache.clear();ydNav.k=0;}
- ydNav.anchor={day,meal};
- // события сегодняшнего дня могли измениться — перечитываем, прошлые держим в кэше
- const todayText=ydFormatDate(day+1);
- [...ydNav.cache.keys()].forEach(key=>{if(key.startsWith(todayText))ydNav.cache.delete(key);});
- ydNav.cache.set(base.date+'|'+base.meal,base);
- if(data.today_meal)ydNav.cache.set(data.today_meal.date+'|'+data.today_meal.meal,data.today_meal);
- ydRender();
+ YD_PAGES.forEach(meal=>{
+  const pair=data.meals[meal],page=group.querySelector('.yd-page[data-meal="'+meal+'"]');
+  if(!pair||!page)return;
+  renderMealCard(page.querySelector('.yd-top'),pair.yesterday,'Вчера');
+  renderMealCard(page.querySelector('.yd-today'),pair.today,'Сегодня');
+ });
+ initYdCarousel();
+ const car=ydCarousel(),target=YD_PAGES.indexOf(data.yesterday_meal.meal);
+ if(car&&target>=0&&car._defaultIdx!==target){ // стартовая страница по времени суток (листание пользователя не сбрасываем)
+  car._defaultIdx=target;
+  car._pending=target;
+  ydApplyPending(car);
+ }
+ ydFitHeight(car,false);
 }
 function toggleTodayMeal(){
- const group=document.getElementById('ydGroup'),card=document.getElementById('yesterdayCard');
- if(!group||card.classList.contains('loading'))return;
- if(ydNav.swiped)return; // тап, оставшийся после свайпа
- const hasSecond=ydNav.k<=0;
- /* состояния по кругу: свёрнуто → развёрнуто → (если есть вторая плашка) + «Сегодня» → свёрнуто */
+ const group=document.getElementById('ydGroup');
+ if(!group||group.querySelector('.yd-top.loading'))return;
+ /* состояния по кругу: свёрнуто → развёрнуто «Вчера» → + «Сегодня» → свёрнуто */
  if(group.classList.contains('collapsed'))group.classList.remove('collapsed');
- else if(hasSecond&&!group.classList.contains('open'))group.classList.add('open');
+ else if(!group.classList.contains('open'))group.classList.add('open');
  else{group.classList.remove('open');group.classList.add('collapsed');}
- card.setAttribute('aria-expanded',String(group.classList.contains('open')));
+ const open=String(group.classList.contains('open'));
+ group.querySelectorAll('.yd-top').forEach(card=>card.setAttribute('aria-expanded',open));
  selectionHaptic();
 }
 function collapseYesterdayCard(){
- const group=document.getElementById('ydGroup'),card=document.getElementById('yesterdayCard');
+ const group=document.getElementById('ydGroup');
  if(!group)return;
- if(ydNav.anchor&&ydNav.k!==0){ydNav.k=0;ydRender('right');} // после запуска таймера возвращаемся к «вчера»
+ const car=ydCarousel();
+ // после запуска таймера возвращаемся на страницу по времени суток
+ if(car&&car._defaultIdx!=null&&car.clientWidth&&carouselIndex(car)!==car._defaultIdx){
+  car.scrollTo({left:car._defaultIdx*car.clientWidth,behavior:'smooth'});
+ }
  if(group.classList.contains('collapsed'))return;
  group.classList.remove('open');
- if(card)card.setAttribute('aria-expanded','false');
+ group.querySelectorAll('.yd-top').forEach(card=>card.setAttribute('aria-expanded','false'));
  group.classList.add('collapsed');
 }
-function initYdSwipe(){
- const card=document.getElementById('yesterdayCard');
- if(!card)return;
- let gesture=null;
- card.addEventListener('pointerdown',event=>{
-  if(event.pointerType==='mouse'&&event.button!==0)return;
-  gesture={x:event.clientX,y:event.clientY,id:event.pointerId,dx:0,active:false};
- });
- card.addEventListener('pointermove',event=>{
-  if(!gesture||event.pointerId!==gesture.id)return;
-  const dx=event.clientX-gesture.x,dy=event.clientY-gesture.y;
-  if(!gesture.active){
-   if(Math.abs(dx)<8||Math.abs(dx)<Math.abs(dy)*1.2)return;
-   gesture.active=true;
-   try{card.setPointerCapture(event.pointerId);}catch(_){}
-   card.style.transition='none';
-  }
-  gesture.dx=dx;
-  card.style.transform='translateX('+(dx*.35)+'px)';
- });
- const finish=event=>{
-  if(!gesture||event.pointerId!==gesture.id)return;
-  const done=gesture;gesture=null;
-  if(!done.active)return;
-  ydNav.swiped=true;setTimeout(()=>{ydNav.swiped=false;},400);
-  card.style.transition='';card.style.transform='';
-  if(event.type==='pointerup'&&Math.abs(done.dx)>=44)ydStep(done.dx<0?1:-1);
- };
- card.addEventListener('pointerup',finish);
- card.addEventListener('pointercancel',finish);
- card.addEventListener('keydown',event=>{
-  if(event.key==='ArrowLeft'){event.preventDefault();ydStep(-1);}
-  else if(event.key==='ArrowRight'){event.preventDefault();ydStep(1);}
- });
-}
-initYdSwipe();
 </script>
 <script>
 (function(){
