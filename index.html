@@ -879,32 +879,7 @@ button.st-ico:active{transform:scale(.88)}
 <!-- --- Карточки: вчера, а по нажатию ниже — сегодня --- -->
 <div class="yd-group" id="ydGroup">
 <div class="carousel shadowfix yd-carousel" id="ydCarousel">
-<div class="yd-page" data-meal="breakfast">
-<section class="metric yesterday yd-card yd-top loading" role="button" tabindex="0" aria-expanded="false" aria-label="Приём пищи за вчера. Нажмите, чтобы показать сегодняшний. Листайте вбок: завтрак или ужин" onclick="toggleTodayMeal()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleTodayMeal();}">
-<div class="metric-head">
-<div class="metric-icon yd-icon">🍽️</div>
-<div class="metric-copy">
-<div class="metric-name yd-title">Вчера</div>
-<div class="metric-latest yd-sub"><span class="metric-skeleton"></span></div>
-</div>
-<span class="yd-chevron" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
-</div>
-<div class="yd-strip"><div class="yd-tile sk"></div><div class="yd-tile sk"></div><div class="yd-tile sk"></div></div>
-<div class="yd-shots" hidden></div>
-</section>
-<section class="metric yesterday yd-card yd-today loading" aria-live="polite">
-<div class="metric-head">
-<div class="metric-icon yd-icon">🍽️</div>
-<div class="metric-copy">
-<div class="metric-name yd-title">Сегодня</div>
-<div class="metric-latest yd-sub"><span class="metric-skeleton"></span></div>
-</div>
-</div>
-<div class="yd-strip"><div class="yd-tile sk"></div><div class="yd-tile sk"></div><div class="yd-tile sk"></div></div>
-<div class="yd-shots" hidden></div>
-</section>
-</div>
-<div class="yd-page" data-meal="dinner">
+<div class="yd-page" id="ydSkeleton">
 <section class="metric yesterday yd-card yd-top loading" role="button" tabindex="0" aria-expanded="false" aria-label="Приём пищи за вчера. Нажмите, чтобы показать сегодняшний. Листайте вбок: завтрак или ужин" onclick="toggleTodayMeal()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleTodayMeal();}">
 <div class="metric-head">
 <div class="metric-icon yd-icon">🍽️</div>
@@ -930,7 +905,7 @@ button.st-ico:active{transform:scale(.88)}
 </section>
 </div>
 </div>
-<div class="carousel-dots" aria-hidden="true"><i></i><i></i></div>
+<div class="carousel-dots" id="ydDots" aria-hidden="true"></div>
 </div>
 <!-- --- Карточка: сахар --- -->
 <section class="metric sugar">
@@ -4352,65 +4327,182 @@ function renderMealCard(card,data,when){
 }
 
 // ---- Карусель приёмов пищи (механика как у карточки ночного) ----
-// Две страницы: завтрак | ужин. На странице сверху «Вчера», снизу «Сегодня» (раскрывается тапом).
-// Стартовая страница — по времени суток; вторая рядом: свайп вправо — завтрак, влево — ужин.
-const YD_PAGES=['breakfast','dinner'];
+// Страницы идут по порядку событий: … завтрак → ужин → завтрак → ужин. На странице сверху событие
+// (вчера на завтрак/ужин по времени суток — страница по умолчанию), снизу то же на следующие сутки («Сегодня»).
+// Вправо — будущее (дальше сегодняшнего ужина нельзя), влево — прошлое: ближайшие дни приходят с главной,
+// более старые подгружаются пачками, когда листаешь к левому краю.
+const YD_MEALS=['breakfast','dinner'];
+const YD_WEEKDAYS=['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
+const YD_BATCH=14,YD_MAX_DAYS=120,YD_SHEET_PAD=32;
+const yd={anchor:null,cache:new Map(),oldest:null,kmin:0,kmax:0,built:false,idx:null,loading:false,exhausted:false};
 function ydCarousel(){return document.getElementById('ydCarousel');}
+function ydDayNumber(text){const [d,m,y]=text.split('.').map(Number);return Math.round(Date.UTC(y,m-1,d)/86400000);}
+function ydFormatDate(day){
+ const date=new Date(day*86400000);
+ return String(date.getUTCDate()).padStart(2,'0')+'.'+String(date.getUTCMonth()+1).padStart(2,'0')+'.'+date.getUTCFullYear();
+}
+function ydEvent(k){
+ const index=yd.anchor.day*2+yd.anchor.meal+k,day=Math.floor(index/2);
+ return {day,date:ydFormatDate(day),meal:YD_MEALS[index-day*2]};
+}
+function ydLabel(ev){
+ const diff=ev.day-(yd.anchor.day+1);
+ if(diff===0)return 'Сегодня';
+ if(diff===-1)return 'Вчера';
+ if(diff===-2)return 'Позавчера';
+ return YD_WEEKDAYS[new Date(ev.day*86400000).getUTCDay()];
+}
+function ydStore(days){
+ days.forEach(item=>{
+  YD_MEALS.forEach(meal=>{if(item[meal])yd.cache.set(item.date+'|'+meal,item[meal]);});
+  const day=ydDayNumber(item.date);
+  if(yd.oldest===null||day<yd.oldest)yd.oldest=day;
+ });
+}
+function ydBounds(){
+ yd.kmax=1-yd.anchor.meal;                                  // последняя страница: снизу сегодняшний ужин
+ return {kmin:(yd.oldest-yd.anchor.day)*2-yd.anchor.meal,kmax:yd.kmax};
+}
+function ydPageHtml(k,expanded){
+ const chev='<span class="yd-chevron" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>';
+ const head=(title,extra)=>'<div class="metric-head"><div class="metric-icon yd-icon">🍽️</div><div class="metric-copy"><div class="metric-name yd-title">'+title+'</div><div class="metric-latest yd-sub"></div></div>'+extra+'</div><div class="yd-strip"></div><div class="yd-shots" hidden></div>';
+ return '<div class="yd-page" data-k="'+k+'">'
+  +'<section class="metric yesterday yd-card yd-top" role="button" tabindex="0" aria-expanded="'+expanded+'" aria-label="Приём пищи. Нажмите, чтобы показать следующие сутки. Листайте вбок: прошлое и будущее" onclick="toggleTodayMeal()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();toggleTodayMeal();}">'+head('',chev)+'</section>'
+  +'<section class="metric yesterday yd-card yd-today" aria-live="polite">'+head('','')+'</section></div>';
+}
+function ydPaintCard(card,ev){
+ const data=yd.cache.get(ev.date+'|'+ev.meal)||{meal:ev.meal,date:ev.date,found:false};
+ const label=ydLabel(ev),sig=label+JSON.stringify(data);
+ if(card._sig===sig)return;
+ card._sig=sig;
+ renderMealCard(card,data,label);
+}
+function ydPaintPage(page){
+ const k=Number(page.dataset.k);
+ ydPaintCard(page.querySelector('.yd-top'),ydEvent(k));
+ ydPaintCard(page.querySelector('.yd-today'),ydEvent(k+2));
+}
 // высота карусели плавно подстраивается под страницу (пока листаем — между двумя соседними)
 function ydFitHeight(car,animate){
  if(!car||!car.children.length)return;
  const w=car.clientWidth;
  if(!w)return;
- const pages=[...car.children];
+ const pages=car.children;
  const pos=Math.max(0,Math.min(pages.length-1,car.scrollLeft/w));
  const i0=Math.floor(pos),i1=Math.min(pages.length-1,i0+1),f=pos-i0;
  const h=pages[i0].offsetHeight*(1-f)+pages[i1].offsetHeight*f;
  if(!h)return;
  car.style.transition=animate?'height .3s cubic-bezier(.2,.8,.2,1)':'none';
- car.style.height=Math.round(h+32)+'px'; // 32 = отступы .shadowfix (6 + 26)
+ car.style.height=Math.round(h+YD_SHEET_PAD)+'px'; // 32 = отступы .shadowfix (6 + 26)
 }
 function ydApplyPending(car){
  if(car._pending==null||!car.clientWidth)return;
+ yd.idx=car._pending;
  car.scrollLeft=car._pending*car.clientWidth;
  car._pending=null;
+ ydUpdateDots();
+}
+// точки: последние пять страниц справа (там «сейчас»); дальше влево активна первая точка
+function ydUpdateDots(){
+ const dots=document.getElementById('ydDots'),car=ydCarousel();
+ if(!dots||!car)return;
+ const total=car.children.length,n=Math.min(5,total);
+ if(total<2){dots.innerHTML='';return;}
+ const first=total-n,active=Math.max(0,(yd.idx==null?total-1:yd.idx)-first);
+ if(dots.children.length!==n)dots.innerHTML='<i></i>'.repeat(n);
+ [...dots.children].forEach((dot,i)=>dot.classList.toggle('on',i===active));
+}
+function ydWhenIdle(fn){ // не трогаем прокрутку, пока палец или инерция
+ const car=ydCarousel();
+ return new Promise(resolve=>{
+  const run=()=>{if(car._scrolling){setTimeout(run,120);return;}fn();resolve();};
+  run();
+ });
+}
+function ydOnScroll(car){
+ ydFitHeight(car,false);
+ const w=car.clientWidth;
+ if(!w)return;
+ const i=Math.max(0,Math.min(car.children.length-1,Math.round(car.scrollLeft/w)));
+ if(yd.idx!==null&&i!==yd.idx&&typeof selectionHaptic==='function')selectionHaptic();
+ if(i!==yd.idx){yd.idx=i;ydUpdateDots();}
+ if(i<=3)ydLoadMore();
 }
 function initYdCarousel(){
  const car=ydCarousel();
  if(!car||car._ydReady)return;
  car._ydReady=true;
- setupCarousel(car);
- let raf=0;
- car.addEventListener('scroll',()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;ydFitHeight(car,false);});},{passive:true});
+ let raf=0,timer=0;
+ car.addEventListener('scroll',()=>{
+  car._scrolling=true;clearTimeout(timer);timer=setTimeout(()=>{car._scrolling=false;},140);
+  if(raf)return;
+  raf=requestAnimationFrame(()=>{raf=0;ydOnScroll(car);});
+ },{passive:true});
  if(typeof ResizeObserver==='function'){
-  const ro=new ResizeObserver(()=>{ydApplyPending(car);ydFitHeight(car,true);});
-  ro.observe(car);
-  [...car.children].forEach(page=>ro.observe(page));
+  car._ro=new ResizeObserver(()=>{ydApplyPending(car);ydFitHeight(car,true);});
+  car._ro.observe(car);
+ }
+}
+// создаёт страницы (первый раз — все, потом — только новые слева) и перерисовывает карточки
+function ydSync(){
+ const car=ydCarousel(),group=document.getElementById('ydGroup');
+ if(!car||!yd.anchor||yd.oldest===null)return;
+ const {kmin,kmax}=ydBounds();
+ const expanded=String(group.classList.contains('open'));
+ if(!yd.built){
+  let html='';
+  for(let k=kmin;k<=kmax;k++)html+=ydPageHtml(k,expanded);
+  car.innerHTML=html;
+  yd.kmin=kmin;yd.built=true;yd.idx=null;
+  car._pending=-kmin;
+ }else if(kmin<yd.kmin){
+  const added=yd.kmin-kmin,w=car.clientWidth;
+  let html='';
+  for(let k=kmin;k<yd.kmin;k++)html+=ydPageHtml(k,expanded);
+  const before=car.scrollLeft;
+  car.insertAdjacentHTML('afterbegin',html);
+  yd.kmin=kmin;
+  if(w){yd.idx=(yd.idx==null?0:yd.idx)+added;car.scrollLeft=before+added*w;}
+ }
+ if(car._ro)[...car.children].forEach(page=>car._ro.observe(page));
+ car.querySelectorAll('.yd-page').forEach(ydPaintPage);
+ ydApplyPending(car);
+ ydFitHeight(car,false);
+ ydUpdateDots();
+}
+async function ydLoadMore(){
+ if(yd.loading||yd.exhausted||!yd.anchor||yd.oldest===null)return;
+ if(yd.anchor.day+1-yd.oldest>=YD_MAX_DAYS){yd.exhausted=true;return;}
+ yd.loading=true;
+ try{
+  const days=await api('meals',{before:ydFormatDate(yd.oldest),days:YD_BATCH});
+  const found=days.some(item=>YD_MEALS.some(meal=>item[meal]&&item[meal].found));
+  if(!found){yd.exhausted=true;}
+  else{ydStore(days);await ydWhenIdle(ydSync);}
+ }catch(error){
+  console.error('Ошибка загрузки прошлых приёмов пищи:',error); // повторим при следующем свайпе к краю
+ }finally{
+  yd.loading=false;
  }
 }
 function renderMealCards(data){
  const group=document.getElementById('ydGroup');
  if(!group)return;
- if(!data||!data.yesterday_meal||!data.meals){group.style.display='none';group.classList.remove('open');return;}
+ if(!data||!data.yesterday_meal||!data.meal_days){group.style.display='none';group.classList.remove('open');return;}
  group.style.display='';
- YD_PAGES.forEach(meal=>{
-  const pair=data.meals[meal],page=group.querySelector('.yd-page[data-meal="'+meal+'"]');
-  if(!pair||!page)return;
-  renderMealCard(page.querySelector('.yd-top'),pair.yesterday,'Вчера');
-  renderMealCard(page.querySelector('.yd-today'),pair.today,'Сегодня');
- });
- initYdCarousel();
- const car=ydCarousel(),target=YD_PAGES.indexOf(data.yesterday_meal.meal);
- if(car&&target>=0&&car._defaultIdx!==target){ // стартовая страница по времени суток (листание пользователя не сбрасываем)
-  car._defaultIdx=target;
-  car._pending=target;
-  ydApplyPending(car);
+ const base=data.yesterday_meal;
+ const day=ydDayNumber(base.date),meal=base.meal==='dinner'?1:0;
+ if(!yd.anchor||yd.anchor.day!==day||yd.anchor.meal!==meal){ // новый день или завтрак сменился ужином — начинаем заново
+  yd.anchor={day,meal};yd.cache.clear();yd.oldest=null;yd.built=false;yd.exhausted=false;yd.loading=false;
  }
- ydFitHeight(car,false);
+ initYdCarousel();
+ ydStore(data.meal_days);
+ ydSync();
 }
 function toggleTodayMeal(){
  const group=document.getElementById('ydGroup');
- if(!group||group.querySelector('.yd-top.loading'))return;
- /* состояния по кругу: свёрнуто → развёрнуто «Вчера» → + «Сегодня» → свёрнуто */
+ if(!group||group.querySelector('.yd-top.loading')||!yd.built)return;
+ /* состояния по кругу: свёрнуто → развёрнуто → + следующие сутки («Сегодня») → свёрнуто */
  if(group.classList.contains('collapsed'))group.classList.remove('collapsed');
  else if(!group.classList.contains('open'))group.classList.add('open');
  else{group.classList.remove('open');group.classList.add('collapsed');}
@@ -4422,9 +4514,9 @@ function collapseYesterdayCard(){
  const group=document.getElementById('ydGroup');
  if(!group)return;
  const car=ydCarousel();
- // после запуска таймера возвращаемся на страницу по времени суток
- if(car&&car._defaultIdx!=null&&car.clientWidth&&carouselIndex(car)!==car._defaultIdx){
-  car.scrollTo({left:car._defaultIdx*car.clientWidth,behavior:'smooth'});
+ // после запуска таймера возвращаемся на страницу «сейчас»
+ if(car&&yd.built&&car.clientWidth&&carouselIndex(car)!==-yd.kmin){
+  car.scrollTo({left:-yd.kmin*car.clientWidth,behavior:'smooth'});
  }
  if(group.classList.contains('collapsed'))return;
  group.classList.remove('open');
