@@ -893,6 +893,36 @@ button.st-ico:active{transform:scale(.88)}
 #targetSaveButton.saved{background:#34c759!important;color:#fff!important;pointer-events:none}
 .st-toast{margin:6px 15px 0}
 
+/* ===== Настройка графиков, «О приложении» ===== */
+.c-purple{background:linear-gradient(#b980f7,#8d52e0);--ic:#8d52e0}
+.c-teal{background:linear-gradient(#4fd1c5,#1fae9f);--ic:#1fae9f}
+.c-pink{background:linear-gradient(#ff82ad,#f0467f);--ic:#f0467f}
+.c-gray{background:linear-gradient(#a6a6ab,#7b7b81);--ic:#7b7b81}
+.analytics-tab[hidden]{display:none}
+.st-ico .cg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#chartCard{overflow:visible;-webkit-user-select:none;user-select:none}
+.ch-row{padding:7px 15px 7px 26px;gap:12px;background:var(--st-card);transition:transform .3s cubic-bezier(.22,1,.36,1),box-shadow .2s,background .2s;border-radius:0}
+.ch-row:first-child{border-radius:26px 26px 0 0}
+.ch-row:last-child{border-radius:0 0 26px 26px}
+.st-row.ch-row:not(:first-child)::before{left:106px}
+.ch-grip{flex:none;width:26px;height:40px;margin:-7px 0;display:grid;place-items:center;color:var(--st-chev);cursor:grab;touch-action:none;-webkit-tap-highlight-color:transparent}
+.ch-grip svg{width:18px;height:14px}
+.ch-row .st-ico,.ch-row .st-t{transition:opacity .25s,filter .25s}
+.ch-row.off .st-ico{opacity:.45;filter:saturate(.4)}
+.ch-row.off .st-t{opacity:.45}
+.ch-row.lifted{z-index:6;border-radius:16px;box-shadow:0 14px 34px rgba(0,0,0,.24),0 0 0 .5px var(--st-ring);transition:box-shadow .2s;cursor:grabbing}
+.ch-row.lifted::before,.ch-row.lifted+.ch-row::before{opacity:0}
+.ch-row.lifted .ch-grip{color:var(--st-blue);cursor:grabbing}
+.ch-list.noanim .ch-row{transition:none}
+.ab-hero{display:flex;flex-direction:column;align-items:center;gap:6px;margin:2px 0 22px}
+.ab-logo{width:84px;height:84px;border-radius:24px;display:grid;place-items:center;color:#fff;font-size:42px;font-weight:800;letter-spacing:-1px;background:linear-gradient(145deg,#6f84ff,#7a5be8);box-shadow:0 14px 28px -10px rgba(95,90,240,.65),inset 0 1px 0 rgba(255,255,255,.35)}
+.ab-name{font-size:24px;font-weight:700;letter-spacing:-.02em;margin-top:6px}
+.ab-sub{font-size:15px;color:var(--st-sub)}
+.ab-ver{margin-top:2px;padding:3px 11px;border-radius:99px;background:var(--st-fill);font-size:13px;font-weight:600;color:var(--st-sub);font-variant-numeric:tabular-nums}
+.ab-log .st-row{align-items:flex-start;padding-top:12px;padding-bottom:12px}
+.ab-log .st-t{font-size:16px;line-height:21px}
+.ab-dot{flex:none;width:7px;height:7px;margin-top:7px;border-radius:50%;background:var(--st-blue)}
+
 /* ===== Свайп назад от левого края ===== */
 #screen-settings,.app{position:relative}
 .st-under{display:block;position:absolute;z-index:1;pointer-events:none;will-change:transform}
@@ -1210,6 +1240,11 @@ button.st-ico:active{transform:scale(.88)}
 <symbol id="i-chev" viewBox="0 0 8 14"><path d="M1 1l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 <symbol id="i-back" viewBox="0 0 10 18"><path d="M9 1L1 9l8 8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 <symbol id="i-check" viewBox="0 0 16 16"><path d="M2 8.5l4 4L14 3.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-chart" viewBox="0 0 24 24"><rect x="4" y="12" width="4.2" height="8" rx="1.3" fill="currentColor"/><rect x="9.9" y="4" width="4.2" height="16" rx="1.3" fill="currentColor"/><rect x="15.8" y="8.5" width="4.2" height="11.5" rx="1.3" fill="currentColor"/></symbol>
+<symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.2" fill="currentColor"/><path d="M12 11v5.4" style="stroke:var(--ic)" stroke-width="2.3" stroke-linecap="round"/><circle cx="12" cy="7.7" r="1.4" style="fill:var(--ic)"/></symbol>
+<symbol id="i-spark" viewBox="0 0 24 24"><path d="M11 2.8l2.3 5.7 5.7 2.3-5.7 2.3L11 18.8l-2.3-5.7L3 10.8l5.7-2.3z" fill="currentColor"/><path d="M18.6 15.2l.9 2.2 2.2.9-2.2.9-.9 2.2-.9-2.2-2.2-.9 2.2-.9z" fill="currentColor"/></symbol>
+<symbol id="i-tg" viewBox="0 0 24 24"><path d="M20.8 4.3L3.4 11c-.9.35-.85 1.6.07 1.85l4.3 1.25 1.6 5.1c.25.8 1.3.95 1.8.3l2.3-2.9 4.2 3.1c.7.5 1.65.1 1.85-.75l2.7-12.9c.2-.85-.7-1.55-1.5-1.25z" fill="currentColor"/></symbol>
+<symbol id="i-grip" viewBox="0 0 18 14"><path d="M1.5 2h15M1.5 7h15M1.5 12h15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
 </defs></svg>
 <div class="st-page active" data-p="root">
 <div class="st-bar"><div class="st-title">Настройки</div></div>
@@ -1222,9 +1257,13 @@ button.st-ico:active{transform:scale(.88)}
 <button class="st-row has-ico st-nav" type="button" onclick="stOpen('timer')"><span class="st-ico c-orange"><svg class="g"><use href="#i-timer"/></svg></span><span class="st-t">Таймер инсулина</span><span class="st-val" id="stV-timer"></span><svg class="st-chev"><use href="#i-chev"/></svg></button>
 <button class="st-row has-ico st-nav" type="button" onclick="stOpen('report')"><span class="st-ico c-blue"><svg class="g"><use href="#i-cal"/></svg></span><span class="st-t">Ежедневный отчёт</span><span class="st-val" id="stV-report"></span><svg class="st-chev"><use href="#i-chev"/></svg></button>
 <button class="st-row has-ico st-nav" type="button" onclick="stOpen('target')"><span class="st-ico c-green"><svg class="g"><use href="#i-target"/></svg></span><span class="st-t">Целевой диапазон</span><span class="st-val" id="stV-target"></span><svg class="st-chev"><use href="#i-chev"/></svg></button>
+<button class="st-row has-ico st-nav" type="button" onclick="stOpen('charts')"><span class="st-ico c-purple"><svg class="g"><use href="#i-chart"/></svg></span><span class="st-t">Настройка графиков</span><span class="st-val" id="stV-charts"></span><svg class="st-chev"><use href="#i-chev"/></svg></button>
 </div>
 <div class="st-card">
 <button class="st-row has-ico st-nav" type="button" onclick="stOpen('theme')"><span class="st-ico c-sky"><svg class="g"><use href="#i-theme"/></svg></span><span class="st-t">Оформление</span><span class="st-val" id="stV-theme"></span><svg class="st-chev"><use href="#i-chev"/></svg></button>
+</div>
+<div class="st-card">
+<button class="st-row has-ico st-nav" type="button" onclick="stOpen('about')"><span class="st-ico c-gray"><svg class="g"><use href="#i-info"/></svg></span><span class="st-t">О приложении</span><span class="st-val" id="stV-about"></span><svg class="st-chev"><use href="#i-chev"/></svg></button>
 </div>
 </div>
 
@@ -1293,6 +1332,36 @@ button.st-ico:active{transform:scale(.88)}
 <div class="st-card">
 <div class="st-row two has-ico"><span class="st-ico c-sky"><svg class="g"><use href="#i-theme"/></svg><span id="themeIcon" hidden></span></span><div class="st-copy"><div class="st-t">Тёмная тема</div><div class="st-desc st-s" id="themeDescription">Комфортное оформление в темноте</div></div><button class="st-sw" id="themeSwitch" type="button" onclick="toggleTheme()" aria-label="Переключить тему"><span id="themeSwitchIcon"></span></button></div>
 </div>
+</div>
+
+<div class="st-page" data-p="charts">
+<div class="st-bar"><button class="st-back" type="button" onclick="stBack()" aria-label="Назад"><svg><use href="#i-back"/></svg></button><div class="st-title">Настройка графиков</div></div>
+<div class="st-card" id="chartCard"><div class="ch-list" id="chartList"></div></div>
+<div class="st-foot">Тяни за три линии, чтобы поменять порядок. Ползунок скрывает график. Настройка общая для всех пользователей бота.</div>
+<div class="toast st-toast" id="chartsToast"></div>
+</div>
+
+<div class="st-page" data-p="about">
+<div class="st-bar"><button class="st-back" type="button" onclick="stBack()" aria-label="Назад"><svg><use href="#i-back"/></svg></button><div class="st-title">О приложении</div></div>
+<div class="ab-hero"><div class="ab-logo" aria-hidden="true">С</div><div class="ab-name">Сёма</div><div class="ab-sub">Сахар и инсулин в одном месте</div><div class="ab-ver" id="abVer"></div></div>
+<div class="st-card">
+<div class="st-row"><span class="st-t">Версия приложения</span><span class="st-val" id="abApp"></span></div>
+<div class="st-row"><span class="st-t">Версия бота</span><span class="st-val" id="abBot">…</span></div>
+<div class="st-row"><span class="st-t">Дата сборки</span><span class="st-val" id="abDate"></span></div>
+</div>
+<div class="st-card">
+<button class="st-row has-ico st-nav" type="button" onclick="stOpen('changes')"><span class="st-ico c-orange"><svg class="g"><use href="#i-spark"/></svg></span><span class="st-t">Что нового</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
+</div>
+<div class="st-sec">Вопросы и предложения</div>
+<div class="st-card">
+<button class="st-row has-ico st-nav" type="button" onclick="openDevChat()"><span class="st-ico c-sky"><svg class="g"><use href="#i-tg"/></svg></span><span class="st-t">Написать разработчику</span><span class="st-val">@larik_11</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
+</div>
+<div class="st-foot">Нашёл ошибку или есть идея — напиши, так приложение становится лучше.<br><br>Данные записываются в вашу Google Таблицу через бота.</div>
+</div>
+
+<div class="st-page" data-p="changes">
+<div class="st-bar"><button class="st-back" type="button" onclick="stOpen('about')" aria-label="Назад"><svg><use href="#i-back"/></svg></button><div class="st-title">Что нового</div></div>
+<div id="changeLog"></div>
 </div>
 </section>
 </main>
@@ -4773,6 +4842,254 @@ document.querySelectorAll('select[id$="-period"]').forEach(sel=>{
 if(saved['trend-period']&&typeof analyticsState!=='undefined')analyticsState.trendDays=Number($('trend-period').value);
 setInterval(()=>{if($('screen-settings').classList.contains('active'))stRefresh();},600);
 stRefresh();
+})();
+</script>
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const APP_VERSION='v20261024_1';          /* ← менять при каждом обновлении: vГГГГММДД_N */
+const DEV_CHAT='https://t.me/larik_11';
+const APP_CHANGES=[
+ {v:'v20261024_1',items:[
+  'Карточки «Вчера» и «Сегодня» одного размера, даже если данных за сегодня ещё нет',
+  'Завтрак и ужин — две стороны карточки: проведи вверх или вниз, чтобы перевернуть',
+  'Карточки листаются по дням; смайл с «↺» возвращает к «вчера / сегодня»',
+  'Настройка графиков: порядок и видимость общие для всех пользователей',
+  'Новый раздел «О приложении»'
+ ]}
+];
+const CH_IDS=['trend','compare','range','distribution','daily','activity','dynamics','effect','summary'];
+const CH_NAMES={trend:'Динамика по дням',compare:'Сравнение трёх недель',range:'Доля в целевом диапазоне',distribution:'Распределение измерений',daily:'Суточная сводка',activity:'Активность по времени',dynamics:'Тренды',effect:'Укол и сахар',summary:'Итоги'};
+const CH_COLOR={trend:'c-blue',compare:'c-purple',range:'c-green',distribution:'c-sky',daily:'c-orange',activity:'c-red',dynamics:'c-teal',effect:'c-pink',summary:'c-gray'};
+const LS='sema-charts';
+function norm(v){
+ const order=[];
+ if(v&&Array.isArray(v.order))v.order.forEach(i=>{if(CH_IDS.includes(i)&&!order.includes(i))order.push(i);});
+ CH_IDS.forEach(i=>{if(!order.includes(i))order.push(i);});
+ let hidden=v&&Array.isArray(v.hidden)?order.filter(i=>v.hidden.includes(i)):[];
+ if(hidden.length>=order.length)hidden=[];
+ return {order,hidden};
+}
+let cs=norm(null);
+try{cs=norm(JSON.parse(localStorage.getItem(LS)||'null'));}catch(e){}
+let csJson=JSON.stringify(cs),csSaving=0,csSeq=0,csDragging=false,userPicked=false,needSelect=false;
+const graphsActive=()=>$('screen-graphs')&&$('screen-graphs').classList.contains('active');
+const visibleIds=()=>cs.order.filter(i=>!cs.hidden.includes(i));
+document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('.analytics-tab'))userPicked=true;},true);
+
+/* --- вкладки на экране «Графики» --- */
+function applyTabs(){
+ const bar=document.querySelector('.analytics-switches');
+ if(!bar)return;
+ const tabs={};bar.querySelectorAll('.analytics-tab').forEach(b=>{tabs[b.dataset.chart]=b;});
+ const domOrder=[...bar.querySelectorAll('.analytics-tab')].map(b=>b.dataset.chart).join();
+ if(domOrder!==cs.order.filter(i=>tabs[i]).join())cs.order.forEach(i=>{if(tabs[i])bar.appendChild(tabs[i]);});
+ cs.order.forEach(i=>{if(tabs[i])tabs[i].hidden=cs.hidden.includes(i);});
+ if(typeof analyticsState==='undefined')return;
+ const first=visibleIds()[0];
+ if(cs.hidden.includes(analyticsState.chart)){
+  if(graphsActive())selectChart(first);
+  else{
+   analyticsState.chart=first;needSelect=true;
+   bar.querySelectorAll('.analytics-tab').forEach(b=>{const a=b.dataset.chart===first;b.classList.toggle('active',a);b.setAttribute('aria-selected',String(a));});
+  }
+ }
+}
+function updateValue(){
+ const e=$('stV-charts');
+ if(e)e.textContent=visibleIds().length+' из '+cs.order.length;
+}
+
+/* --- список в настройках --- */
+function iconSvg(id){
+ const t=document.querySelector('.analytics-tab[data-chart="'+id+'"] .tab-icon');
+ return '<svg class="cg" viewBox="0 0 24 24" aria-hidden="true">'+(t?t.innerHTML:'')+'</svg>';
+}
+function rowHtml(id){
+ const on=!cs.hidden.includes(id);
+ return '<div class="st-row has-ico ch-row'+(on?'':' off')+'" data-id="'+id+'">'
+  +'<span class="ch-grip" role="img" aria-label="Перетащить, чтобы изменить порядок"><svg><use href="#i-grip"/></svg></span>'
+  +'<span class="st-ico '+CH_COLOR[id]+'">'+iconSvg(id)+'</span>'
+  +'<div class="st-t">'+CH_NAMES[id]+'</div>'
+  +'<button class="st-sw" type="button" aria-pressed="'+on+'" aria-label="Показывать: '+CH_NAMES[id]+'"><span></span></button></div>';
+}
+function renderList(animate){
+ const list=$('chartList');
+ if(!list)return;
+ const before={};
+ if(animate)[...list.children].forEach(r=>{before[r.dataset.id]=r.getBoundingClientRect().top;});
+ list.innerHTML=cs.order.map(rowHtml).join('');
+ if(animate){
+  [...list.children].forEach(r=>{
+   const d=before[r.dataset.id]-r.getBoundingClientRect().top;
+   if(!d)return;
+   r.style.transition='none';r.style.transform='translateY('+d+'px)';
+   requestAnimationFrame(()=>requestAnimationFrame(()=>{r.style.transition='';r.style.transform='';}));
+  });
+ }
+}
+function adopt(r){
+ const n=norm(r),j=JSON.stringify(n);
+ if(j===csJson)return;
+ const orderChanged=JSON.stringify(n.order)!==JSON.stringify(cs.order);
+ cs=n;csJson=j;
+ try{localStorage.setItem(LS,j);}catch(e){}
+ applyTabs();updateValue();
+ if(!csDragging&&$('chartList')&&$('chartList').children.length)renderList(orderChanged);
+}
+async function load(){
+ if(csDragging||csSaving)return;
+ try{const r=await api('chart_settings');if(!csDragging&&!csSaving)adopt(r);}catch(e){}
+}
+async function save(){
+ const seq=++csSeq;csSaving++;
+ const toast=$('chartsToast');
+ try{
+  const r=await api('chart_settings_set',{order:cs.order,hidden:cs.hidden});
+  if(seq===csSeq){csSaving--;adopt(r);csSaving++;}
+  setToast(toast,'');
+ }catch(e){
+  setToast(toast,'Не удалось сохранить: '+e.message,'error');
+  uiHaptic('error');
+  csSaving--;await load();csSaving++;
+ }finally{csSaving--;}
+}
+function commit(){
+ csJson=JSON.stringify(cs);
+ try{localStorage.setItem(LS,csJson);}catch(e){}
+ applyTabs();updateValue();save();
+}
+function toggle(id){
+ const hide=!cs.hidden.includes(id);
+ if(hide&&visibleIds().length<=1){
+  setToast($('chartsToast'),'Должен остаться хотя бы один график','error');
+  uiHaptic('error');return;
+ }
+ cs.hidden=hide?cs.hidden.concat(id):cs.hidden.filter(i=>i!==id);
+ const row=$('chartList').querySelector('[data-id="'+id+'"]');
+ if(row){row.classList.toggle('off',hide);row.querySelector('.st-sw').setAttribute('aria-pressed',String(!hide));}
+ selectionHaptic();setToast($('chartsToast'),'');
+ commit();
+}
+/* --- перетаскивание за три линии --- */
+function initDrag(){
+ const list=$('chartList');
+ let d=null;
+ const swipes=on=>{try{on?tg?.enableVerticalSwipes?.():tg?.disableVerticalSwipes?.();}catch(e){}};
+ list.addEventListener('click',e=>{
+  const sw=e.target.closest('.st-sw');
+  if(sw)toggle(sw.closest('.ch-row').dataset.id);
+ });
+ list.addEventListener('pointerdown',e=>{
+  const grip=e.target.closest('.ch-grip');
+  if(!grip||d||(e.pointerType==='mouse'&&e.button!==0))return;
+  const rows=[...list.children],row=grip.closest('.ch-row'),rects=rows.map(r=>r.getBoundingClientRect()),from=rows.indexOf(row);
+  d={id:e.pointerId,row,rows,rects,from,to:from,y0:e.clientY,h:rects[from].height,grip};
+  csDragging=true;swipes(false);
+  try{grip.setPointerCapture(e.pointerId);}catch(_){}
+  row.classList.add('lifted');
+  selectionHaptic();
+  e.preventDefault();
+ });
+ list.addEventListener('pointermove',e=>{
+  if(!d||e.pointerId!==d.id)return;
+  const lo=d.rects[0].top-d.rects[d.from].top,hi=d.rects[d.rects.length-1].top-d.rects[d.from].top;
+  const dy=Math.max(lo,Math.min(hi,e.clientY-d.y0));
+  d.row.style.transform='translateY('+dy+'px) scale(1.025)';
+  const center=d.rects[d.from].top+dy+d.h/2;
+  let to=0;
+  d.rows.forEach((r,i)=>{if(i!==d.from&&d.rects[i].top+d.rects[i].height/2<center)to++;});
+  if(to!==d.to){
+   d.to=to;selectionHaptic();
+   d.rows.forEach((r,i)=>{
+    if(i===d.from)return;
+    let sh=0;
+    if(d.from<to&&i>d.from&&i<=to)sh=-d.h;
+    else if(d.from>to&&i>=to&&i<d.from)sh=d.h;
+    r.style.transform=sh?'translateY('+sh+'px)':'';
+   });
+  }
+ });
+ const end=e=>{
+  if(!d||e.pointerId!==d.id)return;
+  const g=d;d=null;
+  try{g.grip.releasePointerCapture(g.id);}catch(_){}
+  swipes(true);
+  g.row.style.transform='translateY('+((g.to-g.from)*g.h)+'px)';
+  g.row.classList.remove('lifted');
+  setTimeout(()=>{
+   list.classList.add('noanim');
+   const rows=[...list.children];
+   rows.forEach(r=>{r.style.transform='';});
+   if(g.to!==g.from){
+    const ref=rows[g.to>g.from?g.to+1:g.to]||null;
+    list.insertBefore(g.row,ref);
+    const ord=[...list.children].map(r=>r.dataset.id);
+    cs.order=ord;cs.hidden=ord.filter(i=>cs.hidden.includes(i));
+    commit();
+   }
+   requestAnimationFrame(()=>requestAnimationFrame(()=>list.classList.remove('noanim')));
+   csDragging=false;
+  },260);
+ };
+ list.addEventListener('pointerup',end);
+ list.addEventListener('pointercancel',end);
+}
+
+/* --- О приложении --- */
+let botVersion=null;
+function buildDate(v){
+ const m=/^v(\d{4})(\d{2})(\d{2})_(\d+)$/.exec(v||'');
+ return m?m[3]+'.'+m[2]+'.'+m[1]+' · сборка '+m[4]:'';
+}
+function aboutRefresh(){
+ const set=(id,t)=>{const e=$(id);if(e)e.textContent=t;};
+ set('abApp',APP_VERSION);set('abVer',APP_VERSION);set('abDate',buildDate(APP_VERSION)||'—');
+ set('abBot',botVersion||'…');
+ if(!botVersion)api('about').then(r=>{botVersion=r&&r.version||'—';set('abBot',botVersion);}).catch(()=>set('abBot','—'));
+}
+function changesRefresh(){
+ const box=$('changeLog');
+ if(!box||box._done)return;
+ box._done=true;
+ box.innerHTML=APP_CHANGES.map(c=>{
+  const d=buildDate(c.v);
+  return '<div class="st-sec">'+c.v+(d?' · '+d.split(' · ')[0]:'')+'</div><div class="st-card ab-log">'
+   +c.items.map(t=>'<div class="st-row"><span class="ab-dot"></span><div class="st-t">'+t+'</div></div>').join('')+'</div>';
+ }).join('');
+}
+window.openDevChat=function(){
+ if(typeof selectionHaptic==='function')selectionHaptic();
+ try{if(tg&&tg.openTelegramLink){tg.openTelegramLink(DEV_CHAT);return;}}catch(e){}
+ window.open(DEV_CHAT,'_blank');
+};
+
+/* --- подключение --- */
+const so=window.stOpen;
+window.stOpen=function(name){
+ so.apply(this,arguments);
+ if(name==='charts'){renderList(false);load();}
+ if(name==='about')aboutRefresh();
+ if(name==='changes')changesRefresh();
+};
+const sw=window.switchTab;
+window.switchTab=function(name){
+ const r=sw.apply(this,arguments);
+ if(name==='graphs'){
+  const first=visibleIds()[0];
+  if(!userPicked&&analyticsState.chart!==first)selectChart(first);
+  else if(needSelect)selectChart(analyticsState.chart);
+  needSelect=false;
+ }
+ if(name==='settings'||name==='graphs')load();
+ return r;
+};
+applyTabs();updateValue();
+const vv=$('stV-about');if(vv)vv.textContent=APP_VERSION;
+initDrag();
+setInterval(()=>{if(!document.hidden)load();},8000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)load();});
+load();
 })();
 </script>
 </body>
