@@ -680,8 +680,8 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .yd-group.off{display:none!important}
 .dcar{align-items:flex-start;transition:height .32s cubic-bezier(.22,1,.36,1)}
 .carousel-dots.tight{margin:3px 0 4px;min-height:6px}
-/* Чуть больше воздуха между каруселями метрик */
-#sugarDots,#insulinDots{margin-bottom:10px}
+/* Одинаковый промежуток после верхней карточки, сахара и инсулина */
+#ydDots,#sugarDots,#insulinDots{margin:6px 0 8px;min-height:6px}
 .metric.dc-info{padding:10px 14px;display:flex;flex-direction:column;justify-content:center;overflow:hidden}
 .dc-row{display:flex;gap:10px;align-items:flex-start;padding:5px 0;border-top:1px solid var(--line)}
 .dc-row:first-child{border-top:0}
@@ -5243,11 +5243,12 @@ function dots(car){
  if(car._i!==undefined&&car._i!==i&&typeof selectionHaptic==='function')selectionHaptic();
  car._i=i;
 }
-/* Общие страницы для сахара и инсулина: при любом свайпе оба двигаются вместе. */
+/* Синхронное движение: ведомая карусель повторяет каждую позицию ведущей
+   непосредственно во время жеста, а не только после отпускания. */
 let syncingMetric=false;
 let selectedMetricDay=0;
 let metricLeader=null;
-let metricLeaderTimer=0;
+let metricIdleTimer=0;
 function metricPageForDay(car,off){
  for(let i=1;i<car.children.length;i++){
   if([...car.children[i].querySelectorAll('[data-day-off]')].some(row=>Number(row.dataset.dayOff)===off))return i;
@@ -5264,43 +5265,53 @@ function scrollMetricToDay(car,off,behavior){
  const i=off===0?0:metricPageForDay(car,off);
  if(i<0)return;
  const left=i*car.clientWidth;
- if(Math.abs(car.scrollLeft-left)>1){car._metricSyncUntil=Date.now()+800;car.scrollTo({left,behavior:behavior||'instant'});}
+ if(Math.abs(car.scrollLeft-left)>1)car.scrollTo({left,behavior:behavior||'instant'});
  dots(car);
 }
+function releaseMetricLeader(){
+ const lead=metricLeader&&$(metricLeader);
+ if(!lead)return;
+ const other=$(metricLeader==='sugarCar'?'insulinCar':'sugarCar');
+ syncingMetric=true;
+ if(other&&other.clientWidth&&lead.clientWidth){
+  other.scrollLeft=lead.scrollLeft/lead.clientWidth*other.clientWidth;
+  other.style.scrollSnapType='';
+ }
+ selectedMetricDay=metricDayForPage(lead);
+ syncingMetric=false;
+ metricLeader=null;
+}
 function syncMetricScroll(car){
- if(syncingMetric||Date.now()<(car._metricSyncUntil||0))return;
+ if(syncingMetric||!car||!car.clientWidth)return;
  if(car.id!=='sugarCar'&&car.id!=='insulinCar')return;
  if(metricLeader&&metricLeader!==car.id)return;
  const other=$(car.id==='sugarCar'?'insulinCar':'sugarCar');
- if(!other||!other.clientWidth||!car.clientWidth)return;
- metricLeader=car.id;
- clearTimeout(metricLeaderTimer);
- metricLeaderTimer=setTimeout(()=>{
-  if(metricLeader===car.id){
-   syncingMetric=true;
-   const i=carouselIndex(car);
-   other._metricSyncUntil=Date.now()+180;
-   other.scrollTo({left:i*other.clientWidth,behavior:'instant'});
-   selectedMetricDay=metricDayForPage(car);
-   syncingMetric=false;
-   metricLeader=null;
-  }
- },220);
+ if(!other||!other.clientWidth)return;
+ if(!metricLeader){
+  metricLeader=car.id;
+  other.style.scrollSnapType='none';
+ }
+ clearTimeout(metricIdleTimer);
  syncingMetric=true;
- other._metricSyncUntil=Date.now()+320;
  const target=car.scrollLeft/car.clientWidth*other.clientWidth;
- if(Math.abs(other.scrollLeft-target)>0.5)other.scrollLeft=target;
- selectedMetricDay=metricDayForPage(car);
+ if(Math.abs(other.scrollLeft-target)>.1)other.scrollLeft=target;
  syncingMetric=false;
+ selectedMetricDay=metricDayForPage(car);
+ // Даём ведущей завершить инерцию и scroll-snap, затем отпускаем ведомую.
+ metricIdleTimer=setTimeout(releaseMetricLeader,180);
 }
 window.showDayInMetrics=function(off){
  off=Math.max(-(DAYS-1),Math.min(0,Math.trunc(Number(off)||0)));
  selectedMetricDay=off;
+ clearTimeout(metricIdleTimer);
+ if(metricLeader){
+  const companion=$(metricLeader==='sugarCar'?'insulinCar':'sugarCar');
+  if(companion)companion.style.scrollSnapType='';
+ }
  metricLeader=null;
- clearTimeout(metricLeaderTimer);
  syncingMetric=true;
- scrollMetricToDay($('sugarCar'),off,'smooth');
- scrollMetricToDay($('insulinCar'),off,'smooth');
+ scrollMetricToDay($('sugarCar'),off,'instant');
+ scrollMetricToDay($('insulinCar'),off,'instant');
  syncingMetric=false;
 };
 function setup(car){
@@ -5308,14 +5319,24 @@ function setup(car){
  car._dcReady=true;
  const lead=()=>{
   if(car.id!=='sugarCar'&&car.id!=='insulinCar')return;
+  if(metricLeader&&metricLeader!==car.id){
+   const previous=$(metricLeader==='sugarCar'?'insulinCar':'sugarCar');
+   if(previous)previous.style.scrollSnapType='';
+  }
   metricLeader=car.id;
-  car._metricSyncUntil=0;
-  clearTimeout(metricLeaderTimer);
+  clearTimeout(metricIdleTimer);
+  const other=$(car.id==='sugarCar'?'insulinCar':'sugarCar');
+  if(other)other.style.scrollSnapType='none';
  };
  car.addEventListener('pointerdown',lead,{passive:true});
  car.addEventListener('touchstart',lead,{passive:true});
  let raf=0;
- car.addEventListener('scroll',()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;dots(car);fit(car);syncMetricScroll(car);});},{passive:true});
+ car.addEventListener('scroll',()=>{
+  // Не откладываем копирование позиции до requestAnimationFrame.
+  syncMetricScroll(car);
+  if(raf)return;
+  raf=requestAnimationFrame(()=>{raf=0;dots(car);fit(car);});
+ },{passive:true});
  if(typeof ResizeObserver==='function'){
   const ro=new ResizeObserver(()=>fit(car));
   ro.observe(car);ro.observe(car.children[0]);
@@ -5354,8 +5375,14 @@ function render(){
  const sugarRows=offs.map(o=>sugarRow(o,ix,t));
  const insulinRows=offs.map(o=>insulinRow(o,ix));
  const paired=coupledMetricPages(pack($('sugarCar'),'sugar',sugarRows),pack($('insulinCar'),'insulin',insulinRows),sugarRows,insulinRows);
+ syncingMetric=true;
+ clearTimeout(metricIdleTimer);
+ metricLeader=null;
+ $('sugarCar').style.scrollSnapType='';
+ $('insulinCar').style.scrollSnapType='';
  mount('sugarCar',paired.sugar);
  mount('insulinCar',paired.insulin);
+ syncingMetric=false;
  const nights=[];
  for(let o=1;o>-(DAYS-1);o--){const r=nightRow(o,ix,t);if(r)nights.push(r);}
  const head='<div class="dn-head"><span>Ночь на</span><span>Вечер</span><span>Доза</span><span>Утро</span><span>Δ</span></div>';
