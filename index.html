@@ -1793,7 +1793,9 @@ async function api(action,extra={}){
   error.status=response.status;
   throw error;
  }
- return data.result;
+ // Для новой записи сахара возвращаем ещё одноразовый билет анализа.
+ // Для всех остальных действий контракт api() остаётся прежним.
+ return action==='sugar'?{message:data.result,analysisTicket:data.analysis_ticket}:data.result;
 }
 
 // ============================================================
@@ -2158,11 +2160,11 @@ function updateSugarAi(status, data, errorText=''){
   meta.textContent='Сахар успешно сохранён.';
  }
 }
-async function runSugarAiAfterSave(savedValue){
+async function runSugarAiAfterSave(savedValue, ticket){
  const seq=++sugarAiSequence;
  updateSugarAi('loading');
  try{
-  const result=await api('ai_analyze',{expected_value:savedValue});
+  const result=await api('ai_analyze',{expected_value:savedValue,ticket});
   if(seq===sugarAiSequence)updateSugarAi('ready',result);
  }catch(error){
   if(seq===sugarAiSequence){
@@ -2238,7 +2240,7 @@ async function saveValue(type){
  let saved=false;
  try{
   const result=await api(type,{value});
-  setToast(toast,'✓ '+result,'success');
+  setToast(toast,'✓ '+(type==='sugar'?result.message:result),'success');
   saved=true;
   showSaveSuccess(button);
   input.value='';
@@ -2249,7 +2251,7 @@ async function saveValue(type){
   if(type==='sugar'){
    renderLatestMeasurement('sugar',value.replace(',','.'),formatLatestTime(new Date()));
    // Намеренно не await: сохранение сахара никак не зависит от Groq.
-   runSugarAiAfterSave(value.replace(',','.'));
+   runSugarAiAfterSave(value.replace(',','.'),result.analysisTicket);
    await refreshHomeAfterChange(type);
   }
   if(type==='insulin'){
