@@ -676,27 +676,54 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .carousel-dots{display:flex;justify-content:center;gap:6px;margin:6px 0 8px}
 .carousel-dots i{width:6px;height:6px;border-radius:3px;background:var(--muted);opacity:.3;transition:opacity .2s,width .2s}
 .carousel-dots i.on{opacity:.85;width:16px}
-/* --- Карточка дня (сегодня/вчера): та же высота, что у главной карточки ночного --- */
-.metric.night-day{padding:12px 14px;display:flex;flex-direction:column;overflow:hidden}
-.nd-head{display:flex;align-items:baseline;gap:8px;margin-bottom:6px;white-space:nowrap}
-.nd-title{font-size:16px;font-weight:750}
-.nd-date{font-size:12px;color:var(--muted)}
-.nd-sum{margin-left:auto;display:flex;gap:10px;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
-.nd-sum b{color:var(--text);font-weight:750}
-.nd-body{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
-.nd-col{min-width:0;min-height:0;display:flex;flex-direction:column}
-.nd-col-title{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:2px;flex:none}
-/* значения идут столбиками по 3 строки, время растёт сверху вниз и слева направо;
-   если столбцов больше двух, пролистывается только эта половина (инсулин или сахар) */
-.nd-grid{flex:1;min-height:0;display:grid;grid-template-rows:repeat(5,minmax(0,auto));grid-auto-flow:column;grid-auto-columns:max-content;column-gap:14px;align-content:start;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch}
-.nd-grid::-webkit-scrollbar{display:none}
-.nd-cell{display:flex;align-items:center;gap:5px;white-space:nowrap;font-size:13px;line-height:1.15;font-variant-numeric:tabular-nums}
-.nd-cell:nth-child(5n+1){scroll-snap-align:start}
-.nd-cell i{font-style:normal;font-size:11px;color:var(--muted)}
-.nd-cell b{font-weight:750}
-.nd-ins b{color:var(--teal)}
-.nd-sug b{color:var(--pink)}
-.nd-empty{font-size:13px;color:var(--muted)}
+/* --- Дни на карточках: сахар, инсулин, ночной (по три дня, листаются вбок) --- */
+.yd-group.off{display:none!important}
+.dc{margin:2px 0 12px}
+.dc-car{display:flex;align-items:stretch;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.dc-car::-webkit-scrollbar{display:none}
+.dc-page{flex:0 0 100%;min-width:0;box-sizing:border-box;scroll-snap-align:start;scroll-snap-stop:always;display:flex;flex-direction:column}
+.dc-row{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--line)}
+.dc-row:first-child{border-top:0}
+.dc-day{flex:none;width:66px;display:flex;flex-direction:column;line-height:1.2}
+.dc-day b{font-size:13px;font-weight:750}
+.dc-day span{font-size:11px;color:var(--muted)}
+.dc-day em{font-style:normal;font-size:11px;font-weight:700;margin-top:2px;color:var(--pink)}
+.dc-ins .dc-day em{color:var(--teal)}
+.dc-chips{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:3px 11px;align-content:flex-start;padding-top:1px}
+.dc-chip{display:inline-flex;align-items:baseline;gap:4px;white-space:nowrap;font-size:14px;font-variant-numeric:tabular-nums}
+.dc-chip i{font-style:normal;font-size:10.5px;color:var(--muted)}
+.dc-chip b{font-weight:750}
+.dc-chip b.lo{color:#e2484d}
+.dc-chip b.hi{color:#d9831a}
+.dc-ins .dc-chip b{color:var(--teal)}
+.dc-ins .dc-chip.dc-night{padding:0 8px 0 6px;border-radius:99px;background:rgba(112,100,235,.14)}
+.dc-ins .dc-chip.dc-night b{color:#6a5ce0}
+.dc-none{font-size:12.5px;color:var(--muted)}
+.dc-sk{height:44px;margin:6px 0;border-radius:12px;background:linear-gradient(90deg,var(--line) 25%,var(--nav-highlight) 50%,var(--line) 75%);background-size:200% 100%;animation:metricShimmer 1.2s linear infinite}
+.dc-err{padding:14px 0;font-size:13px;color:var(--muted);text-align:center}
+.dc-dots{margin:6px 0 0}
+.dn-head,.dn-row{display:grid;grid-template-columns:46px repeat(3,minmax(0,1fr)) 54px;gap:6px;align-items:center}
+.dn-head{font-size:10.5px;font-weight:700;color:var(--muted);padding:0 0 4px;text-align:center}
+.dn-head span:first-child{text-align:left}
+.dn-row{padding:6px 0;border-top:1px solid var(--line)}
+.dn-day{line-height:1.2}
+.dn-day b{display:block;font-size:13px;font-weight:750}
+.dn-day span{font-size:10.5px;color:var(--muted)}
+.dn-c{text-align:center;line-height:1.15;min-width:0}
+.dn-c b{display:block;font-size:18px;font-weight:800;font-variant-numeric:tabular-nums}
+.dn-c b.lo{color:#e2484d}
+.dn-c b.hi{color:#d9831a}
+.dn-c b.none{color:var(--muted);font-weight:600}
+.dn-c span{font-size:10.5px;color:var(--muted)}
+.dn-dose b{color:#6a5ce0}
+.dn-d{justify-self:end;font-size:12px;font-weight:750;padding:3px 7px;border-radius:99px;font-variant-numeric:tabular-nums;background:rgba(125,135,170,.15);color:var(--muted);white-space:nowrap}
+.dn-d.down{background:rgba(32,169,155,.16);color:#17867b}
+.dn-d.up{background:rgba(245,166,35,.18);color:#b3730b}
+.dn-d.lo{background:rgba(226,72,77,.16);color:#c93a3f}
+:root[data-theme="dark"] .dn-dose b,:root[data-theme="dark"] .dc-ins .dc-chip.dc-night b{color:#a99dff}
+:root[data-theme="dark"] .dn-d.down{color:#6fe0d0}
+:root[data-theme="dark"] .dn-d.up{color:#ffc46b}
+:root[data-theme="dark"] .dn-d.lo{color:#ff8a8e}
 
 /* --- комментарий к визиту --- */
 .doctor-comment-card{background:var(--card-grad);border:1px solid var(--card-border);border-radius:21px;padding:10px 14px;margin-bottom:0;box-shadow:var(--shadow)}
@@ -967,6 +994,7 @@ button.st-ico:active{transform:scale(.88)}
 <div class="metric-skeleton short"></div>
 </div>
 </div>
+<div class="dc" id="sugarDays"><div class="dc-car"><div class="dc-page"><div class="dc-sk"></div><div class="dc-sk"></div><div class="dc-sk"></div></div></div><div class="carousel-dots dc-dots"></div></div>
 <div class="input-row">
 <input class="value-input" id="sugarInput" type="text" inputmode="decimal" placeholder="" aria-label="Новое значение сахара">
 <button class="undo-button" type="button" onclick="undoValue('sugar')" aria-label="Отменить последнюю запись сахара" title="Отменить последнюю запись">↩︎</button>
@@ -987,6 +1015,7 @@ button.st-ico:active{transform:scale(.88)}
 <div class="metric-skeleton short"></div>
 </div>
 </div>
+<div class="dc dc-ins" id="insulinDays"><div class="dc-car"><div class="dc-page"><div class="dc-sk"></div><div class="dc-sk"></div><div class="dc-sk"></div></div></div><div class="carousel-dots dc-dots"></div></div>
 <div class="input-row">
 <input class="value-input" id="insulinInput" type="number" inputmode="numeric" step="1" min="0" max="15" placeholder="" aria-label="Новое значение инсулина">
 <button class="undo-button" type="button" onclick="undoValue('insulin')" aria-label="Отменить последнюю запись инсулина" title="Отменить последнюю запись">↩︎</button>
@@ -1011,7 +1040,6 @@ button.st-ico:active{transform:scale(.88)}
 </div>
 </section>
 <!-- --- Карточка: инсулин (ночной) --- -->
-<div class="carousel shadowfix" id="nightCarousel" data-size="first">
 <section class="metric insulin night">
 <div class="metric-head">
 <div class="metric-icon">🌙</div>
@@ -1025,6 +1053,7 @@ button.st-ico:active{transform:scale(.88)}
 <div class="metric-skeleton short"></div>
 </div>
 </div>
+<div class="dc dn" id="nightDays"><div class="dc-car"><div class="dc-page"><div class="dc-sk"></div><div class="dc-sk"></div><div class="dc-sk"></div></div></div><div class="carousel-dots dc-dots"></div></div>
 <div class="input-row">
 <input class="value-input" id="nightInput" type="text" inputmode="decimal" placeholder="Еще не скоро" aria-label="Новое ночное значение">
 <button class="undo-button" type="button" onclick="undoValue('fact')" aria-label="Отменить последнюю запись ночного значения" title="Отменить последнюю запись">↩︎</button>
@@ -1032,11 +1061,6 @@ button.st-ico:active{transform:scale(.88)}
 </div>
 <div class="toast" id="nightToast"></div>
 </section>
-<section class="metric insulin night night-day" id="nightDayToday"><div class="nd-empty">Загружаю…</div></section>
-<section class="metric insulin night night-day" id="nightDayYesterday"><div class="nd-empty">Загружаю…</div></section>
-<section class="metric insulin night night-day" id="nightDayBefore"><div class="nd-empty">Загружаю…</div></section>
-</div>
-<div class="carousel-dots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i></div>
 <div class="quick-title">
 <div class="section-title">Быстрый доступ</div>
 <span></span>
@@ -1244,6 +1268,7 @@ button.st-ico:active{transform:scale(.88)}
 <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.2" fill="currentColor"/><path d="M12 11v5.4" style="stroke:var(--ic)" stroke-width="2.3" stroke-linecap="round"/><circle cx="12" cy="7.7" r="1.4" style="fill:var(--ic)"/></symbol>
 <symbol id="i-spark" viewBox="0 0 24 24"><path d="M11 2.8l2.3 5.7 5.7 2.3-5.7 2.3L11 18.8l-2.3-5.7L3 10.8l5.7-2.3z" fill="currentColor"/><path d="M18.6 15.2l.9 2.2 2.2.9-2.2.9-.9 2.2-.9-2.2-2.2-.9 2.2-.9z" fill="currentColor"/></symbol>
 <symbol id="i-tg" viewBox="0 0 24 24"><path d="M20.8 4.3L3.4 11c-.9.35-.85 1.6.07 1.85l4.3 1.25 1.6 5.1c.25.8 1.3.95 1.8.3l2.3-2.9 4.2 3.1c.7.5 1.65.1 1.85-.75l2.7-12.9c.2-.85-.7-1.55-1.5-1.25z" fill="currentColor"/></symbol>
+<symbol id="i-meal" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="currentColor"/><circle cx="12" cy="12" r="5" style="fill:var(--ic)"/></symbol>
 <symbol id="i-grip" viewBox="0 0 18 14"><path d="M1.5 2h15M1.5 7h15M1.5 12h15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
 </defs></svg>
 <div class="st-page active" data-p="root">
@@ -1257,7 +1282,6 @@ button.st-ico:active{transform:scale(.88)}
 <button class="st-row has-ico st-nav" type="button" onclick="stOpen('timer')"><span class="st-ico c-orange"><svg class="g"><use href="#i-timer"/></svg></span><span class="st-t">Таймер инсулина</span><span class="st-val" id="stV-timer"></span><svg class="st-chev"><use href="#i-chev"/></svg></button>
 <button class="st-row has-ico st-nav" type="button" onclick="stOpen('report')"><span class="st-ico c-blue"><svg class="g"><use href="#i-cal"/></svg></span><span class="st-t">Ежедневный отчёт</span><span class="st-val" id="stV-report"></span><svg class="st-chev"><use href="#i-chev"/></svg></button>
 <button class="st-row has-ico st-nav" type="button" onclick="stOpen('target')"><span class="st-ico c-green"><svg class="g"><use href="#i-target"/></svg></span><span class="st-t">Целевой диапазон</span><span class="st-val" id="stV-target"></span><svg class="st-chev"><use href="#i-chev"/></svg></button>
-<button class="st-row has-ico st-nav" type="button" onclick="stOpen('charts')"><span class="st-ico c-purple"><svg class="g"><use href="#i-chart"/></svg></span><span class="st-t">Настройка графиков</span><span class="st-val" id="stV-charts"></span><svg class="st-chev"><use href="#i-chev"/></svg></button>
 </div>
 <div class="st-card">
 <button class="st-row has-ico st-nav" type="button" onclick="stOpen('theme')"><span class="st-ico c-sky"><svg class="g"><use href="#i-theme"/></svg></span><span class="st-t">Оформление</span><span class="st-val" id="stV-theme"></span><svg class="st-chev"><use href="#i-chev"/></svg></button>
@@ -1332,6 +1356,11 @@ button.st-ico:active{transform:scale(.88)}
 <div class="st-card">
 <div class="st-row two has-ico"><span class="st-ico c-sky"><svg class="g"><use href="#i-theme"/></svg><span id="themeIcon" hidden></span></span><div class="st-copy"><div class="st-t">Тёмная тема</div><div class="st-desc st-s" id="themeDescription">Комфортное оформление в темноте</div></div><button class="st-sw" id="themeSwitch" type="button" onclick="toggleTheme()" aria-label="Переключить тему"><span id="themeSwitchIcon"></span></button></div>
 </div>
+
+<div class="st-card"><button class="st-row has-ico st-nav" type="button" onclick="stOpen('charts')"><span class="st-ico c-purple"><svg class="g"><use href="#i-chart"/></svg></span><span class="st-t">Настройка графиков</span><span class="st-val" id="stV-charts"></span><svg class="st-chev"><use href="#i-chev"/></svg></button>
+<div class="st-row two has-ico"><span class="st-ico c-orange"><svg class="g"><use href="#i-meal"/></svg></span><div class="st-copy"><div class="st-t">Скрыть карточку «завтрак / ужин»</div><div class="st-desc st-s">Первая карточка на главной</div></div><button class="st-sw" id="hideMealSwitch" type="button" aria-pressed="false" aria-label="Скрыть карточку завтрака и ужина на главной"><span></span></button></div>
+</div>
+<div class="st-foot">Настройка графиков и скрытие карточки общие для всех пользователей бота.</div>
 </div>
 
 <div class="st-page" data-p="charts">
@@ -1360,7 +1389,7 @@ button.st-ico:active{transform:scale(.88)}
 </div>
 
 <div class="st-page" data-p="changes">
-<div class="st-bar"><button class="st-back" type="button" onclick="stOpen('about')" aria-label="Назад"><svg><use href="#i-back"/></svg></button><div class="st-title">Что нового</div></div>
+<div class="st-bar"><button class="st-back" type="button" onclick="stBack()" aria-label="Назад"><svg><use href="#i-back"/></svg></button><div class="st-title">Что нового</div></div>
 <div id="changeLog"></div>
 </div>
 </section>
@@ -2333,39 +2362,6 @@ function setupCarousel(scroller){
  }
  fitCarousel(scroller);
 }
-// Разбор текста отчёта (как в команде /today) на значения инсулина и сахара
-function parseDayReport(text){
- const t=String(text==null?'':text);
- const [head,...rest]=t.split('🍭');
- const sugarPart=rest.join('🍭');
- const grab=part=>[...part.matchAll(/^\s*(\d{1,2}:\d{2})\s*=\s*(.*?)\s*$/gm)].map(m=>({t:m[1],v:m[2]}));
- const date=/(\d{2}\.\d{2}\.\d{4})/.exec(head);
- const total=/Итого\s*=\s*(-?\d+(?:[.,]\d+)?)/.exec(head);
- const avg=/Среднее\s*=\s*([^\n]+)/.exec(sugarPart);
- let night=null;
- try{night=formatNightFact(t).text;}catch(error){night=null;}
- const byTime=(x,y)=>x.t.padStart(5,'0')<y.t.padStart(5,'0')?-1:x.t.padStart(5,'0')>y.t.padStart(5,'0')?1:0;
- return {date:date?date[1]:'',insulin:grab(head).sort(byTime),sugar:grab(sugarPart).sort(byTime),total:total?total[1]:null,avg:avg?avg[1].trim():null,night};
-}
-function renderNightDay(id,text,title){
- const el=document.getElementById(id);
- if(!el)return;
- if(text==null||String(text).trim()===''){
-  el.innerHTML='<div class="nd-head"><span class="nd-title">'+escapeHtml(title)+'</span></div><div class="nd-empty">Нет данных</div>';
- }else{
-  const d=parseDayReport(text);
-  const chips=(items,cls)=>items.length?'<div class="nd-grid">'+items.map(x=>'<div class="nd-cell '+cls+'"><i>'+escapeHtml(x.t.padStart(5,'0'))+'</i><b>'+escapeHtml(x.v)+'</b></div>').join('')+'</div>':'<div class="nd-empty">—</div>';
-  const shortDate=d.date?d.date.slice(0,5):'';
-  el.innerHTML='<div class="nd-head"><span class="nd-title">'+escapeHtml(title)+'</span>'+(shortDate?'<span class="nd-date">'+escapeHtml(shortDate)+'</span>':'')
-   +'<span class="nd-sum"><span>Итого <b>'+escapeHtml(d.total!==null?d.total:'—')+'</b></span><span>🌙 <b>'+escapeHtml(d.night!==null?d.night:'—')+'</b></span><span>Ср <b>'+escapeHtml(d.avg||'—')+'</b></span></span></div>'
-   +'<div class="nd-body"><div class="nd-col"><div class="nd-col-title">💉 Инсулин</div>'+chips(d.insulin,'nd-ins')+'</div>'
-   +'<div class="nd-col"><div class="nd-col-title">🍭 Сахар</div>'+chips(d.sugar,'nd-sug')+'</div></div>';
- }
- const car=document.getElementById('nightCarousel');
- setupCarousel(car);
- if(car)car._sig=null;
- fitCarousel(car);
-}
 function renderNightFact(rawValue, loading = false){
   const container=document.getElementById('nightFact');
   if(!container)return;
@@ -2399,9 +2395,7 @@ function applyHomeData(data){
  put('sugarAverage','ммоль/л',data.sugar_average);
  put('insulinTotal','ед.',data.insulin_total);
  renderNightFact(data.today);
- renderNightDay('nightDayToday',data.today,'Сегодня');
- renderNightDay('nightDayYesterday',data.yesterday,'Вчера');
- renderNightDay('nightDayBefore',data.day_before,'Позавчера');
+ if(window.refreshDayCards)window.refreshDayCards(true);
  renderMealCards(data);
  const yesterday=document.getElementById('nightYesterday');
  if(yesterday){
@@ -2475,7 +2469,6 @@ async function loadNightFact(){
   try{
    const today=await api('today');
    renderNightFact(today);
-   renderNightDay('nightDayToday',today,'Сегодня');
    setAccess(true,'Сервер подтвердил доступ');
   }catch(error){
    showMetricError(element,true);
@@ -3373,7 +3366,6 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden){updateEnt
 if(tg)tg.onEvent?.('activated',()=>{updateEntryPlaceholders();updateInsulinTimer();});
 updateNightInputPlaceholder();
 setInterval(updateNightInputPlaceholder,60_000);
-setupCarousel(document.getElementById('nightCarousel'));
 loadHomeCards(true);
 
 // --- Инициализация пилюли навигации ---
@@ -4757,7 +4749,8 @@ window.stOpen=function(name){
   if(typeof selectionHaptic==='function')selectionHaptic();
   stRefresh();
 };
-window.stBack=function(){stOpen('root');};
+const ST_PARENT={charts:'theme',changes:'about'};
+window.stBack=function(){const cur=document.querySelector('#screen-settings .st-page.active');stOpen((cur&&ST_PARENT[cur.dataset.p])||'root');};
 const sec=$('screen-settings');
 function edgeBack(get){
   let g=null,busy=false;
@@ -4815,7 +4808,7 @@ edgeBack(()=>{
   if(!sec.classList.contains('active'))return null;
   const top=sec.querySelector('.st-page.active');
   if(!top||top.dataset.p==='root')return null;
-  return {top,under:sec.querySelector('[data-p="root"]'),back:stBack};
+  return {top,under:sec.querySelector('[data-p="'+(ST_PARENT[top.dataset.p]||'root')+'"]'),back:stBack};
 });
 edgeBack(()=>{
   const top=$('screen-doctor');
@@ -4847,9 +4840,15 @@ stRefresh();
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const APP_VERSION='v20261024_1';          /* ← менять при каждом обновлении: vГГГГММДД_N */
+const APP_VERSION='v20261024_2';          /* ← менять при каждом обновлении: vГГГГММДД_N */
 const DEV_CHAT='https://t.me/larik_11';
 const APP_CHANGES=[
+ {v:'v20261024_2',items:[
+  'Ночной: три ночи на одной карточке — вечерний сахар, доза и утренний сахар; листай вбок, чтобы увидеть дальше',
+  'Сахар и инсулин: значения за несколько дней на одной карточке, у инсулина — вместе с ночной дозой',
+  'Настройка графиков теперь в разделе «Оформление»',
+  'В «Оформлении» можно скрыть карточку «завтрак / ужин» на главной — для всех пользователей'
+ ]},
  {v:'v20261024_1',items:[
   'Карточки «Вчера» и «Сегодня» одного размера, даже если данных за сегодня ещё нет',
   'Завтрак и ужин — две стороны карточки: проведи вверх или вниз, чтобы перевернуть',
@@ -4868,7 +4867,7 @@ function norm(v){
  CH_IDS.forEach(i=>{if(!order.includes(i))order.push(i);});
  let hidden=v&&Array.isArray(v.hidden)?order.filter(i=>v.hidden.includes(i)):[];
  if(hidden.length>=order.length)hidden=[];
- return {order,hidden};
+ return {order,hidden,hideMeal:!!(v&&(v.hide_meal||v.hideMeal))};
 }
 let cs=norm(null);
 try{cs=norm(JSON.parse(localStorage.getItem(LS)||'null'));}catch(e){}
@@ -4894,6 +4893,10 @@ function applyTabs(){
    bar.querySelectorAll('.analytics-tab').forEach(b=>{const a=b.dataset.chart===first;b.classList.toggle('active',a);b.setAttribute('aria-selected',String(a));});
   }
  }
+}
+function applyHideMeal(){
+ const g=$('ydGroup');if(g)g.classList.toggle('off',cs.hideMeal);
+ const b=$('hideMealSwitch');if(b)b.setAttribute('aria-pressed',String(cs.hideMeal));
 }
 function updateValue(){
  const e=$('stV-charts');
@@ -4934,7 +4937,7 @@ function adopt(r){
  const orderChanged=JSON.stringify(n.order)!==JSON.stringify(cs.order);
  cs=n;csJson=j;
  try{localStorage.setItem(LS,j);}catch(e){}
- applyTabs();updateValue();
+ applyTabs();applyHideMeal();updateValue();
  if(!csDragging&&$('chartList')&&$('chartList').children.length)renderList(orderChanged);
 }
 async function load(){
@@ -4945,7 +4948,7 @@ async function save(){
  const seq=++csSeq;csSaving++;
  const toast=$('chartsToast');
  try{
-  const r=await api('chart_settings_set',{order:cs.order,hidden:cs.hidden});
+  const r=await api('chart_settings_set',{order:cs.order,hidden:cs.hidden,hide_meal:cs.hideMeal});
   if(seq===csSeq){csSaving--;adopt(r);csSaving++;}
   setToast(toast,'');
  }catch(e){
@@ -4957,7 +4960,7 @@ async function save(){
 function commit(){
  csJson=JSON.stringify(cs);
  try{localStorage.setItem(LS,csJson);}catch(e){}
- applyTabs();updateValue();save();
+ applyTabs();applyHideMeal();updateValue();save();
 }
 function toggle(id){
  const hide=!cs.hidden.includes(id);
@@ -5084,12 +5087,156 @@ window.switchTab=function(name){
  if(name==='settings'||name==='graphs')load();
  return r;
 };
-applyTabs();updateValue();
+applyTabs();applyHideMeal();updateValue();
+document.addEventListener('click',e=>{
+ if(e.target.closest&&e.target.closest('#hideMealSwitch')){cs.hideMeal=!cs.hideMeal;selectionHaptic();setToast($('chartsToast'),'');commit();}
+});
 const vv=$('stV-about');if(vv)vv.textContent=APP_VERSION;
 initDrag();
 setInterval(()=>{if(!document.hidden)load();},8000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)load();});
 load();
+})();
+</script>
+<script>
+/* Карточки дней: сахар, инсулин (с ночной дозой) и «ночной» (вечер → доза → утро) */
+(function(){
+const $=id=>document.getElementById(id);
+const DAYS=45,PER_PAGE=3;
+const EVENING_FROM=18*60;                    /* вечерний сахар — последний замер после 18:00 предыдущего дня */
+const MORNING_FROM=4*60,MORNING_TO=12*60;    /* утренний — первый замер с 4:00 до 12:00 */
+const WD=['вс','пн','вт','ср','чт','пт','сб'];
+const pad=n=>String(n).padStart(2,'0');
+let hist=null,histAt=0,histPromise=null,failed=false;
+function fetchHist(){
+ return api('history',{days:DAYS}).then(r=>{hist={rows:normalizeHistory(r),doses:normalizeDoses(r)};histAt=Date.now();failed=false;return hist;});
+}
+function getHistory(force){
+ if(!force&&hist&&Date.now()-histAt<20000)return Promise.resolve(hist);
+ if(histPromise&&!force)return histPromise;
+ const prev=histPromise||Promise.resolve();
+ const p=prev.catch(()=>{}).then(fetchHist);
+ histPromise=p;
+ p.then(()=>{if(histPromise===p)histPromise=null;},()=>{if(histPromise===p)histPromise=null;});
+ return p;
+}
+function dayInfo(off){
+ const d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()+off);
+ const name=off===0?'Сегодня':off===-1?'Вчера':off===-2?'Позавчера':WD[d.getDay()].replace(/^./,c=>c.toUpperCase());
+ return {key:dateKey(d),dm:pad(d.getDate())+'.'+pad(d.getMonth()+1),wd:WD[d.getDay()],name};
+}
+function index(h){
+ const sugar=new Map(),ins=new Map();
+ h.rows.forEach(r=>{
+  const m=r.type==='sugar'?sugar:ins;
+  if(!m.has(r.dateKey))m.set(r.dateKey,[]);
+  m.get(r.dateKey).push({m:r.timeObj.minutes,t:r.timeObj.text,v:r.value});
+ });
+ return {sugar,ins,night:h.doses.night};
+}
+function target(){
+ const rs=typeof reportSettings!=='undefined'&&reportSettings?reportSettings:{};
+ const lo=Number(rs.target_low),hi=Number(rs.target_high);
+ return {lo:Number.isFinite(lo)&&lo>0?lo:3.9,hi:Number.isFinite(hi)&&hi>0?hi:10};
+}
+const fs=v=>(Math.round(v*10)/10).toFixed(1).replace('.',',');
+const cls=(v,t)=>v<t.lo?'lo':v>t.hi?'hi':'ok';
+function pages(items,wrap){
+ let html='';
+ for(let i=0;i<items.length;i+=PER_PAGE)html+='<div class="dc-page">'+(wrap?wrap(items.slice(i,i+PER_PAGE)):items.slice(i,i+PER_PAGE).join(''))+'</div>';
+ return html;
+}
+function sugarRow(off,ix,t){
+ const d=dayInfo(off),list=ix.sugar.get(d.key)||[];
+ const avg=list.length?list.reduce((a,x)=>a+x.v,0)/list.length:null;
+ const chips=list.length?list.map(x=>'<span class="dc-chip"><i>'+x.t+'</i><b class="'+cls(x.v,t)+'">'+fs(x.v)+'</b></span>').join(''):'<span class="dc-none">нет замеров</span>';
+ return '<div class="dc-row"><div class="dc-day"><b>'+d.name+'</b><span>'+d.dm+'</span>'+(avg!==null?'<em>ср '+fs(avg)+'</em>':'')+'</div><div class="dc-chips">'+chips+'</div></div>';
+}
+function insulinRow(off,ix){
+ const d=dayInfo(off),list=ix.ins.get(d.key)||[],n=ix.night.get(d.key);
+ const sum=list.reduce((a,x)=>a+x.v,0);
+ let chips=list.map(x=>'<span class="dc-chip"><i>'+x.t+'</i><b>'+fmtDose(x.v)+'</b></span>').join('');
+ if(n)chips+='<span class="dc-chip dc-night" title="Ночной"><i>🌙</i><b>'+(n.approx?'≈':'')+fmtDose(n.value)+'</b></span>';
+ if(!chips)chips='<span class="dc-none">нет уколов</span>';
+ return '<div class="dc-row"><div class="dc-day"><b>'+d.name+'</b><span>'+d.dm+'</span>'+(list.length?'<em>Σ '+fmtDose(sum)+'</em>':'')+'</div><div class="dc-chips">'+chips+'</div></div>';
+}
+function nightRow(off,ix,t){
+ const D=dayInfo(off),E=dayInfo(off-1);
+ let ev=null;
+ (ix.sugar.get(E.key)||[]).forEach(x=>{if(x.m>=EVENING_FROM)ev=x;});
+ const mo=(ix.sugar.get(D.key)||[]).find(x=>x.m>=MORNING_FROM&&x.m<MORNING_TO)||null;
+ const dose=ix.night.get(E.key)||null;
+ if(!ev&&!mo&&!dose)return null;
+ const cell=(x,c)=>x?'<div class="dn-c"><b class="'+c+'">'+fs(x.v)+'</b><span>'+x.t+'</span></div>':'<div class="dn-c"><b class="none">—</b><span>&nbsp;</span></div>';
+ const doseCell=dose?'<div class="dn-c dn-dose"><b>'+(dose.approx?'≈':'')+fmtDose(dose.value)+'</b><span>'+(dose.fact?'факт':dose.approx?'расчёт':'')+'&nbsp;</span></div>':'<div class="dn-c dn-dose"><b class="none">—</b><span>&nbsp;</span></div>';
+ let delta='<span class="dn-d">—</span>';
+ if(ev&&mo){
+  const diff=Math.round((mo.v-ev.v)*10)/10;
+  const c=mo.v<t.lo?'lo':diff<0?'down':diff>0?'up':'';
+  delta='<span class="dn-d '+c+'">'+(diff>0?'+':diff<0?'−':'')+fs(Math.abs(diff))+'</span>';
+ }
+ return '<div class="dn-row"><div class="dn-day"><b>'+D.dm+'</b><span>'+(off===1?'сейчас':off===0?'сегодня':D.wd)+'</span></div>'
+  +cell(ev,ev?cls(ev.v,t):'')+doseCell+cell(mo,mo?cls(mo.v,t):'')+delta+'</div>';
+}
+function mount(id,html,count){
+ const box=$(id);
+ if(!box)return;
+ const car=box.querySelector('.dc-car');
+ const w=car.clientWidth||1,keep=Math.round(car.scrollLeft/w);
+ car.innerHTML=html;
+ box._count=count;
+ if(!car._dcReady){
+  car._dcReady=true;
+  let raf=0;
+  car.addEventListener('scroll',()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;dots(box);});},{passive:true});
+ }
+ car.scrollLeft=Math.min(keep,Math.max(0,count-1))*car.clientWidth;
+ dots(box);
+}
+function dots(box){
+ const car=box.querySelector('.dc-car'),el=box.querySelector('.dc-dots'),n=Math.min(5,box._count||1);
+ if(!el)return;
+ if(n<2){el.innerHTML='';return;}
+ const i=Math.round(car.scrollLeft/(car.clientWidth||1));
+ if(el.children.length!==n)el.innerHTML='<i></i>'.repeat(n);
+ const active=Math.min(i,n-1);
+ [...el.children].forEach((d,k)=>d.classList.toggle('on',k===active));
+ if(box._i!==undefined&&box._i!==i&&typeof selectionHaptic==='function')selectionHaptic();
+ box._i=i;
+}
+function render(){
+ if(!hist)return;
+ const ix=index(hist),t=target();
+ const offs=Array.from({length:DAYS},(_,i)=>-i);
+ const s=offs.map(o=>sugarRow(o,ix,t)),n=offs.map(o=>insulinRow(o,ix));
+ mount('sugarDays',pages(s),Math.ceil(s.length/PER_PAGE));
+ mount('insulinDays',pages(n),Math.ceil(n.length/PER_PAGE));
+ const nights=[];
+ for(let o=1;o>-(DAYS-1);o--){const r=nightRow(o,ix,t);if(r)nights.push(r);}
+ const head='<div class="dn-head"><span>Ночь на</span><span>Вечер</span><span>Доза</span><span>Утро</span><span>Δ</span></div>';
+ mount('nightDays',nights.length?pages(nights,rows=>head+rows.join('')):'<div class="dc-page"><div class="dc-err">Пока нет ночей с данными</div></div>',Math.max(1,Math.ceil(nights.length/PER_PAGE)));
+}
+function showError(){
+ if(hist)return;
+ ['sugarDays','insulinDays','nightDays'].forEach(id=>{
+  const car=$(id)&&$(id).querySelector('.dc-car');
+  if(car)car.innerHTML='<div class="dc-page"><div class="dc-err">Не удалось загрузить дни. Потяни вниз или зайди позже</div></div>';
+ });
+}
+window.refreshDayCards=function(force){
+ return getHistory(!!force).then(render).catch(error=>{
+  console.error('Ошибка загрузки дней для карточек:',error);
+  failed=true;showError();
+  if(typeof handleAccessError==='function')handleAccessError(error);
+ });
+};
+const sw=window.switchTab;
+window.switchTab=function(name){
+ const r=sw.apply(this,arguments);
+ if(name==='home')render();
+ return r;
+};
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&failed)window.refreshDayCards(true);});
 })();
 </script>
 </body>
