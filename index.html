@@ -4591,11 +4591,18 @@ function initYdGestures(car){
   if(car._dragged)return;
   if(e.target.closest('.yd-mealsw')){ydFlip(1);return;}
   if(e.target.closest('.yd-icon')&&ydGroup().classList.contains('away')){ydGoDefault();return;}
-  if(e.target.closest('.yd-top'))toggleTodayMeal();
+  if(e.target.closest('.yd-top')){
+   const page=e.target.closest('.yd-page');
+   if(page&&typeof window.showDayInMetrics==='function'){
+    const off=ydToday()+Number(page.dataset.k)-1-ydToday();
+    window.showDayInMetrics(off);
+   }
+   toggleTodayMeal();
+  }
  });
  car.addEventListener('keydown',e=>{
   if(!e.target.closest||!e.target.closest('.yd-top'))return;
-  if(e.key==='Enter'||e.key===' '){e.preventDefault();toggleTodayMeal();}
+  if(e.key==='Enter'||e.key===' '){e.preventDefault();const page=e.target.closest('.yd-page');if(page&&typeof window.showDayInMetrics==='function')window.showDayInMetrics(Number(page.dataset.k)-1);toggleTodayMeal();}
   else if(e.key==='ArrowUp'){e.preventDefault();ydFlip(1);}
   else if(e.key==='ArrowDown'){e.preventDefault();ydFlip(-1);}
  });
@@ -5182,7 +5189,7 @@ function sugarRow(off,ix,t){
  const d=dayInfo(off),list=ix.sugar.get(d.key)||[];
  const avg=list.length?list.reduce((a,x)=>a+x.v,0)/list.length:null;
  const chips=list.length?list.map(x=>'<span class="dc-chip"><i>'+x.t+'</i><b class="'+cls(x.v,t)+'">'+fs(x.v)+'</b></span>').join(''):'<span class="dc-none">нет замеров</span>';
- return '<div class="dc-row"><div class="dc-day"><b>'+d.name+'</b><span>'+d.dm+'</span>'+(avg!==null?'<em>ср '+fs(avg)+'</em>':'')+'</div><div class="dc-chips">'+chips+'</div></div>';
+ return '<div class="dc-row" data-day-off="'+off+'"><div class="dc-day"><b>'+d.name+'</b><span>'+d.dm+'</span>'+(avg!==null?'<em>ср '+fs(avg)+'</em>':'')+'</div><div class="dc-chips">'+chips+'</div></div>';
 }
 function insulinRow(off,ix){
  const d=dayInfo(off),list=ix.ins.get(d.key)||[],n=ix.night.get(d.key);
@@ -5190,7 +5197,7 @@ function insulinRow(off,ix){
  let chips=list.map(x=>'<span class="dc-chip"><i>'+x.t+'</i><b>'+fmtDose(x.v)+'</b></span>').join('');
  if(n)chips+='<span class="dc-chip dc-night" title="Ночной"><i>🌙</i><b>'+(n.approx?'≈':'')+fmtDose(n.value)+'</b></span>';
  if(!chips)chips='<span class="dc-none">нет уколов</span>';
- return '<div class="dc-row"><div class="dc-day"><b>'+d.name+'</b><span>'+d.dm+'</span>'+(list.length?'<em>Σ '+fmtDose(sum)+'</em>':'')+'</div><div class="dc-chips">'+chips+'</div></div>';
+ return '<div class="dc-row" data-day-off="'+off+'"><div class="dc-day"><b>'+d.name+'</b><span>'+d.dm+'</span>'+(list.length?'<em>Σ '+fmtDose(sum)+'</em>':'')+'</div><div class="dc-chips">'+chips+'</div></div>';
 }
 function nightRow(off,ix,t){
  const D=dayInfo(off),E=dayInfo(off-1);
@@ -5234,11 +5241,54 @@ function dots(car){
  if(car._i!==undefined&&car._i!==i&&typeof selectionHaptic==='function')selectionHaptic();
  car._i=i;
 }
+/* Синхронизация каруселей по календарным дням, а не индексам страниц. */
+let syncingMetric=false;
+let selectedMetricDay=0;
+function metricPageForDay(car,off){
+ const pages=[...car.children];
+ for(let i=1;i<pages.length;i++){
+  const rows=[...pages[i].querySelectorAll('[data-day-off]')];
+  if(rows.some(row=>Number(row.dataset.dayOff)===off))return i;
+ }
+ return -1;
+}
+function metricDayForPage(car){
+ const page=car.children[carouselIndex(car)];
+ const row=page&&page.querySelector('[data-day-off]');
+ return row?Number(row.dataset.dayOff):0;
+}
+function scrollMetricToDay(car,off,behavior){
+ if(!car||!car.clientWidth)return;
+ const i=off===0?0:metricPageForDay(car,off);
+ if(i<0)return;
+ const left=i*car.clientWidth;
+ if(Math.abs(car.scrollLeft-left)>1){car._metricSyncUntil=Date.now()+(behavior==='smooth'?650:180);car.scrollTo({left,behavior:behavior||'instant'});}
+ dots(car);
+}
+function syncMetricScroll(car){
+ if(syncingMetric||Date.now()<(car._metricSyncUntil||0)||!['sugarCar','insulinCar'].includes(car.id))return;
+ const other=$(car.id==='sugarCar'?'insulinCar':'sugarCar');
+ if(!other||!other.clientWidth)return;
+ syncingMetric=true;
+ selectedMetricDay=metricDayForPage(car);
+ scrollMetricToDay(other,selectedMetricDay,'instant');
+ syncingMetric=false;
+}
+window.showDayInMetrics=function(off){
+ off=Math.max(-(DAYS-1),Math.min(0,Math.trunc(Number(off)||0)));
+ selectedMetricDay=off;
+ syncingMetric=true;
+ scrollMetricToDay($('sugarCar'),off,'smooth');
+ scrollMetricToDay($('insulinCar'),off,'smooth');
+ syncingMetric=false;
+};
 function setup(car){
  if(car._dcReady)return;
  car._dcReady=true;
+ car.addEventListener('pointerdown',()=>{car._metricSyncUntil=0;},{passive:true});
+ car.addEventListener('touchstart',()=>{car._metricSyncUntil=0;},{passive:true});
  let raf=0;
- car.addEventListener('scroll',()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;dots(car);fit(car);});},{passive:true});
+ car.addEventListener('scroll',()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;dots(car);fit(car);syncMetricScroll(car);});},{passive:true});
  if(typeof ResizeObserver==='function'){
   const ro=new ResizeObserver(()=>fit(car));
   ro.observe(car);ro.observe(car.children[0]);
@@ -5250,7 +5300,9 @@ function mount(carId,pages){
  setup(car);
  car.querySelectorAll('.dc-info').forEach(e=>e.remove());
  car.insertAdjacentHTML('beforeend',pages.join(''));
- fit(car);dots(car);
+ fit(car);
+ if(carId==='sugarCar'||carId==='insulinCar')scrollMetricToDay(car,selectedMetricDay,'instant');
+ dots(car);
 }
 function render(){
  if(!hist)return;
