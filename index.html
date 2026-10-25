@@ -5243,12 +5243,14 @@ function dots(car){
  if(car._i!==undefined&&car._i!==i&&typeof selectionHaptic==='function')selectionHaptic();
  car._i=i;
 }
-/* Синхронное движение: ведомая карусель повторяет каждую позицию ведущей
-   непосредственно во время жеста, а не только после отпускания. */
+/* Общий жест: страницы обеих каруселей сдвигаются в одном кадре через transform.
+   Пока палец на экране, scrollLeft вообще не меняется. */
 let syncingMetric=false;
 let selectedMetricDay=0;
-let metricLeader=null;
-let metricIdleTimer=0;
+let metricGesture=null;
+let metricAnimating=false;
+let metricAnimationTimer=0;
+const metricCars=()=>[$('sugarCar'),$('insulinCar')].filter(Boolean);
 function metricPageForDay(car,off){
  for(let i=1;i<car.children.length;i++){
   if([...car.children[i].querySelectorAll('[data-day-off]')].some(row=>Number(row.dataset.dayOff)===off))return i;
@@ -5260,55 +5262,91 @@ function metricDayForPage(car){
  const row=page&&page.querySelector('[data-day-off]');
  return row?Number(row.dataset.dayOff):0;
 }
+function metricTransforms(dx,transition){
+ for(const car of metricCars())for(const page of car.children){
+  page.style.transition=transition?'transform .3s cubic-bezier(.22,1,.36,1)':'none';
+  page.style.transform='translate3d('+dx+'px,0,0)';
+ }
+}
+function clearMetricTransforms(){
+ clearTimeout(metricAnimationTimer);
+ metricAnimating=false;
+ for(const car of metricCars()){
+  for(const page of car.children){page.style.transition='none';page.style.transform='';}
+  car.style.scrollSnapType='';
+ }
+}
+function metricGoTo(index){
+ syncingMetric=true;
+ for(const car of metricCars()){
+  const i=Math.max(0,Math.min(car.children.length-1,index));
+  car.scrollLeft=i*car.clientWidth;
+  dots(car);
+ }
+ syncingMetric=false;
+ const lead=$('sugarCar');
+ if(lead)selectedMetricDay=metricDayForPage(lead);
+}
 function scrollMetricToDay(car,off,behavior){
  if(!car||!car.clientWidth)return;
  const i=off===0?0:metricPageForDay(car,off);
  if(i<0)return;
- const left=i*car.clientWidth;
- if(Math.abs(car.scrollLeft-left)>1)car.scrollTo({left,behavior:behavior||'instant'});
+ if(Math.abs(car.scrollLeft-i*car.clientWidth)>1)car.scrollLeft=i*car.clientWidth;
  dots(car);
 }
-function releaseMetricLeader(){
- const lead=metricLeader&&$(metricLeader);
- if(!lead)return;
- const other=$(metricLeader==='sugarCar'?'insulinCar':'sugarCar');
- syncingMetric=true;
- if(other&&other.clientWidth&&lead.clientWidth){
-  other.scrollLeft=lead.scrollLeft/lead.clientWidth*other.clientWidth;
-  other.style.scrollSnapType='';
- }
- selectedMetricDay=metricDayForPage(lead);
- syncingMetric=false;
- metricLeader=null;
+function finishMetricAnimation(index){
+ clearMetricTransforms();
+ metricGoTo(index);
 }
-function syncMetricScroll(car){
- if(syncingMetric||!car||!car.clientWidth)return;
- if(car.id!=='sugarCar'&&car.id!=='insulinCar')return;
- if(metricLeader&&metricLeader!==car.id)return;
- const other=$(car.id==='sugarCar'?'insulinCar':'sugarCar');
- if(!other||!other.clientWidth)return;
- if(!metricLeader){
-  metricLeader=car.id;
-  other.style.scrollSnapType='none';
- }
- clearTimeout(metricIdleTimer);
- syncingMetric=true;
- const target=car.scrollLeft/car.clientWidth*other.clientWidth;
- if(Math.abs(other.scrollLeft-target)>.1)other.scrollLeft=target;
- syncingMetric=false;
- selectedMetricDay=metricDayForPage(car);
- // Даём ведущей завершить инерцию и scroll-snap, затем отпускаем ведомую.
- metricIdleTimer=setTimeout(releaseMetricLeader,180);
+function metricTouchStart(e,car){
+ if(metricGesture||!e.touches||e.touches.length!==1)return;
+ if(e.target.closest('input,button,textarea,select,a'))return;
+ if(metricAnimating){clearMetricTransforms();}
+ const t=e.touches[0];
+ const index=carouselIndex(car);
+ metricGesture={id:t.identifier,x:t.clientX,y:t.clientY,dx:0,axis:null,index,car,started:performance.now()};
 }
+function metricTouchMove(e){
+ const g=metricGesture;
+ if(!g)return;
+ const t=[...e.touches].find(x=>x.identifier===g.id);
+ if(!t)return;
+ const dx=t.clientX-g.x,dy=t.clientY-g.y;
+ if(!g.axis){
+  if(Math.max(Math.abs(dx),Math.abs(dy))<5)return;
+  g.axis=Math.abs(dx)>Math.abs(dy)*1.15?'x':'y';
+  if(g.axis==='x')for(const car of metricCars())car.style.scrollSnapType='none';
+ }
+ if(g.axis!=='x')return;
+ e.preventDefault();
+ const car=g.car,w=car.clientWidth;
+ const atFirst=g.index===0&&dx>0;
+ const atLast=g.index>=car.children.length-1&&dx<0;
+ g.dx=(atFirst||atLast)?dx*.2:dx;
+ metricTransforms(g.dx,false);
+}
+function metricTouchEnd(e){
+ const g=metricGesture;
+ if(!g)return;
+ if(e.type==='touchend'&&[...e.touches].some(t=>t.identifier===g.id))return;
+ metricGesture=null;
+ if(g.axis!=='x')return;
+ const w=g.car.clientWidth||1;
+ const elapsed=Math.max(1,performance.now()-g.started);
+ const distance=Math.abs(g.dx);
+ const advance=distance>w*.24||(distance>28&&distance/elapsed>.45);
+ const next=Math.max(0,Math.min(g.car.children.length-1,g.index+(advance?(g.dx<0?1:-1):0)));
+ const finalDx=(g.index-next)*w;
+ metricAnimating=true;
+ metricTransforms(finalDx,true);
+ metricAnimationTimer=setTimeout(()=>finishMetricAnimation(next),315);
+}
+/* Программный выбор даты из верхней карточки. */
 window.showDayInMetrics=function(off){
  off=Math.max(-(DAYS-1),Math.min(0,Math.trunc(Number(off)||0)));
  selectedMetricDay=off;
- clearTimeout(metricIdleTimer);
- if(metricLeader){
-  const companion=$(metricLeader==='sugarCar'?'insulinCar':'sugarCar');
-  if(companion)companion.style.scrollSnapType='';
- }
- metricLeader=null;
+ metricGesture=null;
+ clearMetricTransforms();
  syncingMetric=true;
  scrollMetricToDay($('sugarCar'),off,'instant');
  scrollMetricToDay($('insulinCar'),off,'instant');
@@ -5317,23 +5355,24 @@ window.showDayInMetrics=function(off){
 function setup(car){
  if(car._dcReady)return;
  car._dcReady=true;
- const lead=()=>{
-  if(car.id!=='sugarCar'&&car.id!=='insulinCar')return;
-  if(metricLeader&&metricLeader!==car.id){
-   const previous=$(metricLeader==='sugarCar'?'insulinCar':'sugarCar');
-   if(previous)previous.style.scrollSnapType='';
-  }
-  metricLeader=car.id;
-  clearTimeout(metricIdleTimer);
-  const other=$(car.id==='sugarCar'?'insulinCar':'sugarCar');
-  if(other)other.style.scrollSnapType='none';
- };
- car.addEventListener('pointerdown',lead,{passive:true});
- car.addEventListener('touchstart',lead,{passive:true});
+ if(car.id==='sugarCar'||car.id==='insulinCar'){
+  car.style.touchAction='pan-y';
+  car.addEventListener('touchstart',e=>metricTouchStart(e,car),{passive:true});
+  car.addEventListener('touchmove',metricTouchMove,{passive:false});
+  car.addEventListener('touchend',metricTouchEnd,{passive:true});
+  car.addEventListener('touchcancel',metricTouchEnd,{passive:true});
+ }
  let raf=0;
  car.addEventListener('scroll',()=>{
-  // Не откладываем копирование позиции до requestAnimationFrame.
-  syncMetricScroll(car);
+  if(!metricGesture&&!metricAnimating&&!syncingMetric&&(car.id==='sugarCar'||car.id==='insulinCar')){
+   const other=$(car.id==='sugarCar'?'insulinCar':'sugarCar');
+   if(other&&other.clientWidth&&car.clientWidth){
+    syncingMetric=true;
+    other.scrollLeft=car.scrollLeft/car.clientWidth*other.clientWidth;
+    syncingMetric=false;
+    selectedMetricDay=metricDayForPage(car);
+   }
+  }
   if(raf)return;
   raf=requestAnimationFrame(()=>{raf=0;dots(car);fit(car);});
  },{passive:true});
@@ -5376,8 +5415,8 @@ function render(){
  const insulinRows=offs.map(o=>insulinRow(o,ix));
  const paired=coupledMetricPages(pack($('sugarCar'),'sugar',sugarRows),pack($('insulinCar'),'insulin',insulinRows),sugarRows,insulinRows);
  syncingMetric=true;
- clearTimeout(metricIdleTimer);
- metricLeader=null;
+ metricGesture=null;
+ clearMetricTransforms();
  $('sugarCar').style.scrollSnapType='';
  $('insulinCar').style.scrollSnapType='';
  mount('sugarCar',paired.sugar);
