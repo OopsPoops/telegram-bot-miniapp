@@ -679,7 +679,7 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 /* --- Свайп-страницы на карточках: сахар / инсулин / ночной (по три дня на странице) --- */
 .yd-group.off{display:none!important}
 .dcar{align-items:flex-start;transition:height .32s cubic-bezier(.22,1,.36,1)}
-.carousel-dots.tight{margin:3px 0 4px}
+.carousel-dots.tight{margin:3px 0 4px;min-height:6px}
 .metric.dc-info{padding:10px 14px;display:flex;flex-direction:column;justify-content:center;overflow:hidden}
 .dc-row{display:flex;gap:10px;align-items:flex-start;padding:5px 0;border-top:1px solid var(--line)}
 .dc-row:first-child{border-top:0}
@@ -999,7 +999,7 @@ button.st-ico:active{transform:scale(.88)}
 <div class="toast" id="sugarToast"></div>
 </section>
 </div>
-<div class="carousel-dots tight" id="sugarDots" aria-hidden="true"></div>
+<div class="carousel-dots tight" id="sugarDots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i><i></i></div>
 <!-- --- Карточка: инсулин (дневной) + таймер --- -->
 <div class="carousel shadowfix dcar" id="insulinCar">
 <section class="metric insulin">
@@ -1038,7 +1038,7 @@ button.st-ico:active{transform:scale(.88)}
 </div>
 </section>
 </div>
-<div class="carousel-dots tight" id="insulinDots" aria-hidden="true"></div>
+<div class="carousel-dots tight" id="insulinDots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i><i></i></div>
 <!-- --- Карточка: инсулин (ночной) --- -->
 <div class="carousel shadowfix dcar" id="nightCar">
 <section class="metric insulin night">
@@ -1062,7 +1062,7 @@ button.st-ico:active{transform:scale(.88)}
 <div class="toast" id="nightToast"></div>
 </section>
 </div>
-<div class="carousel-dots tight" id="nightDots" aria-hidden="true"></div>
+<div class="carousel-dots tight" id="nightDots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i><i></i></div>
 <div class="quick-title">
 <div class="section-title">Быстрый доступ</div>
 <span></span>
@@ -4842,9 +4842,13 @@ stRefresh();
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const APP_VERSION='v20261024_2';          /* ← менять при каждом обновлении: vГГГГММДД_N */
+const APP_VERSION='v20261025_1';          /* ← менять при каждом обновлении: vГГГГММДД_N */
 const DEV_CHAT='https://t.me/larik_11';
 const APP_CHANGES=[
+ {v:'v20261025_1',items:[
+  'Точки под карточками видны сразу, данные дней грузятся в фоне — экран больше не прыгает',
+  'Напоминания: «Поменяй иголку🥺» и «Пора делять 🤗»; лист statist больше не используется'
+ ]},
  {v:'v20261024_2',items:[
   'Ночной: свайп вбок — по три ночи на странице: вечерний сахар, доза, утренний сахар',
   'Сахар и инсулин: свайп вбок — замеры и уколы за несколько дней, у инсулина вместе с ночной дозой',
@@ -5109,11 +5113,14 @@ const EVENING_FROM=18*60;                    /* вечерний сахар — 
 const MORNING_FROM=4*60,MORNING_TO=12*60;    /* утренний — первый замер с 4:00 до 12:00 */
 const WD=['вс','пн','вт','ср','чт','пт','сб'];
 const pad=n=>String(n).padStart(2,'0');
-let hist=null,histAt=0,histPromise=null,failed=false;
+let hist=null,histAt=0,histStart=0,histPromise=null,failed=false;
 function fetchHist(){
+ histStart=Date.now();
  return api('history',{days:DAYS}).then(r=>{hist={rows:normalizeHistory(r),doses:normalizeDoses(r)};histAt=Date.now();failed=false;return hist;});
 }
 function getHistory(force){
+ if(force&&hist&&Date.now()-histAt<1500)force=false;
+ if(force&&histPromise&&Date.now()-histStart<1500)force=false;
  if(!force&&hist&&Date.now()-histAt<20000)return Promise.resolve(hist);
  if(histPromise&&!force)return histPromise;
  const prev=histPromise||Promise.resolve();
