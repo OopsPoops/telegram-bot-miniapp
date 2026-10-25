@@ -676,13 +676,12 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .carousel-dots{display:flex;justify-content:center;gap:6px;margin:6px 0 8px}
 .carousel-dots i{width:6px;height:6px;border-radius:3px;background:var(--muted);opacity:.3;transition:opacity .2s,width .2s}
 .carousel-dots i.on{opacity:.85;width:16px}
-/* --- Дни на карточках: сахар, инсулин, ночной (по три дня, листаются вбок) --- */
+/* --- Свайп-страницы на карточках: сахар / инсулин / ночной (по три дня на странице) --- */
 .yd-group.off{display:none!important}
-.dc{margin:2px 0 12px}
-.dc-car{display:flex;align-items:stretch;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
-.dc-car::-webkit-scrollbar{display:none}
-.dc-page{flex:0 0 100%;min-width:0;box-sizing:border-box;scroll-snap-align:start;scroll-snap-stop:always;display:flex;flex-direction:column}
-.dc-row{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--line)}
+.dcar{align-items:flex-start;transition:height .32s cubic-bezier(.22,1,.36,1)}
+.carousel-dots.tight{margin:3px 0 4px;min-height:6px}
+.metric.dc-info{padding:12px 14px;display:flex;flex-direction:column;justify-content:center}
+.dc-row{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-top:1px solid var(--line)}
 .dc-row:first-child{border-top:0}
 .dc-day{flex:none;width:66px;display:flex;flex-direction:column;line-height:1.2}
 .dc-day b{font-size:13px;font-weight:750}
@@ -699,9 +698,6 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .dc-ins .dc-chip.dc-night{padding:0 8px 0 6px;border-radius:99px;background:rgba(112,100,235,.14)}
 .dc-ins .dc-chip.dc-night b{color:#6a5ce0}
 .dc-none{font-size:12.5px;color:var(--muted)}
-.dc-sk{height:44px;margin:6px 0;border-radius:12px;background:linear-gradient(90deg,var(--line) 25%,var(--nav-highlight) 50%,var(--line) 75%);background-size:200% 100%;animation:metricShimmer 1.2s linear infinite}
-.dc-err{padding:14px 0;font-size:13px;color:var(--muted);text-align:center}
-.dc-dots{margin:6px 0 0}
 .dn-head,.dn-row{display:grid;grid-template-columns:46px repeat(3,minmax(0,1fr)) 54px;gap:6px;align-items:center}
 .dn-head{font-size:10.5px;font-weight:700;color:var(--muted);padding:0 0 4px;text-align:center}
 .dn-head span:first-child{text-align:left}
@@ -982,6 +978,7 @@ button.st-ico:active{transform:scale(.88)}
 <div class="carousel-dots" id="ydDots" aria-hidden="true"></div>
 </div>
 <!-- --- Карточка: сахар --- -->
+<div class="carousel shadowfix dcar" id="sugarCar">
 <section class="metric sugar">
 <div class="metric-head">
 <div class="metric-icon">🩸</div>
@@ -994,7 +991,6 @@ button.st-ico:active{transform:scale(.88)}
 <div class="metric-skeleton short"></div>
 </div>
 </div>
-<div class="dc" id="sugarDays"><div class="dc-car"><div class="dc-page"><div class="dc-sk"></div><div class="dc-sk"></div><div class="dc-sk"></div></div></div><div class="carousel-dots dc-dots"></div></div>
 <div class="input-row">
 <input class="value-input" id="sugarInput" type="text" inputmode="decimal" placeholder="" aria-label="Новое значение сахара">
 <button class="undo-button" type="button" onclick="undoValue('sugar')" aria-label="Отменить последнюю запись сахара" title="Отменить последнюю запись">↩︎</button>
@@ -1002,7 +998,10 @@ button.st-ico:active{transform:scale(.88)}
 </div>
 <div class="toast" id="sugarToast"></div>
 </section>
+</div>
+<div class="carousel-dots tight" id="sugarDots" aria-hidden="true"></div>
 <!-- --- Карточка: инсулин (дневной) + таймер --- -->
+<div class="carousel shadowfix dcar" id="insulinCar">
 <section class="metric insulin">
 <div class="metric-head">
 <div class="metric-icon">💉</div>
@@ -1015,7 +1014,6 @@ button.st-ico:active{transform:scale(.88)}
 <div class="metric-skeleton short"></div>
 </div>
 </div>
-<div class="dc dc-ins" id="insulinDays"><div class="dc-car"><div class="dc-page"><div class="dc-sk"></div><div class="dc-sk"></div><div class="dc-sk"></div></div></div><div class="carousel-dots dc-dots"></div></div>
 <div class="input-row">
 <input class="value-input" id="insulinInput" type="number" inputmode="numeric" step="1" min="0" max="15" placeholder="" aria-label="Новое значение инсулина">
 <button class="undo-button" type="button" onclick="undoValue('insulin')" aria-label="Отменить последнюю запись инсулина" title="Отменить последнюю запись">↩︎</button>
@@ -1039,7 +1037,10 @@ button.st-ico:active{transform:scale(.88)}
 </div>
 </div>
 </section>
+</div>
+<div class="carousel-dots tight" id="insulinDots" aria-hidden="true"></div>
 <!-- --- Карточка: инсулин (ночной) --- -->
+<div class="carousel shadowfix dcar" id="nightCar">
 <section class="metric insulin night">
 <div class="metric-head">
 <div class="metric-icon">🌙</div>
@@ -1053,7 +1054,6 @@ button.st-ico:active{transform:scale(.88)}
 <div class="metric-skeleton short"></div>
 </div>
 </div>
-<div class="dc dn" id="nightDays"><div class="dc-car"><div class="dc-page"><div class="dc-sk"></div><div class="dc-sk"></div><div class="dc-sk"></div></div></div><div class="carousel-dots dc-dots"></div></div>
 <div class="input-row">
 <input class="value-input" id="nightInput" type="text" inputmode="decimal" placeholder="Еще не скоро" aria-label="Новое ночное значение">
 <button class="undo-button" type="button" onclick="undoValue('fact')" aria-label="Отменить последнюю запись ночного значения" title="Отменить последнюю запись">↩︎</button>
@@ -1061,6 +1061,8 @@ button.st-ico:active{transform:scale(.88)}
 </div>
 <div class="toast" id="nightToast"></div>
 </section>
+</div>
+<div class="carousel-dots tight" id="nightDots" aria-hidden="true"></div>
 <div class="quick-title">
 <div class="section-title">Быстрый доступ</div>
 <span></span>
@@ -4844,8 +4846,8 @@ const APP_VERSION='v20261024_2';          /* ← менять при каждо�
 const DEV_CHAT='https://t.me/larik_11';
 const APP_CHANGES=[
  {v:'v20261024_2',items:[
-  'Ночной: три ночи на одной карточке — вечерний сахар, доза и утренний сахар; листай вбок, чтобы увидеть дальше',
-  'Сахар и инсулин: значения за несколько дней на одной карточке, у инсулина — вместе с ночной дозой',
+  'Ночной: свайп вбок — по три ночи на странице: вечерний сахар, доза, утренний сахар',
+  'Сахар и инсулин: свайп вбок — замеры и уколы за несколько дней, у инсулина вместе с ночной дозой',
   'Настройка графиков теперь в разделе «Оформление»',
   'В «Оформлении» можно скрыть карточку «завтрак / ужин» на главной — для всех пользователей'
  ]},
@@ -5099,7 +5101,7 @@ load();
 })();
 </script>
 <script>
-/* Карточки дней: сахар, инсулин (с ночной дозой) и «ночной» (вечер → доза → утро) */
+/* Свайп-страницы на карточках: сахар (замеры), инсулин (уколы + ночной), ночной (вечер → доза → утро) */
 (function(){
 const $=id=>document.getElementById(id);
 const DAYS=45,PER_PAGE=3;
@@ -5141,10 +5143,11 @@ function target(){
 }
 const fs=v=>(Math.round(v*10)/10).toFixed(1).replace('.',',');
 const cls=(v,t)=>v<t.lo?'lo':v>t.hi?'hi':'ok';
-function pages(items,wrap){
- let html='';
- for(let i=0;i<items.length;i+=PER_PAGE)html+='<div class="dc-page">'+(wrap?wrap(items.slice(i,i+PER_PAGE)):items.slice(i,i+PER_PAGE).join(''))+'</div>';
- return html;
+const KIND={sugar:'metric sugar dc-info',insulin:'metric insulin dc-info dc-ins',night:'metric insulin night dc-info dn'};
+function pagesOf(kind,items,head){
+ const out=[];
+ for(let i=0;i<items.length;i+=PER_PAGE)out.push('<section class="'+KIND[kind]+'">'+(head||'')+items.slice(i,i+PER_PAGE).join('')+'</section>');
+ return out;
 }
 function sugarRow(off,ix,t){
  const d=dayInfo(off),list=ix.sugar.get(d.key)||[];
@@ -5178,55 +5181,63 @@ function nightRow(off,ix,t){
  return '<div class="dn-row"><div class="dn-day"><b>'+D.dm+'</b><span>'+(off===1?'сейчас':off===0?'сегодня':D.wd)+'</span></div>'
   +cell(ev,ev?cls(ev.v,t):'')+doseCell+cell(mo,mo?cls(mo.v,t):'')+delta+'</div>';
 }
-function mount(id,html,count){
- const box=$(id);
- if(!box)return;
- const car=box.querySelector('.dc-car');
- const w=car.clientWidth||1,keep=Math.round(car.scrollLeft/w);
- car.innerHTML=html;
- box._count=count;
- if(!car._dcReady){
-  car._dcReady=true;
-  let raf=0;
-  car.addEventListener('scroll',()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;dots(box);});},{passive:true});
- }
- car.scrollLeft=Math.min(keep,Math.max(0,count-1))*car.clientWidth;
- dots(box);
+/* высота карусели = высота текущей страницы; страницы дней не ниже главной карточки */
+function fit(car){
+ const w=car.clientWidth;
+ if(!w||!car.children.length)return;
+ const h0=car.children[0].offsetHeight;
+ [...car.children].forEach((p,k)=>{if(k>0)p.style.minHeight=h0+'px';});
+ const i=Math.max(0,Math.min(car.children.length-1,Math.round(car.scrollLeft/w)));
+ const h=car.children[i].offsetHeight;
+ if(h>0)car.style.height=(h+32)+'px';
 }
-function dots(box){
- const car=box.querySelector('.dc-car'),el=box.querySelector('.dc-dots'),n=Math.min(5,box._count||1);
- if(!el)return;
+function dots(car){
+ const el=car.nextElementSibling;
+ if(!el||!el.classList.contains('carousel-dots'))return;
+ const total=car.children.length,n=Math.min(5,total);
  if(n<2){el.innerHTML='';return;}
- const i=Math.round(car.scrollLeft/(car.clientWidth||1));
+ const i=Math.max(0,Math.min(total-1,Math.round(car.scrollLeft/(car.clientWidth||1))));
  if(el.children.length!==n)el.innerHTML='<i></i>'.repeat(n);
  const active=Math.min(i,n-1);
  [...el.children].forEach((d,k)=>d.classList.toggle('on',k===active));
- if(box._i!==undefined&&box._i!==i&&typeof selectionHaptic==='function')selectionHaptic();
- box._i=i;
+ if(car._i!==undefined&&car._i!==i&&typeof selectionHaptic==='function')selectionHaptic();
+ car._i=i;
+}
+function setup(car){
+ if(car._dcReady)return;
+ car._dcReady=true;
+ let raf=0;
+ car.addEventListener('scroll',()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;dots(car);fit(car);});},{passive:true});
+ if(typeof ResizeObserver==='function'){
+  const ro=new ResizeObserver(()=>fit(car));
+  ro.observe(car);ro.observe(car.children[0]);
+  car._ro=ro;
+ }
+}
+function mount(carId,pages){
+ const car=$(carId);
+ if(!car)return;
+ setup(car);
+ car.querySelectorAll('.dc-info').forEach(e=>{if(car._ro)car._ro.unobserve(e);e.remove();});
+ car.insertAdjacentHTML('beforeend',pages.join(''));
+ car.querySelectorAll('.dc-info').forEach(e=>{if(car._ro)car._ro.observe(e);});
+ fit(car);dots(car);
 }
 function render(){
  if(!hist)return;
  const ix=index(hist),t=target();
  const offs=Array.from({length:DAYS},(_,i)=>-i);
- const s=offs.map(o=>sugarRow(o,ix,t)),n=offs.map(o=>insulinRow(o,ix));
- mount('sugarDays',pages(s),Math.ceil(s.length/PER_PAGE));
- mount('insulinDays',pages(n),Math.ceil(n.length/PER_PAGE));
+ mount('sugarCar',pagesOf('sugar',offs.map(o=>sugarRow(o,ix,t))));
+ mount('insulinCar',pagesOf('insulin',offs.map(o=>insulinRow(o,ix))));
  const nights=[];
  for(let o=1;o>-(DAYS-1);o--){const r=nightRow(o,ix,t);if(r)nights.push(r);}
  const head='<div class="dn-head"><span>Ночь на</span><span>Вечер</span><span>Доза</span><span>Утро</span><span>Δ</span></div>';
- mount('nightDays',nights.length?pages(nights,rows=>head+rows.join('')):'<div class="dc-page"><div class="dc-err">Пока нет ночей с данными</div></div>',Math.max(1,Math.ceil(nights.length/PER_PAGE)));
-}
-function showError(){
- if(hist)return;
- ['sugarDays','insulinDays','nightDays'].forEach(id=>{
-  const car=$(id)&&$(id).querySelector('.dc-car');
-  if(car)car.innerHTML='<div class="dc-page"><div class="dc-err">Не удалось загрузить дни. Потяни вниз или зайди позже</div></div>';
- });
+ mount('nightCar',pagesOf('night',nights,head));
 }
 window.refreshDayCards=function(force){
  return getHistory(!!force).then(render).catch(error=>{
   console.error('Ошибка загрузки дней для карточек:',error);
-  failed=true;showError();
+  failed=true;
   if(typeof handleAccessError==='function')handleAccessError(error);
  });
 };
@@ -5237,6 +5248,7 @@ window.switchTab=function(name){
  return r;
 };
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&failed)window.refreshDayCards(true);});
+['sugarCar','insulinCar','nightCar'].forEach(id=>{const c=$(id);if(c)setup(c);});
 })();
 </script>
 </body>
