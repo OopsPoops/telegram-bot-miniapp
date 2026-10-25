@@ -669,6 +669,9 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .carousel::-webkit-scrollbar{display:none}
 .carousel.shadowfix{padding:6px 0 26px;margin:-6px 0 -26px}
 .carousel>*{flex:0 0 100%;min-width:0;box-sizing:border-box;scroll-snap-align:start;scroll-snap-stop:always}
+/* Синхронный свайп: один CSS-параметр вместо изменения каждой страницы в JS */
+.dcar.metric-dragging > *{transform:translate3d(var(--metric-dx,0px),0,0);transition:none!important;will-change:transform}
+.dcar.metric-settling > *{transform:translate3d(var(--metric-dx,0px),0,0);transition:transform .30s cubic-bezier(.22,1,.36,1)!important;will-change:transform}
 .carousel>.metric{margin-bottom:0}
 .carousel>.doctor-page{display:flex;flex-direction:column}
 .doctor-page .doctor-comment-card{flex:1;min-height:56px}
@@ -5262,17 +5265,26 @@ function metricDayForPage(car){
  const row=page&&page.querySelector('[data-day-off]');
  return row?Number(row.dataset.dayOff):0;
 }
+let metricFrame=0;
+let metricPendingDx=0;
+function metricApplyDx(dx){
+ for(const car of metricCars())car.style.setProperty('--metric-dx',dx+'px');
+}
 function metricTransforms(dx,transition){
- for(const car of metricCars())for(const page of car.children){
-  page.style.transition=transition?'transform .3s cubic-bezier(.22,1,.36,1)':'none';
-  page.style.transform='translate3d('+dx+'px,0,0)';
+ if(metricFrame){cancelAnimationFrame(metricFrame);metricFrame=0;}
+ for(const car of metricCars()){
+  car.classList.toggle('metric-dragging',!transition);
+  car.classList.toggle('metric-settling',!!transition);
  }
+ metricApplyDx(dx);
 }
 function clearMetricTransforms(){
  clearTimeout(metricAnimationTimer);
+ if(metricFrame){cancelAnimationFrame(metricFrame);metricFrame=0;}
  metricAnimating=false;
  for(const car of metricCars()){
-  for(const page of car.children){page.style.transition='none';page.style.transform='';}
+  car.classList.remove('metric-dragging','metric-settling');
+  car.style.removeProperty('--metric-dx');
   car.style.scrollSnapType='';
  }
 }
@@ -5295,8 +5307,14 @@ function scrollMetricToDay(car,off,behavior){
  dots(car);
 }
 function finishMetricAnimation(index){
- clearMetricTransforms();
+ // Переход в настоящий scrollLeft и удаление временного transform в одном кадре.
+ // Без предварительного сброса transform, вызывавшего визуальный скачок.
+ for(const car of metricCars()){
+  car.classList.remove('metric-settling','metric-dragging');
+  car.style.removeProperty('--metric-dx');
+ }
  metricGoTo(index);
+ clearMetricTransforms();
 }
 function metricTouchStart(e,car){
  if(metricGesture||!e.touches||e.touches.length!==1)return;
@@ -5315,7 +5333,7 @@ function metricTouchMove(e){
  if(!g.axis){
   if(Math.max(Math.abs(dx),Math.abs(dy))<5)return;
   g.axis=Math.abs(dx)>Math.abs(dy)*1.15?'x':'y';
-  if(g.axis==='x')for(const car of metricCars())car.style.scrollSnapType='none';
+  if(g.axis==='x'){for(const car of metricCars())car.style.scrollSnapType='none';metricTransforms(0,false);}
  }
  if(g.axis!=='x')return;
  e.preventDefault();
@@ -5323,7 +5341,8 @@ function metricTouchMove(e){
  const atFirst=g.index===0&&dx>0;
  const atLast=g.index>=car.children.length-1&&dx<0;
  g.dx=(atFirst||atLast)?dx*.2:dx;
- metricTransforms(g.dx,false);
+ metricPendingDx=g.dx;
+ if(!metricFrame)metricFrame=requestAnimationFrame(()=>{metricFrame=0;if(metricGesture&&metricGesture.axis==='x')metricApplyDx(metricPendingDx);});
 }
 function metricTouchEnd(e){
  const g=metricGesture;
