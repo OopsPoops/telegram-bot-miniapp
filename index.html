@@ -964,6 +964,16 @@ button.st-ico:active{transform:scale(.88)}
 .bottom-nav .nav-pill::before{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(ellipse at 25% 0%,rgba(255,255,255,.6),transparent 60%);pointer-events:none}
 :root[data-theme="dark"] .bottom-nav .nav-pill::before{opacity:.35}
 @media(prefers-reduced-motion:reduce){.bottom-nav .nav-pill{transition:none}}
+
+/* Минимальный ИИ-результат под сахаром. Визуал можно менять позже отдельно. */
+.sugar-ai{margin:0 0 13px;padding:12px 14px;border-radius:16px;border:1px solid var(--card-border);background:var(--card-grad);box-shadow:var(--shadow);color:var(--text)}
+.sugar-ai[hidden],.sugar-ai-why[hidden]{display:none}
+.sugar-ai-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
+.sugar-ai-name{font-size:12px;font-weight:750;color:var(--blue)}
+.sugar-ai-why{border:1px solid var(--line);border-radius:10px;padding:7px 10px;background:var(--input-bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer}
+.sugar-ai-headline{font-size:14px;font-weight:750;line-height:1.35}
+.sugar-ai-summary{margin-top:4px;font-size:12px;line-height:1.5;color:var(--muted);white-space:pre-wrap}
+.sugar-ai-meta{margin-top:6px;font-size:11px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -1007,6 +1017,13 @@ button.st-ico:active{transform:scale(.88)}
 </section>
 </div>
 <div class="carousel-dots tight" id="sugarDots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+<!-- Технический блок ИИ: отдельно от карусели, чтобы не менять механику свайпов. -->
+<section class="sugar-ai" id="sugarAi" hidden aria-live="polite" aria-label="ИИ-анализ сахара">
+ <div class="sugar-ai-top"><span class="sugar-ai-name">✦ Анализ Сёмы</span><button class="sugar-ai-why" id="sugarAiWhy" type="button" onclick="openSugarAiDetails()" hidden>Почему?</button></div>
+ <div class="sugar-ai-headline" id="sugarAiHeadline"></div>
+ <div class="sugar-ai-summary" id="sugarAiSummary"></div>
+ <div class="sugar-ai-meta" id="sugarAiMeta"></div>
+</section>
 <!-- --- Карточка: инсулин (дневной) + таймер --- -->
 <div class="carousel shadowfix dcar" id="insulinCar">
 <section class="metric insulin">
@@ -2109,6 +2126,71 @@ async function openAction(action){
  }
 }
 
+// ИИ вызывается отдельным запросом только после успешного сохранения сахара.
+// Ошибка анализа не изменяет статус уже сохранённой записи.
+let sugarAiData=null;
+let sugarAiSequence=0;
+function updateSugarAi(status, data, errorText=''){
+ const panel=document.getElementById('sugarAi');
+ const why=document.getElementById('sugarAiWhy');
+ const headline=document.getElementById('sugarAiHeadline');
+ const summary=document.getElementById('sugarAiSummary');
+ const meta=document.getElementById('sugarAiMeta');
+ if(!panel)return;
+ panel.hidden=false;
+ why.hidden=status!=='ready';
+ panel.setAttribute('aria-busy',status==='loading'?'true':'false');
+ if(status==='loading'){
+  sugarAiData=null;
+  headline.textContent='Изучаю предыдущие измерения…';
+  summary.textContent='Сахар уже сохранён. Анализ загружается отдельно.';
+  meta.textContent='';
+ }else if(status==='ready'&&data){
+  sugarAiData=data;
+  headline.textContent=data.headline||'История измерений собрана';
+  summary.textContent=data.summary||'';
+  const stats=data.stats||{};
+  meta.textContent='Похожие дни: '+(stats.similar??0)+' · С повторным замером: '+(stats.with_followup??0)+' · Достоверность: '+(stats.reliability||'не оценена');
+ }else{
+  sugarAiData=null;
+  headline.textContent='Анализ пока недоступен';
+  summary.textContent=errorText||'Не удалось связаться с Groq.';
+  meta.textContent='Сахар успешно сохранён.';
+ }
+}
+async function runSugarAiAfterSave(savedValue){
+ const seq=++sugarAiSequence;
+ updateSugarAi('loading');
+ try{
+  const result=await api('ai_analyze',{expected_value:savedValue});
+  if(seq===sugarAiSequence)updateSugarAi('ready',result);
+ }catch(error){
+  if(seq===sugarAiSequence){
+   updateSugarAi('error',null,error.message||'Сервис недоступен');
+   handleAccessError(error);
+  }
+ }
+}
+function openSugarAiDetails(){
+ if(!sugarAiData||!sugarAiData.verified)return;
+ const d=sugarAiData.verified,s=sugarAiData.stats||{};
+ const parts=[
+  'Исходное измерение: '+d.measurement,
+  'Предыдущие инъекции: '+d.injections,
+  'Похожие случаи: '+d.similar,
+  'Как выбирались совпадения: '+d.criteria,
+  'Надёжность: '+(d.reliability||'не оценена'),
+  'Ограничения: '+d.limitations
+ ];
+ if(Array.isArray(d.examples)&&d.examples.length){
+  parts.push('Примеры из истории:\n'+d.examples.map((item,i)=>(i+1)+'. '+item).join('\n'));
+ }
+ const usage=sugarAiData.usage;
+ if(usage&&Number.isFinite(usage.total_tokens)&&usage.total_tokens>0)parts.push('Groq: '+usage.total_tokens+' токенов за анализ (вход '+usage.prompt_tokens+', выход '+usage.completion_tokens+').');
+ showModal('Почему такой вывод?','Факты из Google Sheets · без скрытых рассуждений','✦','');
+ document.getElementById('modalContent').textContent=parts.join('\n\n');
+}
+
 // ============================================================
 // ЗАПИСЬ ЗНАЧЕНИЙ: сохранить сахар / инсулин / ночной
 // ============================================================
@@ -2166,6 +2248,8 @@ async function saveValue(type){
   uiHaptic('success');
   if(type==='sugar'){
    renderLatestMeasurement('sugar',value.replace(',','.'),formatLatestTime(new Date()));
+   // Намеренно не await: сохранение сахара никак не зависит от Groq.
+   runSugarAiAfterSave(value.replace(',','.'));
    await refreshHomeAfterChange(type);
   }
   if(type==='insulin'){
