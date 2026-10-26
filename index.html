@@ -1055,7 +1055,7 @@ body.keyboard-open .home-to-top,body.access-denied .home-to-top{opacity:0;visibi
 <div class="yd-today-wrap"><div class="yd-today-in"></div></div>
 </div>
 </div>
-<div class="carousel-dots" id="ydDots" aria-hidden="true"></div>
+<div class="carousel-dots" id="ydDots" aria-hidden="true"><i></i><i></i><i></i><i></i><i class="on"></i></div>
 </div>
 <!-- --- Карточка: сахар --- -->
 <div class="carousel shadowfix dcar" id="sugarCar">
@@ -5727,7 +5727,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&failed)wi
  const button=$('homeToTop');
  if(!button)return;
  let raf=0;
- function update(){raf=0;button.classList.toggle('visible',window.scrollY>260 && $('screen-home').classList.contains('active'));}
+ function update(){raf=0;button.classList.toggle('visible',window.scrollY>8 && $('screen-home').classList.contains('active'));}
  window.addEventListener('scroll',()=>{if(!raf)raf=requestAnimationFrame(update);},{passive:true});
  document.querySelectorAll('.nav-button').forEach(b=>b.addEventListener('click',()=>requestAnimationFrame(update)));
  update();
