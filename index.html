@@ -969,42 +969,39 @@ button.st-ico:active{transform:scale(.88)}
 .ai-card{position:relative;overflow:hidden;isolation:isolate;border-color:rgba(116,106,231,.18);background:var(--card-grad);margin-bottom:13px}
 .ai-card::before{content:"";position:absolute;inset:0 0 auto;height:108px;pointer-events:none;background:radial-gradient(ellipse 78% 98% at 2% -24%,rgba(137,123,255,.15),transparent 88%),radial-gradient(ellipse 70% 94% at 98% -20%,rgba(68,192,205,.10),transparent 85%)}
 .ai-card>*{position:relative;z-index:1}
-.ai-card-head{display:flex;align-items:center;gap:12px;margin-bottom:13px}
-.ai-card-icon{display:grid;place-items:center;flex:none;width:43px;height:43px;border-radius:15px;background:linear-gradient(135deg,#697dfa,#9f70ee 58%,#61d3d5);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 9px 19px -8px rgba(119,103,238,.58)}
+.ai-card-head{display:flex;align-items:center;gap:12px;margin-bottom:11px}
+.ai-card-icon{display:grid;place-items:center;flex:none;width:43px;height:43px;border-radius:15px;background:linear-gradient(135deg,#697dfa,#9f70ee 58%,#61d3d5);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 9px 19px -8px rgba(119,103,238,.58);cursor:pointer;transition:transform .18s ease,box-shadow .18s ease}
 .ai-card-icon svg{width:27px;height:27px;fill:none;stroke:#fff;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 1px 2px rgba(48,38,123,.25))}
+.ai-card-icon:active{transform:scale(.97)}
+.ai-card-icon[aria-disabled="true"]{cursor:default;opacity:.82}
 .ai-card-icon .ai-core{fill:#fff;stroke:none}
 .ai-card-copy{min-width:0;flex:1}
 .ai-card-title{font-size:18px;font-weight:750;letter-spacing:-.2px}
-.ai-card-sub{font-size:12px;color:var(--muted);margin-top:3px}
+.ai-card-sub{display:none}
 .ai-card-status{flex:none;display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:var(--muted);white-space:nowrap}
 .ai-card-dot{width:6px;height:6px;border-radius:50%;background:#a6adc0}
 .ai-card[data-status="ready"] .ai-card-dot{background:#35b999;box-shadow:0 0 0 3px rgba(53,185,153,.12)}
 .ai-card[data-status="loading"] .ai-card-dot{background:#9889f4;animation:aiPulse 1.4s ease-in-out infinite}
 .ai-card[data-status="error"] .ai-card-dot{background:#e6a35c}
 @keyframes aiPulse{50%{opacity:.35;transform:scale(.75)}}
-.ai-card-headline{font-size:17px;font-weight:780;line-height:1.35;letter-spacing:-.25px;max-width:100%;overflow-wrap:anywhere}
-.ai-card-summary{margin-top:6px;font-size:13px;line-height:1.55;color:var(--muted);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;overflow-wrap:anywhere}
-.ai-card-foot{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:16px}
+.ai-card-headline{font-size:16px;font-weight:780;line-height:1.34;letter-spacing:-.25px;max-width:100%;overflow-wrap:anywhere}
+.ai-card-summary{margin-top:5px;font-size:12.5px;line-height:1.52;color:var(--muted);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;overflow-wrap:anywhere}
+.ai-card-foot{display:flex;align-items:center;justify-content:flex-start;flex-wrap:wrap;gap:10px;margin-top:12px}
 .ai-card-metrics{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
 .ai-card-metrics b{color:var(--text);font-weight:750}
 .ai-card-sep{width:3px;height:3px;border-radius:50%;background:var(--muted);opacity:.6}
-.ai-card-open{display:inline-flex;align-items:center;justify-content:center;gap:7px;flex:none;min-height:35px;padding:8px 12px;border:1px solid rgba(125,113,220,.19);border-radius:11px;background:linear-gradient(130deg,rgba(137,124,235,.14),rgba(123,173,241,.09));color:var(--text);font-size:12px;font-weight:750;cursor:pointer;transition:transform .2s,background .2s}
-.ai-card-open svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none}
-.ai-card-open:active{transform:scale(.96)}
-.ai-card-open[hidden]{display:none}
 .ai-card[data-status="loading"] .ai-card-headline{animation:aiSoftPulse 1.6s ease-in-out infinite}
 @keyframes aiSoftPulse{50%{opacity:.5}}
 :root[data-theme="dark"] .ai-card{border-color:rgba(151,140,255,.19)}
 :root[data-theme="dark"] .ai-card::before{background:radial-gradient(ellipse 85% 100% at 0% -20%,rgba(122,105,251,.16),transparent 85%),radial-gradient(ellipse 65% 95% at 100% -10%,rgba(35,199,192,.08),transparent 85%)}
-:root[data-theme="dark"] .ai-card-open{border-color:rgba(165,151,255,.18);background:linear-gradient(130deg,rgba(137,124,235,.20),rgba(123,173,241,.08))}
 @media(prefers-reduced-motion:reduce){.ai-card-headline,.ai-card-dot{animation:none!important}}
 
 /* ===== Полноэкранный разбор Сёмы ===== */
-.ai-fullsheet{position:fixed;inset:0;z-index:110;display:none;flex-direction:column;overflow:hidden;background:var(--bg);color:var(--text);-webkit-overflow-scrolling:touch}
+.ai-fullsheet{position:fixed;inset:calc(env(safe-area-inset-top) + 18px) 0 0 0;z-index:110;display:none;flex-direction:column;overflow:hidden;background:var(--bg);color:var(--text);-webkit-overflow-scrolling:touch;border-top-left-radius:24px;border-top-right-radius:24px;box-shadow:0 -8px 28px rgba(28,33,74,.14);-webkit-overflow-scrolling:touch}
 .ai-fullsheet.visible{display:flex;animation:aiSheetIn .24s cubic-bezier(.22,1,.36,1)}
 @keyframes aiSheetIn{from{opacity:.5;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 .ai-full-open{overflow:hidden}
-.ai-fullbar{flex:none;display:flex;align-items:center;gap:12px;padding:calc(env(safe-area-inset-top) + 13px) 19px 13px;background:var(--bg);border-bottom:1px solid var(--line)}
+.ai-fullbar{flex:none;display:flex;align-items:center;gap:12px;padding:15px 19px 13px;background:var(--bg);border-bottom:1px solid var(--line)}
 .ai-fullclose{display:grid;place-items:center;width:38px;height:38px;border:1px solid var(--line);border-radius:13px;background:var(--card);color:var(--text);font-size:23px;cursor:pointer;line-height:1}
 .ai-fullbar-title{font-size:17px;font-weight:770;letter-spacing:-.2px}
 .ai-fullbar-sub{font-size:11px;color:var(--muted);margin-top:2px}
@@ -1141,15 +1138,14 @@ button.st-ico:active{transform:scale(.88)}
 <!-- AI-карточка после «Ночного»: вне каруселей, свайпы остаются прежними. -->
 <section class="metric ai-card" id="sugarAi" data-status="empty" aria-live="polite" aria-label="AI-вывод Сёмы">
  <div class="ai-card-head">
-  <div class="ai-card-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M16 3.5c.8 7 4.5 10.7 11.5 12-7 1.3-10.7 5-11.5 12-.8-7-4.5-10.7-11.5-12 7-1.3 10.7-5 11.5-12Z"/><path d="M24.5 3.8v6M21.5 6.8h6"/><circle class="ai-core" cx="16" cy="15.5" r="2"/></svg></div>
-  <div class="ai-card-copy"><div class="ai-card-title">AI · Вывод</div><div class="ai-card-sub">Сёма изучает твою историю</div></div>
+  <div class="ai-card-icon" id="sugarAiWhy" role="button" tabindex="0" aria-label="Открыть подробный AI-разбор" aria-disabled="true" onclick="openSugarAiDetails()"><svg viewBox="0 0 32 32"><path d="M16 3.5c.8 7 4.5 10.7 11.5 12-7 1.3-10.7 5-11.5 12-.8-7-4.5-10.7-11.5-12 7-1.3 10.7-5 11.5-12Z"/><path d="M24.5 3.8v6M21.5 6.8h6"/><circle class="ai-core" cx="16" cy="15.5" r="2"/></svg></div>
+  <div class="ai-card-copy"><div class="ai-card-title">AI · Вывод</div></div>
   <span class="ai-card-status"><i class="ai-card-dot" aria-hidden="true"></i><span id="sugarAiStatus">Ожидает</span></span>
  </div>
  <div class="ai-card-headline" id="sugarAiHeadline">Здесь появится анализ сахара</div>
- <div class="ai-card-summary" id="sugarAiSummary">После следующего замера Сёма сравнит его с похожими ситуациями за последние 90 дней.</div>
+ <div class="ai-card-summary" id="sugarAiSummary">После следующего замера здесь появится краткий вывод.</div>
  <div class="ai-card-foot">
-  <div class="ai-card-metrics" id="sugarAiMeta">90 дней истории</div>
-  <button class="ai-card-open" id="sugarAiWhy" type="button" onclick="openSugarAiDetails()" hidden>Разбор <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button>
+  <div class="ai-card-metrics" id="sugarAiMeta">Последний анализ сохранится здесь</div>
  </div>
 </section>
 <div class="quick-title">
@@ -2237,34 +2233,31 @@ function updateSugarAi(status,data,errorText=''){
  if(!card)return;
  card.dataset.status=status;
  card.setAttribute('aria-busy',status==='loading'?'true':'false');
- why.hidden=status!=='ready';
+ why.setAttribute('aria-disabled',status==='ready'?'false':'true');
  if(status==='ready'&&data){
   sugarAiData=data;
   state.textContent='Готово';
   title.textContent=data.headline||'История измерений собрана';
   summary.textContent=data.summary||'';
-  const stats=data.stats||{};
-  meta.replaceChildren();
-  const note=(n,word)=>{const span=document.createElement('span');const b=document.createElement('b');b.textContent=String(n??0);span.append(b,' '+word);meta.append(span);};
-  meta.textContent='История за 90 дней · Подробности в «Разборе»';
+  meta.textContent='Нажми на значок AI для подробного разбора';
  }else if(status==='loading'){
   sugarAiData=null;
   state.textContent='Анализ';
   title.textContent='Сопоставляю измерения…';
-  summary.textContent='Ищу похожие случаи за 90 дней. Сахар уже сохранён.';
-  meta.textContent='Обновится после ответа ИИ';
+  summary.textContent='Сопоставляю твои прошлые замеры и уколы.';
+  meta.textContent='Новый вывод появится через несколько секунд';
  }else if(status==='error'){
   sugarAiData=null;
   state.textContent='Недоступен';
   title.textContent='Не удалось завершить анализ';
   summary.textContent=errorText||'Groq сейчас недоступен. Сахар сохранён.';
-  meta.textContent='Следующий анализ — после нового сахара';
+  meta.textContent='Подробный разбор снова откроется после нового ответа';
  }else{
   sugarAiData=null;
   state.textContent='Ожидает';
   title.textContent='Здесь появится анализ сахара';
-  summary.textContent='После следующего замера Сёма сравнит его с похожими ситуациями за последние 90 дней.';
-  meta.textContent='90 дней истории';
+  summary.textContent='После следующего замера здесь появится краткий вывод.';
+  meta.textContent='Последний анализ сохранится здесь';
  }
 }
 async function loadSugarAiLatest(){
@@ -2347,6 +2340,12 @@ function closeSugarAiDetails(){
  document.body.classList.remove('ai-full-open');
  document.getElementById('sugarAiWhy').focus({preventScroll:true});
 }
+document.getElementById('sugarAiWhy')?.addEventListener('keydown',event=>{
+ if((event.key==='Enter'||event.key===' ')&&event.currentTarget.getAttribute('aria-disabled')!=='true'){
+  event.preventDefault();
+  openSugarAiDetails();
+ }
+});
 document.addEventListener('keydown',event=>{
  if(event.key==='Escape'&&document.getElementById('aiFullsheet').classList.contains('visible')){
   event.preventDefault();closeSugarAiDetails();
