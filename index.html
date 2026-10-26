@@ -2246,9 +2246,7 @@ function updateSugarAi(status,data,errorText=''){
   const stats=data.stats||{};
   meta.replaceChildren();
   const note=(n,word)=>{const span=document.createElement('span');const b=document.createElement('b');b.textContent=String(n??0);span.append(b,' '+word);meta.append(span);};
-  note(stats.similar,'похожих');
-  const dot=document.createElement('i');dot.className='ai-card-sep';dot.setAttribute('aria-hidden','true');meta.append(dot);
-  note(stats.with_followup,'с повторным замером');
+  meta.textContent='История за 90 дней · Подробности в «Разборе»';
  }else if(status==='loading'){
   sugarAiData=null;
   state.textContent='Анализ';
@@ -2313,6 +2311,7 @@ function openSugarAiDetails(){
  const heading=document.createElement('h2');heading.textContent=data.headline||'Вывод Сёмы';
  const p=document.createElement('p');p.textContent=data.summary||'';
  hero.append(label,heading,p);root.append(hero);
+ if(data.details)aiDetailSection(root,'Что обнаружил AI',data.details);
  const facts=document.createElement('div');facts.className='ai-fullfacts';
  [[s.similar??0,'Похожих дней'],[s.with_followup??0,'С повторным замером']].forEach(([value,label])=>{
   const fact=document.createElement('div');fact.className='ai-fullfact';
@@ -2320,11 +2319,11 @@ function openSugarAiDetails(){
   const name=document.createElement('div');name.className='ai-fullfact-name';name.textContent=label;
   fact.append(num,name);facts.append(fact);
  });
- root.append(facts);
+ if(s.similar!=null||s.with_followup!=null)root.append(facts);
  aiDetailSection(root,'01 · Исходный сахар',d.measurement);
  aiDetailSection(root,'02 · Инъекции перед замером',d.injections);
  aiDetailSection(root,'03 · Что показала история',d.similar);
- aiDetailSection(root,'04 · Как подбирались совпадения',d.criteria);
+ aiDetailSection(root,'04 · Данные и ограничения сравнения',d.criteria);
  if(Array.isArray(d.examples)&&d.examples.length){
   const section=document.createElement('section');section.className='ai-fullsection';
   const title=document.createElement('h3');title.textContent='05 · Похожие ситуации';section.append(title);
@@ -2333,7 +2332,7 @@ function openSugarAiDetails(){
  }
  aiDetailSection(root,'Надёжность: '+(d.reliability||'не определена'),d.limitations);
  const note=document.createElement('div');note.className='ai-fullnote';
- note.textContent='Вывод сформирован Groq на основе подготовленной статистики. Здесь показаны проверяемые факты и критерии отбора, а не скрытые рассуждения модели. Анализ не заменяет медицинскую рекомендацию.';
+ note.textContent='Вывод сформирован Groq из последовательности измерений за 90 дней. AI может ошибаться в сопоставлениях и арифметике; это описание истории, а не схема подбора инсулина.';
  root.append(note);
  const sheet=document.getElementById('aiFullsheet');
  sheet.classList.add('visible');sheet.setAttribute('aria-hidden','false');
