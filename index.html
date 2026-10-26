@@ -965,15 +965,68 @@ button.st-ico:active{transform:scale(.88)}
 :root[data-theme="dark"] .bottom-nav .nav-pill::before{opacity:.35}
 @media(prefers-reduced-motion:reduce){.bottom-nav .nav-pill{transition:none}}
 
-/* Минимальный ИИ-результат под сахаром. Визуал можно менять позже отдельно. */
-.sugar-ai{margin:0 0 13px;padding:12px 14px;border-radius:16px;border:1px solid var(--card-border);background:var(--card-grad);box-shadow:var(--shadow);color:var(--text)}
-.sugar-ai[hidden],.sugar-ai-why[hidden]{display:none}
-.sugar-ai-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
-.sugar-ai-name{font-size:12px;font-weight:750;color:var(--blue)}
-.sugar-ai-why{border:1px solid var(--line);border-radius:10px;padding:7px 10px;background:var(--input-bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer}
-.sugar-ai-headline{font-size:14px;font-weight:750;line-height:1.35}
-.sugar-ai-summary{margin-top:4px;font-size:12px;line-height:1.5;color:var(--muted);white-space:pre-wrap}
-.sugar-ai-meta{margin-top:6px;font-size:11px;color:var(--muted)}
+/* ===== AI · Вывод: самостоятельная карточка главной ===== */
+.ai-card{position:relative;overflow:hidden;isolation:isolate;border-color:rgba(116,106,231,.18);background:var(--card-grad);margin-bottom:13px}
+.ai-card::before{content:"";position:absolute;inset:0 0 auto;height:108px;pointer-events:none;background:radial-gradient(ellipse 78% 98% at 2% -24%,rgba(137,123,255,.15),transparent 88%),radial-gradient(ellipse 70% 94% at 98% -20%,rgba(68,192,205,.10),transparent 85%)}
+.ai-card>*{position:relative;z-index:1}
+.ai-card-head{display:flex;align-items:center;gap:12px;margin-bottom:13px}
+.ai-card-icon{display:grid;place-items:center;flex:none;width:43px;height:43px;border-radius:15px;background:linear-gradient(135deg,#697dfa,#9f70ee 58%,#61d3d5);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 9px 19px -8px rgba(119,103,238,.58)}
+.ai-card-icon svg{width:27px;height:27px;fill:none;stroke:#fff;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 1px 2px rgba(48,38,123,.25))}
+.ai-card-icon .ai-core{fill:#fff;stroke:none}
+.ai-card-copy{min-width:0;flex:1}
+.ai-card-title{font-size:18px;font-weight:750;letter-spacing:-.2px}
+.ai-card-sub{font-size:12px;color:var(--muted);margin-top:3px}
+.ai-card-status{flex:none;display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:var(--muted);white-space:nowrap}
+.ai-card-dot{width:6px;height:6px;border-radius:50%;background:#a6adc0}
+.ai-card[data-status="ready"] .ai-card-dot{background:#35b999;box-shadow:0 0 0 3px rgba(53,185,153,.12)}
+.ai-card[data-status="loading"] .ai-card-dot{background:#9889f4;animation:aiPulse 1.4s ease-in-out infinite}
+.ai-card[data-status="error"] .ai-card-dot{background:#e6a35c}
+@keyframes aiPulse{50%{opacity:.35;transform:scale(.75)}}
+.ai-card-headline{font-size:17px;font-weight:780;line-height:1.35;letter-spacing:-.25px;max-width:100%;overflow-wrap:anywhere}
+.ai-card-summary{margin-top:6px;font-size:13px;line-height:1.55;color:var(--muted);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;overflow-wrap:anywhere}
+.ai-card-foot{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:16px}
+.ai-card-metrics{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.ai-card-metrics b{color:var(--text);font-weight:750}
+.ai-card-sep{width:3px;height:3px;border-radius:50%;background:var(--muted);opacity:.6}
+.ai-card-open{display:inline-flex;align-items:center;justify-content:center;gap:7px;flex:none;min-height:35px;padding:8px 12px;border:1px solid rgba(125,113,220,.19);border-radius:11px;background:linear-gradient(130deg,rgba(137,124,235,.14),rgba(123,173,241,.09));color:var(--text);font-size:12px;font-weight:750;cursor:pointer;transition:transform .2s,background .2s}
+.ai-card-open svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none}
+.ai-card-open:active{transform:scale(.96)}
+.ai-card-open[hidden]{display:none}
+.ai-card[data-status="loading"] .ai-card-headline{animation:aiSoftPulse 1.6s ease-in-out infinite}
+@keyframes aiSoftPulse{50%{opacity:.5}}
+:root[data-theme="dark"] .ai-card{border-color:rgba(151,140,255,.19)}
+:root[data-theme="dark"] .ai-card::before{background:radial-gradient(ellipse 85% 100% at 0% -20%,rgba(122,105,251,.16),transparent 85%),radial-gradient(ellipse 65% 95% at 100% -10%,rgba(35,199,192,.08),transparent 85%)}
+:root[data-theme="dark"] .ai-card-open{border-color:rgba(165,151,255,.18);background:linear-gradient(130deg,rgba(137,124,235,.20),rgba(123,173,241,.08))}
+@media(prefers-reduced-motion:reduce){.ai-card-headline,.ai-card-dot{animation:none!important}}
+
+/* ===== Полноэкранный разбор Сёмы ===== */
+.ai-fullsheet{position:fixed;inset:0;z-index:110;display:none;flex-direction:column;overflow:hidden;background:var(--bg);color:var(--text);-webkit-overflow-scrolling:touch}
+.ai-fullsheet.visible{display:flex;animation:aiSheetIn .24s cubic-bezier(.22,1,.36,1)}
+@keyframes aiSheetIn{from{opacity:.5;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.ai-full-open{overflow:hidden}
+.ai-fullbar{flex:none;display:flex;align-items:center;gap:12px;padding:calc(env(safe-area-inset-top) + 13px) 19px 13px;background:var(--bg);border-bottom:1px solid var(--line)}
+.ai-fullclose{display:grid;place-items:center;width:38px;height:38px;border:1px solid var(--line);border-radius:13px;background:var(--card);color:var(--text);font-size:23px;cursor:pointer;line-height:1}
+.ai-fullbar-title{font-size:17px;font-weight:770;letter-spacing:-.2px}
+.ai-fullbar-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.ai-fullbar-icon{margin-left:auto;width:33px;height:33px;display:grid;place-items:center;border-radius:12px;background:linear-gradient(135deg,#697dfa,#9774e7);color:#fff;font-size:19px}
+.ai-fullscroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:20px 18px calc(env(safe-area-inset-bottom) + 32px)}
+.ai-fullinner{max-width:520px;margin:0 auto}
+.ai-fullhero{padding:22px 20px;border-radius:24px;background:linear-gradient(145deg,rgba(127,112,241,.15),rgba(85,193,200,.08)),var(--card-grad);border:1px solid var(--card-border);box-shadow:var(--shadow)}
+.ai-fullhero-label{color:var(--blue);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px}
+.ai-fullhero h2{font-size:23px;line-height:1.3;letter-spacing:-.5px;margin:12px 0 8px}
+.ai-fullhero p{font-size:14px;line-height:1.65;color:var(--text);margin:0}
+.ai-fullfacts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:13px 0 22px}
+.ai-fullfact{background:var(--card);border:1px solid var(--card-border);border-radius:17px;padding:13px 14px}
+.ai-fullfact-num{font-size:27px;font-weight:800;letter-spacing:-.6px;font-variant-numeric:tabular-nums}
+.ai-fullfact-name{margin-top:3px;color:var(--muted);font-size:11px;line-height:1.4}
+.ai-fullsection{margin:19px 0 0;padding:17px 16px;background:var(--card-grad);border:1px solid var(--card-border);border-radius:19px;box-shadow:0 5px 18px rgba(60,72,150,.045)}
+.ai-fullsection h3{font-size:15px;font-weight:780;margin:0 0 10px;letter-spacing:-.15px}
+.ai-fullsection p{margin:0;color:var(--muted);font-size:13px;line-height:1.65;white-space:pre-line;overflow-wrap:anywhere}
+.ai-fullsection .ai-case{padding:10px 0;border-top:1px solid var(--line);font-size:12px;line-height:1.6;color:var(--text)}
+.ai-fullsection .ai-case:first-of-type{border-top:0;padding-top:0}
+.ai-fullnote{margin:19px 3px 0;font-size:11px;line-height:1.65;color:var(--muted)}
+@media(max-width:360px){.ai-fullscroll{padding-left:13px;padding-right:13px}.ai-fullfacts{gap:7px}.ai-fullfact{padding:11px 12px}}
+@media(prefers-reduced-motion:reduce){.ai-fullsheet.visible{animation:none}}
 </style>
 </head>
 <body>
@@ -1017,13 +1070,6 @@ button.st-ico:active{transform:scale(.88)}
 </section>
 </div>
 <div class="carousel-dots tight" id="sugarDots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i><i></i></div>
-<!-- Технический блок ИИ: отдельно от карусели, чтобы не менять механику свайпов. -->
-<section class="sugar-ai" id="sugarAi" hidden aria-live="polite" aria-label="ИИ-анализ сахара">
- <div class="sugar-ai-top"><span class="sugar-ai-name">✦ Анализ Сёмы</span><button class="sugar-ai-why" id="sugarAiWhy" type="button" onclick="openSugarAiDetails()" hidden>Почему?</button></div>
- <div class="sugar-ai-headline" id="sugarAiHeadline"></div>
- <div class="sugar-ai-summary" id="sugarAiSummary"></div>
- <div class="sugar-ai-meta" id="sugarAiMeta"></div>
-</section>
 <!-- --- Карточка: инсулин (дневной) + таймер --- -->
 <div class="carousel shadowfix dcar" id="insulinCar">
 <section class="metric insulin">
@@ -1087,6 +1133,20 @@ button.st-ico:active{transform:scale(.88)}
 </section>
 </div>
 <div class="carousel-dots tight" id="nightDots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+<!-- AI-карточка после «Ночного»: вне каруселей, свайпы остаются прежними. -->
+<section class="metric ai-card" id="sugarAi" data-status="empty" aria-live="polite" aria-label="AI-вывод Сёмы">
+ <div class="ai-card-head">
+  <div class="ai-card-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M16 3.5c.8 7 4.5 10.7 11.5 12-7 1.3-10.7 5-11.5 12-.8-7-4.5-10.7-11.5-12 7-1.3 10.7-5 11.5-12Z"/><path d="M24.5 3.8v6M21.5 6.8h6"/><circle class="ai-core" cx="16" cy="15.5" r="2"/></svg></div>
+  <div class="ai-card-copy"><div class="ai-card-title">AI · Вывод</div><div class="ai-card-sub">Сёма изучает твою историю</div></div>
+  <span class="ai-card-status"><i class="ai-card-dot" aria-hidden="true"></i><span id="sugarAiStatus">Ожидает</span></span>
+ </div>
+ <div class="ai-card-headline" id="sugarAiHeadline">Здесь появится анализ сахара</div>
+ <div class="ai-card-summary" id="sugarAiSummary">После следующего замера Сёма сравнит его с похожими ситуациями за последние 90 дней.</div>
+ <div class="ai-card-foot">
+  <div class="ai-card-metrics" id="sugarAiMeta">90 дней истории</div>
+  <button class="ai-card-open" id="sugarAiWhy" type="button" onclick="openSugarAiDetails()" hidden>Разбор <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button>
+ </div>
+</section>
 <div class="quick-title">
 <div class="section-title">Быстрый доступ</div>
 <span></span>
@@ -1461,6 +1521,15 @@ button.st-ico:active{transform:scale(.88)}
 </div>
 <!-- === ОВЕРЛЕЙ ЗАГРУЗКИ === -->
 <div class="loading-overlay" id="loadingOverlay" role="status" aria-label="Загрузка"><div class="spinner"></div></div>
+<!-- === ПОЛНОЭКРАННЫЙ AI-РАЗБОР === -->
+<section class="ai-fullsheet" id="aiFullsheet" role="dialog" aria-modal="true" aria-labelledby="aiFullTitle" aria-hidden="true">
+ <div class="ai-fullbar">
+  <button class="ai-fullclose" id="aiFullClose" type="button" onclick="closeSugarAiDetails()" aria-label="Закрыть разбор">‹</button>
+  <div><div class="ai-fullbar-title" id="aiFullTitle">Как Сёма сделал вывод</div><div class="ai-fullbar-sub">Факты и совпадения за 90 дней</div></div>
+  <div class="ai-fullbar-icon" aria-hidden="true">✦</div>
+ </div>
+ <div class="ai-fullscroll" id="aiFullscroll"><div class="ai-fullinner" id="aiFullbody"></div></div>
+</section>
 <!-- === МОДАЛЬНОЕ ОКНО === -->
 <div class="modal-backdrop" id="modalBackdrop" onclick="backdropClose(event)">
 <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
@@ -2128,39 +2197,69 @@ async function openAction(action){
  }
 }
 
-// ИИ вызывается отдельным запросом только после успешного сохранения сахара.
-// Ошибка анализа не изменяет статус уже сохранённой записи.
+// Новый анализ только после нового сахара; открытие Mini App читает готовый
+// результат из Google Sheets и никогда не вызывает Groq повторно.
 let sugarAiData=null;
 let sugarAiSequence=0;
-function updateSugarAi(status, data, errorText=''){
- const panel=document.getElementById('sugarAi');
+let sugarAiLoadingLatest=false;
+function updateSugarAi(status,data,errorText=''){
+ const card=document.getElementById('sugarAi');
  const why=document.getElementById('sugarAiWhy');
- const headline=document.getElementById('sugarAiHeadline');
+ const title=document.getElementById('sugarAiHeadline');
  const summary=document.getElementById('sugarAiSummary');
  const meta=document.getElementById('sugarAiMeta');
- if(!panel)return;
- panel.hidden=false;
+ const state=document.getElementById('sugarAiStatus');
+ if(!card)return;
+ card.dataset.status=status;
+ card.setAttribute('aria-busy',status==='loading'?'true':'false');
  why.hidden=status!=='ready';
- panel.setAttribute('aria-busy',status==='loading'?'true':'false');
- if(status==='loading'){
-  sugarAiData=null;
-  headline.textContent='Изучаю предыдущие измерения…';
-  summary.textContent='Сахар уже сохранён. Анализ загружается отдельно.';
-  meta.textContent='';
- }else if(status==='ready'&&data){
+ if(status==='ready'&&data){
   sugarAiData=data;
-  headline.textContent=data.headline||'История измерений собрана';
+  state.textContent='Готово';
+  title.textContent=data.headline||'История измерений собрана';
   summary.textContent=data.summary||'';
   const stats=data.stats||{};
-  meta.textContent='Похожие дни: '+(stats.similar??0)+' · С повторным замером: '+(stats.with_followup??0)+' · Достоверность: '+(stats.reliability||'не оценена');
+  meta.replaceChildren();
+  const note=(n,word)=>{const span=document.createElement('span');const b=document.createElement('b');b.textContent=String(n??0);span.append(b,' '+word);meta.append(span);};
+  note(stats.similar,'похожих');
+  const dot=document.createElement('i');dot.className='ai-card-sep';dot.setAttribute('aria-hidden','true');meta.append(dot);
+  note(stats.with_followup,'с повторным замером');
+ }else if(status==='loading'){
+  sugarAiData=null;
+  state.textContent='Анализ';
+  title.textContent='Сопоставляю измерения…';
+  summary.textContent='Ищу похожие случаи за 90 дней. Сахар уже сохранён.';
+  meta.textContent='Обновится после ответа ИИ';
+ }else if(status==='error'){
+  sugarAiData=null;
+  state.textContent='Недоступен';
+  title.textContent='Не удалось завершить анализ';
+  summary.textContent=errorText||'Groq сейчас недоступен. Сахар сохранён.';
+  meta.textContent='Следующий анализ — после нового сахара';
  }else{
   sugarAiData=null;
-  headline.textContent='Анализ пока недоступен';
-  summary.textContent=errorText||'Не удалось связаться с Groq.';
-  meta.textContent='Сахар успешно сохранён.';
+  state.textContent='Ожидает';
+  title.textContent='Здесь появится анализ сахара';
+  summary.textContent='После следующего замера Сёма сравнит его с похожими ситуациями за последние 90 дней.';
+  meta.textContent='90 дней истории';
  }
 }
-async function runSugarAiAfterSave(savedValue, ticket){
+async function loadSugarAiLatest(){
+ if(sugarAiLoadingLatest)return;
+ sugarAiLoadingLatest=true;
+ const seq=sugarAiSequence;
+ try{
+  const latest=await api('ai_latest');
+  if(seq!==sugarAiSequence)return;
+  if(latest?.analysis)updateSugarAi('ready',latest.analysis);
+  else updateSugarAi('empty');
+ }catch(error){
+  // Ошибка чтения не должна стирать уже показанный вывод.
+  if(seq===sugarAiSequence&&!sugarAiData)updateSugarAi('empty');
+  handleAccessError(error);
+ }finally{sugarAiLoadingLatest=false;}
+}
+async function runSugarAiAfterSave(savedValue,ticket){
  const seq=++sugarAiSequence;
  updateSugarAi('loading');
  try{
@@ -2173,25 +2272,62 @@ async function runSugarAiAfterSave(savedValue, ticket){
   }
  }
 }
+function aiDetailSection(parent,heading,text){
+ const section=document.createElement('section');section.className='ai-fullsection';
+ const title=document.createElement('h3');title.textContent=heading;
+ const para=document.createElement('p');para.textContent=text||'Данных нет.';
+ section.append(title,para);parent.append(section);
+ return section;
+}
 function openSugarAiDetails(){
  if(!sugarAiData||!sugarAiData.verified)return;
- const d=sugarAiData.verified,s=sugarAiData.stats||{};
- const parts=[
-  'Исходное измерение: '+d.measurement,
-  'Предыдущие инъекции: '+d.injections,
-  'Похожие случаи: '+d.similar,
-  'Как выбирались совпадения: '+d.criteria,
-  'Надёжность: '+(d.reliability||'не оценена'),
-  'Ограничения: '+d.limitations
- ];
+ const data=sugarAiData,d=data.verified,s=data.stats||{};
+ const root=document.getElementById('aiFullbody');root.replaceChildren();
+ const hero=document.createElement('div');hero.className='ai-fullhero';
+ const label=document.createElement('div');label.className='ai-fullhero-label';label.textContent='✦ Результат анализа';
+ const heading=document.createElement('h2');heading.textContent=data.headline||'Вывод Сёмы';
+ const p=document.createElement('p');p.textContent=data.summary||'';
+ hero.append(label,heading,p);root.append(hero);
+ const facts=document.createElement('div');facts.className='ai-fullfacts';
+ [[s.similar??0,'Похожих дней'],[s.with_followup??0,'С повторным замером']].forEach(([value,label])=>{
+  const fact=document.createElement('div');fact.className='ai-fullfact';
+  const num=document.createElement('div');num.className='ai-fullfact-num';num.textContent=String(value);
+  const name=document.createElement('div');name.className='ai-fullfact-name';name.textContent=label;
+  fact.append(num,name);facts.append(fact);
+ });
+ root.append(facts);
+ aiDetailSection(root,'01 · Исходный сахар',d.measurement);
+ aiDetailSection(root,'02 · Инъекции перед замером',d.injections);
+ aiDetailSection(root,'03 · Что показала история',d.similar);
+ aiDetailSection(root,'04 · Как подбирались совпадения',d.criteria);
  if(Array.isArray(d.examples)&&d.examples.length){
-  parts.push('Примеры из истории:\n'+d.examples.map((item,i)=>(i+1)+'. '+item).join('\n'));
+  const section=document.createElement('section');section.className='ai-fullsection';
+  const title=document.createElement('h3');title.textContent='05 · Похожие ситуации';section.append(title);
+  d.examples.forEach((item,i)=>{const line=document.createElement('div');line.className='ai-case';line.textContent=String(i+1).padStart(2,'0')+'  '+item;section.append(line);});
+  root.append(section);
  }
- const usage=sugarAiData.usage;
- if(usage&&Number.isFinite(usage.total_tokens)&&usage.total_tokens>0)parts.push('Groq: '+usage.total_tokens+' токенов за анализ (вход '+usage.prompt_tokens+', выход '+usage.completion_tokens+').');
- showModal('Почему такой вывод?','Факты из Google Sheets · без скрытых рассуждений','✦','');
- document.getElementById('modalContent').textContent=parts.join('\n\n');
+ aiDetailSection(root,'Надёжность: '+(d.reliability||'не определена'),d.limitations);
+ const note=document.createElement('div');note.className='ai-fullnote';
+ note.textContent='Вывод сформирован Groq на основе подготовленной статистики. Здесь показаны проверяемые факты и критерии отбора, а не скрытые рассуждения модели. Анализ не заменяет медицинскую рекомендацию.';
+ root.append(note);
+ const sheet=document.getElementById('aiFullsheet');
+ sheet.classList.add('visible');sheet.setAttribute('aria-hidden','false');
+ document.body.classList.add('ai-full-open');
+ document.getElementById('aiFullscroll').scrollTop=0;
+ document.getElementById('aiFullClose').focus({preventScroll:true});
 }
+function closeSugarAiDetails(){
+ const sheet=document.getElementById('aiFullsheet');
+ if(!sheet.classList.contains('visible'))return;
+ sheet.classList.remove('visible');sheet.setAttribute('aria-hidden','true');
+ document.body.classList.remove('ai-full-open');
+ document.getElementById('sugarAiWhy').focus({preventScroll:true});
+}
+document.addEventListener('keydown',event=>{
+ if(event.key==='Escape'&&document.getElementById('aiFullsheet').classList.contains('visible')){
+  event.preventDefault();closeSugarAiDetails();
+ }
+});
 
 // ============================================================
 // ЗАПИСЬ ЗНАЧЕНИЙ: сохранить сахар / инсулин / ночной
@@ -3457,11 +3593,12 @@ function initPlaceholderMarquee(){
 updateEntryPlaceholders();
 initPlaceholderMarquee();
 window.addEventListener('pageshow',()=>{updateEntryPlaceholders();updateInsulinTimer();});
-document.addEventListener('visibilitychange',()=>{if(!document.hidden){updateEntryPlaceholders();updateInsulinTimer();syncInsulinTimer();loadHomeCards(false);loadReportSettings();}});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){updateEntryPlaceholders();updateInsulinTimer();syncInsulinTimer();loadHomeCards(false);loadReportSettings();if(document.getElementById('sugarAi')?.dataset.status!=='loading')loadSugarAiLatest();}});
 if(tg)tg.onEvent?.('activated',()=>{updateEntryPlaceholders();updateInsulinTimer();});
 updateNightInputPlaceholder();
 setInterval(updateNightInputPlaceholder,60_000);
 loadHomeCards(true);
+loadSugarAiLatest();
 
 // --- Инициализация пилюли навигации ---
 requestAnimationFrame(()=>{
@@ -4942,9 +5079,13 @@ stRefresh();
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const APP_VERSION='v20261025_1';          /* ← менять при каждом обновлении: vГГГГММДД_N */
+const APP_VERSION='v20261025_2';          /* ← менять при каждом обновлении: vГГГГММДД_N */
 const DEV_CHAT='https://t.me/larik_11';
 const APP_CHANGES=[
+ {v:'v20261025_2',items:[
+  'Новая AI-карточка под ночным инсулином с полноэкранным разбором',
+  'Последний вывод хранится в Google Sheets и открывается без нового запроса к Groq'
+ ]},
  {v:'v20261025_1',items:[
   'Точки под карточками видны сразу, данные дней грузятся в фоне — экран больше не прыгает',
   'Напоминания: «Поменяй иголку🥺» и «Пора делять 🤗»; лист statist больше не используется'
