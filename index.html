@@ -966,7 +966,7 @@ button.st-ico:active{transform:scale(.88)}
 @media(prefers-reduced-motion:reduce){.bottom-nav .nav-pill{transition:none}}
 
 /* ===== AI · Вывод: самостоятельная карточка главной ===== */
-.ai-card{position:relative;overflow:hidden;isolation:isolate;border-color:rgba(116,106,231,.18);background:var(--card-grad);margin-bottom:13px}
+.ai-card{position:relative;overflow:hidden;isolation:isolate;border-color:rgba(116,106,231,.18);background:var(--card-grad);margin-bottom:13px;height:var(--night-card-height,155px);display:flex;flex-direction:column}
 .ai-card::before{content:"";position:absolute;inset:0 0 auto;height:108px;pointer-events:none;background:radial-gradient(ellipse 78% 98% at 2% -24%,rgba(137,123,255,.15),transparent 88%),radial-gradient(ellipse 70% 94% at 98% -20%,rgba(68,192,205,.10),transparent 85%)}
 .ai-card>*{position:relative;z-index:1}
 .ai-card-head{display:flex;align-items:center;gap:12px;margin-bottom:11px}
@@ -986,7 +986,7 @@ button.st-ico:active{transform:scale(.88)}
 @keyframes aiPulse{50%{opacity:.35;transform:scale(.75)}}
 .ai-card-headline{font-size:16px;font-weight:780;line-height:1.34;letter-spacing:-.25px;max-width:100%;overflow-wrap:anywhere}
 .ai-card-summary{margin-top:5px;font-size:12.5px;line-height:1.52;color:var(--muted);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;overflow-wrap:anywhere}
-.ai-card-foot{display:flex;align-items:center;justify-content:flex-start;flex-wrap:wrap;gap:10px;margin-top:12px}
+.ai-card-foot{display:none}
 .ai-card-metrics{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
 .ai-card-metrics b{color:var(--text);font-weight:750}
 .ai-card-sep{width:3px;height:3px;border-radius:50%;background:var(--muted);opacity:.6}
@@ -997,7 +997,7 @@ button.st-ico:active{transform:scale(.88)}
 @media(prefers-reduced-motion:reduce){.ai-card-headline,.ai-card-dot{animation:none!important}}
 
 /* ===== Полноэкранный разбор Сёмы ===== */
-.ai-fullsheet{position:fixed;inset:calc(env(safe-area-inset-top) + 18px) 0 0 0;z-index:110;display:none;flex-direction:column;overflow:hidden;background:var(--bg);color:var(--text);-webkit-overflow-scrolling:touch;border-top-left-radius:24px;border-top-right-radius:24px;box-shadow:0 -8px 28px rgba(28,33,74,.14);-webkit-overflow-scrolling:touch}
+.ai-fullsheet{position:fixed;inset:calc(env(safe-area-inset-top) + 36px) 0 0 0;z-index:110;display:none;flex-direction:column;overflow:hidden;background:var(--bg);color:var(--text);-webkit-overflow-scrolling:touch;border-radius:0;box-shadow:0 -8px 28px rgba(28,33,74,.14);-webkit-overflow-scrolling:touch}
 .ai-fullsheet.visible{display:flex;animation:aiSheetIn .24s cubic-bezier(.22,1,.36,1)}
 @keyframes aiSheetIn{from{opacity:.5;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 .ai-full-open{overflow:hidden}
@@ -1145,7 +1145,7 @@ button.st-ico:active{transform:scale(.88)}
  <div class="ai-card-headline" id="sugarAiHeadline">Здесь появится анализ сахара</div>
  <div class="ai-card-summary" id="sugarAiSummary">После следующего замера здесь появится краткий вывод.</div>
  <div class="ai-card-foot">
-  <div class="ai-card-metrics" id="sugarAiMeta">Последний анализ сохранится здесь</div>
+  <div class="ai-card-metrics" id="sugarAiMeta"></div>
  </div>
 </section>
 <div class="quick-title">
@@ -2223,6 +2223,18 @@ async function openAction(action){
 let sugarAiData=null;
 let sugarAiSequence=0;
 let sugarAiLoadingLatest=false;
+function syncAiCardHeight(){
+ const night=document.querySelector('#nightCar .metric.night');
+ const ai=document.getElementById('sugarAi');
+ if(!night||!ai)return;
+ const height=night.getBoundingClientRect().height;
+ if(height>0)ai.style.setProperty('--night-card-height',height+'px');
+}
+const nightCardObserver=new ResizeObserver(syncAiCardHeight);
+const nightCarousel=document.getElementById('nightCar');
+if(nightCarousel)nightCardObserver.observe(nightCarousel);
+window.addEventListener('resize',syncAiCardHeight);
+requestAnimationFrame(syncAiCardHeight);
 function updateSugarAi(status,data,errorText=''){
  const card=document.getElementById('sugarAi');
  const why=document.getElementById('sugarAiWhy');
@@ -2239,7 +2251,7 @@ function updateSugarAi(status,data,errorText=''){
   state.textContent='Готово';
   title.textContent=data.headline||'История измерений собрана';
   summary.textContent=data.summary||'';
-  meta.textContent='Нажми на значок AI для подробного разбора';
+  meta.textContent='';
  }else if(status==='loading'){
   sugarAiData=null;
   state.textContent='Анализ';
