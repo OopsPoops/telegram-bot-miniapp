@@ -1027,6 +1027,16 @@ button.st-ico:active{transform:scale(.88)}
 .ai-fullnote{margin:19px 3px 0;font-size:11px;line-height:1.65;color:var(--muted)}
 @media(max-width:360px){.ai-fullscroll{padding-left:13px;padding-right:13px}.ai-fullfacts{gap:7px}.ai-fullfact{padding:11px 12px}}
 @media(prefers-reduced-motion:reduce){.ai-fullsheet.visible{animation:none}}
+
+/* Главная: равный интервал после ночной карточки и кнопка наверх */
+#screen-home #nightDots{margin-bottom:4px}
+#screen-home #sugarAi{margin-top:0}
+.home-to-top{position:fixed;right:max(17px,calc((100vw - 520px)/2 + 18px));bottom:calc(91px + env(safe-area-inset-bottom));z-index:19;width:45px;height:45px;display:grid;place-items:center;border:1px solid var(--card-border);border-radius:50%;background:var(--card-grad);color:var(--text);box-shadow:var(--shadow);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);opacity:0;visibility:hidden;pointer-events:none;transform:translateY(9px) scale(.94);transition:opacity .2s,transform .25s,visibility .2s;cursor:pointer}
+.home-to-top.visible{opacity:1;visibility:visible;pointer-events:auto;transform:none}
+.home-to-top svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round}
+.home-to-top:active{transform:scale(.93)}
+body.keyboard-open .home-to-top,body.access-denied .home-to-top{opacity:0;visibility:hidden;pointer-events:none}
+@media(prefers-reduced-motion:reduce){.home-to-top{transition:none}}
 </style>
 </head>
 <body>
@@ -1511,6 +1521,7 @@ button.st-ico:active{transform:scale(.88)}
 </button>
 </div>
 </nav>
+<button type="button" id="homeToTop" class="home-to-top" aria-label="Наверх" title="Наверх" onclick="window.scrollTo({top:0,behavior:'smooth'})"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5m-7 7 7-7 7 7"/></svg></button>
 <div class="chart-fs" id="chartFs" role="dialog" aria-modal="true" aria-label="График на весь экран">
 <div class="chart-fs-inner" id="chartFsInner">
 <div class="chart-fs-head"><div class="chart-fs-title" id="fsTitle"></div><button class="chart-fs-close" type="button" onclick="closeChartFullscreen()" aria-label="Закрыть">×</button></div>
@@ -4718,9 +4729,10 @@ function ydUpdateAway(){
  const g=ydGroup();
  if(!g||!yd.anchor||!yd.built)return;
  const idx=yd.idx==null?-yd.kmin:yd.idx;
- g.classList.toggle('away',idx!==-yd.kmin||g.dataset.meal!==(yd.anchor.meal?'dinner':'breakfast'));
+ g.classList.toggle('away',idx!==-yd.kmin||g.dataset.meal!==(yd.anchor.meal?'dinner':'breakfast')||!!window.semaMetricsAway);
 }
 function ydGoDefault(){
+ if(typeof window.resetHomeMetricCards==='function')window.resetHomeMetricCards();
  const car=ydCarousel();
  if(car&&car.clientWidth&&carouselIndex(car)!==-yd.kmin)car.scrollTo({left:-yd.kmin*car.clientWidth,behavior:'smooth'});
  if(ydMealAt(yd.raf?yd.target:yd.rot)!==(yd.anchor.meal?'dinner':'breakfast'))ydFlip(1);
@@ -5527,7 +5539,24 @@ function metricGoTo(index){
  syncingMetric=false;
  const lead=$('sugarCar');
  if(lead)selectedMetricDay=metricDayForPage(lead);
+ syncHomeResetIndicator();
 }
+function syncHomeResetIndicator(){
+ window.semaMetricsAway=selectedMetricDay!==0 || carouselIndex($('nightCar'))!==0;
+ if(typeof ydUpdateAway==='function')ydUpdateAway();
+}
+window.resetHomeMetricCards=function(){
+ metricGesture=null;
+ clearMetricTransforms();
+ syncingMetric=true;
+ selectedMetricDay=0;
+ for(const car of [...metricCars(),$('nightCar')].filter(Boolean)){
+  car.scrollLeft=0;
+  dots(car);
+ }
+ syncingMetric=false;
+ syncHomeResetIndicator();
+};
 function scrollMetricToDay(car,off,behavior){
  if(!car||!car.clientWidth)return;
  const i=off===0?0:metricPageForDay(car,off);
@@ -5599,6 +5628,7 @@ window.showDayInMetrics=function(off){
  scrollMetricToDay($('sugarCar'),off,'instant');
  scrollMetricToDay($('insulinCar'),off,'instant');
  syncingMetric=false;
+ syncHomeResetIndicator();
 };
 function setup(car){
  if(car._dcReady)return;
@@ -5619,8 +5649,10 @@ function setup(car){
     other.scrollLeft=car.scrollLeft/car.clientWidth*other.clientWidth;
     syncingMetric=false;
     selectedMetricDay=metricDayForPage(car);
+    syncHomeResetIndicator();
    }
   }
+  if(car.id==='nightCar')syncHomeResetIndicator();
   if(raf)return;
   raf=requestAnimationFrame(()=>{raf=0;dots(car);fit(car);});
  },{passive:true});
@@ -5674,6 +5706,7 @@ function render(){
  for(let o=1;o>-(DAYS-1);o--){const r=nightRow(o,ix,t);if(r)nights.push(r);}
  const head='<div class="dn-head"><span>Ночь на</span><span>Вечер</span><span>Доза</span><span>Утро</span><span>Δ</span></div>';
  mount('nightCar',pack($('nightCar'),'night',nights,head));
+ syncHomeResetIndicator();
 }
 window.refreshDayCards=function(force){
  return getHistory(!!force).then(render).catch(error=>{
@@ -5690,6 +5723,15 @@ window.switchTab=function(name){
 };
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&failed)window.refreshDayCards(true);});
 ['sugarCar','insulinCar','nightCar'].forEach(id=>{const c=$(id);if(c)setup(c);});
+(function(){
+ const button=$('homeToTop');
+ if(!button)return;
+ let raf=0;
+ function update(){raf=0;button.classList.toggle('visible',window.scrollY>260 && $('screen-home').classList.contains('active'));}
+ window.addEventListener('scroll',()=>{if(!raf)raf=requestAnimationFrame(update);},{passive:true});
+ document.querySelectorAll('.nav-button').forEach(b=>b.addEventListener('click',()=>requestAnimationFrame(update)));
+ update();
+})();
 })();
 </script>
 </body>
