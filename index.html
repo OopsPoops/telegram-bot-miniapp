@@ -1028,15 +1028,10 @@ button.st-ico:active{transform:scale(.88)}
 @media(max-width:360px){.ai-fullscroll{padding-left:13px;padding-right:13px}.ai-fullfacts{gap:7px}.ai-fullfact{padding:11px 12px}}
 @media(prefers-reduced-motion:reduce){.ai-fullsheet.visible{animation:none}}
 
-/* Главная: равный интервал после ночной карточки и кнопка наверх */
+/* Главная: равный интервал после ночной карточки */
 #screen-home #nightDots{margin-bottom:4px}
 #screen-home #sugarAi{margin-top:0}
-.home-to-top{position:fixed;right:max(17px,calc((100vw - 520px)/2 + 18px));bottom:calc(91px + env(safe-area-inset-bottom));z-index:19;width:45px;height:45px;display:grid;place-items:center;border:1px solid var(--card-border);border-radius:50%;background:var(--card-grad);color:var(--text);box-shadow:var(--shadow);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);opacity:0;visibility:hidden;pointer-events:none;transform:translateY(9px) scale(.94);transition:opacity .2s,transform .25s,visibility .2s;cursor:pointer}
-.home-to-top.visible{opacity:1;visibility:visible;pointer-events:auto;transform:none}
-.home-to-top svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round}
-.home-to-top:active{transform:scale(.93)}
-body.keyboard-open .home-to-top,body.access-denied .home-to-top{opacity:0;visibility:hidden;pointer-events:none}
-@media(prefers-reduced-motion:reduce){.home-to-top{transition:none}}
+
 </style>
 </head>
 <body>
@@ -1374,16 +1369,16 @@ body.keyboard-open .home-to-top,body.access-denied .home-to-top{opacity:0;visibi
 <div class="st-row has-ico"><span class="st-ico c-green"><svg class="g"><use href="#i-shield"/></svg></span><div class="st-copy"><div class="st-t">Доступ к боту</div><div class="st-s" id="accessDescription"></div></div><span class="st-val access-status" id="accessStatus"><span class="status-dot"></span><span id="accessText">Проверяется…</span></span></div>
 </div>
 <div class="st-card">
-<button class="st-row has-ico st-nav" type="button" onclick="stOpen('sound')"><span class="st-ico c-red"><svg class="g"><use href="#i-sound"/></svg></span><span class="st-t">Звук и вибрация</span><span class="st-val" id="stV-sound"></span><svg class="st-chev"><use href="#i-chev"/></svg></button>
-<button class="st-row has-ico st-nav" type="button" onclick="stOpen('timer')"><span class="st-ico c-orange"><svg class="g"><use href="#i-timer"/></svg></span><span class="st-t">Таймер инсулина</span><span class="st-val" id="stV-timer"></span><svg class="st-chev"><use href="#i-chev"/></svg></button>
-<button class="st-row has-ico st-nav" type="button" onclick="stOpen('report')"><span class="st-ico c-blue"><svg class="g"><use href="#i-cal"/></svg></span><span class="st-t">Ежедневный отчёт</span><span class="st-val" id="stV-report"></span><svg class="st-chev"><use href="#i-chev"/></svg></button>
-<button class="st-row has-ico st-nav" type="button" onclick="stOpen('target')"><span class="st-ico c-green"><svg class="g"><use href="#i-target"/></svg></span><span class="st-t">Целевой диапазон</span><span class="st-val" id="stV-target"></span><svg class="st-chev"><use href="#i-chev"/></svg></button>
+<button class="st-row has-ico st-nav" type="button" onclick="stOpen('sound')"><span class="st-ico c-red"><svg class="g"><use href="#i-sound"/></svg></span><span class="st-t">Звук и вибрация</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
+<button class="st-row has-ico st-nav" type="button" onclick="stOpen('timer')"><span class="st-ico c-orange"><svg class="g"><use href="#i-timer"/></svg></span><span class="st-t">Таймер инсулина</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
+<button class="st-row has-ico st-nav" type="button" onclick="stOpen('report')"><span class="st-ico c-blue"><svg class="g"><use href="#i-cal"/></svg></span><span class="st-t">Ежедневный отчёт</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
+<button class="st-row has-ico st-nav" type="button" onclick="stOpen('target')"><span class="st-ico c-green"><svg class="g"><use href="#i-target"/></svg></span><span class="st-t">Целевой диапазон</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
 </div>
 <div class="st-card">
-<button class="st-row has-ico st-nav" type="button" onclick="stOpen('theme')"><span class="st-ico c-sky"><svg class="g"><use href="#i-theme"/></svg></span><span class="st-t">Оформление</span><span class="st-val" id="stV-theme"></span><svg class="st-chev"><use href="#i-chev"/></svg></button>
+<button class="st-row has-ico st-nav" type="button" onclick="stOpen('theme')"><span class="st-ico c-sky"><svg class="g"><use href="#i-theme"/></svg></span><span class="st-t">Оформление</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
 </div>
 <div class="st-card">
-<button class="st-row has-ico st-nav" type="button" onclick="stOpen('about')"><span class="st-ico c-gray"><svg class="g"><use href="#i-info"/></svg></span><span class="st-t">О приложении</span><span class="st-val" id="stV-about"></span><svg class="st-chev"><use href="#i-chev"/></svg></button>
+<button class="st-row has-ico st-nav" type="button" onclick="stOpen('about')"><span class="st-ico c-gray"><svg class="g"><use href="#i-info"/></svg></span><span class="st-t">О приложении</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
 </div>
 </div>
 
@@ -1521,7 +1516,6 @@ body.keyboard-open .home-to-top,body.access-denied .home-to-top{opacity:0;visibi
 </button>
 </div>
 </nav>
-<button type="button" id="homeToTop" class="home-to-top" aria-label="Наверх" title="Наверх" onclick="window.scrollTo({top:0,behavior:'smooth'})"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5m-7 7 7-7 7 7"/></svg></button>
 <div class="chart-fs" id="chartFs" role="dialog" aria-modal="true" aria-label="График на весь экран">
 <div class="chart-fs-inner" id="chartFsInner">
 <div class="chart-fs-head"><div class="chart-fs-title" id="fsTitle"></div><button class="chart-fs-close" type="button" onclick="closeChartFullscreen()" aria-label="Закрыть">×</button></div>
@@ -5723,15 +5717,7 @@ window.switchTab=function(name){
 };
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&failed)window.refreshDayCards(true);});
 ['sugarCar','insulinCar','nightCar'].forEach(id=>{const c=$(id);if(c)setup(c);});
-(function(){
- const button=$('homeToTop');
- if(!button)return;
- let raf=0;
- function update(){raf=0;button.classList.toggle('visible',window.scrollY>8 && $('screen-home').classList.contains('active'));}
- window.addEventListener('scroll',()=>{if(!raf)raf=requestAnimationFrame(update);},{passive:true});
- document.querySelectorAll('.nav-button').forEach(b=>b.addEventListener('click',()=>requestAnimationFrame(update)));
- update();
-})();
+
 })();
 </script>
 </body>
