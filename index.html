@@ -989,6 +989,8 @@ button.st-ico:active{transform:scale(.88)}
 .ai-card-foot{display:none}
 .ai-card-metrics{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
 .ai-card-metrics b{color:var(--text);font-weight:750}
+.ai-retry{border:1px solid var(--line);border-radius:11px;background:var(--input-bg);color:var(--text);padding:8px 11px;font-size:12px;font-weight:700;cursor:pointer}
+.ai-retry[hidden]{display:none}
 .ai-card-sep{width:3px;height:3px;border-radius:50%;background:var(--muted);opacity:.6}
 .ai-card[data-status="loading"] .ai-card-headline{animation:aiSoftPulse 1.6s ease-in-out infinite}
 @keyframes aiSoftPulse{50%{opacity:.5}}
@@ -1138,7 +1140,7 @@ button.st-ico:active{transform:scale(.88)}
  <div class="ai-card-headline" id="sugarAiHeadline">Здесь появится анализ сахара</div>
  <div class="ai-card-summary" id="sugarAiSummary">После следующего замера здесь появится краткий вывод.</div>
  <div class="ai-card-foot">
-  <div class="ai-card-metrics" id="sugarAiMeta"></div>
+  <div class="ai-card-metrics" id="sugarAiMeta"></div><button class="ai-retry" id="sugarAiRetry" type="button" onclick="retrySugarAi()" hidden>↻ Повторить анализ</button>
  </div>
 </section>
 <div class="quick-title">
@@ -2216,6 +2218,8 @@ async function openAction(action){
 let sugarAiData=null;
 let sugarAiSequence=0;
 let sugarAiLoadingLatest=false;
+let sugarAiRetryPayload=null;
+let sugarAiRetryCount=0;
 function syncAiCardHeight(){
  const night=document.querySelector('#nightCar .metric.night');
  const ai=document.getElementById('sugarAi');
@@ -2231,6 +2235,7 @@ requestAnimationFrame(syncAiCardHeight);
 function updateSugarAi(status,data,errorText=''){
  const card=document.getElementById('sugarAi');
  const why=document.getElementById('sugarAiWhy');
+ const retry=document.getElementById('sugarAiRetry');
  const title=document.getElementById('sugarAiHeadline');
  const summary=document.getElementById('sugarAiSummary');
  const meta=document.getElementById('sugarAiMeta');
@@ -2239,6 +2244,7 @@ function updateSugarAi(status,data,errorText=''){
  card.dataset.status=status;
  card.setAttribute('aria-busy',status==='loading'?'true':'false');
  why.setAttribute('aria-disabled',status==='ready'?'false':'true');
+ retry.hidden=status!=='error'||!sugarAiRetryPayload||sugarAiRetryCount>=2;
  if(status==='ready'&&data){
   sugarAiData=data;
   state.textContent='Готово';
@@ -2280,12 +2286,21 @@ async function loadSugarAiLatest(){
   handleAccessError(error);
  }finally{sugarAiLoadingLatest=false;}
 }
-async function runSugarAiAfterSave(savedValue,ticket){
+function retrySugarAi(){
+ if(!sugarAiRetryPayload||sugarAiRetryCount>=2)return;
+ runSugarAiAfterSave(sugarAiRetryPayload.value,sugarAiRetryPayload.ticket,true);
+}
+async function runSugarAiAfterSave(savedValue,ticket,isRetry=false){
+ if(!isRetry){
+  sugarAiRetryPayload={value:savedValue,ticket};
+  sugarAiRetryCount=0;
+ }
+ sugarAiRetryCount++;
  const seq=++sugarAiSequence;
  updateSugarAi('loading');
  try{
   const result=await api('ai_analyze',{expected_value:savedValue,ticket});
-  if(seq===sugarAiSequence)updateSugarAi('ready',result);
+  if(seq===sugarAiSequence){sugarAiRetryPayload=null;updateSugarAi('ready',result);}
  }catch(error){
   if(seq===sugarAiSequence){
    updateSugarAi('error',null,error.message||'Сервис недоступен');
