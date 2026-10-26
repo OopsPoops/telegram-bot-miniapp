@@ -1200,18 +1200,13 @@ button.st-ico:active{transform:scale(.88)}
 <button class="analytics-choice" type="button" data-metric="insulin" onclick="selectMetric('insulin')">Инсулин</button>
 <button class="analytics-choice" type="button" data-metric="night" onclick="selectMetric('night')">Ночной</button>
 </div>
-<div class="analytics-toolbar" style="margin:8px 2px 12px">
-<label class="analytics-toolbar-label" for="historyPeriod">История для графиков</label>
-<select id="historyPeriod" aria-label="Период истории" onchange="changeHistoryPeriod()" style="border:1px solid var(--line);border-radius:11px;padding:8px 10px;background:var(--input-bg);color:var(--text)">
-<option value="7">7 дней</option><option value="21" selected>21 день</option><option value="45">45 дней</option><option value="90">90 дней</option><option value="180">180 дней</option>
-</select></div>
 <div id="analytics-loading" class="analytics-card analytics-message" role="status" data-mw>Загружаю измерения…</div>
 <div id="analytics-content" hidden>
 <section class="analytics-card analytics-panel" data-panel="trend">
 <div class="analytics-toolbar">
 <span class="analytics-toolbar-label">Период</span>
 <select id="trend-period" aria-label="Период графика динамики" onchange="changeTrendPeriod()">
-<option value="1" selected>1 день</option><option value="2">2 дня</option><option value="3">3 дня</option><option value="7">7 дней</option><option value="14">14 дней</option><option value="21">21 день</option><option value="30">30 дней</option><option value="45">45 дней</option>
+<option value="1">1 день</option><option value="2">2 дня</option><option value="3" selected>3 дня</option><option value="7">7 дней</option><option value="14">14 дней</option><option value="21">21 день</option><option value="30">30 дней</option><option value="45">45 дней</option>
 </select>
 <span class="toolbar-count" id="trend-count" role="status"></span>
 </div>
@@ -1237,8 +1232,8 @@ button.st-ico:active{transform:scale(.88)}
 <section class="analytics-card analytics-panel" data-panel="distribution" hidden>
 <div class="analytics-toolbar">
 <span class="analytics-toolbar-label">Период</span>
-<select id="distribution-period" aria-label="Период графика распределения" onchange="renderDistribution()">
-<option value="3" selected>3 дня</option><option value="7">7 дней</option><option value="14">14 дней</option><option value="21">21 день</option><option value="30">30 дней</option><option value="45">45 дней</option>
+<select id="distribution-period" aria-label="Период графика распределения" onchange="onChartPeriodChange()">
+<option value="3">3 дня</option><option value="7">7 дней</option><option value="14" selected>14 дней</option><option value="21">21 день</option><option value="30">30 дней</option><option value="45">45 дней</option>
 </select>
 <span class="toolbar-count" id="distribution-count" role="status"></span>
 </div>
@@ -1250,8 +1245,8 @@ button.st-ico:active{transform:scale(.88)}
 <section class="analytics-card analytics-panel" data-panel="daily" hidden>
 <div class="analytics-toolbar">
 <span class="analytics-toolbar-label">Сводка за период</span>
-<select id="daily-period" aria-label="Период суточной сводки" onchange="renderDailySummary()">
-<option value="3" selected>3 дня</option><option value="7">7 дней</option><option value="14">14 дней</option><option value="21">21 день</option><option value="30">30 дней</option><option value="45">45 дней</option>
+<select id="daily-period" aria-label="Период суточной сводки" onchange="onChartPeriodChange()">
+<option value="3">3 дня</option><option value="7">7 дней</option><option value="14" selected>14 дней</option><option value="21">21 день</option><option value="30">30 дней</option><option value="45">45 дней</option>
 </select>
 <span class="toolbar-count" id="daily-count" role="status"></span>
 </div>
@@ -1266,8 +1261,8 @@ button.st-ico:active{transform:scale(.88)}
 <section class="analytics-card analytics-panel" data-panel="dose" hidden>
 <div class="analytics-toolbar">
 <span class="analytics-toolbar-label">Период</span>
-<select id="dose-period" aria-label="Период" onchange="renderDoseChart()">
-<option value="7">7 дней</option><option value="14">14 дней</option><option value="30" selected>30 дней</option><option value="45">45 дней</option>
+<select id="dose-period" aria-label="Период" onchange="onChartPeriodChange()">
+<option value="7">7 дней</option><option value="14" selected>14 дней</option><option value="30">30 дней</option><option value="45">45 дней</option>
 </select>
 <span class="toolbar-count" id="dose-count" role="status"></span>
 </div>
@@ -1283,7 +1278,7 @@ button.st-ico:active{transform:scale(.88)}
 <section class="analytics-card analytics-panel" data-panel="range" hidden>
 <div class="analytics-toolbar">
 <span class="analytics-toolbar-label">Период</span>
-<select id="range-period" aria-label="Период для расчёта доли в цели" onchange="renderRangeDonut()">
+<select id="range-period" aria-label="Период для расчёта доли в цели" onchange="onChartPeriodChange()">
 <option value="1">Сегодня</option><option value="3">3 дня</option><option value="7">7 дней</option><option value="14" selected>14 дней</option><option value="21">21 день</option><option value="30">30 дней</option><option value="45">45 дней</option>
 </select>
 <span class="toolbar-count" id="range-count" role="status"></span>
@@ -1298,8 +1293,8 @@ button.st-ico:active{transform:scale(.88)}
 <section class="analytics-card analytics-panel" data-panel="activity" hidden>
 <div class="analytics-toolbar">
 <span class="analytics-toolbar-label">Активность за период</span>
-<select id="activity-period" aria-label="Период тепловой карты" onchange="renderActivityHeatmap()">
-<option value="3" selected>3 дня</option><option value="7">7 дней</option><option value="14">14 дней</option><option value="21">21 день</option><option value="30">30 дней</option><option value="45">45 дней</option>
+<select id="activity-period" aria-label="Период тепловой карты" onchange="onChartPeriodChange()">
+<option value="3">3 дня</option><option value="7">7 дней</option><option value="14" selected>14 дней</option><option value="21">21 день</option><option value="30">30 дней</option><option value="45">45 дней</option>
 </select>
 <span class="toolbar-count" id="activity-count" role="status"></span>
 </div>
@@ -1326,7 +1321,7 @@ button.st-ico:active{transform:scale(.88)}
 <section class="analytics-card analytics-panel" data-panel="effect" hidden>
 <div class="analytics-toolbar">
 <span class="analytics-toolbar-label">Укол → сахар</span>
-<select id="effect-period" aria-label="Период графика" onchange="renderEffectChart()">
+<select id="effect-period" aria-label="Период графика" onchange="onChartPeriodChange()">
 <option value="14">14 дней</option><option value="30" selected>30 дней</option><option value="45">45 дней</option>
 </select>
 <span class="toolbar-count" id="effect-count" role="status"></span>
@@ -1717,7 +1712,7 @@ function historyWindow(days,force=false){
  return task;
 }
 function invalidateHistoryWindow(){semaHistoryCache.result=null;semaHistoryCache.at=0;}
-const analyticsState={loaded:false,loading:false,measurements:[],doses:{limitInsulin:null,limitNight:null,night:new Map()},chart:'trend',metric:'sugar',trendDays:1,selectedDates:null,visibleWeeks:[true,true,true]};
+const analyticsState={loaded:false,loading:false,measurements:[],doses:{limitInsulin:null,limitNight:null,night:new Map()},chart:'trend',metric:'sugar',trendDays:3,historyDays:0,selectedDates:null,visibleWeeks:[true,true,true]};
 const weekColors=['#5267e8','#ec9438','#31a66d'];
 const labels={
 today:{title:'Сегодня',subtitle:'Данные за текущий день',icon:'☀️',loading:'Собираю данные за сегодня…'},
@@ -2808,37 +2803,58 @@ function normalizeHistory(result){
    return {...row,dateObj:date,dateKey:dateKey(date),timeObj:time,value,type};
   }).filter(Boolean).sort((a,b)=>a.dateObj-b.dateObj||a.timeObj.minutes-b.timeObj.minutes);
 }
-function changeHistoryPeriod(){
- analyticsState.loaded=false;
- analyticsState.selectedDates=null;
- loadAnalytics(true);
+// Начальная загрузка графиков — 14 дней. Более длинные периоды — по необходимости.
+const DEFAULT_GRAPH_HISTORY_DAYS=14;
+function requiredGraphHistoryDays(){
+ const chart=analyticsState.chart;
+ if(chart==='compare')return 21; // три календарные недели
+ if(chart==='effect')return Number(document.getElementById('effect-period')?.value)||30;
+ if(chart==='trend')return Number(document.getElementById('trend-period')?.value)||3;
+ const id={distribution:'distribution-period',daily:'daily-period',activity:'activity-period',range:analyticsState.metric==='sugar'?'range-period':'dose-period'}[chart];
+ return id?(Number(document.getElementById(id)?.value)||14):DEFAULT_GRAPH_HISTORY_DAYS;
 }
-async function loadAnalytics(force=false){
-  if(analyticsState.loading||analyticsState.loaded&&!force)return;
-  analyticsState.loading=true;
-  const loading=document.getElementById('analytics-loading');
-  const content=document.getElementById('analytics-content');
+function onChartPeriodChange(){
+ if(analyticsState.chart==='trend'){
+  analyticsState.trendDays=Number(document.getElementById('trend-period').value)||3;
+  analyticsState.selectedDates=null;
+ }
+ const needed=requiredGraphHistoryDays();
+ if(analyticsState.loaded&&needed>analyticsState.historyDays){loadAnalytics(true,needed);return;}
+ renderAnalytics();
+}
+async function loadAnalytics(force=false,requestedDays=null){
+ if(analyticsState.loading)return;
+ const days=Math.max(DEFAULT_GRAPH_HISTORY_DAYS,requestedDays||requiredGraphHistoryDays());
+ if(analyticsState.loaded&&analyticsState.historyDays>=days&&!force){renderAnalytics();return;}
+ // Не перечитываем меньший период, когда более длинное окно уже загружено.
+ if(analyticsState.loaded&&analyticsState.historyDays>=days){renderAnalytics();return;}
+ analyticsState.loading=true;
+ const loading=document.getElementById('analytics-loading');
+ const content=document.getElementById('analytics-content');
+ loading.hidden=false;
+ loading.textContent=mw('Загружаю измерения…');
+ content.hidden=true;
+ try{
+  const result=await historyWindow(days);
+  analyticsState.measurements=normalizeHistory(result);
+  analyticsState.doses=normalizeDoses(result);
+  analyticsState.historyDays=days;
+  analyticsState.loaded=true;
+  analyticsState.selectedDates=null;
+  setAccess(true,'Сервер подтвердил доступ');
+  loading.hidden=true;
+  content.hidden=false;
+  renderAnalytics();
+  // Если график переключили во время запроса, подгружаем нужный ему период.
+  const newerDays=requiredGraphHistoryDays();
+  if(newerDays>days)queueMicrotask(()=>loadAnalytics(true,newerDays));
+ }catch(error){
+  handleAccessError(error);
+  loading.innerHTML=escapeHtml(error.message)+'<br><button class="analytics-retry" type="button" onclick="loadAnalytics(true)">Повторить</button>';
   loading.hidden=false;
-  loading.textContent=mw('Загружаю измерения…');
-  content.hidden=true;
-  try{
-   const days=Number(document.getElementById('historyPeriod')?.value)||21;
-   const result=await historyWindow(days,force);
-   analyticsState.measurements=normalizeHistory(result);
-   analyticsState.doses=normalizeDoses(result);
-   analyticsState.loaded=true;
-   analyticsState.selectedDates=null;
-   setAccess(true,'Сервер подтвердил доступ');
-   loading.hidden=true;
-   content.hidden=false;
-   renderAnalytics();
-  }catch(error){
-   handleAccessError(error);
-   loading.innerHTML=escapeHtml(error.message)+'<br><button class="analytics-retry" type="button" onclick="loadAnalytics(true)">Повторить</button>';
-   loading.hidden=false;
-  }finally{
-   analyticsState.loading=false;
-  }
+ }finally{
+  analyticsState.loading=false;
+ }
 }
 
 // ============================================================
@@ -2965,6 +2981,7 @@ function selectChart(name){
   syncAnalyticsLayout();
   if(name==='dynamics')loadTrends(false);
   if(name==='summary')loadSummary(false);
+  if(!analyticsState.loading&&analyticsState.loaded&&requiredGraphHistoryDays()>analyticsState.historyDays){loadAnalytics(true,requiredGraphHistoryDays());return;}
   renderAnalytics();
 }
 function toInjectionWords(text){
@@ -3085,9 +3102,7 @@ function renderTrend(){
   setChartCount('trend-count',visible.length);
 }
 function changeTrendPeriod(){
-  analyticsState.trendDays=Number(document.getElementById('trend-period').value);
-  analyticsState.selectedDates=null;
-  renderTrend();
+  onChartPeriodChange();
 }
 function mondayOf(date){
   const monday=new Date(date.getFullYear(),date.getMonth(),date.getDate());
@@ -4448,7 +4463,7 @@ const SUMMARY_PERIODS={
  weeks:[[4,'4 недели'],[8,'8 недель'],[12,'12 недель']],
  months:[[3,'3 месяца'],[6,'6 месяцев'],[12,'12 месяцев']]
 };
-const SUMMARY_DEFAULT_PERIOD={days:7,weeks:8,months:12};
+const SUMMARY_DEFAULT_PERIOD={days:14,weeks:8,months:12};
 const SUMMARY_MONTHS=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
 const SUMMARY_WEEKDAYS=['вс','пн','вт','ср','чт','пт','сб'];
 const SUMMARY_COLORS={sugar:'#5267e8',insulin:'#1f9d8f',night:'#8b6ee0'};
@@ -5387,7 +5402,7 @@ load();
 /* Свайп-страницы на карточках: сахар (замеры), инсулин (уколы + ночной), ночной (вечер → доза → утро) */
 (function(){
 const $=id=>document.getElementById(id);
-let DAYS=7;const MAX_ROWS=3;const MAX_DAYS=45;
+let DAYS=14;const MAX_ROWS=3;const MAX_DAYS=45;
 const EVENING_FROM=18*60;                    /* вечерний сахар — последний замер после 18:00 предыдущего дня */
 const MORNING_FROM=4*60,MORNING_TO=12*60;    /* утренний — первый замер с 4:00 до 12:00 */
 const WD=['вс','пн','вт','ср','чт','пт','сб'];
@@ -5410,7 +5425,7 @@ function getHistory(force){
 }
 function extendHomeHistory(){
  if(DAYS>=MAX_DAYS||histPromise)return;
- DAYS=Math.min(MAX_DAYS,DAYS===7?21:DAYS+14);
+ DAYS=Math.min(MAX_DAYS,DAYS===14?28:DAYS+14);
  getHistory(true).then(render).catch(error=>console.error('Не удалось подгрузить прошлые дни:',error));
 }
 function dayInfo(off){
@@ -5654,7 +5669,7 @@ function metricTouchEnd(e){
 window.showDayInMetrics=function(off){
  off=Math.min(0,Math.trunc(Number(off)||0));
  if(-off>=DAYS&&-off<MAX_DAYS){
-  DAYS=Math.min(MAX_DAYS,Math.max(21,-off+1));
+  DAYS=Math.min(MAX_DAYS,Math.max(28,-off+1));
   selectedMetricDay=off;
   getHistory(true).then(render);
   return;
