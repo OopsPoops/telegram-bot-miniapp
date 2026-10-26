@@ -1200,6 +1200,11 @@ button.st-ico:active{transform:scale(.88)}
 <button class="analytics-choice" type="button" data-metric="insulin" onclick="selectMetric('insulin')">Инсулин</button>
 <button class="analytics-choice" type="button" data-metric="night" onclick="selectMetric('night')">Ночной</button>
 </div>
+<div class="analytics-toolbar" style="margin:8px 2px 12px">
+<label class="analytics-toolbar-label" for="historyPeriod">История для графиков</label>
+<select id="historyPeriod" aria-label="Период истории" onchange="changeHistoryPeriod()" style="border:1px solid var(--line);border-radius:11px;padding:8px 10px;background:var(--input-bg);color:var(--text)">
+<option value="7">7 дней</option><option value="21" selected>21 день</option><option value="45">45 дней</option><option value="90">90 дней</option><option value="180">180 дней</option>
+</select></div>
 <div id="analytics-loading" class="analytics-card analytics-message" role="status" data-mw>Загружаю измерения…</div>
 <div id="analytics-content" hidden>
 <section class="analytics-card analytics-panel" data-panel="trend">
@@ -1692,6 +1697,26 @@ function timerStateStorageKey(){
  const userId=tg?.initDataUnsafe?.user?.id;
  return userId?`${TIMER_STATE_KEY_PREFIX}:${userId}`:TIMER_STATE_KEY_PREFIX;
 }
+// Общая краткоживущая загрузка истории: одновременно запрошенные окна используют
+// один сетевой запрос. Данные не хранятся на сервере и не переживают закрытие вкладки.
+const semaHistoryCache={days:0,result:null,at:0,pending:null,pendingDays:0};
+function historyWindow(days,force=false){
+ days=Math.max(1,Math.min(365,Math.trunc(Number(days)||7)));
+ if(!force&&semaHistoryCache.result&&semaHistoryCache.days>=days&&Date.now()-semaHistoryCache.at<25000){
+  const r=semaHistoryCache.result;
+  // Для точных периодов серверное окно всё равно выбираем заново, если отличается.
+  if(semaHistoryCache.days===days)return Promise.resolve(r);
+ }
+ if(!force&&semaHistoryCache.pending&&semaHistoryCache.pendingDays===days)return semaHistoryCache.pending;
+ const task=api('history',{days});
+ semaHistoryCache.pending=task;semaHistoryCache.pendingDays=days;
+ task.then(result=>{
+  semaHistoryCache.result=result;semaHistoryCache.days=days;semaHistoryCache.at=Date.now();
+  if(semaHistoryCache.pending===task)semaHistoryCache.pending=null;
+ },()=>{if(semaHistoryCache.pending===task)semaHistoryCache.pending=null;});
+ return task;
+}
+function invalidateHistoryWindow(){semaHistoryCache.result=null;semaHistoryCache.at=0;}
 const analyticsState={loaded:false,loading:false,measurements:[],doses:{limitInsulin:null,limitNight:null,night:new Map()},chart:'trend',metric:'sugar',trendDays:1,selectedDates:null,visibleWeeks:[true,true,true]};
 const weekColors=['#5267e8','#ec9438','#31a66d'];
 const labels={
@@ -1724,7 +1749,7 @@ function switchTab(name){
  moveNavPill();
  window.scrollTo({top:0,behavior:'smooth'});
  selectionHaptic();
- if(name==='graphs')loadAnalytics(true);
+ if(name==='graphs')loadAnalytics(false);
  if(name==='settings')loadReportSettings();
 }
 function moveNavPill(){
@@ -2657,6 +2682,7 @@ async function refreshHomeAfterChange(type){
  if(type==='insulin'){showMetricLoading(insulinEl);renderNightFact(null,true);}
  if(type==='fact')renderNightFact(null,true);
  for(let i=0;i<30&&homeBusy;i++)await new Promise(resolve=>setTimeout(resolve,150));
+ invalidateHistoryWindow();
  lastHomeJson=null;
  const ok=await loadHomeCards(false);
  if(!ok){
@@ -2782,6 +2808,11 @@ function normalizeHistory(result){
    return {...row,dateObj:date,dateKey:dateKey(date),timeObj:time,value,type};
   }).filter(Boolean).sort((a,b)=>a.dateObj-b.dateObj||a.timeObj.minutes-b.timeObj.minutes);
 }
+function changeHistoryPeriod(){
+ analyticsState.loaded=false;
+ analyticsState.selectedDates=null;
+ loadAnalytics(true);
+}
 async function loadAnalytics(force=false){
   if(analyticsState.loading||analyticsState.loaded&&!force)return;
   analyticsState.loading=true;
@@ -2791,7 +2822,8 @@ async function loadAnalytics(force=false){
   loading.textContent=mw('Загружаю измерения…');
   content.hidden=true;
   try{
-   const result=await api('history',{days:45});
+   const days=Number(document.getElementById('historyPeriod')?.value)||21;
+   const result=await historyWindow(days,force);
    analyticsState.measurements=normalizeHistory(result);
    analyticsState.doses=normalizeDoses(result);
    analyticsState.loaded=true;
@@ -3490,7 +3522,7 @@ async function loadNightYesterday(){
 }
 async function loadLatestMeasurements(){
  try{
-  const result=await api('history',{days:45});
+  const result=await historyWindow(7);
   const rows=normalizeHistory(result);
   const today=dateKey(new Date());
   ['sugar','insulin'].forEach(type=>{
@@ -5355,7 +5387,7 @@ load();
 /* Свайп-страницы на карточках: сахар (замеры), инсулин (уколы + ночной), ночной (вечер → доза → утро) */
 (function(){
 const $=id=>document.getElementById(id);
-const DAYS=45,MAX_ROWS=3;
+let DAYS=7;const MAX_ROWS=3;const MAX_DAYS=45;
 const EVENING_FROM=18*60;                    /* вечерний сахар — последний замер после 18:00 предыдущего дня */
 const MORNING_FROM=4*60,MORNING_TO=12*60;    /* утренний — первый замер с 4:00 до 12:00 */
 const WD=['вс','пн','вт','ср','чт','пт','сб'];
@@ -5363,7 +5395,7 @@ const pad=n=>String(n).padStart(2,'0');
 let hist=null,histAt=0,histStart=0,histPromise=null,failed=false;
 function fetchHist(){
  histStart=Date.now();
- return api('history',{days:DAYS}).then(r=>{hist={rows:normalizeHistory(r),doses:normalizeDoses(r)};histAt=Date.now();failed=false;return hist;});
+ return historyWindow(DAYS).then(r=>{hist={rows:normalizeHistory(r),doses:normalizeDoses(r)};histAt=Date.now();failed=false;return hist;});
 }
 function getHistory(force){
  if(force&&hist&&Date.now()-histAt<1500)force=false;
@@ -5375,6 +5407,11 @@ function getHistory(force){
  histPromise=p;
  p.then(()=>{if(histPromise===p)histPromise=null;},()=>{if(histPromise===p)histPromise=null;});
  return p;
+}
+function extendHomeHistory(){
+ if(DAYS>=MAX_DAYS||histPromise)return;
+ DAYS=Math.min(MAX_DAYS,DAYS===7?21:DAYS+14);
+ getHistory(true).then(render).catch(error=>console.error('Не удалось подгрузить прошлые дни:',error));
 }
 function dayInfo(off){
  const d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()+off);
@@ -5607,6 +5644,7 @@ function metricTouchEnd(e){
  const distance=Math.abs(g.dx);
  const advance=distance>w*.24||(distance>28&&distance/elapsed>.45);
  const next=Math.max(0,Math.min(g.car.children.length-1,g.index+(advance?(g.dx<0?1:-1):0)));
+ if(g.dx<0&&g.index>=g.car.children.length-2)extendHomeHistory();
  const finalDx=(g.index-next)*w;
  metricAnimating=true;
  metricTransforms(finalDx,true);
@@ -5614,7 +5652,14 @@ function metricTouchEnd(e){
 }
 /* Программный выбор даты из верхней карточки. */
 window.showDayInMetrics=function(off){
- off=Math.max(-(DAYS-1),Math.min(0,Math.trunc(Number(off)||0)));
+ off=Math.min(0,Math.trunc(Number(off)||0));
+ if(-off>=DAYS&&-off<MAX_DAYS){
+  DAYS=Math.min(MAX_DAYS,Math.max(21,-off+1));
+  selectedMetricDay=off;
+  getHistory(true).then(render);
+  return;
+ }
+ off=Math.max(-(DAYS-1),off);
  selectedMetricDay=off;
  metricGesture=null;
  clearMetricTransforms();
@@ -5646,7 +5691,7 @@ function setup(car){
     syncHomeResetIndicator();
    }
   }
-  if(car.id==='nightCar')syncHomeResetIndicator();
+  if(car.id==='nightCar'){syncHomeResetIndicator();if(car.scrollLeft>=car.scrollWidth-car.clientWidth*2)extendHomeHistory();}
   if(raf)return;
   raf=requestAnimationFrame(()=>{raf=0;dots(car);fit(car);});
  },{passive:true});
