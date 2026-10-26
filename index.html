@@ -996,17 +996,10 @@ button.st-ico:active{transform:scale(.88)}
 :root[data-theme="dark"] .ai-card::before{background:radial-gradient(ellipse 85% 100% at 0% -20%,rgba(122,105,251,.16),transparent 85%),radial-gradient(ellipse 65% 95% at 100% -10%,rgba(35,199,192,.08),transparent 85%)}
 @media(prefers-reduced-motion:reduce){.ai-card-headline,.ai-card-dot{animation:none!important}}
 
-/* ===== Полноэкранный разбор Сёмы ===== */
-.ai-fullsheet{position:fixed;inset:calc(env(safe-area-inset-top) + 36px) 0 0 0;z-index:110;display:none;flex-direction:column;overflow:hidden;background:var(--bg);color:var(--text);-webkit-overflow-scrolling:touch;border-radius:0;box-shadow:0 -8px 28px rgba(28,33,74,.14);-webkit-overflow-scrolling:touch}
-.ai-fullsheet.visible{display:flex;animation:aiSheetIn .24s cubic-bezier(.22,1,.36,1)}
-@keyframes aiSheetIn{from{opacity:.5;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
-.ai-full-open{overflow:hidden}
-.ai-fullbar{flex:none;display:flex;align-items:center;gap:12px;padding:15px 19px 13px;background:var(--bg);border-bottom:1px solid var(--line)}
-.ai-fullclose{display:grid;place-items:center;width:38px;height:38px;border:1px solid var(--line);border-radius:13px;background:var(--card);color:var(--text);font-size:23px;cursor:pointer;line-height:1}
-.ai-fullbar-title{font-size:17px;font-weight:770;letter-spacing:-.2px}
-.ai-fullbar-sub{font-size:11px;color:var(--muted);margin-top:2px}
-.ai-fullbar-icon{margin-left:auto;width:33px;height:33px;display:grid;place-items:center;border-radius:12px;background:linear-gradient(135deg,#697dfa,#9774e7);color:#fff;font-size:19px}
-.ai-fullscroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:20px 18px calc(env(safe-area-inset-bottom) + 32px)}
+/* ===== AI-разбор: обычный экран внутри приложения ===== */
+#screen-ai .doctor-head{margin:8px 0 16px}
+.ai-page-symbol{width:38px;height:38px;border-radius:13px;background:linear-gradient(135deg,#697dfa,#9774e7);color:white;display:grid;place-items:center;font-size:21px}
+#screen-ai .ai-fullinner{padding-bottom:16px}
 .ai-fullinner{max-width:520px;margin:0 auto}
 .ai-fullhero{padding:22px 20px;border-radius:24px;background:linear-gradient(145deg,rgba(127,112,241,.15),rgba(85,193,200,.08)),var(--card-grad);border:1px solid var(--card-border);box-shadow:var(--shadow)}
 .ai-fullhero-label{color:var(--blue);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px}
@@ -1162,6 +1155,15 @@ button.st-ico:active{transform:scale(.88)}
 <button class="quick-button quick-chip" onclick="openAction('memory')"><span class="quick-icon gray">⚙️</span><span class="quick-label">Память</span></button>
 <button class="quick-button quick-big quick-wide q-doctor" onclick="openDoctor()"><span class="quick-icon green">🩺</span><span><div class="quick-label">К врачу</div></span></button>
 </section>
+</section>
+<!-- === ЭКРАН AI-РАЗБОРА === -->
+<section class="screen" id="screen-ai" aria-labelledby="aiFullTitle">
+ <div class="doctor-head">
+  <button class="doctor-back" id="aiFullClose" type="button" onclick="closeSugarAiDetails()" aria-label="Назад">‹</button>
+  <div class="doctor-head-copy"><div class="page-heading" id="aiFullTitle" style="margin:0">AI · Разбор</div></div>
+  <div class="ai-page-symbol" aria-hidden="true">✦</div>
+ </div>
+ <div class="ai-fullinner" id="aiFullbody"></div>
 </section>
 <!-- === ЭКРАН «К ВРАЧУ» === -->
 <section class="screen" id="screen-doctor">
@@ -1522,15 +1524,6 @@ button.st-ico:active{transform:scale(.88)}
 </div>
 <!-- === ОВЕРЛЕЙ ЗАГРУЗКИ === -->
 <div class="loading-overlay" id="loadingOverlay" role="status" aria-label="Загрузка"><div class="spinner"></div></div>
-<!-- === ПОЛНОЭКРАННЫЙ AI-РАЗБОР === -->
-<section class="ai-fullsheet" id="aiFullsheet" role="dialog" aria-modal="true" aria-labelledby="aiFullTitle" aria-hidden="true">
- <div class="ai-fullbar">
-  <button class="ai-fullclose" id="aiFullClose" type="button" onclick="closeSugarAiDetails()" aria-label="Закрыть разбор">‹</button>
-  <div><div class="ai-fullbar-title" id="aiFullTitle">Как Сёма сделал вывод</div><div class="ai-fullbar-sub">Факты и совпадения за 90 дней</div></div>
-  <div class="ai-fullbar-icon" aria-hidden="true">✦</div>
- </div>
- <div class="ai-fullscroll" id="aiFullscroll"><div class="ai-fullinner" id="aiFullbody"></div></div>
-</section>
 <!-- === МОДАЛЬНОЕ ОКНО === -->
 <div class="modal-backdrop" id="modalBackdrop" onclick="backdropClose(event)">
 <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
@@ -2339,18 +2332,11 @@ function openSugarAiDetails(){
  const note=document.createElement('div');note.className='ai-fullnote';
  note.textContent='Вывод сформирован Groq из последовательности измерений за 90 дней. AI может ошибаться в сопоставлениях и арифметике; это описание истории, а не схема подбора инсулина.';
  root.append(note);
- const sheet=document.getElementById('aiFullsheet');
- sheet.classList.add('visible');sheet.setAttribute('aria-hidden','false');
- document.body.classList.add('ai-full-open');
- document.getElementById('aiFullscroll').scrollTop=0;
- document.getElementById('aiFullClose').focus({preventScroll:true});
+ switchTab('ai');
 }
 function closeSugarAiDetails(){
- const sheet=document.getElementById('aiFullsheet');
- if(!sheet.classList.contains('visible'))return;
- sheet.classList.remove('visible');sheet.setAttribute('aria-hidden','true');
- document.body.classList.remove('ai-full-open');
- document.getElementById('sugarAiWhy').focus({preventScroll:true});
+ if(!document.getElementById('screen-ai').classList.contains('active'))return;
+ switchTab('home');
 }
 document.getElementById('sugarAiWhy')?.addEventListener('keydown',event=>{
  if((event.key==='Enter'||event.key===' ')&&event.currentTarget.getAttribute('aria-disabled')!=='true'){
@@ -2359,7 +2345,7 @@ document.getElementById('sugarAiWhy')?.addEventListener('keydown',event=>{
  }
 });
 document.addEventListener('keydown',event=>{
- if(event.key==='Escape'&&document.getElementById('aiFullsheet').classList.contains('visible')){
+ if(event.key==='Escape'&&document.getElementById('screen-ai').classList.contains('active')){
   event.preventDefault();closeSugarAiDetails();
  }
 });
