@@ -984,8 +984,9 @@ button.st-ico:active{transform:scale(.88)}
 .ai-card[data-status="loading"] .ai-card-dot{background:#9889f4;animation:aiPulse 1.4s ease-in-out infinite}
 .ai-card[data-status="error"] .ai-card-dot,.ai-card[data-status="limit"] .ai-card-dot{background:#e6a35c}
 @keyframes aiPulse{50%{opacity:.35;transform:scale(.75)}}
-.ai-card-headline{font-size:16px;font-weight:780;line-height:1.34;letter-spacing:-.25px;max-width:100%;overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
-.ai-card-summary{margin-top:5px;font-size:12.5px;line-height:1.52;color:var(--muted);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;overflow-wrap:anywhere}
+.ai-card-headline{font-size:16px;font-weight:500;line-height:1.38;letter-spacing:0;max-width:100%;overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+.ai-card-summary{margin-top:7px;font-size:14px;font-weight:400;line-height:1.45;color:var(--text);opacity:.82;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:8;overflow:hidden;overflow-wrap:anywhere}
+.ai-card[data-status="loading"] .ai-card-summary{display:none}
 .ai-card-foot{display:none}
 .ai-card[data-status="error"] .ai-card-foot:has(.ai-retry:not([hidden])){display:flex;margin-top:auto}
 .ai-retry{border:1px solid var(--line);border-radius:11px;background:var(--input-bg);color:var(--text);padding:8px 11px;font-size:12px;font-weight:700;cursor:pointer}
@@ -2277,7 +2278,7 @@ function updateSugarAi(status,data,errorText=''){
   sugarAiData=null;
   state.textContent='Анализ';
   title.textContent='Сопоставляю измерения…';
-  summary.textContent='Сопоставляю твои прошлые замеры и уколы.';
+  summary.textContent='';
  }else if(status==='limit'){
   sugarAiData=null;
   state.textContent='Лимит';
@@ -5189,7 +5190,8 @@ const APP_CHANGES=[
   'AI-карточка оформлена как остальные карточки главной, текст больше не обрезается, открывается нажатием на любое место',
   'AI теперь видит ночной инсулин (длинного действия) и делает выводы по истории, а не пересказывает цифры',
   'История для AI сжата по дням и подгоняется под лимит Groq; при исчерпании дневного лимита на карточке появляется уведомление',
-  'AI-вывод приходит вместе с данными главной — на один запрос меньше при каждом открытии'
+  'AI-вывод приходит вместе с данными главной — на один запрос меньше при каждом открытии',
+  'AI-карточка теперь отвечает на главный вопрос: колоть сейчас или подождать и сколько ед. на еду; текст обычным шрифтом'
  ]},
  {v:'v20261025_2',items:[
   'Новая AI-карточка под ночным инсулином с полноэкранным разбором',
