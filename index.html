@@ -982,17 +982,14 @@ button.st-ico:active{transform:scale(.88)}
 .ai-card-dot{width:6px;height:6px;border-radius:50%;background:#a6adc0}
 .ai-card[data-status="ready"] .ai-card-dot{background:#35b999;box-shadow:0 0 0 3px rgba(53,185,153,.12)}
 .ai-card[data-status="loading"] .ai-card-dot{background:#9889f4;animation:aiPulse 1.4s ease-in-out infinite}
-.ai-card[data-status="error"] .ai-card-dot{background:#e6a35c}
+.ai-card[data-status="error"] .ai-card-dot,.ai-card[data-status="limit"] .ai-card-dot{background:#e6a35c}
 @keyframes aiPulse{50%{opacity:.35;transform:scale(.75)}}
 .ai-card-headline{font-size:16px;font-weight:780;line-height:1.34;letter-spacing:-.25px;max-width:100%;overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
 .ai-card-summary{margin-top:5px;font-size:12.5px;line-height:1.52;color:var(--muted);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;overflow-wrap:anywhere}
 .ai-card-foot{display:none}
 .ai-card[data-status="error"] .ai-card-foot:has(.ai-retry:not([hidden])){display:flex;margin-top:auto}
-.ai-card-metrics{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
-.ai-card-metrics b{color:var(--text);font-weight:750}
 .ai-retry{border:1px solid var(--line);border-radius:11px;background:var(--input-bg);color:var(--text);padding:8px 11px;font-size:12px;font-weight:700;cursor:pointer}
 .ai-retry[hidden]{display:none}
-.ai-card-sep{width:3px;height:3px;border-radius:50%;background:var(--muted);opacity:.6}
 .ai-card[data-status="loading"] .ai-card-headline{animation:aiSoftPulse 1.6s ease-in-out infinite}
 @keyframes aiSoftPulse{50%{opacity:.5}}
 :root[data-theme="dark"] .ai-card{--glow:168,152,255;border-color:rgba(151,140,255,.19)}
@@ -1013,18 +1010,10 @@ button.st-ico:active{transform:scale(.88)}
 .ai-fullhero-label{color:var(--blue);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px}
 .ai-fullhero h2{font-size:23px;line-height:1.3;letter-spacing:-.5px;margin:12px 0 8px}
 .ai-fullhero p{font-size:14px;line-height:1.65;color:var(--text);margin:0}
-.ai-fullfacts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:13px 0 22px}
-.ai-fullfact{background:var(--card);border:1px solid var(--card-border);border-radius:17px;padding:13px 14px}
-.ai-fullfact-num{font-size:27px;font-weight:800;letter-spacing:-.6px;font-variant-numeric:tabular-nums}
-.ai-fullfact-name{margin-top:3px;color:var(--muted);font-size:11px;line-height:1.4}
 .ai-fullsection{margin:19px 0 0;padding:17px 16px;background:var(--card-grad);border:1px solid var(--card-border);border-radius:19px;box-shadow:0 5px 18px rgba(60,72,150,.045)}
 .ai-fullsection h3{font-size:15px;font-weight:780;margin:0 0 10px;letter-spacing:-.15px}
 .ai-fullsection p{margin:0;color:var(--muted);font-size:13px;line-height:1.65;white-space:pre-line;overflow-wrap:anywhere}
-.ai-fullsection .ai-case{padding:10px 0;border-top:1px solid var(--line);font-size:12px;line-height:1.6;color:var(--text)}
-.ai-fullsection .ai-case:first-of-type{border-top:0;padding-top:0}
 .ai-fullnote{margin:19px 3px 0;font-size:11px;line-height:1.65;color:var(--muted)}
-@media(max-width:360px){.ai-fullscroll{padding-left:13px;padding-right:13px}.ai-fullfacts{gap:7px}.ai-fullfact{padding:11px 12px}}
-@media(prefers-reduced-motion:reduce){.ai-fullsheet.visible{animation:none}}
 
 /* Главная: равный интервал после ночной карточки */
 #screen-home #nightDots{margin-bottom:4px}
@@ -1146,7 +1135,7 @@ button.st-ico:active{transform:scale(.88)}
  <div class="ai-card-headline" id="sugarAiHeadline">Здесь появится анализ сахара</div>
  <div class="ai-card-summary" id="sugarAiSummary">После следующего замера здесь появится краткий вывод.</div>
  <div class="ai-card-foot">
-  <div class="ai-card-metrics" id="sugarAiMeta"></div><button class="ai-retry" id="sugarAiRetry" type="button" onclick="retrySugarAi()" hidden>↻ Повторить анализ</button>
+  <button class="ai-retry" id="sugarAiRetry" type="button" onclick="retrySugarAi()" hidden>↻ Повторить анализ</button>
  </div>
 </section>
 <div class="quick-title">
@@ -1882,6 +1871,7 @@ async function api(action,extra={}){
  if(!response.ok||!data.ok){
   const error=new Error(data.error||'Ошибка сервера');
   error.status=response.status;
+  if(data.limit)error.limit=data.limit;
   throw error;
  }
  // Для новой записи сахара возвращаем ещё одноразовый билет анализа.
@@ -2223,7 +2213,6 @@ async function openAction(action){
 // результат из Google Sheets и никогда не вызывает Groq повторно.
 let sugarAiData=null;
 let sugarAiSequence=0;
-let sugarAiLoadingLatest=false;
 let sugarAiRetryPayload=null;
 let sugarAiRetryCount=0;
 function syncAiCardHeight(){
@@ -2242,13 +2231,34 @@ function formatSugarAiDate(raw){
  const match=String(raw||'').match(/^(\d{2})\.(\d{2})\.\d{4} (\d{2}:\d{2})$/);
  return match?match[1]+'.'+match[2]+' в '+match[3]:String(raw||'');
 }
+// Дневной лимит Groq помним и на устройстве: сервер на Render может перезапуститься.
+const AI_LIMIT_KEY='sema-ai-limit';
+function aiLimitUntil(){
+ try{const v=Number(localStorage.getItem(AI_LIMIT_KEY));return v>Date.now()?v:0;}catch(e){return 0;}
+}
+function setAiLimitUntil(ms){
+ try{if(ms)localStorage.setItem(AI_LIMIT_KEY,String(ms));else localStorage.removeItem(AI_LIMIT_KEY);}catch(e){}
+}
+function formatAiLimitWhen(ms){
+ const d=new Date(ms),now=new Date();
+ const time=d.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
+ const days=Math.round((new Date(d.getFullYear(),d.getMonth(),d.getDate())-new Date(now.getFullYear(),now.getMonth(),now.getDate()))/864e5);
+ if(days<=0)return 'в '+time;
+ if(days===1)return 'завтра в '+time;
+ return d.toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit'})+' в '+time;
+}
+function showAiLimit(untilTs){
+ if(untilTs)setAiLimitUntil(untilTs*1000);
+ const until=aiLimitUntil();
+ if(until)updateSugarAi('limit',null,formatAiLimitWhen(until));
+ return !!until;
+}
 function updateSugarAi(status,data,errorText=''){
  const card=document.getElementById('sugarAi');
  const why=document.getElementById('sugarAiWhy');
  const retry=document.getElementById('sugarAiRetry');
  const title=document.getElementById('sugarAiHeadline');
  const summary=document.getElementById('sugarAiSummary');
- const meta=document.getElementById('sugarAiMeta');
  const latest=document.getElementById('sugarAiLatest');
  const state=document.getElementById('sugarAiStatus');
  if(!card)return;
@@ -2262,44 +2272,41 @@ function updateSugarAi(status,data,errorText=''){
   title.textContent=data.headline||'История измерений собрана';
   summary.textContent=data.summary||'';
   latest.textContent=data.generated_at?'Последнее '+formatSugarAiDate(data.generated_at):'Последнее: —';
-  meta.textContent='';
   document.getElementById('aiPageDate').textContent=data.generated_at?'Последнее '+formatSugarAiDate(data.generated_at):'';
  }else if(status==='loading'){
   sugarAiData=null;
   state.textContent='Анализ';
   title.textContent='Сопоставляю измерения…';
   summary.textContent='Сопоставляю твои прошлые замеры и уколы.';
-  meta.textContent='';
+ }else if(status==='limit'){
+  sugarAiData=null;
+  state.textContent='Лимит';
+  title.textContent='Дневной лимит Groq исчерпан';
+  summary.textContent='Сахар сохранён. Анализ снова будет доступен примерно '+(errorText||'позже')+'.';
  }else if(status==='error'){
   sugarAiData=null;
   state.textContent='Недоступен';
   title.textContent='Не удалось завершить анализ';
   summary.textContent=errorText||'Groq сейчас недоступен. Сахар сохранён.';
-  meta.textContent='';
  }else{
   sugarAiData=null;
   state.textContent='Ожидает';
   title.textContent='Здесь появится анализ сахара';
   summary.textContent='После следующего замера здесь появится краткий вывод.';
   latest.textContent='Последнее: —';
-  meta.textContent='';
  }
 }
-async function loadSugarAiLatest(){
- if(sugarAiLoadingLatest)return;
- sugarAiLoadingLatest=true;
- const seq=sugarAiSequence;
- try{
-  const latest=await api('ai_latest');
-  if(seq!==sugarAiSequence)return;
-  if(latest?.analysis)updateSugarAi('ready',latest.analysis);
-  // Если последний анализ не удался и ждёт повтора, не стираем ошибку и кнопку «Повторить».
-  else if(!(document.getElementById('sugarAi')?.dataset.status==='error'&&sugarAiRetryPayload))updateSugarAi('empty');
- }catch(error){
-  // Ошибка чтения не должна стирать уже показанный вывод.
-  if(seq===sugarAiSequence&&!sugarAiData)updateSugarAi('empty');
-  handleAccessError(error);
- }finally{sugarAiLoadingLatest=false;}
+// Вывод и лимит приходят в общем ответе `home` — отдельного запроса за AI больше нет.
+function applyHomeAi(ai){
+ if(!ai)return;
+ const card=document.getElementById('sugarAi');
+ if(!card)return;
+ const status=card.dataset.status;
+ if(status==='loading')return;
+ if(ai.analysis){updateSugarAi('ready',ai.analysis);return;}
+ if(showAiLimit(ai.limit?.until_ts))return;
+ if(status==='error'&&sugarAiRetryPayload)return;
+ updateSugarAi('empty');
 }
 let aiRefreshBusy=false;
 async function refreshSugarAi(){
@@ -2315,7 +2322,7 @@ async function refreshSugarAi(){
   updateSugarAi('ready',result);
   openSugarAiDetails();
  }catch(error){
-  {const msg=error.message||'Не удалось обновить анализ';if(tg?.showAlert){try{tg.showAlert(msg);}catch(e){alert(msg);}}else alert(msg);}
+  {if(error.limit?.until_ts)setAiLimitUntil(error.limit.until_ts*1000);const msg=error.limit?.until_ts?'Дневной лимит Groq исчерпан. Анализ снова будет доступен примерно '+formatAiLimitWhen(error.limit.until_ts*1000)+'.':(error.message||'Не удалось обновить анализ');if(tg?.showAlert){try{tg.showAlert(msg);}catch(e){alert(msg);}}else alert(msg);}
   handleAccessError(error);
  }finally{
   aiRefreshBusy=false;
@@ -2328,6 +2335,7 @@ function retrySugarAi(){
  runSugarAiAfterSave(sugarAiRetryPayload.value,sugarAiRetryPayload.ticket,true);
 }
 async function runSugarAiAfterSave(savedValue,ticket,isRetry=false){
+ if(aiLimitUntil()){++sugarAiSequence;sugarAiRetryPayload=null;showAiLimit();return;}
  if(!isRetry){
   sugarAiRetryPayload={value:savedValue,ticket};
   sugarAiRetryCount=0;
@@ -2340,8 +2348,8 @@ async function runSugarAiAfterSave(savedValue,ticket,isRetry=false){
   if(seq===sugarAiSequence){sugarAiRetryPayload=null;updateSugarAi('ready',result);}
  }catch(error){
   if(seq===sugarAiSequence){
-   updateSugarAi('error',null,error.message||'Сервис недоступен');
-   handleAccessError(error);
+   if(error.limit?.until_ts){sugarAiRetryPayload=null;showAiLimit(error.limit.until_ts);}
+   else{updateSugarAi('error',null,error.message||'Сервис недоступен');handleAccessError(error);}
   }
  }
 }
@@ -2354,7 +2362,7 @@ function aiDetailSection(parent,heading,text){
 }
 function openSugarAiDetails(){
  if(!sugarAiData||!sugarAiData.verified)return;
- const data=sugarAiData,d=data.verified,s=data.stats||{};
+ const data=sugarAiData,d=data.verified;
  document.getElementById('aiPageDate').textContent=data.generated_at?'Последнее '+formatSugarAiDate(data.generated_at):'';
  const root=document.getElementById('aiFullbody');root.replaceChildren();
  const hero=document.createElement('div');hero.className='ai-fullhero';
@@ -2363,27 +2371,13 @@ function openSugarAiDetails(){
  const p=document.createElement('p');p.textContent=data.summary||'';
  hero.append(label,heading,p);root.append(hero);
  if(data.details)aiDetailSection(root,'Что обнаружил AI',data.details);
- const facts=document.createElement('div');facts.className='ai-fullfacts';
- [[s.similar??0,'Похожих дней'],[s.with_followup??0,'С повторным замером']].forEach(([value,label])=>{
-  const fact=document.createElement('div');fact.className='ai-fullfact';
-  const num=document.createElement('div');num.className='ai-fullfact-num';num.textContent=String(value);
-  const name=document.createElement('div');name.className='ai-fullfact-name';name.textContent=label;
-  fact.append(num,name);facts.append(fact);
- });
- if(s.similar!=null||s.with_followup!=null)root.append(facts);
  aiDetailSection(root,'01 · Исходный сахар',d.measurement);
  aiDetailSection(root,'02 · Инъекции перед замером',d.injections);
- aiDetailSection(root,'03 · Что показала история',d.similar);
- aiDetailSection(root,'04 · Данные и ограничения сравнения',d.criteria);
- if(Array.isArray(d.examples)&&d.examples.length){
-  const section=document.createElement('section');section.className='ai-fullsection';
-  const title=document.createElement('h3');title.textContent='05 · Похожие ситуации';section.append(title);
-  d.examples.forEach((item,i)=>{const line=document.createElement('div');line.className='ai-case';line.textContent=String(i+1).padStart(2,'0')+'  '+item;section.append(line);});
-  root.append(section);
- }
+ aiDetailSection(root,'03 · Какие данные переданы',d.similar);
+ aiDetailSection(root,'04 · По чему сравнивал',d.criteria);
  aiDetailSection(root,'Надёжность: '+(d.reliability||'не определена'),d.limitations);
  const note=document.createElement('div');note.className='ai-fullnote';
- note.textContent='Вывод сформирован Groq из последовательности измерений за 90 дней. AI может ошибаться в сопоставлениях и арифметике; это описание истории, а не схема подбора инсулина.';
+ note.textContent='Вывод сформирован Groq из последовательности измерений, уколов и ночных доз за последние недели (сколько именно — в разделе 03). AI может ошибаться в сопоставлениях и арифметике; это разбор истории и мнение модели, а не назначение врача.';
  root.append(note);
  switchTab('ai');
 }
@@ -2751,8 +2745,10 @@ async function loadHomeCards(first){
   renderNightFact(null,true);
  }
  try{
+  const aiSeq=sugarAiSequence;
   const data=await api('home');
   setAccess(true,'Сервер подтвердил доступ');
+  if(aiSeq===sugarAiSequence)applyHomeAi(data.ai);
   const json=JSON.stringify(data);
   if(first||json!==lastHomeJson){applyHomeData(data);lastHomeJson=json;}
   return true;
@@ -3699,12 +3695,12 @@ function initPlaceholderMarquee(){
 updateEntryPlaceholders();
 initPlaceholderMarquee();
 window.addEventListener('pageshow',()=>{updateEntryPlaceholders();updateInsulinTimer();});
-document.addEventListener('visibilitychange',()=>{if(!document.hidden){updateEntryPlaceholders();updateInsulinTimer();syncInsulinTimer();loadHomeCards(false);loadReportSettings();if(document.getElementById('sugarAi')?.dataset.status!=='loading')loadSugarAiLatest();}});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){updateEntryPlaceholders();updateInsulinTimer();syncInsulinTimer();loadHomeCards(false);loadReportSettings();}});
 if(tg)tg.onEvent?.('activated',()=>{updateEntryPlaceholders();updateInsulinTimer();});
 updateNightInputPlaceholder();
 setInterval(updateNightInputPlaceholder,60_000);
+if(aiLimitUntil())showAiLimit();
 loadHomeCards(true);
-loadSugarAiLatest();
 
 // --- Инициализация пилюли навигации ---
 requestAnimationFrame(()=>{
@@ -5190,9 +5186,10 @@ const APP_VERSION='v20261027_1';          /* ← менять при каждо�
 const DEV_CHAT='https://t.me/larik_11';
 const APP_CHANGES=[
  {v:'v20261027_1',items:[
-  'AI-карточка оформлена как остальные карточки главной; текст больше не обрезается',
-  'AI-карточка открывает разбор по нажатию на любое место; ошибка анализа не пропадает при возврате в приложение',
-  'Ручное обновление AI: кнопка не блокируется после ошибки чтения, результат не теряется при сбое журнала'
+  'AI-карточка оформлена как остальные карточки главной, текст больше не обрезается, открывается нажатием на любое место',
+  'AI теперь видит ночной инсулин (длинного действия) и делает выводы по истории, а не пересказывает цифры',
+  'История для AI сжата по дням и подгоняется под лимит Groq; при исчерпании дневного лимита на карточке появляется уведомление',
+  'AI-вывод приходит вместе с данными главной — на один запрос меньше при каждом открытии'
  ]},
  {v:'v20261025_2',items:[
   'Новая AI-карточка под ночным инсулином с полноэкранным разбором',
