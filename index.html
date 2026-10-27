@@ -2317,7 +2317,7 @@ async function refreshSugarAi(){
  btn.disabled=true;
  btn.textContent='…';
  try{
-  const result=await api('ai_refresh');
+  const result=await api('ai_refresh',{tz_offset:-new Date().getTimezoneOffset()});
   ++sugarAiSequence;
   sugarAiRetryPayload=null;
   updateSugarAi('ready',result);
@@ -2345,7 +2345,7 @@ async function runSugarAiAfterSave(savedValue,ticket,isRetry=false){
  const seq=++sugarAiSequence;
  updateSugarAi('loading');
  try{
-  const result=await api('ai_analyze',{expected_value:savedValue,ticket});
+  const result=await api('ai_analyze',{expected_value:savedValue,ticket,tz_offset:-new Date().getTimezoneOffset()});
   if(seq===sugarAiSequence){sugarAiRetryPayload=null;updateSugarAi('ready',result);}
  }catch(error){
   if(seq===sugarAiSequence){
@@ -2371,14 +2371,11 @@ function openSugarAiDetails(){
  const heading=document.createElement('h2');heading.textContent=data.headline||'Вывод Сёмы';
  const p=document.createElement('p');p.textContent=data.summary||'';
  hero.append(label,heading,p);root.append(hero);
- if(data.details)aiDetailSection(root,'Что обнаружил AI',data.details);
- aiDetailSection(root,'01 · Исходный сахар',d.measurement);
- aiDetailSection(root,'02 · Инъекции перед замером',d.injections);
- aiDetailSection(root,'03 · Какие данные переданы',d.similar);
- aiDetailSection(root,'04 · По чему сравнивал',d.criteria);
- aiDetailSection(root,'Надёжность: '+(d.reliability||'не определена'),d.limitations);
+ if(data.tz_warning)aiDetailSection(root,'Часовой пояс',data.tz_warning);
+ if(data.details)aiDetailSection(root,'Факты из истории',data.details);
+ aiDetailSection(root,'Исходные данные',[d.measurement,d.injections].filter(Boolean).join('\n'));
  const note=document.createElement('div');note.className='ai-fullnote';
- note.textContent='Вывод сформирован Groq из последовательности измерений, уколов и ночных доз за последние недели (сколько именно — в разделе 03). AI может ошибаться в сопоставлениях и арифметике; это разбор истории и мнение модели, а не назначение врача.';
+ note.textContent=[d.similar,'AI может ошибаться в сопоставлениях и арифметике; это разбор истории и мнение модели, а не назначение врача.'].filter(Boolean).join(' ');
  root.append(note);
  switchTab('ai');
 }
@@ -5191,6 +5188,8 @@ const APP_CHANGES=[
   'AI теперь видит ночной инсулин (длинного действия) и делает выводы по истории, а не пересказывает цифры',
   'История для AI сжата по дням и подгоняется под лимит Groq; при исчерпании дневного лимита на карточке появляется уведомление',
   'AI-вывод приходит вместе с данными главной — на один запрос меньше при каждом открытии',
+  'AI-подробности стали короткими и по фактам; AI знает распорядок дня (завтрак, подколка, ужин) и проверяется часовой пояс',
+  'Лист ai_usage: новые строки вставляются сверху, под шапкой',
   'AI-карточка теперь отвечает на главный вопрос: колоть сейчас или подождать и сколько ед. на еду; текст обычным шрифтом'
  ]},
  {v:'v20261025_2',items:[
