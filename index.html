@@ -991,8 +991,13 @@ button.st-ico:active{transform:scale(.88)}
 .ai-card[data-status="error"] .ai-card-foot:has(.ai-retry:not([hidden])){display:flex;margin-top:auto}
 .ai-retry{border:1px solid var(--line);border-radius:11px;background:var(--input-bg);color:var(--text);padding:8px 11px;font-size:12px;font-weight:700;cursor:pointer}
 .ai-retry[hidden]{display:none}
-.ai-card[data-status="loading"] .ai-card-headline{animation:aiSoftPulse 1.6s ease-in-out infinite}
-@keyframes aiSoftPulse{50%{opacity:.5}}
+/* Загрузка: только мерцающая надпись строго по центру карточки */
+.ai-card{--ai-shimmer-base:var(--muted);--ai-shimmer-peak:#7a6bef}
+:root[data-theme="dark"] .ai-card{--ai-shimmer-peak:#d3cbff}
+.ai-card[data-status="loading"]{justify-content:center;align-items:center;text-align:center}
+.ai-card[data-status="loading"] .ai-card-head{display:none}
+.ai-card[data-status="loading"] .ai-card-headline{display:block;overflow:visible;font-size:19px;font-weight:500;letter-spacing:.1px;text-align:center;background:linear-gradient(105deg,var(--ai-shimmer-base) 0%,var(--ai-shimmer-base) 36%,var(--ai-shimmer-peak) 50%,var(--ai-shimmer-base) 64%,var(--ai-shimmer-base) 100%);background-size:280% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;animation:aiShimmer 2.1s ease-in-out infinite}
+@keyframes aiShimmer{0%{background-position:115% 0}100%{background-position:-15% 0}}
 :root[data-theme="dark"] .ai-card{--glow:168,152,255;border-color:rgba(151,140,255,.19)}
 :root[data-theme="dark"] .ai-card-icon{color:#c9c0ff;background:linear-gradient(145deg,rgba(168,152,255,.30),rgba(168,152,255,.10));box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 10px 20px -10px rgba(var(--glow),.7)}
 .ai-card[data-status="ready"]{cursor:pointer;transition:transform .18s ease}
@@ -5188,6 +5193,7 @@ const APP_CHANGES=[
   'AI теперь видит ночной инсулин (длинного действия) и делает выводы по истории, а не пересказывает цифры',
   'История для AI сжата по дням и подгоняется под лимит Groq; при исчерпании дневного лимита на карточке появляется уведомление',
   'AI-вывод приходит вместе с данными главной — на один запрос меньше при каждом открытии',
+  'AI-карточка при загрузке: мерцающая надпись по центру; анализ устойчив к ошибке Groq HTTP 400',
   'AI-подробности стали короткими и по фактам; AI знает распорядок дня (завтрак, подколка, ужин) и проверяется часовой пояс',
   'Лист ai_usage: новые строки вставляются сверху, под шапкой',
   'AI-карточка теперь отвечает на главный вопрос: колоть сейчас или подождать и сколько ед. на еду; текст обычным шрифтом'
