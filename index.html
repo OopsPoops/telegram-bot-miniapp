@@ -1019,6 +1019,64 @@ button.st-ico:active{transform:scale(.88)}
 .ai-fullsection h3{font-size:15px;font-weight:780;margin:0 0 10px;letter-spacing:-.15px}
 .ai-fullsection p{margin:0;color:var(--muted);font-size:13px;line-height:1.65;white-space:pre-line;overflow-wrap:anywhere}
 .ai-fullnote{margin:19px 3px 0;font-size:11px;line-height:1.65;color:var(--muted)}
+/* Экран разбора: визуальный отчёт */
+.ai-herorow{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:10px 0 2px}
+.ai-bignum{font-size:44px;font-weight:800;letter-spacing:-1.5px;line-height:1}
+.ai-bignum small{font-size:14px;font-weight:650;letter-spacing:0;color:var(--muted);margin-left:5px}
+.ai-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.ai-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:999px;background:rgba(127,112,241,.10);color:var(--text);font-size:12px;font-weight:650;font-variant-numeric:tabular-nums}
+.ai-chip.warn{background:rgba(230,163,92,.18);color:#b9792f}
+:root[data-theme="dark"] .ai-chip.warn{color:#e6a35c}
+.ai-alert{margin:16px 0 0;padding:14px 16px;border-radius:18px;font-size:13.5px;line-height:1.55;font-weight:550;border:1px solid transparent}
+.ai-alert.low{background:rgba(232,90,90,.12);border-color:rgba(232,90,90,.35);color:#c0392b}
+.ai-alert.high{background:rgba(230,163,92,.14);border-color:rgba(230,163,92,.4);color:#b9792f}
+:root[data-theme="dark"] .ai-alert.low{color:#ff8a80}
+:root[data-theme="dark"] .ai-alert.high{color:#e6a35c}
+.ai-kv{display:grid;grid-template-columns:auto 1fr;gap:9px 14px;font-size:13.5px;line-height:1.45}
+.ai-kv dt{color:var(--muted);font-weight:600;white-space:nowrap}
+.ai-kv dd{margin:0;font-weight:650;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.ai-subnote{margin-top:10px;font-size:12px;line-height:1.55;color:var(--muted)}
+.ai-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 10px}
+.ai-tile{padding:11px 8px;border-radius:15px;background:rgba(127,112,241,.08);text-align:center}
+.ai-tile-v{font-size:17px;font-weight:780;font-variant-numeric:tabular-nums;letter-spacing:-.3px}
+.ai-tile-l{margin-top:3px;font-size:11px;line-height:1.3;color:var(--muted);font-weight:600}
+.ai-tile.low .ai-tile-v{color:#d9534f}
+.ai-tile.high .ai-tile-v{color:#c98a3a}
+.ai-tablewrap{overflow-x:auto;margin:0 -4px;padding:0 4px}
+.ai-table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+.ai-table th{padding:7px 6px;text-align:right;font-size:11px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--card-border);white-space:nowrap}
+.ai-table th:first-child,.ai-table td:first-child{text-align:left}
+.ai-table td{padding:10px 6px;text-align:right;border-bottom:1px solid rgba(125,135,170,.10);white-space:nowrap}
+.ai-table tr:last-child td{border-bottom:0}
+.ai-table .dose{font-weight:800}
+.ai-table tr.top td{background:rgba(127,112,241,.07)}
+.ai-table tr.top td:first-child{border-radius:12px 0 0 12px}
+.ai-table tr.top td:last-child{border-radius:0 12px 12px 0}
+.ai-table .low{color:#d9534f;font-weight:700}
+.ai-chain{padding:11px 0;border-bottom:1px solid rgba(125,135,170,.10)}
+.ai-chain:last-child{border-bottom:0;padding-bottom:0}
+.ai-chain:first-child{padding-top:0}
+.ai-chain-head{display:flex;justify-content:space-between;gap:8px;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:7px;font-variant-numeric:tabular-nums}
+.ai-chain-row{display:flex;align-items:center;flex-wrap:wrap;gap:5px}
+.ai-node{display:inline-flex;flex-direction:column;padding:6px 10px;border-radius:12px;font-size:13px;font-weight:750;line-height:1.2;font-variant-numeric:tabular-nums;background:rgba(95,185,140,.15)}
+.ai-node small{font-size:10.5px;font-weight:600;color:var(--muted);margin-top:1px}
+.ai-node.low{background:rgba(232,90,90,.16)}
+.ai-node.high{background:rgba(230,163,92,.20)}
+.ai-node.dose{background:rgba(127,112,241,.16);color:var(--text)}
+.ai-arrow{color:var(--muted);font-size:14px}
+.ai-chain-foot{margin-top:6px;font-size:11.5px;color:var(--muted);line-height:1.45}
+.ai-points{margin:10px 0 0;padding-left:18px;font-size:13.5px;line-height:1.55}
+.ai-points li{margin:4px 0}
+.ai-node.corr{background:rgba(230,163,92,.24)}
+.ai-result{margin-left:4px;padding:5px 10px;border-radius:999px;font-size:12px;font-weight:750}
+.ai-result.ok{background:rgba(95,185,140,.2);color:#2f9466}
+.ai-result.high{background:rgba(230,163,92,.22);color:#b9792f}
+.ai-result.low{background:rgba(232,90,90,.18);color:#c0392b}
+.ai-table .warnc{color:#b9792f;font-weight:700}
+.ai-tile.high .ai-tile-v{color:#c98a3a}
+.ai-conclusion{font-size:14.5px;line-height:1.6;font-weight:560;margin:0}
+.ai-warnbox{margin:0;padding:10px 12px;border-radius:13px;background:rgba(230,163,92,.14);color:#b9792f;font-size:12.5px;line-height:1.5;font-weight:600}
+:root[data-theme="dark"] .ai-warnbox{color:#e6a35c}
 
 /* Главная: равный интервал после ночной карточки */
 #screen-home #nightDots{margin-bottom:4px}
@@ -2277,10 +2335,11 @@ function fillAiSlide(slide,i,limited){
  const status=live&&sugarAiRunning?'loading':data?'ready':live?(sugarAiNotice?(sugarAiNoticeKind==='limit'?'limit':'error'):'empty'):'empty';
  slide.dataset.status=status;
  slide.dataset.has=data?'1':'0';
- slide.dataset.notice=(live&&!sugarAiRunning&&data&&sugarAiNotice)?'1':'0';
+ const llmNote=!!(live&&!sugarAiRunning&&data&&!sugarAiNotice&&data.llm_error);
+ slide.dataset.notice=(live&&!sugarAiRunning&&data&&(sugarAiNotice||llmNote))?'1':'0';
  const stamp=data&&data.generated_at?formatSugarAiDate(data.generated_at):'—';
  const sub=q('.ai-card-sub'),title=q('.ai-card-headline'),summary=q('.ai-card-summary');
- if(live&&slide.dataset.notice==='1')sub.textContent='Не обновлено · '+sugarAiNotice;
+ if(live&&slide.dataset.notice==='1')sub.textContent=llmNote?'Без вывода ИИ · '+data.llm_error:'Не обновлено · '+sugarAiNotice;
  else sub.textContent=live?'Последнее: '+stamp:'Ранее · '+stamp;
  const btn=q('.ai-refresh');
  btn.hidden=!live;
@@ -2404,12 +2463,173 @@ function aiDetailSection(parent,heading,text){
  section.append(title,para);parent.append(section);
  return section;
 }
+// ───── Визуальный отчёт на экране разбора ─────
+const aiG=x=>x==null?'—':String(Math.round(Number(x)*10)/10).replace('.',',');
+const aiKN=kn=>kn?kn[0]+'/'+kn[1]:'—';
+function aiEl(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;}
+function aiSugarClass(v){return v<3.9?'low':v>10?'high':'';}
+function aiSection(root,title,...children){
+ const section=aiEl('section','ai-fullsection');
+ section.append(aiEl('h3','',title),...children);
+ root.append(section);
+ return section;
+}
+function aiTiles(items){
+ const grid=aiEl('div','ai-tiles');
+ items.forEach(([label,value,cls])=>{
+  const tile=aiEl('div','ai-tile'+(cls?' '+cls:''));
+  tile.append(aiEl('div','ai-tile-v',value),aiEl('div','ai-tile-l',label));
+  grid.append(tile);
+ });
+ return grid;
+}
+function aiKv(rows){
+ const list=aiEl('dl','ai-kv');
+ rows.forEach(([name,value])=>{list.append(aiEl('dt','',name),aiEl('dd','',value));});
+ return list;
+}
+function aiNode(text,small,cls){
+ const node=aiEl('span','ai-node'+(cls?' '+cls:''),text);
+ if(small)node.append(aiEl('small','',small));
+ return node;
+}
+function aiAgo(min){return min<60?min+' мин назад':aiG(min/60)+' ч назад';}
+function renderAiReport(root,data,index){
+ const r=data.report,now=r.now,before=r.before,match=r.match,night=r.night;
+ // Сейчас
+ const hero=aiEl('div','ai-fullhero');
+ hero.append(aiEl('div','ai-fullhero-label','✦ Сейчас'));
+ const row=aiEl('div','ai-herorow');
+ const big=aiEl('div','ai-bignum',aiG(now.v));big.append(aiEl('small','','ммоль/л'));
+ row.append(big);hero.append(row);
+ const chips=aiEl('div','ai-chips');
+ chips.append(aiEl('span','ai-chip','🕒 '+now.time),aiEl('span','ai-chip','Фаза: '+now.phase+' (по часам)'));
+ if(match&&match.stats.thin)chips.append(aiEl('span','ai-chip warn','мало сопоставимых данных'));
+ hero.append(chips);
+ const h=aiEl('h2','',data.headline||'');hero.append(h);
+ if(data.summary)hero.append(aiEl('p','',data.summary));
+ root.append(hero);
+ if(index===0&&sugarAiNotice)root.append(aiEl('div','ai-alert high','Не удалось обновить: '+sugarAiNotice));
+ if(data.tz_warning)root.append(aiEl('div','ai-alert high',data.tz_warning));
+ if(r.alert)root.append(aiEl('div','ai-alert '+r.alert.level,r.alert.text));
+ // До этого
+ const recent=before.recent.length?before.recent.map(x=>x.time.slice(6)+' · '+aiG(x.dose)+' ед. · '+aiAgo(x.ago_min)).join('\n'):'нет за 12 часов';
+ const longText=before.long.known?aiG(before.long.dose)+' ед. · '+before.long.date+' 21:00 · '+aiG(before.long.hours)+' ч назад':'не записан за '+before.long.date;
+ const rows=[['Короткие',recent],['Суммы',aiG(before.sums[0])+' / '+aiG(before.sums[1])+' / '+aiG(before.sums[2])+' ед. (0–2 / 2–4 / 4–6 ч)'],['Длинный',longText],['Низкий за 6 ч',before.low6?'был':'не было']];
+ if(before.prev)rows.push(['Прошлый замер',aiG(before.prev.v)+' · '+before.prev.time+' ('+aiAgo(before.prev.gap_min)+')']);
+ const prior=aiSection(root,'До этого',aiKv(rows));
+ if(r.after_note&&r.after_note.length)prior.append(aiEl('div','ai-subnote','После этого замера уже записано: '+r.after_note.map(x=>x.time.slice(6)+' — '+aiG(x.dose)+' ед.').join(', ')+'. В анализ это не входит.'));
+ // Похожие случаи
+ if(match&&match.kind==='meal'){
+  const st=match.stats;
+  const nextName=match.phase==='завтрак'?'ужина':'вечера';
+  const forNext=now.phase!==match.phase;
+  const sec=aiSection(root,forNext?('К '+(match.phase==='завтрак'?'завтраку':'ужину')+' · итоги прошлых дней'):('Похожие приёмы · '+match.phase));
+  sec.append(aiTiles([
+   ['случаев · дней',st.episodes+' · '+st.days],
+   ['без подколки и в норме',aiKN(st.success)],
+   ['была подколка',aiKN(st.corrected),st.corrected[0]?'high':'']
+  ]));
+  sec.append(aiTiles([
+   ['выше 10',aiKN(st.high),st.high[0]?'high':''],
+   ['ниже 3,9',aiKN(st.low),st.low[0]?'low':''],
+   ['перед '+nextName+', медиана',aiG(st.median_end)]
+  ]));
+  const wrap=aiEl('div','ai-tablewrap'),table=aiEl('table','ai-table');
+  const head=aiEl('tr');['Введено','Случ.','В норме','Подколка','>10','<3,9'].forEach(t=>head.append(aiEl('th','',t)));
+  table.append(head);
+  match.groups.forEach((gr,i)=>{
+   const tr=aiEl('tr',i===0?'top':'');
+   tr.append(aiEl('td','dose',aiG(gr.dose)+' ед.'+(i===0?' ★':'')),aiEl('td','',gr.n+' / '+gr.days+' дн.'),
+    aiEl('td','',aiKN(gr.success)),aiEl('td',gr.corrected[0]?'warnc':'',aiKN(gr.corrected)),
+    aiEl('td','',aiKN(gr.high)),aiEl('td',gr.low[0]?'low':'',aiKN(gr.low)));
+   table.append(tr);
+  });
+  wrap.append(table);sec.append(wrap);
+  sec.append(aiEl('div','ai-subnote','★ — лучший результат среди введённых доз (с поправкой на малое число случаев). «В норме» — сахар 3,9–10 до '+nextName+' и без дополнительных коротких; любая подколка считается недобором дозы. n_eff '+aiG(st.n_eff)+(match.weighted_by_similarity?'':'; сходство с текущим замером не учитывается, только свежесть')+'. Это история, а не назначение; еда и сок не учтены.'));
+  const ex=aiSection(root,'Примеры (самые похожие)');
+  match.examples.forEach(e=>{
+   const chain=aiEl('div','ai-chain');
+   const hd=aiEl('div','ai-chain-head');hd.append(aiEl('span','',e.day),aiEl('span','','сходство '+Math.round(e.w*100)+'%'));
+   const line=aiEl('div','ai-chain-row');
+   line.append(aiNode(aiG(e.before.v),e.before.time.slice(6),aiSugarClass(e.before.v)),aiEl('span','ai-arrow','→'),aiNode(aiG(e.inj.dose)+' ед.',e.inj.time,'dose'));
+   (e.seq||[]).forEach(x=>{
+    line.append(aiEl('span','ai-arrow','→'));
+    line.append(x.k==='I'?aiNode('+'+aiG(x.v)+' ед.',x.t+' подколка','corr'):aiNode(aiG(x.v),x.t,aiSugarClass(x.v)));
+   });
+   const cls=e.result==='в норме'?'ok':e.result==='низкий'?'low':'high';
+   line.append(aiEl('span','ai-result '+cls,e.result));
+   chain.append(hd,line,aiEl('div','ai-chain-foot',(e.long!=null?'длинный '+aiG(e.long)+' ед. · ':'')+e.before.ref+', '+e.inj.ref));
+   ex.append(chain);
+  });
+ }else if(match){
+  const st=match.stats;
+  const sec=aiSection(root,'Похожие случаи · '+match.phase);
+  sec.append(aiTiles([
+   ['случаев · дней',st.episodes+' · '+st.days],
+   ['через ~'+aiG(st.median_interval_h)+' ч, медиана',aiG(st.median_after)],
+   ['разброс 10–90%',st.q10==null?'—':aiG(st.q10)+'–'+aiG(st.q90)]
+  ]));
+  sec.append(aiTiles([
+   ['ниже 3,9',aiKN(st.lt39),st.lt39[0]?'low':''],
+   ['ниже 3,0',aiKN(st.lt30),st.lt30[0]?'low':''],
+   ['выше 10',aiKN(st.gt10),st.gt10[0]?'high':'']
+  ]));
+  const wrap=aiEl('div','ai-tablewrap'),table=aiEl('table','ai-table');
+  const head=aiEl('tr');['Введено тогда','Случ.','Сахар через ~'+aiG(st.median_interval_h)+' ч','<3,9','>10'].forEach(t=>head.append(aiEl('th','',t)));
+  table.append(head);
+  match.groups.forEach((gr,i)=>{
+   const tr=aiEl('tr',i===0?'top':'');
+   tr.append(aiEl('td','dose',aiG(gr.dose)+' ед.'),aiEl('td','',gr.n+' / '+gr.days+' дн.'),
+    aiEl('td','',aiG(gr.median_after)+(gr.q10==null?'':' ('+aiG(gr.q10)+'–'+aiG(gr.q90)+')')),
+    aiEl('td',gr.lt39[0]?'low':'',aiKN(gr.lt39)),aiEl('td','',aiKN(gr.gt10)));
+   table.append(tr);
+  });
+  wrap.append(table);sec.append(wrap);
+  sec.append(aiEl('div','ai-subnote','n_eff '+aiG(st.n_eff)+'. Дозы — то, что вводилось тогда. k/n — частоты случаев, не вероятности.'));
+  const ex=aiSection(root,'Примеры (самые похожие)');
+  match.examples.forEach(e=>{
+   const chain=aiEl('div','ai-chain');
+   const hd=aiEl('div','ai-chain-head');hd.append(aiEl('span','',e.day),aiEl('span','','сходство '+Math.round(e.w*100)+'%'));
+   const line=aiEl('div','ai-chain-row');
+   line.append(aiNode(aiG(e.before.v),e.before.time.slice(6),aiSugarClass(e.before.v)),aiEl('span','ai-arrow','→'),
+    aiNode(aiG(e.inj.dose)+' ед.',e.inj.time,'dose'),aiEl('span','ai-arrow','→'),
+    aiNode(aiG(e.after.v),e.after.time.slice(6),aiSugarClass(e.after.v)));
+   chain.append(hd,line,aiEl('div','ai-chain-foot','Изменение '+(e.delta>0?'+':'')+aiG(e.delta)+' за '+aiG(e.interval_h)+' ч'+(e.low_seen?' · мин. '+aiG(e.min):'')+' · '+e.before.ref+', '+e.inj.ref+', '+e.after.ref));
+   ex.append(chain);
+  });
+  if(r.skipped_intermediate)ex.append(aiEl('div','ai-subnote','Не вошло '+r.skipped_intermediate+' эпизодов с промежуточными уколами.'));
+ }else if(!r.alert||r.alert.level!=='low'){
+  aiSection(root,'Похожие случаи',aiEl('p','','Сопоставимых завершённых случаев за '+r.window.days+' дн. нет.'));
+ }
+ // Ночь
+ if(night){
+  aiSection(root,'Ночь · вечер → утро',
+   aiTiles([['пар',String(night.pairs)],['медиана сдвига',aiG(night.median_delta)],['утром ниже 3,9',aiKN(night.lt39),night.lt39[0]?'low':'']]),
+   aiEl('div','ai-subnote','Без новых коротких между замерами: '+night.quiet_pairs+' пар, утром ниже 3,9 — '+aiKN(night.quiet_lt39)+'. Это не тест базального инсулина: возможны остаточный короткий и сок.'));
+ }
+ // Вывод ИИ
+ const ai=aiSection(root,'Вывод ИИ');
+ if(data.conclusion){
+  ai.append(aiEl('p','ai-conclusion',data.conclusion));
+  if(data.points&&data.points.length){const ul=aiEl('ul','ai-points');data.points.forEach(p=>ul.append(aiEl('li','',p)));ai.append(ul);}
+ }else if(data.llm_error){
+  ai.append(aiEl('div','ai-warnbox','Вывод ИИ недоступен: '+data.llm_error+' Цифры выше посчитаны без него — нажми ↻, чтобы запросить вывод снова.'));
+ }else{
+  ai.append(aiEl('p','','Для этого замера текстовый вывод не требуется.'));
+ }
+ const note=aiEl('div','ai-fullnote');
+ const w=r.window;
+ note.textContent='Данные: '+w.days+' дн. (с '+w.from+'), замеров '+w.sugars+', коротких '+w.shorts+', длинных '+w.longs+'. '+(r.quality||[]).join(' ')+' Это описание прошлых наблюдений, не назначение: дозы показаны как история. Еда и сок неизвестны.';
+ root.append(note);
+}
 function openSugarAiDetails(index=0){
  const data=sugarAiList[index];
  if(!data||!data.verified)return;
  const d=data.verified;
  document.getElementById('aiPageDate').textContent=data.generated_at?'Последнее '+formatSugarAiDate(data.generated_at):'';
  const root=document.getElementById('aiFullbody');root.replaceChildren();
+ if(data.report){renderAiReport(root,data,index);switchTab('ai');return;}
  const hero=document.createElement('div');hero.className='ai-fullhero';
  const label=document.createElement('div');label.className='ai-fullhero-label';label.textContent='✦ Результат анализа';
  const heading=document.createElement('h2');heading.textContent=data.headline||'Вывод Сёмы';
@@ -5233,6 +5453,7 @@ const APP_CHANGES=[
   'AI теперь видит ночной инсулин (длинного действия) и делает выводы по истории, а не пересказывает цифры',
   'История для AI сжата по дням и подгоняется под лимит Groq; при исчерпании дневного лимита на карточке появляется уведомление',
   'AI-вывод приходит вместе с данными главной — на один запрос меньше при каждом открытии',
+  'AI подбирает дозу на завтрак/ужин: ищет дозу, после которой сахар в норме до следующего приёма без подколок; карточка показывает лучшую из введённых доз, разбор — таблицы и цепочки',
   'AI-карточка всегда показывает последний анализ из таблицы, кнопка «Обновить» пересчитывает; при загрузке мерцающая надпись под заголовком',
   'AI-анализ идёт в фоне на сервере и не прерывается, если свернуть приложение; при сбое Groq автоповтор',
   'AI-подробности стали короткими и по фактам; AI знает распорядок дня (завтрак, подколка, ужин) и проверяется часовой пояс',
