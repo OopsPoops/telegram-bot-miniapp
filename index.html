@@ -2522,9 +2522,9 @@ function renderAiReport(root,data,index){
  // Похожие случаи
  if(match&&match.kind==='meal'){
   const st=match.stats;
-  const nextName=match.phase==='завтрак'?'ужина':'вечера';
+  const nextName=match.phase==='завтрак'?'ужина':'вечерней проверки';
   const forNext=now.phase!==match.phase;
-  const sec=aiSection(root,forNext?('К '+(match.phase==='завтрак'?'завтраку':'ужину')+' · итоги прошлых дней'):('Похожие приёмы · '+match.phase));
+  const sec=aiSection(root,(forNext?'История к ближайшей проверке · ':'Похожие приёмы · ')+match.phase);
   sec.append(aiTiles([
    ['случаев · дней',st.episodes+' · '+st.days],
    ['без подколки и в норме',aiKN(st.success)],
@@ -2538,15 +2538,15 @@ function renderAiReport(root,data,index){
   const wrap=aiEl('div','ai-tablewrap'),table=aiEl('table','ai-table');
   const head=aiEl('tr');['Введено','Случ.','В норме','Подколка','>10','<3,9'].forEach(t=>head.append(aiEl('th','',t)));
   table.append(head);
-  match.groups.forEach((gr,i)=>{
-   const tr=aiEl('tr',i===0?'top':'');
-   tr.append(aiEl('td','dose',aiG(gr.dose)+' ед.'+(i===0?' ★':'')),aiEl('td','',gr.n+' / '+gr.days+' дн.'),
+  match.groups.forEach(gr=>{
+   const tr=aiEl('tr');
+   tr.append(aiEl('td','dose',aiG(gr.dose)+' ед.'),aiEl('td','',gr.n+' / '+gr.days+' дн.'),
     aiEl('td','',aiKN(gr.success)),aiEl('td',gr.corrected[0]?'warnc':'',aiKN(gr.corrected)),
     aiEl('td','',aiKN(gr.high)),aiEl('td',gr.low[0]?'low':'',aiKN(gr.low)));
    table.append(tr);
   });
   wrap.append(table);sec.append(wrap);
-  sec.append(aiEl('div','ai-subnote','★ — лучший результат среди введённых доз (с поправкой на малое число случаев). «В норме» — сахар 3,9–10 до '+nextName+' и без дополнительных коротких; любая подколка считается недобором дозы. n_eff '+aiG(st.n_eff)+(match.weighted_by_similarity?'':'; сходство с текущим замером не учитывается, только свежесть')+'. Это история, а не назначение; еда и сок не учтены.'));
+  sec.append(aiEl('div','ai-subnote','Таблица описывает фактически введённые дозы и наблюдавшиеся исходы; строки не ранжированы и не являются рекомендацией. «В норме» — сахар 3,9–10 до '+nextName+' без дополнительного короткого. Подколка отмечена как событие, но сама по себе не доказывает недобор: её могли сделать по текущему сахару. n_eff '+aiG(st.n_eff)+'. Состав еды и сок в журнале не отмечены.'));
   const ex=aiSection(root,'Примеры (самые похожие)');
   match.examples.forEach(e=>{
    const chain=aiEl('div','ai-chain');
@@ -2578,8 +2578,8 @@ function renderAiReport(root,data,index){
   const wrap=aiEl('div','ai-tablewrap'),table=aiEl('table','ai-table');
   const head=aiEl('tr');['Введено тогда','Случ.','Сахар через ~'+aiG(st.median_interval_h)+' ч','<3,9','>10'].forEach(t=>head.append(aiEl('th','',t)));
   table.append(head);
-  match.groups.forEach((gr,i)=>{
-   const tr=aiEl('tr',i===0?'top':'');
+  match.groups.forEach(gr=>{
+   const tr=aiEl('tr');
    tr.append(aiEl('td','dose',aiG(gr.dose)+' ед.'),aiEl('td','',gr.n+' / '+gr.days+' дн.'),
     aiEl('td','',aiG(gr.median_after)+(gr.q10==null?'':' ('+aiG(gr.q10)+'–'+aiG(gr.q90)+')')),
     aiEl('td',gr.lt39[0]?'low':'',aiKN(gr.lt39)),aiEl('td','',aiKN(gr.gt10)));
@@ -2604,9 +2604,25 @@ function renderAiReport(root,data,index){
  }
  // Ночь
  if(night){
-  aiSection(root,'Ночь · вечер → утро',
-   aiTiles([['пар',String(night.pairs)],['медиана сдвига',aiG(night.median_delta)],['утром ниже 3,9',aiKN(night.lt39),night.lt39[0]?'low':'']]),
-   aiEl('div','ai-subnote','Без новых коротких между замерами: '+night.quiet_pairs+' пар, утром ниже 3,9 — '+aiKN(night.quiet_lt39)+'. Это не тест базального инсулина: возможны остаточный короткий и сок.'));
+  const sec=aiSection(root,'Ночь · вечер → длинный в 21:00 → утро',
+   aiTiles([['пар',String(night.pairs)],['медиана изменения',aiG(night.median_delta)],['утром ниже 3,9',aiKN(night.lt39),night.lt39[0]?'low':'']]),
+   aiEl('div','ai-subnote','Без короткого после 15:00: '+night.quiet_pairs+' пар, утром ниже 3,9 — '+aiKN(night.quiet_lt39)+'. В остальных парах короткий после ужина мог влиять на утренний сахар. Это наблюдаемая связь, не оценка причинного эффекта длинного.'));
+  if(Array.isArray(night.by_dose)&&night.by_dose.length){
+   const wrap=aiEl('div','ai-tablewrap'),table=aiEl('table','ai-table');
+   const head=aiEl('tr');['Длинный тогда','Пар','Вечер, медиана','Утро, медиана','Утром <3,9','Короткий после 15:00','Вечерний замер после 21:00'].forEach(t=>head.append(aiEl('th','',t)));
+   table.append(head);
+   night.by_dose.forEach(gr=>{
+    const tr=aiEl('tr');
+    tr.append(aiEl('td','dose',aiG(gr.dose)+' ед.'),aiEl('td','',String(gr.n)),
+     aiEl('td','',aiG(gr.evening_median)),aiEl('td','',aiG(gr.morning_median)),
+     aiEl('td',gr.morning_lt39[0]?'low':'',aiKN(gr.morning_lt39)),
+     aiEl('td','',gr.with_short_after_dinner+' из '+gr.n),
+     aiEl('td','',gr.evening_after_long+' из '+gr.n));
+    table.append(tr);
+   });
+   wrap.append(table);sec.append(wrap);
+  }
+  sec.append(aiEl('div','ai-subnote','В группах показаны исторические пары при данной фактической дозе. Утренний замер — первое значение 05:00–08:30; возможные снижения между замерами не видны. Не интерпретируй строку как совет менять дозу.'));
  }
  // Вывод ИИ
  const ai=aiSection(root,'Вывод ИИ');
@@ -5453,7 +5469,7 @@ const APP_CHANGES=[
   'AI теперь видит ночной инсулин (длинного действия) и делает выводы по истории, а не пересказывает цифры',
   'История для AI сжата по дням и подгоняется под лимит Groq; при исчерпании дневного лимита на карточке появляется уведомление',
   'AI-вывод приходит вместе с данными главной — на один запрос меньше при каждом открытии',
-  'AI подбирает дозу на завтрак/ужин: ищет дозу, после которой сахар в норме до следующего приёма без подколок; карточка показывает лучшую из введённых доз, разбор — таблицы и цепочки',
+  'AI сравнивает завтрак, дневную проверку, ужин, вечернюю проверку и ночь раздельно; показывает фактические дозы и последующие сахара из похожих случаев, без рейтинга доз',
   'AI-карточка всегда показывает последний анализ из таблицы, кнопка «Обновить» пересчитывает; при загрузке мерцающая надпись под заголовком',
   'AI-анализ идёт в фоне на сервере и не прерывается, если свернуть приложение; при сбое Groq автоповтор',
   'AI-подробности стали короткими и по фактам; AI знает распорядок дня (завтрак, подколка, ужин) и проверяется часовой пояс',
