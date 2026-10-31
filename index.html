@@ -980,7 +980,7 @@ button.st-ico:active{transform:scale(.88)}
 .ai-card-title{font-size:18px;font-weight:750;line-height:1.2}
 .ai-card-sub{margin-top:4px;font-size:12px;font-weight:650;line-height:1.3;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ai-card[data-notice="1"] .ai-card-sub{color:#b9792f}
-.ai-card-headline{font-size:16px;font-weight:500;line-height:1.3;letter-spacing:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ai-card-headline{font-size:26px;font-weight:780;line-height:1.08;letter-spacing:-.4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ai-card-summary{margin-top:4px;font-size:13.5px;font-weight:400;line-height:1.36;color:var(--text);opacity:.82;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;overflow-wrap:anywhere}
 /* Кнопка «обновить» — маленькая, только символ, в правом верхнем углу */
 .ai-refresh{position:relative;display:grid;place-items:center;flex:none;width:30px;height:30px;padding:0;border-radius:50%;border:1px solid rgba(116,106,231,.22);color:#5b49d6;background:linear-gradient(145deg,#f6f3ff,#e4defd);box-shadow:inset 0 1px 0 rgba(255,255,255,.85),0 6px 12px -8px rgba(var(--glow),.75);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .16s ease,opacity .2s ease}
@@ -2495,7 +2495,7 @@ function aiNode(text,small,cls){
 }
 function aiAgo(min){return min<60?min+' мин назад':aiG(min/60)+' ч назад';}
 function renderAiReport(root,data,index){
- const r=data.report,now=r.now,before=r.before,match=r.match,night=r.night;
+ const r=data.report,now=r.now,before=r.before,match=r.match,night=r.night,nightMatch=r.night_match;
  const hero=aiEl('div','ai-fullhero');
  hero.append(aiEl('div','ai-fullhero-label','✦ Сейчас'));
  const row=aiEl('div','ai-herorow');
@@ -2525,19 +2525,27 @@ function renderAiReport(root,data,index){
    const chain=aiEl('div','ai-chain');
    chain.append(aiEl('div','ai-chain-head',e.day+' · сахар '+aiG(e.before.v)+' в '+e.before.time.slice(6)));
    const result=match.kind==='meal'
-    ?'Тогда фактически введено '+aiG(e.inj.dose)+' ед. в '+e.inj.time+'. Исход: '+e.result+'. Следующий сахар: '+aiG(e.end_v)+'.'
-    :'Тогда фактически введено '+aiG(e.inj.dose)+' ед. в '+e.inj.time+'. Следующий сахар: '+(e.after?aiG(e.after.v)+' через '+aiG(e.interval_h)+' ч':'нет')+'.';
+    ?aiG(e.inj.dose)+' ед. в '+e.inj.time+' → '+e.result+'; следующий сахар '+aiG(e.end_v)+'.'
+    :aiG(e.inj.dose)+' ед. в '+e.inj.time+' → следующий сахар '+(e.after?aiG(e.after.v)+' через '+aiG(e.interval_h)+' ч':'нет')+'.';
    chain.append(aiEl('div','ai-chain-foot',result));
    ex.append(chain);
   });
-  ex.append(aiEl('div','ai-subnote','Это фактические записи похожих дней, не рассчитанная доза на сейчас.'));
+  ex.append(aiEl('div','ai-subnote','Сопоставление по сахару, времени и недавним коротким дозам.'));
  }else if(!r.alert||r.alert.level!=='low'){
-  aiSection(root,'Похожие записи',aiEl('p','','Подходящих завершённых аналогов не нашлось. Не подставляю дозу из несопоставимых дней.'));
+  aiSection(root,'Похожие записи',aiEl('p','','Подходящих завершённых аналогов не нашлось.'));
  }
- if(night){
-  aiSection(root,'Ночь по дневнику',aiEl('p','',night.pairs+' пар «вечерний замер → первый утренний». Утром ниже 3,9: '+aiKN(night.lt39)+'. Промежуточные замеры есть в '+night.intermediate_measurements+' парах; по этим данным нельзя отделить вклад длинного от коротких доз и других факторов.'));
+ if(night||nightMatch){
+  const section=aiSection(root,'Ночные аналоги');
+  const top=nightMatch&&nightMatch.dose_groups[0];
+  if(top)section.append(aiEl('p','ai-conclusion',nightMatch.episodes+' похожих ночей · чаще длинный '+aiG(top.dose)+' ед. ('+top.n+'). Утром медиана '+aiG(top.morning_median)+'; ниже 3,9 — '+aiKN(top.morning_low)+'.'));
+  else section.append(aiEl('p','','Нет достаточно близких ночных эпизодов.'));
+  (nightMatch?.examples||[]).forEach(e=>{
+   const line=aiEl('div','ai-chain');
+   line.append(aiEl('div','ai-chain-head',e.day+' · вечер '+aiG(e.evening)+' в '+e.evening_time));
+   line.append(aiEl('div','ai-chain-foot','Длинный '+aiG(e.long_dose)+' ед. → утром '+aiG(e.morning)+' в '+e.morning_time));
+   section.append(line);
+  });
  }
- root.append(aiEl('div','ai-fullnote','Исторические аналоги помогают обсуждать закономерности с врачом и не заменяют индивидуальную схему дозирования.'));
 }
 function openSugarAiDetails(index=0){
  const data=sugarAiList[index];
