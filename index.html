@@ -2536,15 +2536,25 @@ function renderAiReport(root,data,index){
  }
  if(night||nightMatch){
   const section=aiSection(root,'Ночные аналоги');
-  const top=nightMatch&&nightMatch.dose_groups[0];
-  if(top)section.append(aiEl('p','ai-conclusion',nightMatch.episodes+' похожих ночей · чаще длинный '+aiG(top.dose)+' ед. ('+top.n+'). Утром медиана '+aiG(top.morning_median)+'; ниже 3,9 — '+aiKN(top.morning_low)+'.'));
+  const groups=nightMatch&&nightMatch.dose_groups||[];
+  const topCount=groups.length?groups[0].n:0;
+  const tops=groups.filter(g=>g.n===topCount);
+  if(tops.length&&topCount===1)section.append(aiEl('p','ai-conclusion',nightMatch.episodes+' похожих дней · дозы разошлись, повторяющейся нет.'));
+  else if(tops.length)section.append(aiEl('p','ai-conclusion',nightMatch.episodes+' похожих дней · чаще всего длинный '+tops.map(g=>aiG(g.dose)+' ед.').join(' / ')+' ('+topCount+' раз).'));
   else section.append(aiEl('p','','Нет достаточно близких ночных эпизодов.'));
+  groups.slice(0,3).forEach(g=>{
+   const line=aiEl('div','ai-chain');
+   line.append(aiEl('div','ai-chain-head',aiG(g.dose)+' ед. длинного · '+g.n+' дней'));
+   line.append(aiEl('div','ai-chain-foot','Утро: медиана '+aiG(g.morning_median)+' · ниже 3,9: '+aiKN(g.morning_low)));
+   section.append(line);
+  });
   (nightMatch?.examples||[]).forEach(e=>{
    const line=aiEl('div','ai-chain');
-   line.append(aiEl('div','ai-chain-head',e.day+' · вечер '+aiG(e.evening)+' в '+e.evening_time));
+   line.append(aiEl('div','ai-chain-head',e.day+' · сахар '+aiG(e.sugar)+' в '+e.time));
    line.append(aiEl('div','ai-chain-foot','Длинный '+aiG(e.long_dose)+' ед. → утром '+aiG(e.morning)+' в '+e.morning_time));
    section.append(line);
   });
+  if(nightMatch)section.append(aiEl('div','ai-subnote','Сравнение учитывает сахар в это же время, предыдущие замеры, короткий за 4 ч и длинный с прошлой ночи.'));
  }
 }
 function openSugarAiDetails(index=0){
