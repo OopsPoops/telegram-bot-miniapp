@@ -2496,7 +2496,6 @@ function aiNode(text,small,cls){
 function aiAgo(min){return min<60?min+' мин назад':aiG(min/60)+' ч назад';}
 function renderAiReport(root,data,index){
  const r=data.report,now=r.now,before=r.before,match=r.match,night=r.night;
- // Сейчас
  const hero=aiEl('div','ai-fullhero');
  hero.append(aiEl('div','ai-fullhero-label','✦ Сейчас'));
  const row=aiEl('div','ai-herorow');
@@ -2504,140 +2503,41 @@ function renderAiReport(root,data,index){
  row.append(big);hero.append(row);
  const chips=aiEl('div','ai-chips');
  chips.append(aiEl('span','ai-chip','🕒 '+now.time),aiEl('span','ai-chip','Фаза: '+now.phase+' (по часам)'));
- if(match&&match.stats.thin)chips.append(aiEl('span','ai-chip warn','мало сопоставимых данных'));
+ if(match&&match.stats.thin)chips.append(aiEl('span','ai-chip warn','мало аналогов'));
  hero.append(chips);
- const h=aiEl('h2','',data.headline||'');hero.append(h);
+ hero.append(aiEl('h2','',data.headline||''));
  if(data.summary)hero.append(aiEl('p','',data.summary));
  root.append(hero);
  if(index===0&&sugarAiNotice)root.append(aiEl('div','ai-alert high','Не удалось обновить: '+sugarAiNotice));
  if(data.tz_warning)root.append(aiEl('div','ai-alert high',data.tz_warning));
  if(r.alert)root.append(aiEl('div','ai-alert '+r.alert.level,r.alert.text));
- // До этого
- const recent=before.recent.length?before.recent.map(x=>x.time.slice(6)+' · '+aiG(x.dose)+' ед. · '+aiAgo(x.ago_min)).join('\n'):'нет за 12 часов';
- const longText=before.long.known?aiG(before.long.dose)+' ед. · '+before.long.date+' 21:00 · '+aiG(before.long.hours)+' ч назад':'не записан за '+before.long.date;
- const rows=[['Короткие',recent],['Суммы',aiG(before.sums[0])+' / '+aiG(before.sums[1])+' / '+aiG(before.sums[2])+' ед. (0–2 / 2–4 / 4–6 ч)'],['Длинный',longText],['Низкий за 6 ч',before.low6?'был':'не было']];
- if(before.prev)rows.push(['Прошлый замер',aiG(before.prev.v)+' · '+before.prev.time+' ('+aiAgo(before.prev.gap_min)+')']);
- const prior=aiSection(root,'До этого',aiKv(rows));
- if(r.after_note&&r.after_note.length)prior.append(aiEl('div','ai-subnote','После этого замера уже записано: '+r.after_note.map(x=>x.time.slice(6)+' — '+aiG(x.dose)+' ед.').join(', ')+'. В анализ это не входит.'));
- // Похожие случаи
- if(match&&match.kind==='meal'){
-  const st=match.stats;
-  const nextName=match.phase==='завтрак'?'ужина':'вечерней проверки';
-  const forNext=now.phase!==match.phase;
-  const sec=aiSection(root,(forNext?'История к ближайшей проверке · ':'Похожие приёмы · ')+match.phase);
-  sec.append(aiTiles([
-   ['случаев · дней',st.episodes+' · '+st.days],
-   ['без подколки и в норме',aiKN(st.success)],
-   ['была подколка',aiKN(st.corrected),st.corrected[0]?'high':'']
-  ]));
-  sec.append(aiTiles([
-   ['выше 10',aiKN(st.high),st.high[0]?'high':''],
-   ['ниже 3,9',aiKN(st.low),st.low[0]?'low':''],
-   ['перед '+nextName+', медиана',aiG(st.median_end)]
-  ]));
-  const wrap=aiEl('div','ai-tablewrap'),table=aiEl('table','ai-table');
-  const head=aiEl('tr');['Введено','Случ.','В норме','Подколка','>10','<3,9'].forEach(t=>head.append(aiEl('th','',t)));
-  table.append(head);
-  match.groups.forEach(gr=>{
-   const tr=aiEl('tr');
-   tr.append(aiEl('td','dose',aiG(gr.dose)+' ед.'),aiEl('td','',gr.n+' / '+gr.days+' дн.'),
-    aiEl('td','',aiKN(gr.success)),aiEl('td',gr.corrected[0]?'warnc':'',aiKN(gr.corrected)),
-    aiEl('td','',aiKN(gr.high)),aiEl('td',gr.low[0]?'low':'',aiKN(gr.low)));
-   table.append(tr);
-  });
-  wrap.append(table);sec.append(wrap);
-  sec.append(aiEl('div','ai-subnote','Таблица описывает фактически введённые дозы и наблюдавшиеся исходы; строки не ранжированы и не являются рекомендацией. «В норме» — сахар 3,9–10 до '+nextName+' без дополнительного короткого. Подколка отмечена как событие, но сама по себе не доказывает недобор: её могли сделать по текущему сахару. n_eff '+aiG(st.n_eff)+'. Состав еды и сок в журнале не отмечены.'));
-  const ex=aiSection(root,'Примеры (самые похожие)');
-  match.examples.forEach(e=>{
+
+ const active=before.recent.filter(x=>x.ago_min<=240);
+ const priorRows=[['Короткий за последние 4 ч',active.length?active.map(x=>aiG(x.dose)+' ед. · '+x.time.slice(6)+' · '+aiAgo(x.ago_min)).join('\n'):'нет записей']];
+ if(before.prev)priorRows.push(['Предыдущий сахар',aiG(before.prev.v)+' · '+before.prev.time+' · '+aiAgo(before.prev.gap_min)]);
+ if(before.long.known)priorRows.push(['Длинный',aiG(before.long.dose)+' ед. · '+before.long.date+' в 21:00']);
+ const prior=aiSection(root,'Что уже было',aiKv(priorRows));
+ if(active.length)prior.append(aiEl('div','ai-subnote','Короткий инсулин может ещё действовать. В похожих днях это учитывается отдельно.'));
+
+ if(match&&match.examples&&match.examples.length){
+  const ex=aiSection(root,'Ближайшие похожие записи');
+  match.examples.slice(0,3).forEach(e=>{
    const chain=aiEl('div','ai-chain');
-   const hd=aiEl('div','ai-chain-head');hd.append(aiEl('span','',e.day),aiEl('span','','сходство '+Math.round(e.w*100)+'%'));
-   const line=aiEl('div','ai-chain-row');
-   line.append(aiNode(aiG(e.before.v),e.before.time.slice(6),aiSugarClass(e.before.v)),aiEl('span','ai-arrow','→'),aiNode(aiG(e.inj.dose)+' ед.',e.inj.time,'dose'));
-   (e.seq||[]).forEach(x=>{
-    line.append(aiEl('span','ai-arrow','→'));
-    line.append(x.k==='I'?aiNode('+'+aiG(x.v)+' ед.',x.t+' подколка','corr'):aiNode(aiG(x.v),x.t,aiSugarClass(x.v)));
-   });
-   const cls=e.result==='в норме'?'ok':e.result==='низкий'?'low':'high';
-   line.append(aiEl('span','ai-result '+cls,e.result));
-   chain.append(hd,line,aiEl('div','ai-chain-foot',(e.long!=null?'длинный '+aiG(e.long)+' ед. · ':'')+e.before.ref+', '+e.inj.ref));
+   chain.append(aiEl('div','ai-chain-head',e.day+' · сахар '+aiG(e.before.v)+' в '+e.before.time.slice(6)));
+   const result=match.kind==='meal'
+    ?'Тогда фактически введено '+aiG(e.inj.dose)+' ед. в '+e.inj.time+'. Исход: '+e.result+'. Следующий сахар: '+aiG(e.end_v)+'.'
+    :'Тогда фактически введено '+aiG(e.inj.dose)+' ед. в '+e.inj.time+'. Следующий сахар: '+(e.after?aiG(e.after.v)+' через '+aiG(e.interval_h)+' ч':'нет')+'.';
+   chain.append(aiEl('div','ai-chain-foot',result));
    ex.append(chain);
   });
- }else if(match){
-  const st=match.stats;
-  const sec=aiSection(root,'Похожие случаи · '+match.phase);
-  sec.append(aiTiles([
-   ['случаев · дней',st.episodes+' · '+st.days],
-   ['через ~'+aiG(st.median_interval_h)+' ч, медиана',aiG(st.median_after)],
-   ['разброс 10–90%',st.q10==null?'—':aiG(st.q10)+'–'+aiG(st.q90)]
-  ]));
-  sec.append(aiTiles([
-   ['ниже 3,9',aiKN(st.lt39),st.lt39[0]?'low':''],
-   ['ниже 3,0',aiKN(st.lt30),st.lt30[0]?'low':''],
-   ['выше 10',aiKN(st.gt10),st.gt10[0]?'high':'']
-  ]));
-  const wrap=aiEl('div','ai-tablewrap'),table=aiEl('table','ai-table');
-  const head=aiEl('tr');['Введено тогда','Случ.','Сахар через ~'+aiG(st.median_interval_h)+' ч','<3,9','>10'].forEach(t=>head.append(aiEl('th','',t)));
-  table.append(head);
-  match.groups.forEach(gr=>{
-   const tr=aiEl('tr');
-   tr.append(aiEl('td','dose',aiG(gr.dose)+' ед.'),aiEl('td','',gr.n+' / '+gr.days+' дн.'),
-    aiEl('td','',aiG(gr.median_after)+(gr.q10==null?'':' ('+aiG(gr.q10)+'–'+aiG(gr.q90)+')')),
-    aiEl('td',gr.lt39[0]?'low':'',aiKN(gr.lt39)),aiEl('td','',aiKN(gr.gt10)));
-   table.append(tr);
-  });
-  wrap.append(table);sec.append(wrap);
-  sec.append(aiEl('div','ai-subnote','n_eff '+aiG(st.n_eff)+'. Дозы — то, что вводилось тогда. k/n — частоты случаев, не вероятности.'));
-  const ex=aiSection(root,'Примеры (самые похожие)');
-  match.examples.forEach(e=>{
-   const chain=aiEl('div','ai-chain');
-   const hd=aiEl('div','ai-chain-head');hd.append(aiEl('span','',e.day),aiEl('span','','сходство '+Math.round(e.w*100)+'%'));
-   const line=aiEl('div','ai-chain-row');
-   line.append(aiNode(aiG(e.before.v),e.before.time.slice(6),aiSugarClass(e.before.v)),aiEl('span','ai-arrow','→'),
-    aiNode(aiG(e.inj.dose)+' ед.',e.inj.time,'dose'),aiEl('span','ai-arrow','→'),
-    aiNode(aiG(e.after.v),e.after.time.slice(6),aiSugarClass(e.after.v)));
-   chain.append(hd,line,aiEl('div','ai-chain-foot','Изменение '+(e.delta>0?'+':'')+aiG(e.delta)+' за '+aiG(e.interval_h)+' ч'+(e.low_seen?' · мин. '+aiG(e.min):'')+' · '+e.before.ref+', '+e.inj.ref+', '+e.after.ref));
-   ex.append(chain);
-  });
-  if(r.skipped_intermediate)ex.append(aiEl('div','ai-subnote','Не вошло '+r.skipped_intermediate+' эпизодов с промежуточными уколами.'));
+  ex.append(aiEl('div','ai-subnote','Это фактические записи похожих дней, не рассчитанная доза на сейчас.'));
  }else if(!r.alert||r.alert.level!=='low'){
-  aiSection(root,'Похожие случаи',aiEl('p','','Сопоставимых завершённых случаев за '+r.window.days+' дн. нет.'));
+  aiSection(root,'Похожие записи',aiEl('p','','Подходящих завершённых аналогов не нашлось. Не подставляю дозу из несопоставимых дней.'));
  }
- // Ночь
  if(night){
-  const sec=aiSection(root,'Ночь · вечер → длинный в 21:00 → утро',
-   aiTiles([['пар',String(night.pairs)],['медиана изменения',aiG(night.median_delta)],['утром ниже 3,9',aiKN(night.lt39),night.lt39[0]?'low':'']]),
-   aiEl('div','ai-subnote','Без позднего короткого после 18:30: '+night.quiet_pairs+' пар; зарегистрированный промежуточный сахар <3,9: '+aiKN(night.intermediate_low)+'. Утреннее значение — замер на конце интервала, не подтверждённое ночное снижение.'));
-  if(Array.isArray(night.by_dose)&&night.by_dose.length){
-   const wrap=aiEl('div','ai-tablewrap'),table=aiEl('table','ai-table');
-   const head=aiEl('tr');['Длинный тогда','Пар','Вечер, медиана','Утро, медиана','Утром <3,9','Поздний короткий после 18:30','Вечерний замер после 21:00'].forEach(t=>head.append(aiEl('th','',t)));
-   table.append(head);
-   night.by_dose.forEach(gr=>{
-    const tr=aiEl('tr');
-    tr.append(aiEl('td','dose',aiG(gr.dose)+' ед.'),aiEl('td','',String(gr.n)),
-     aiEl('td','',aiG(gr.evening_median)),aiEl('td','',aiG(gr.morning_median)),
-     aiEl('td',gr.morning_lt39[0]?'low':'',aiKN(gr.morning_lt39)),
-     aiEl('td','',gr.with_short_after_dinner+' из '+gr.n),
-     aiEl('td','',gr.evening_after_long+' из '+gr.n));
-    table.append(tr);
-   });
-   wrap.append(table);sec.append(wrap);
-  }
-  sec.append(aiEl('div','ai-subnote','Данные в строках — исторические пары при указанной фактической дозе. Значение <3,9 относится к первому утреннему замеру, а не подтверждённому ночному эпизоду. Между вечерним и утренним замерами снижение не исключается. Это не совет менять дозу.'));
+  aiSection(root,'Ночь по дневнику',aiEl('p','',night.pairs+' пар «вечерний замер → первый утренний». Утром ниже 3,9: '+aiKN(night.lt39)+'. Промежуточные замеры есть в '+night.intermediate_measurements+' парах; по этим данным нельзя отделить вклад длинного от коротких доз и других факторов.'));
  }
- // Проверенная сводка
- const ai=aiSection(root,'Проверенная сводка');
- if(data.conclusion){
-  ai.append(aiEl('p','ai-conclusion',data.conclusion));
-  if(data.points&&data.points.length){const ul=aiEl('ul','ai-points');data.points.forEach(p=>ul.append(aiEl('li','',p)));ai.append(ul);}
- }else if(data.llm_error){
-  ai.append(aiEl('div','ai-warnbox','Вывод ИИ недоступен: '+data.llm_error+' Цифры выше посчитаны без него — нажми ↻, чтобы запросить вывод снова.'));
- }else{
-  ai.append(aiEl('p','','Для этого замера текстовый вывод не требуется.'));
- }
- const note=aiEl('div','ai-fullnote');
- const w=r.window;
- note.textContent='Данные: '+w.days+' дн. (с '+w.from+'), замеров '+w.sugars+', коротких '+w.shorts+', длинных '+w.longs+'. '+(r.quality||[]).join(' ')+' Это описание прошлых наблюдений, не назначение: дозы показаны как история. Еда и сок неизвестны.';
- root.append(note);
+ root.append(aiEl('div','ai-fullnote','Исторические аналоги помогают обсуждать закономерности с врачом и не заменяют индивидуальную схему дозирования.'));
 }
 function openSugarAiDetails(index=0){
  const data=sugarAiList[index];
