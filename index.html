@@ -2606,10 +2606,10 @@ function renderAiReport(root,data,index){
  if(night){
   const sec=aiSection(root,'Ночь · вечер → длинный в 21:00 → утро',
    aiTiles([['пар',String(night.pairs)],['медиана изменения',aiG(night.median_delta)],['утром ниже 3,9',aiKN(night.lt39),night.lt39[0]?'low':'']]),
-   aiEl('div','ai-subnote','Без короткого после 15:00: '+night.quiet_pairs+' пар, утром ниже 3,9 — '+aiKN(night.quiet_lt39)+'. В остальных парах короткий после ужина мог влиять на утренний сахар. Это наблюдаемая связь, не оценка причинного эффекта длинного.'));
+   aiEl('div','ai-subnote','Без позднего короткого после 18:30: '+night.quiet_pairs+' пар; зарегистрированный промежуточный сахар <3,9: '+aiKN(night.intermediate_low)+'. Утреннее значение — замер на конце интервала, не подтверждённое ночное снижение.'));
   if(Array.isArray(night.by_dose)&&night.by_dose.length){
    const wrap=aiEl('div','ai-tablewrap'),table=aiEl('table','ai-table');
-   const head=aiEl('tr');['Длинный тогда','Пар','Вечер, медиана','Утро, медиана','Утром <3,9','Короткий после 15:00','Вечерний замер после 21:00'].forEach(t=>head.append(aiEl('th','',t)));
+   const head=aiEl('tr');['Длинный тогда','Пар','Вечер, медиана','Утро, медиана','Утром <3,9','Поздний короткий после 18:30','Вечерний замер после 21:00'].forEach(t=>head.append(aiEl('th','',t)));
    table.append(head);
    night.by_dose.forEach(gr=>{
     const tr=aiEl('tr');
@@ -2622,10 +2622,10 @@ function renderAiReport(root,data,index){
    });
    wrap.append(table);sec.append(wrap);
   }
-  sec.append(aiEl('div','ai-subnote','В группах показаны исторические пары при данной фактической дозе. Утренний замер — первое значение 05:00–08:30; возможные снижения между замерами не видны. Не интерпретируй строку как совет менять дозу.'));
+  sec.append(aiEl('div','ai-subnote','Данные в строках — исторические пары при указанной фактической дозе. Значение <3,9 относится к первому утреннему замеру, а не подтверждённому ночному эпизоду. Между вечерним и утренним замерами снижение не исключается. Это не совет менять дозу.'));
  }
- // Вывод ИИ
- const ai=aiSection(root,'Вывод ИИ');
+ // Проверенная сводка
+ const ai=aiSection(root,'Проверенная сводка');
  if(data.conclusion){
   ai.append(aiEl('p','ai-conclusion',data.conclusion));
   if(data.points&&data.points.length){const ul=aiEl('ul','ai-points');data.points.forEach(p=>ul.append(aiEl('li','',p)));ai.append(ul);}
