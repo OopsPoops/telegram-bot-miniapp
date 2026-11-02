@@ -2308,7 +2308,7 @@ function aiLimitText(ms){return 'Дневной лимит Groq исчерпан
 // Идущий расчёт — мерцающая надпись по центру; ошибка или лимит — заметка внизу.
 const AI_SLIDE_HTML='<section class="metric ai-card" data-status="empty" data-has="0" data-notice="0">'
  +'<div class="ai-card-head"><div class="ai-card-icon"><svg viewBox="0 0 32 32"><path d="M16 3.5c.8 7 4.5 10.7 11.5 12-7 1.3-10.7 5-11.5 12-.8-7-4.5-10.7-11.5-12 7-1.3 10.7-5 11.5-12Z"/><path d="M24.5 3.8v6M21.5 6.8h6"/><circle class="ai-core" cx="16" cy="15.5" r="2"/></svg></div>'
- +'<div class="ai-card-copy"><div class="ai-card-title">AI · Вывод</div><div class="ai-card-sub"></div></div>'
+ +'<div class="ai-card-copy"><div class="ai-card-title">AI · Доза</div><div class="ai-card-sub"></div></div>'
  +'<button class="ai-refresh" type="button" aria-label="Обновить AI-анализ" title="Обновить" onclick="refreshSugarAi(event)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg></button></div>'
  +'<div class="ai-card-headline"></div><div class="ai-card-summary"></div></section>';
 // Подгоняем число строк краткого текста под реальную высоту карточки.
@@ -2557,12 +2557,82 @@ function renderAiReport(root,data,index){
   if(nightMatch)section.append(aiEl('div','ai-subnote','Сравнение учитывает сахар в это же время, предыдущие замеры, короткий за 4 ч и длинный с прошлой ночи.'));
  }
 }
+function renderAiReco(root,data,index){
+ const r=data.reco,night=r.night,meal=r.meal,corr=r.corr;
+ const label=r.kind==='night'?'Длинный на сегодня':r.kind==='meal'?(r.phase==='завтрак'?'Доза на завтрак':'Доза на ужин'):r.kind==='hypo'?'Сейчас':'Что делать сейчас';
+ const hero=aiEl('div','ai-fullhero');
+ hero.append(aiEl('div','ai-fullhero-label','✦ '+label));
+ const row=aiEl('div','ai-herorow');
+ const big=aiEl('div','ai-bignum',r.big);
+ if(r.unit)big.append(aiEl('small','',r.unit));
+ row.append(big);hero.append(row);
+ if(r.action)hero.append(aiEl('div','ai-subnote',r.action));
+ const chips=aiEl('div','ai-chips');
+ chips.append(aiEl('span','ai-chip','🕒 '+r.time),aiEl('span','ai-chip','Сахар '+aiG(r.sugar)));
+ if(r.next_meal)chips.append(aiEl('span','ai-chip','Завтрак ~'+r.next_meal.dose+' ед.'));
+ if(r.confidence==='low')chips.append(aiEl('span','ai-chip warn','мало данных'));
+ hero.append(chips);
+ if(data.summary)hero.append(aiEl('p','',data.summary));
+ root.append(hero);
+ if(index===0&&sugarAiNotice)root.append(aiEl('div','ai-alert high','Не удалось обновить: '+sugarAiNotice));
+ if(data.tz_warning)root.append(aiEl('div','ai-alert high',data.tz_warning));
+ if(r.alert)root.append(aiEl('div','ai-alert '+r.alert.level,r.alert.text));
+
+ const why=(r.details||[]).filter(Boolean);
+ if(why.length)aiSection(root,'Почему так',...why.map(t=>aiEl('p','ai-conclusion',t)));
+
+ const st=meal?meal.stats:corr&&corr.stats;
+ if(st){
+  const tiles=[];
+  if(meal){
+   tiles.push(['Похожих случаев',String(st.n)],['В цели 4–9',aiKN(st.in_target)],['Без подколки',aiKN(st.clean)]);
+  }else{
+   tiles.push(['Похожих случаев',String(st.n)],['Без подколки',aiKN(st.no_corr)],['Сахар к след. замеру','~'+aiG(st.median_y)]);
+  }
+  aiSection(root,'Что показывает история',aiTiles(tiles));
+ }
+ const list=meal?meal.analogs:corr&&corr.analogs;
+ if(list&&list.length){
+  const sec=aiSection(root,'Похожие дни');
+  list.slice(0,4).forEach(e=>{
+   const chain=aiEl('div','ai-chain');
+   if(meal){
+    chain.append(aiEl('div','ai-chain-head',e.day+' · сахар '+aiG(e.pre)+' в '+e.pre_time));
+    let text=aiG(e.dose)+' ед. → к '+e.y_time+' сахар '+aiG(e.y);
+    if(e.corr)text+=' · подколка '+aiG(e.corr)+' ед.';
+    if(e.low)text+=' · был низкий '+aiG(e.low);
+    chain.append(aiEl('div','ai-chain-foot',text+(e.in_target&&!e.corr?' ✓':'')));
+   }else{
+    chain.append(aiEl('div','ai-chain-head',e.day+' · сахар '+aiG(e.s)+' в '+e.s_time));
+    chain.append(aiEl('div','ai-chain-foot',(e.c?'подколка '+aiG(e.c)+' ед.':'без подколки')+' → в '+e.y_time+' сахар '+aiG(e.y)));
+   }
+   sec.append(chain);
+  });
+  sec.append(aiEl('div','ai-subnote','Ближайшие по сахару, времени суток и свежести — за последний год.'));
+ }
+ if(night&&night.dose!=null){
+  const sec=aiSection(root,'Ночной (длинный) инсулин');
+  const tiles=[['Рекомендую',night.dose+' ед.']];
+  if(night.last)tiles.push(['Вчера',aiG(night.last.dose)+' ед.']);
+  if(night.stats&&night.stats.last_morning)tiles.push(['Утро',aiG(night.stats.last_morning[0])]);
+  sec.append(aiTiles(tiles));
+  if(night.reason)sec.append(aiEl('p','ai-conclusion',night.reason));
+  (night.cases||[]).forEach(c=>{
+   const line=aiEl('div','ai-chain');
+   line.append(aiEl('div','ai-chain-head',c.day+' · вечером '+aiG(c.e)+' в '+c.e_time));
+   line.append(aiEl('div','ai-chain-foot','Длинный '+aiG(c.long)+' ед.'+(c.late?' · подколка вечером '+aiG(c.late)+' ед.':'')+' → утром '+aiG(c.m)+' в '+c.m_time));
+   sec.append(line);
+  });
+ }
+ root.append(aiEl('div','ai-fullnote','Расчёт по твоей истории за год: ищу похожие дни и смотрю, чем они закончились. Еда, сок и самочувствие не учитываются. Это подсказка, а не назначение врача.'+(data.llm_error?' Текст без ИИ: '+data.llm_error+'.':'')));
+}
 function openSugarAiDetails(index=0){
  const data=sugarAiList[index];
  if(!data||!data.verified)return;
  const d=data.verified;
  document.getElementById('aiPageDate').textContent=data.generated_at?'Последнее '+formatSugarAiDate(data.generated_at):'';
  const root=document.getElementById('aiFullbody');root.replaceChildren();
+ if(data.v===3&&data.reco){renderAiReco(root,data,index);switchTab('ai');return;}
  if(data.report){renderAiReport(root,data,index);switchTab('ai');return;}
  const hero=document.createElement('div');hero.className='ai-fullhero';
  const label=document.createElement('div');label.className='ai-fullhero-label';label.textContent='✦ Результат анализа';
