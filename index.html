@@ -987,6 +987,53 @@ button.st-ico:active{transform:scale(.88)}
 :root[data-theme="dark"] .ai-card{--glow:168,152,255;border-color:rgba(151,140,255,.19)}
 :root[data-theme="dark"] .ai-card::before{background:radial-gradient(ellipse 85% 100% at 0% -20%,rgba(122,105,251,.16),transparent 85%),radial-gradient(ellipse 65% 95% at 100% -10%,rgba(35,199,192,.08),transparent 85%)}
 
+/* ===== Еда после записи инсулина: окно по центру, фон размыт ===== */
+.food-backdrop{position:fixed;inset:0;z-index:35;display:none;align-items:center;justify-content:center;padding:calc(18px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom));background:rgba(18,24,45,.42);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.food-backdrop.visible{display:flex;animation:fade .2s ease}
+.food-sheet{width:100%;max-width:420px;max-height:100%;overflow:auto;background:var(--modal-bg,var(--card));color:var(--text);border:1px solid var(--line);border-radius:28px;padding:20px 18px 18px;box-shadow:0 25px 80px rgba(0,0,0,.28);animation:foodUp .38s cubic-bezier(.22,1,.36,1)}
+@keyframes foodUp{from{transform:translateY(18px) scale(.95);opacity:0}to{transform:none;opacity:1}}
+.food-top{display:flex;align-items:center;gap:13px;margin-bottom:16px}
+.food-ico{flex:none;width:48px;height:48px;border-radius:16px;display:grid;place-items:center;font-size:24px;background:linear-gradient(145deg,rgba(32,169,155,.24),rgba(82,103,232,.16))}
+.food-title{font-size:21px;font-weight:800;line-height:1.1}
+.food-sub{font-size:12.5px;color:var(--muted);margin-top:5px;font-weight:600}
+.food-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.food-chip{display:inline-flex;align-items:center;gap:0;border:1.5px solid var(--line);background:var(--input-bg);color:var(--text);font:inherit;font-size:15.5px;font-weight:650;padding:9px 15px;border-radius:999px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .35s cubic-bezier(.34,1.5,.4,1),background .22s,border-color .22s,color .22s,box-shadow .22s;}
+.food-chips.intro .food-chip{animation:foodChipIn .4s cubic-bezier(.22,1,.36,1) both;animation-delay:calc(var(--i,0)*28ms)}
+@keyframes foodChipIn{from{opacity:0;transform:translateY(8px) scale(.94)}to{opacity:1;transform:none}}
+.food-chip:active{transform:scale(.93)}
+.food-chip svg{width:0;height:14px;margin-right:0;opacity:0;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;transition:width .22s,margin .22s,opacity .22s}
+.food-chip.on{background:var(--teal);border-color:var(--teal);color:#fff;box-shadow:0 8px 18px -10px var(--teal)}
+.food-chip.on svg{width:14px;margin-right:7px;opacity:1}
+:root[data-theme="dark"] .food-chip.on{color:#06201c}
+.food-add{display:flex;gap:8px;margin-bottom:14px}
+.food-input{flex:1;min-width:0;height:48px;border:1.5px solid var(--line);border-radius:15px;background:var(--input-bg);color:var(--input-text);font:inherit;font-size:16px;padding:0 14px;transition:border-color .2s}
+.food-input:focus{outline:0;border-color:var(--teal)}
+.food-input::placeholder{color:var(--muted)}
+.food-plus{flex:none;width:48px;height:48px;border:0;border-radius:15px;background:var(--input-bg);color:var(--teal);display:grid;place-items:center;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .3s cubic-bezier(.34,1.5,.4,1)}
+.food-plus:active{transform:scale(.9)}
+.food-plus svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round}
+.food-preview{border-radius:16px;padding:11px 14px;margin-bottom:14px;background:rgba(32,169,155,.09);border:1px dashed rgba(32,169,155,.4)}
+.food-preview small{display:block;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.food-preview div{font-size:15px;font-weight:650;line-height:1.35;overflow-wrap:anywhere}
+.food-preview.empty div{color:var(--muted);font-weight:550}
+.food-actions{display:flex;gap:10px}
+.food-skip{flex:none;height:50px;padding:0 20px;border:0;border-radius:16px;background:var(--input-bg);color:var(--muted);font:inherit;font-size:15px;font-weight:700;cursor:pointer}
+.food-save{flex:1;height:50px;border:0;border-radius:16px;font:inherit;font-size:16px;font-weight:750;color:#fff;background:linear-gradient(135deg,#1f9f92,#3bc7b7);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 12px 22px -12px rgba(32,169,155,.95);cursor:pointer;transition:transform .3s cubic-bezier(.34,1.5,.4,1),opacity .2s}
+.food-save:active{transform:scale(.97)}
+.food-save:disabled{opacity:.45;box-shadow:none}
+.food-sheet .toast{text-align:center;margin-top:10px}
+/* настройки: слова приёма пищи */
+.food-item .st-t{flex:1;min-width:0;overflow-wrap:anywhere}
+.food-dot{flex:none;width:26px;height:26px;border-radius:50%;border:2px solid var(--st-chev);background:none;padding:0;display:grid;place-items:center;color:#fff;cursor:pointer;transition:background .2s,border-color .2s}
+.food-dot svg{width:13px;height:13px;opacity:0;transition:opacity .15s}
+.food-dot[aria-pressed="true"]{background:var(--st-on,#34c759);border-color:var(--st-on,#34c759)}
+.food-dot[aria-pressed="true"] svg{opacity:1}
+.food-del{flex:none;width:30px;height:30px;border:0;border-radius:50%;background:var(--st-fill);color:var(--st-sub);font-size:19px;line-height:1;padding:0;cursor:pointer}
+.food-new{flex:1;width:auto;min-width:0;text-align:left}
+#screen-settings .food-plus{width:34px;height:34px;border-radius:10px;background:var(--st-fill)}
+#screen-settings .food-plus svg{width:16px;height:16px}
+.food-empty{padding:14px 15px;font-size:15px;color:var(--st-sub)}
+
 /* ===== Карточка «Инсулин»: оборот с похожими случаями из истории ===== */
 .ins-flip{position:relative;perspective:1300px;-webkit-perspective:1300px;touch-action:none}
 .ins-flip .metric{margin-bottom:0}
@@ -1354,6 +1401,7 @@ button.st-ico:active{transform:scale(.88)}
 <button class="st-row has-ico st-nav" type="button" onclick="stOpen('sound')"><span class="st-ico c-red"><svg class="g"><use href="#i-sound"/></svg></span><span class="st-t">Звук и вибрация</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
 <button class="st-row has-ico st-nav" type="button" onclick="stOpen('timer')"><span class="st-ico c-orange"><svg class="g"><use href="#i-timer"/></svg></span><span class="st-t">Таймер инсулина</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
 <button class="st-row has-ico st-nav" type="button" onclick="stOpen('report')"><span class="st-ico c-blue"><svg class="g"><use href="#i-cal"/></svg></span><span class="st-t">Ежедневный отчёт</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
+<button class="st-row has-ico st-nav" type="button" onclick="stOpen('food')"><span class="st-ico c-purple"><svg class="g"><use href="#i-meal"/></svg></span><span class="st-t">Еда</span><span class="st-val" id="stV-food"></span><svg class="st-chev"><use href="#i-chev"/></svg></button>
 <button class="st-row has-ico st-nav" type="button" onclick="stOpen('target')"><span class="st-ico c-green"><svg class="g"><use href="#i-target"/></svg></span><span class="st-t">Целевой диапазон</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
 </div>
 <div class="st-card">
@@ -1410,6 +1458,29 @@ button.st-ico:active{transform:scale(.88)}
 <div class="st-foot">Приходит через выбранное время после отчёта. 0 минут — вопрос не приходит.</div>
 </div>
 <div class="toast st-toast" id="reportToast"></div>
+</div>
+
+<div class="st-page" data-p="food">
+<div class="st-bar"><button class="st-back" type="button" onclick="stBack()" aria-label="Назад"><svg><use href="#i-back"/></svg></button><div class="st-title">Еда</div></div>
+<div class="st-card">
+<div class="st-row two has-ico"><span class="st-ico c-purple"><svg class="g"><use href="#i-meal"/></svg></span><div class="st-copy"><div class="st-t">Вносить еду</div><div class="st-s" id="foodDescription">Загружаю настройки…</div></div><button class="st-sw" id="foodEnabledSwitch" type="button" aria-pressed="true" disabled onclick="toggleFoodEnabled()" aria-label="Вносить еду"><span></span></button></div>
+</div>
+<div class="report-options" id="foodOptions">
+<div class="st-sec">Завтрак</div>
+<div class="st-card">
+<label class="st-row"><span class="st-t">С</span><input class="st-in" id="foodBreakfastStart" type="time" onchange="saveFoodTime('breakfast')" aria-label="Начало завтрака"></label>
+<label class="st-row"><span class="st-t">До</span><input class="st-in" id="foodBreakfastEnd" type="time" onchange="saveFoodTime('breakfast')" aria-label="Конец завтрака"></label>
+</div>
+<div class="st-card"><div id="foodBreakfastList"></div><div class="st-row"><input class="st-in food-new" id="foodBreakfastNew" type="text" maxlength="40" autocomplete="off" placeholder="Новое слово" enterkeyhint="done" onkeydown="if(event.key==='Enter'){event.preventDefault();foodItemAdd('breakfast');}" aria-label="Новое слово для завтрака"><button class="food-plus" type="button" onclick="foodItemAdd('breakfast')" aria-label="Добавить слово"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div></div>
+<div class="st-sec">Ужин</div>
+<div class="st-card">
+<label class="st-row"><span class="st-t">С</span><input class="st-in" id="foodDinnerStart" type="time" onchange="saveFoodTime('dinner')" aria-label="Начало ужина"></label>
+<label class="st-row"><span class="st-t">До</span><input class="st-in" id="foodDinnerEnd" type="time" onchange="saveFoodTime('dinner')" aria-label="Конец ужина"></label>
+</div>
+<div class="st-card"><div id="foodDinnerList"></div><div class="st-row"><input class="st-in food-new" id="foodDinnerNew" type="text" maxlength="40" autocomplete="off" placeholder="Новое слово" enterkeyhint="done" onkeydown="if(event.key==='Enter'){event.preventDefault();foodItemAdd('dinner');}" aria-label="Новое слово для ужина"><button class="food-plus" type="button" onclick="foodItemAdd('dinner')" aria-label="Добавить слово"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div></div>
+<div class="st-foot">Кружок слева — слово будет выбрано заранее, пустой — только предложено. В остальное время слова не предлагаются, можно вписать своё. Время московское, настройки общие для всех пользователей бота.</div>
+</div>
+<div class="toast st-toast" id="foodSettingsToast"></div>
 </div>
 
 <div class="st-page" data-p="target">
@@ -1509,6 +1580,17 @@ button.st-ico:active{transform:scale(.88)}
 <!-- === ОВЕРЛЕЙ ЗАГРУЗКИ === -->
 <div class="loading-overlay" id="loadingOverlay" role="status" aria-label="Загрузка"><div class="spinner"></div></div>
 <!-- === МОДАЛЬНОЕ ОКНО === -->
+<div class="food-backdrop" id="foodBackdrop" onclick="if(event.target===this)closeFoodSheet()">
+<section class="food-sheet" role="dialog" aria-modal="true" aria-labelledby="foodTitle">
+<div class="food-top"><div class="food-ico" id="foodIco">🍽️</div><div><div class="food-title" id="foodTitle">Что ешь?</div><div class="food-sub" id="foodSub"></div></div></div>
+<div class="food-chips" id="foodChips"></div>
+<div class="food-add"><input class="food-input" id="foodInput" type="text" enterkeyhint="done" maxlength="40" autocomplete="off" placeholder="Добавь своё…" aria-label="Добавить блюдо"><button class="food-plus" id="foodPlus" type="button" aria-label="Добавить"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div>
+<div class="food-preview empty" id="foodPreview"></div>
+<div class="food-actions"><button class="food-skip" type="button" onclick="closeFoodSheet()">Пропустить</button><button class="food-save" id="foodSave" type="button" onclick="submitFood()">Записать</button></div>
+<div class="toast" id="foodToast"></div>
+</section>
+</div>
+
 <div class="modal-backdrop" id="modalBackdrop" onclick="backdropClose(event)">
 <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
 <div class="modal-top">
@@ -1718,7 +1800,7 @@ function switchTab(name){
  window.scrollTo({top:0,behavior:'smooth'});
  selectionHaptic();
  if(name==='graphs')loadAnalytics(false);
- if(name==='settings')loadReportSettings();
+ if(name==='settings'){loadReportSettings();loadFoodSettings();}
 }
 function moveNavPill(){
  const nav=document.querySelector('.bottom-nav');
@@ -1861,7 +1943,7 @@ async function api(action,extra={}){
   throw error;
  }
  // Сахар возвращаем в виде {message}, остальные действия — как есть.
- return action==='sugar'?{message:data.result}:data.result;
+ return action==='sugar'?{message:data.result}:action==='insulin'?{message:data.result,food:data.food,entry:data.entry}:data.result;
 }
 
 // ============================================================
@@ -2263,7 +2345,7 @@ async function saveValue(type){
  let saved=false;
  try{
   const result=await api(type,{value});
-  setToast(toast,'✓ '+(type==='sugar'?result.message:result),'success');
+  setToast(toast,'✓ '+(type==='sugar'||type==='insulin'?result.message:result),'success');
   saved=true;
   showSaveSuccess(button);
   input.value='';
@@ -2279,6 +2361,7 @@ async function saveValue(type){
   }
   if(type==='insulin'){
    renderLatestMeasurement('insulin',value,formatLatestTime(new Date()));
+   openFoodSheet(result.food,result.entry,value);
    await Promise.all([syncInsulinTimer(),refreshHomeAfterChange(type)]);
   }
   if(type==='fact')await refreshHomeAfterChange(type);
@@ -2290,6 +2373,205 @@ async function saveValue(type){
   button.disabled=false;
   if(!saved)button.textContent='Сохранить';
  }
+}
+
+// ============================================================
+// ЕДА: шторка после записи инсулина и настройки (лист total, столбец G)
+// ============================================================
+const FOOD_ICONS={breakfast:'🍳',dinner:'🍝'};
+const FOOD_CHECK='<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 8.5l3.8 3.8L13.5 4"/></svg>';
+let foodState=null;
+function foodSplit(text){
+ return String(text||'').split(/[,;\n]+/).map(s=>s.replace(/\s+/g,' ').trim().slice(0,40)).filter(Boolean);
+}
+function foodChosenText(){
+ return foodState?foodState.chips.filter(c=>c.on).map(c=>c.text).join(', '):'';
+}
+function renderFoodSheet(){
+ if(!foodState)return;
+ document.getElementById('foodChips').innerHTML=foodState.chips.map((chip,i)=>
+  '<button class="food-chip'+(chip.on?' on':'')+'" type="button" style="--i:'+i+'" aria-pressed="'+chip.on+'" onclick="toggleFoodChip('+i+')">'+FOOD_CHECK+'<span>'+escapeHtml(chip.text)+'</span></button>'
+ ).join('');
+ updateFoodSummary();
+}
+function updateFoodSummary(){
+ if(!foodState)return;
+ const text=foodChosenText();
+ const preview=document.getElementById('foodPreview');
+ preview.classList.toggle('empty',!text);
+ preview.innerHTML='<small>Запишу в таблицу</small><div>'+(text?escapeHtml(text):'Выбери из списка или напиши своё')+'</div>';
+ document.getElementById('foodSave').disabled=foodState.busy||(!text&&!document.getElementById('foodInput').value.trim());
+}
+function toggleFoodChip(i){
+ if(!foodState||foodState.busy||!foodState.chips[i])return;
+ foodState.chips[i].on=!foodState.chips[i].on;
+ selectionHaptic();
+ renderFoodSheet();
+}
+function addFoodTyped(){
+ if(!foodState)return false;
+ const input=document.getElementById('foodInput');
+ const words=foodSplit(input.value);
+ if(!words.length)return false;
+ for(const word of words){
+  const existing=foodState.chips.find(c=>c.text.toLowerCase()===word.toLowerCase());
+  if(existing)existing.on=true;
+  else foodState.chips.push({text:word,on:true});
+ }
+ input.value='';
+ selectionHaptic();
+ renderFoodSheet();
+ return true;
+}
+function openFoodSheet(food,entry,dose){
+ if(!food||!food.enabled||!entry)return;
+ foodState={entry,busy:false,chips:(food.items||[]).map(item=>({text:item.text,on:!!item.selected}))};
+ document.getElementById('foodTitle').textContent=food.title||'Что ешь?';
+ document.getElementById('foodIco').textContent=FOOD_ICONS[food.period]||'🍽️';
+ document.getElementById('foodSub').textContent='Инсулин '+dose+' ед. записан · добавь, что ешь';
+ document.getElementById('foodInput').value='';
+ setToast(document.getElementById('foodToast'),'');
+ const save=document.getElementById('foodSave');
+ save.textContent='Записать';
+ const chips=document.getElementById('foodChips');
+ chips.classList.add('intro');
+ renderFoodSheet();
+ setTimeout(()=>chips.classList.remove('intro'),900);
+ document.getElementById('foodBackdrop').classList.add('visible');
+}
+function closeFoodSheet(){
+ if(foodState&&foodState.busy)return;
+ document.getElementById('foodBackdrop').classList.remove('visible');
+ document.getElementById('foodInput').blur();
+ foodState=null;
+}
+async function submitFood(){
+ if(!foodState||foodState.busy)return;
+ addFoodTyped();
+ const text=foodChosenText();
+ if(!text)return;
+ const toast=document.getElementById('foodToast');
+ const save=document.getElementById('foodSave');
+ foodState.busy=true;
+ save.disabled=true;save.textContent='Записываю…';
+ setToast(toast,'');
+ try{
+  await api('food_add',{entry:foodState.entry,food:text});
+  uiHaptic('success');
+  save.textContent='Записано ✓';
+  foodState.busy=false;
+  setTimeout(closeFoodSheet,550);
+ }catch(error){
+  foodState.busy=false;
+  save.textContent='Записать';save.disabled=false;
+  setToast(toast,'Не удалось записать: '+error.message,'error');
+  uiHaptic('error');
+  handleAccessError(error);
+ }
+}
+(function(){
+ const input=document.getElementById('foodInput');
+ if(!input)return;
+ input.addEventListener('keydown',event=>{
+  if(event.key!=='Enter')return;
+  event.preventDefault();
+  if(!addFoodTyped())input.blur();
+ });
+ input.addEventListener('input',()=>{
+  if(/[,;]/.test(input.value))addFoodTyped();
+  else updateFoodSummary();
+ });
+ document.getElementById('foodPlus').addEventListener('click',()=>{addFoodTyped();input.focus();});
+})();
+
+let foodSettings=null;
+const FOOD_PERIOD_NAMES={breakfast:'Breakfast',dinner:'Dinner'};
+function renderFoodSettings(){
+ if(!foodSettings)return;
+ const sw=document.getElementById('foodEnabledSwitch');
+ if(!sw)return;
+ sw.disabled=false;
+ sw.setAttribute('aria-pressed',String(foodSettings.enabled));
+ document.getElementById('foodOptions').classList.toggle('off',!foodSettings.enabled);
+ document.getElementById('foodDescription').textContent=foodSettings.enabled
+  ?'После записи инсулина спрошу, что ты ешь'
+  :'Выключено для всех: окно с едой не появляется';
+ for(const period of ['breakfast','dinner']){
+  const name=FOOD_PERIOD_NAMES[period];
+  const block=foodSettings[period];
+  for(const [suffix,key] of [['Start','start'],['End','end']]){
+   const input=document.getElementById('food'+name+suffix);
+   if(input&&document.activeElement!==input)input.value=block[key];
+  }
+  const list=document.getElementById('food'+name+'List');
+  list.innerHTML=block.items.length?block.items.map((item,i)=>
+   '<div class="st-row food-item"><button class="food-dot" type="button" aria-pressed="'+item.selected+'" aria-label="Выбрано заранее: '+escapeHtml(item.text)+'" onclick="foodItemToggle(\''+period+'\','+i+')">'+FOOD_CHECK+'</button>'
+   +'<div class="st-t">'+escapeHtml(item.text)+'</div>'
+   +'<button class="food-del" type="button" aria-label="Убрать: '+escapeHtml(item.text)+'" onclick="foodItemRemove(\''+period+'\','+i+')">×</button></div>'
+  ).join(''):'<div class="food-empty">Список пуст — добавь слово ниже</div>';
+ }
+}
+async function loadFoodSettings(){
+ try{
+  foodSettings=await api('food_settings');
+  renderFoodSettings();
+ }catch(error){
+  const d=document.getElementById('foodDescription');
+  if(d&&!foodSettings)d.textContent='Не удалось загрузить настройки';
+ }
+}
+async function saveFoodSettings(change){
+ const toast=document.getElementById('foodSettingsToast');
+ setToast(toast,'');
+ try{
+  foodSettings=await api('food_settings_set',change);
+  renderFoodSettings();
+  uiHaptic('success');
+  setToast(toast,'✓ Сохранено','success');
+ }catch(error){
+  setToast(toast,'Не удалось сохранить: '+error.message,'error');
+  uiHaptic('error');
+  await loadFoodSettings();
+ }
+}
+function toggleFoodEnabled(){
+ if(!foodSettings)return;
+ saveFoodSettings({enabled:!foodSettings.enabled});
+}
+function saveFoodTime(period){
+ const name=FOOD_PERIOD_NAMES[period];
+ const start=document.getElementById('food'+name+'Start').value;
+ const end=document.getElementById('food'+name+'End').value;
+ if(!/^([01]\d|2[0-3]):[0-5]\d$/.test(start)||!/^([01]\d|2[0-3]):[0-5]\d$/.test(end)){
+  setToast(document.getElementById('foodSettingsToast'),'Выбери время начала и конца.','error');
+  return;
+ }
+ saveFoodSettings({[period]:{start,end}});
+}
+function foodItems(period){return foodSettings?foodSettings[period].items.map(i=>({text:i.text,selected:i.selected})):null;}
+function foodItemToggle(period,index){
+ const items=foodItems(period);
+ if(!items||!items[index])return;
+ items[index].selected=!items[index].selected;
+ saveFoodSettings({[period]:{items}});
+}
+function foodItemRemove(period,index){
+ const items=foodItems(period);
+ if(!items||!items[index])return;
+ items.splice(index,1);
+ saveFoodSettings({[period]:{items}});
+}
+function foodItemAdd(period){
+ const items=foodItems(period);
+ const input=document.getElementById('food'+FOOD_PERIOD_NAMES[period]+'New');
+ if(!items||!input)return;
+ const added=foodSplit(input.value);
+ if(!added.length)return;
+ for(const text of added){
+  if(!items.some(i=>i.text.toLowerCase()===text.toLowerCase()))items.push({text,selected:false});
+ }
+ input.value='';
+ saveFoodSettings({[period]:{items}});
 }
 
 // ============================================================
@@ -3440,6 +3722,7 @@ document.addEventListener('focusout',event=>{
 // ============================================================
 initUser();
 loadReportSettings();
+loadFoodSettings();
 initInsulinTimer();
 
 // ============================================================
@@ -4893,6 +5176,7 @@ window.stRefresh=function(){
   set('stV-timer',{always:'Всегда',threshold:'От дозы',off:'Выкл.'}[m&&m.value]||'');
   const r=$('reportEnabledSwitch');
   set('stV-report',r.disabled?'':(on('reportEnabledSwitch')?$('reportTimeInput').value:'Выкл.'));
+  set('stV-food',typeof foodSettings!=='undefined'&&foodSettings?(foodSettings.enabled?'Вкл.':'Выкл.'):'');
   set('stV-target',$('targetLowInput').value&&$('targetHighInput').value?$('targetLowInput').value+'–'+$('targetHighInput').value:'');
   set('stV-theme',document.documentElement.dataset.theme==='dark'?'Тёмная':'Светлая');
 };
@@ -4993,9 +5277,13 @@ stRefresh();
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const APP_VERSION='v20261102_1';          /* ← менять при каждом обновлении: vГГГГММДД_N */
+const APP_VERSION='v20261102_2';          /* ← менять при каждом обновлении: vГГГГММДД_N */
 const DEV_CHAT='https://t.me/larik_11';
 const APP_CHANGES=[
+ {v:'v20261102_2',items:[
+  'После записи инсулина появляется шторка «Что ешь?»: выбери слова из предвыбора или впиши своё, еда сохранится в таблицу рядом с уколом',
+  'Новый пункт в настройках «Еда»: включение, время завтрака и ужина, наборы слов и какие из них выбраны заранее — общее для всех пользователей'
+ ]},
  {v:'v20261102_1',items:[
   'Карточка «Инсулин» переворачивается вверх или вниз: на обороте похожий случай из истории — сахар тогда, сколько инсулина было до и сколько кололи потом',
   'Поиск похожих случаев работает по таблице за год (листы sugar и total), без ИИ и без Groq; нажми на цифры, чтобы увидеть следующий случай',
