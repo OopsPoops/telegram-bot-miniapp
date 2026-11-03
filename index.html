@@ -685,7 +685,12 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .carousel-dots.tight{margin:3px 0 4px;min-height:6px}
 /* Одинаковый промежуток после верхней карточки, сахара и инсулина */
 #ydDots,#sugarDots,#insulinDots{margin:6px 0 8px;min-height:6px}
-.metric.dc-info{padding:10px 14px;display:flex;flex-direction:column;justify-content:center;overflow:hidden}
+.metric.dc-info{padding:10px 14px;display:flex;flex-direction:column;justify-content:safe center;overflow-x:hidden;overflow-y:auto;scrollbar-width:none}
+.metric.dc-info::-webkit-scrollbar{display:none}
+.metric.dc-info.dc-dense{padding-top:7px;padding-bottom:7px}
+.dc-dense .dc-row{padding:3px 0}
+.dc-dense .dc-chip{font-size:12px;line-height:1.15}
+.st-s:empty{display:none}
 .dc-row{display:flex;gap:10px;align-items:flex-start;padding:5px 0;border-top:1px solid var(--line)}
 .dc-row:first-child{border-top:0}
 .dc-day{flex:none;width:66px;display:flex;flex-direction:column;line-height:1.1}
@@ -1401,7 +1406,7 @@ button.st-ico:active{transform:scale(.88)}
 <button class="st-row has-ico st-nav" type="button" onclick="stOpen('sound')"><span class="st-ico c-red"><svg class="g"><use href="#i-sound"/></svg></span><span class="st-t">Звук и вибрация</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
 <button class="st-row has-ico st-nav" type="button" onclick="stOpen('timer')"><span class="st-ico c-orange"><svg class="g"><use href="#i-timer"/></svg></span><span class="st-t">Таймер инсулина</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
 <button class="st-row has-ico st-nav" type="button" onclick="stOpen('report')"><span class="st-ico c-blue"><svg class="g"><use href="#i-cal"/></svg></span><span class="st-t">Ежедневный отчёт</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
-<button class="st-row has-ico st-nav" type="button" onclick="stOpen('food')"><span class="st-ico c-purple"><svg class="g"><use href="#i-meal"/></svg></span><span class="st-t">Еда</span><span class="st-val" id="stV-food"></span><svg class="st-chev"><use href="#i-chev"/></svg></button>
+<button class="st-row has-ico st-nav" type="button" onclick="stOpen('food')"><span class="st-ico c-purple"><svg class="g"><use href="#i-meal"/></svg></span><span class="st-t">Еда</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
 <button class="st-row has-ico st-nav" type="button" onclick="stOpen('target')"><span class="st-ico c-green"><svg class="g"><use href="#i-target"/></svg></span><span class="st-t">Целевой диапазон</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
 </div>
 <div class="st-card">
@@ -1463,9 +1468,13 @@ button.st-ico:active{transform:scale(.88)}
 <div class="st-page" data-p="food">
 <div class="st-bar"><button class="st-back" type="button" onclick="stBack()" aria-label="Назад"><svg><use href="#i-back"/></svg></button><div class="st-title">Еда</div></div>
 <div class="st-card">
-<div class="st-row two has-ico"><span class="st-ico c-purple"><svg class="g"><use href="#i-meal"/></svg></span><div class="st-copy"><div class="st-t">Вносить еду</div><div class="st-s" id="foodDescription">Загружаю настройки…</div></div><button class="st-sw" id="foodEnabledSwitch" type="button" aria-pressed="true" disabled onclick="toggleFoodEnabled()" aria-label="Вносить еду"><span></span></button></div>
+<div class="st-row two has-ico"><span class="st-ico c-purple"><svg class="g"><use href="#i-meal"/></svg></span><div class="st-copy"><div class="st-t">Вносить еду</div><div class="st-s" id="foodDescription"></div></div><button class="st-sw" id="foodEnabledSwitch" type="button" aria-pressed="true" disabled onclick="toggleFoodEnabled()" aria-label="Вносить еду"><span></span></button></div>
 </div>
 <div class="report-options" id="foodOptions">
+<div class="st-sec">Когда спрашивать</div>
+<div class="st-card">
+<label class="st-row"><span class="st-t">От дозы, ед.</span><input class="st-in" id="foodMinDose" type="number" inputmode="numeric" min="1" max="50" step="1" onchange="saveFoodMinDose()" aria-label="Минимальная доза инсулина, от которой спрашивать еду"></label>
+</div>
 <div class="st-sec">Завтрак</div>
 <div class="st-card">
 <label class="st-row"><span class="st-t">С</span><input class="st-in" id="foodBreakfastStart" type="time" onchange="saveFoodTime('breakfast')" aria-label="Начало завтрака"></label>
@@ -1478,7 +1487,7 @@ button.st-ico:active{transform:scale(.88)}
 <label class="st-row"><span class="st-t">До</span><input class="st-in" id="foodDinnerEnd" type="time" onchange="saveFoodTime('dinner')" aria-label="Конец ужина"></label>
 </div>
 <div class="st-card"><div id="foodDinnerList"></div><div class="st-row"><input class="st-in food-new" id="foodDinnerNew" type="text" maxlength="40" autocomplete="off" placeholder="Новое слово" enterkeyhint="done" onkeydown="if(event.key==='Enter'){event.preventDefault();foodItemAdd('dinner');}" aria-label="Новое слово для ужина"><button class="food-plus" type="button" onclick="foodItemAdd('dinner')" aria-label="Добавить слово"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div></div>
-<div class="st-foot">Кружок слева — слово будет выбрано заранее, пустой — только предложено. В остальное время слова не предлагаются, можно вписать своё. Время московское, настройки общие для всех пользователей бота.</div>
+<div class="st-foot">Еда спрашивается, только если доза не меньше порога. Кружок слева — слово будет выбрано заранее, пустой — только предложено. В остальное время слова не предлагаются, можно вписать своё. Время московское, настройки общие для всех пользователей бота.</div>
 </div>
 <div class="toast st-toast" id="foodSettingsToast"></div>
 </div>
@@ -2493,9 +2502,9 @@ function renderFoodSettings(){
  sw.disabled=false;
  sw.setAttribute('aria-pressed',String(foodSettings.enabled));
  document.getElementById('foodOptions').classList.toggle('off',!foodSettings.enabled);
- document.getElementById('foodDescription').textContent=foodSettings.enabled
-  ?'После записи инсулина спрошу, что ты ешь'
-  :'Выключено для всех: окно с едой не появляется';
+ document.getElementById('foodDescription').textContent='';
+ const doseInput=document.getElementById('foodMinDose');
+ if(doseInput&&document.activeElement!==doseInput)doseInput.value=foodSettings.min_dose;
  for(const period of ['breakfast','dinner']){
   const name=FOOD_PERIOD_NAMES[period];
   const block=foodSettings[period];
@@ -2537,6 +2546,16 @@ async function saveFoodSettings(change){
 function toggleFoodEnabled(){
  if(!foodSettings)return;
  saveFoodSettings({enabled:!foodSettings.enabled});
+}
+function saveFoodMinDose(){
+ const input=document.getElementById('foodMinDose');
+ const value=Number(input.value);
+ if(!Number.isInteger(value)||value<1||value>50){
+  setToast(document.getElementById('foodSettingsToast'),'Введи целое число от 1 до 50.','error');
+  if(foodSettings)input.value=foodSettings.min_dose;
+  return;
+ }
+ saveFoodSettings({min_dose:value});
 }
 function saveFoodTime(period){
  const name=FOOD_PERIOD_NAMES[period];
@@ -5176,7 +5195,6 @@ window.stRefresh=function(){
   set('stV-timer',{always:'Всегда',threshold:'От дозы',off:'Выкл.'}[m&&m.value]||'');
   const r=$('reportEnabledSwitch');
   set('stV-report',r.disabled?'':(on('reportEnabledSwitch')?$('reportTimeInput').value:'Выкл.'));
-  set('stV-food',typeof foodSettings!=='undefined'&&foodSettings?(foodSettings.enabled?'Вкл.':'Выкл.'):'');
   set('stV-target',$('targetLowInput').value&&$('targetHighInput').value?$('targetLowInput').value+'–'+$('targetHighInput').value:'');
   set('stV-theme',document.documentElement.dataset.theme==='dark'?'Тёмная':'Светлая');
 };
@@ -5277,9 +5295,13 @@ stRefresh();
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const APP_VERSION='v20261102_2';          /* ← менять при каждом обновлении: vГГГГММДД_N */
+const APP_VERSION='v20261103_1';          /* ← менять при каждом обновлении: vГГГГММДД_N */
 const DEV_CHAT='https://t.me/larik_11';
 const APP_CHANGES=[
+ {v:'v20261103_1',items:[
+  'Еда: добавлен порог дозы — окно появляется, только если укол не меньше заданного (по умолчанию 5 ед.)',
+  'Карточки сахара и инсулина по дням: на каждой странице всегда два дня'
+ ]},
  {v:'v20261102_2',items:[
   'После записи инсулина появляется шторка «Что ешь?»: выбери слова из предвыбора или впиши своё, еда сохранится в таблицу рядом с уколом',
   'Новый пункт в настройках «Еда»: включение, время завтрака и ужина, наборы слов и какие из них выбраны заранее — общее для всех пользователей'
@@ -5619,7 +5641,8 @@ const KIND={sugar:'metric sugar dc-info',insulin:'metric insulin dc-info dc-ins'
 /* Страницы строго по высоте главной карточки: строки измеряем и раскладываем так, чтобы всё влезло */
 function pack(car,kind,items,head){
  const main=car.children[0],h0=main.offsetHeight,w=main.offsetWidth;
- const make=rows=>'<section class="'+KIND[kind]+'">'+(head||'')+rows.join('')+'</section>';
+ const pair=kind==='sugar'||kind==='insulin';
+ const make=(rows,dense)=>'<section class="'+KIND[kind]+(dense?' dc-dense':'')+'">'+(head||'')+rows.join('')+'</section>';
  const pages=[];
  let sizes=null,cap=0;
  if(h0&&w){
@@ -5637,10 +5660,10 @@ function pack(car,kind,items,head){
  let cur=[],sum=0;
  items.forEach((html,i)=>{
   const h=sizes?sizes[i]:0;
-  if(cur.length&&(cur.length>=MAX_ROWS||(sizes&&sum+h>cap))){pages.push(make(cur));cur=[];sum=0;}
+  if(cur.length&&(pair?cur.length>=2:(cur.length>=MAX_ROWS||(sizes&&sum+h>cap)))){pages.push(make(cur,pair&&sum>cap));cur=[];sum=0;}
   cur.push(html);sum+=h;
  });
- if(cur.length)pages.push(make(cur));
+ if(cur.length)pages.push(make(cur,pair&&sum>cap));
  return pages;
 }
 function sugarRow(off,ix,t){
