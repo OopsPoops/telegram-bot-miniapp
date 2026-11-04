@@ -1025,16 +1025,19 @@ button.st-ico:active{transform:scale(.88)}
 .ins-flipper{display:grid}
 .ins-flipper>.metric{grid-area:1/1;transition:opacity .24s ease,transform .24s ease,visibility 0s}
 .ins-flipper>.ins-back{position:relative;overflow:hidden;--glow:32,169,155;background:radial-gradient(120% 95% at 0% 0%,rgba(32,169,155,.14),transparent 62%),var(--card-grad)}
-.ins-flip[data-side="front"] .ins-back{opacity:0;transform:scale(.97);visibility:hidden;pointer-events:none;transition:opacity .2s ease,transform .2s ease,visibility 0s linear .2s}
-.ins-flip[data-side="back"] .ins-front{opacity:0;transform:scale(.97);visibility:hidden;pointer-events:none;transition:opacity .2s ease,transform .2s ease,visibility 0s linear .2s}
-.lupa-button{flex-shrink:0;width:46px;display:grid;place-items:center;padding:0;border:1px solid var(--line);border-radius:13px;background:var(--input-bg);color:#1a8f83;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .38s cubic-bezier(.34,1.5,.4,1)}
-.lupa-button svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}
-.lupa-button:active{transform:scale(.92)}
-:root[data-theme="dark"] .lupa-button{color:#6fe0d0}
+.ins-flip[data-side="front"] .ins-back{position:absolute;left:0;right:0;top:0;opacity:0;transform:scale(.97);visibility:hidden;pointer-events:none;transition:opacity .2s ease,transform .2s ease,visibility 0s linear .2s}
+.ins-flip[data-side="back"] .ins-front{position:absolute;left:0;right:0;top:0;opacity:0;transform:scale(.97);visibility:hidden;pointer-events:none;transition:opacity .2s ease,transform .2s ease,visibility 0s linear .2s}
+.ins-open{cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .3s cubic-bezier(.34,1.5,.4,1)}
+.ins-open:active{transform:scale(.9)}
+.ins-shot{display:flex;justify-content:center;gap:5px;font-size:11px;line-height:1.35;font-variant-numeric:tabular-nums;white-space:nowrap}
+.ins-shot i{font-style:normal;color:var(--muted)}
+.ins-shot b{font-weight:750;color:var(--text)}
+.ins-shot.more{color:var(--muted);font-size:10px}
+#insBackSub[data-open]{cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px}
 .ins-back .yd-strip{grid-template-columns:minmax(0,1fr) minmax(0,1.2fr) minmax(0,1fr)}
 .ins-back .yd-tile.sugar{padding-top:7px;padding-bottom:7px}
 .ins-back .yd-tile.sugar .yd-value{font-size:30px}
-.ins-back-in{position:absolute;inset:0;display:flex;flex-direction:column;padding:11px 14px 10px;min-height:0}
+.ins-back-in{position:relative;display:flex;flex-direction:column;padding:11px 14px 10px;min-height:var(--ins-h,150px)}
 .ins-back-head{flex:none;display:flex;align-items:center;gap:8px;height:26px;margin-bottom:7px}
 .ins-back-ico{font-size:15px;line-height:1}
 .ins-back-title{font-size:14px;font-weight:750;white-space:nowrap}
@@ -1048,7 +1051,7 @@ button.st-ico:active{transform:scale(.88)}
 .ins-back .yd-value{font-size:23px}
 .ins-back .yd-label{font-size:10.5px;white-space:nowrap}
 .ins-back .yd-time{font-size:11px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ins-back-foot{flex:none;height:18px;margin-top:7px;font-size:12px;font-weight:650;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
+.ins-back-foot{flex:none;height:18px;margin-top:auto;padding-top:7px;box-sizing:content-box;font-size:12px;font-weight:650;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
 .ins-back-note{flex:1;display:flex;align-items:center;justify-content:center;text-align:center;padding:0 10px;border-radius:16px;background:rgba(125,135,170,.08);border:1px dashed rgba(125,135,170,.28);color:var(--muted);font-size:13px;line-height:1.35;cursor:pointer}
 .ins-back-note.busy{border-style:solid;border-color:transparent;animation:insBusy 1.4s ease-in-out infinite}
 @keyframes insBusy{0%,100%{opacity:.55}50%{opacity:1}}
@@ -1074,13 +1077,6 @@ button.st-ico:active{transform:scale(.88)}
 .ns-hint{margin:0 0 8px;padding:9px 12px;border-radius:12px;background:rgba(125,107,232,.12);color:#5f4cc9;font-size:13px;font-weight:700;line-height:1.35}
 .ns-hint small{font-weight:600;opacity:.8}
 :root[data-theme="dark"] .ns-hint{color:#c0b4ff;background:rgba(168,152,255,.14)}
-.ns-grid{display:grid;grid-template-columns:46px repeat(4,minmax(0,1fr));gap:6px;align-items:center}
-.ns-gh{font-size:10px;font-weight:700;color:var(--muted);padding:0 0 3px;text-align:center}
-.ns-gh span:first-child{text-align:left}
-.ns-row,.ns-now{padding:5px 0;border-top:1px solid var(--line)}
-.ns-now{background:var(--nav-active);border-radius:10px;border-top:0;padding:5px 4px;margin:0 -4px 2px}
-.ns-grid .dn-c b{font-size:16px}
-.ns-grid .dn-c span{font-size:9.5px;white-space:nowrap}
 /* окно дня */
 .dp-backdrop{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;padding:calc(18px + env(safe-area-inset-top)) 14px calc(18px + env(safe-area-inset-bottom));background:rgba(18,24,45,.38);-webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%);opacity:0;transition:opacity .2s ease}
 .dp-backdrop.visible{opacity:1}
@@ -1089,8 +1085,12 @@ button.st-ico:active{transform:scale(.88)}
 .dp.has-sum{height:62vh;height:62dvh;min-height:400px}
 .dp-sum{margin:0 0 10px;padding:8px 10px 6px;border-radius:16px;background:var(--modal-content)}
 .dp-sum .dn-row{border-top:0;padding:2px 0}
-#nightStatsBody .dn-row[data-off]{cursor:pointer;-webkit-tap-highlight-color:transparent;border-radius:10px;transition:background .15s}
-#nightStatsBody .dn-row[data-off]:active{background:var(--nav-active)}
+#nightStatsBody .dn-row[data-off],#nightSimBody .dn-row[data-case]{cursor:pointer;-webkit-tap-highlight-color:transparent;border-radius:10px;transition:background .15s}
+#nightStatsBody .dn-row[data-off]:active,#nightSimBody .dn-row[data-case]:active{background:var(--nav-active)}
+.ns-now.dn-row{background:var(--nav-active);border-top:0;border-radius:10px;padding:4px 4px;margin:0 -4px 2px}
+.dp-nav{display:flex;gap:6px;margin-left:auto}
+.dp-nav button{width:38px;height:38px;border:0;border-radius:50%;background:var(--close-bg);color:var(--close-text);font-size:24px;line-height:1;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.dp-nav button:active{transform:scale(.92)}
 .dp-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
 .dp-title b{display:block;font-size:21px;font-weight:800;line-height:1.15}
 .dp-title span{display:block;margin-top:3px;font-size:12.5px;font-weight:650;color:var(--muted)}
@@ -1165,7 +1165,7 @@ button.st-ico:active{transform:scale(.88)}
 <div class="ins-flip" id="insFlip" data-side="front"><div class="ins-flipper" id="insFlipper">
 <section class="metric insulin ins-front">
 <div class="metric-head">
-<div class="metric-icon">💉</div>
+<div class="metric-icon ins-open" id="insOpenBtn" role="button" tabindex="0" aria-label="Показать похожие случаи из истории" title="Похожие случаи">💉</div>
 <div class="metric-copy">
 <div class="metric-name">Инсулин</div>
 <div class="metric-latest" id="insulinLatest">Последнее: <span class="metric-skeleton"></span></div>
@@ -1177,7 +1177,6 @@ button.st-ico:active{transform:scale(.88)}
 </div>
 <div class="input-row">
 <input class="value-input" id="insulinInput" type="number" inputmode="numeric" step="1" min="0" max="15" placeholder="" aria-label="Новое значение инсулина">
-<button class="lupa-button" type="button" id="insLupaBtn" aria-label="Показать похожие случаи из истории" title="Похожие случаи"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg></button>
 <button class="undo-button" type="button" onclick="undoValue('insulin')" aria-label="Отменить последнюю запись инсулина" title="Отменить последнюю запись">↩︎</button>
 <button class="save-button" onclick="saveValue('insulin')">Сохранить</button>
 </div>
@@ -5336,9 +5335,15 @@ stRefresh();
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const APP_VERSION='v20261104_3';          /* ← менять при каждом обновлении: vГГГГММДД_N */
+const APP_VERSION='v20261104_4';          /* ← менять при каждом обновлении: vГГГГММДД_N */
 const DEV_CHAT='https://t.me/larik_11';
 const APP_CHANGES=[
+ {v:'v20261104_4',items:[
+  'Инсулин: лупа убрана — похожие случаи открываются нажатием на шприц',
+  'Похожие случаи: инсулин до и после показан весь и со временем',
+  'Нажми на дату в топе — окно с сахаром и инсулином того дня; листай топ 1–5 стрелками или свайпом',
+  'Ночной: топ похожих вечеров выглядит как статистика, строки открывают то же окно'
+ ]},
  {v:'v20261104_3',items:[
   'Окно дня: инсулин стоит на одной строке с ближайшим по времени сахаром (в пределах 30 минут), ночной вынесен вниз к среднему сахару и сумме',
   'Вкладка «Ночной»: убран дублирующий заголовок'
@@ -5743,13 +5748,9 @@ function insulinRow(off,ix){
  if(!chips)chips='<span class="dc-none">нет уколов</span>';
  return '<div class="dc-row" data-day-off="'+off+'"><div class="dc-day"><b>'+d.name+'</b><span>'+d.dm+'</span>'+(list.length?'<em>Σ '+fmtDose(sum)+'</em>':'')+'</div><div class="dc-chips">'+chips+'</div></div>';
 }
-function nightRow(off,ix,t){
- const E=dayInfo(off),D=dayInfo(off+1);
- let ev=null;
- (ix.sugar.get(E.key)||[]).forEach(x=>{if(x.m>=EVENING_FROM)ev=x;});
- const mo=(ix.sugar.get(D.key)||[]).find(x=>x.m>=MORNING_FROM&&x.m<MORNING_TO)||null;
- const dose=ix.night.get(E.key)||null;
- if(!ev&&!mo&&!dose)return null;
+function nightHead(){return '<div class="dn-head"><span>Дата</span><span>Вечер</span><span>Доза</span><span>Утро</span><span>Δ</span></div>';}
+function nightRowHtml(o,t){
+ const ev=o.ev,mo=o.mo,dose=o.dose;
  const cell=(x,c)=>x?'<div class="dn-c"><b class="'+c+'">'+fs(x.v)+'</b><span>'+x.t+'</span></div>':'<div class="dn-c"><b class="none">—</b><span>&nbsp;</span></div>';
  const doseCell=dose?'<div class="dn-c dn-dose"><b>'+(dose.approx?'≈':'')+fmtDose(dose.value)+'</b><span>'+(dose.fact?'факт':dose.approx?'расчёт':'')+'&nbsp;</span></div>':'<div class="dn-c dn-dose"><b class="none">—</b><span>&nbsp;</span></div>';
  let delta='<span class="dn-d">—</span>';
@@ -5758,8 +5759,21 @@ function nightRow(off,ix,t){
   const c=mo.v<t.lo?'lo':diff<0?'down':diff>0?'up':'';
   delta='<span class="dn-d '+c+'">'+(diff>0?'+':diff<0?'−':'')+fs(Math.abs(diff))+'</span>';
  }
- return '<div class="dn-row" data-off="'+off+'"><div class="dn-day"><b>'+E.dm+'</b><span>'+(off===0?'сегодня':off===-1?'вчера':E.wd)+'</span></div>'
+ return '<div class="dn-row'+(o.cls?' '+o.cls:'')+'"'+(o.attr||'')+'><div class="dn-day"><b>'+o.main+'</b><span>'+o.sub+'</span></div>'
   +cell(ev,ev?cls(ev.v,t):'')+doseCell+cell(mo,mo?cls(mo.v,t):'')+delta+'</div>';
+}
+function nightRow(off,ix,t){
+ const E=dayInfo(off),D=dayInfo(off+1);
+ let ev=null;
+ (ix.sugar.get(E.key)||[]).forEach(x=>{if(x.m>=EVENING_FROM)ev=x;});
+ const mo=(ix.sugar.get(D.key)||[]).find(x=>x.m>=MORNING_FROM&&x.m<MORNING_TO)||null;
+ const dose=ix.night.get(E.key)||null;
+ if(!ev&&!mo&&!dose)return null;
+ return nightRowHtml({main:E.dm,sub:off===0?'сегодня':off===-1?'вчера':E.wd,ev,mo,dose,attr:' data-off="'+off+'"'},t);
+}
+function nightCaseRow(c,t,attr){
+ return nightRowHtml({main:c.date.slice(0,5),sub:'Σ'+nG(c.insulin_to_now),
+  ev:{v:c.sugar.value,t:c.sugar.time},mo:{v:c.morning.value,t:c.morning.time},dose:{value:c.basal,fact:true},attr},t);
 }
 let nightDays=10;
 try{const saved=Number(localStorage.getItem('sema-night-days'));if([10,20,30].includes(saved))nightDays=saved;}catch(e){}
@@ -5769,8 +5783,7 @@ function renderNightStats(ix,t){
  document.querySelectorAll('#nightRange button').forEach(b=>b.classList.toggle('active',Number(b.dataset.n)===nightDays));
  const rows=[];
  for(let o=0;o>-nightDays;o--){const r=nightRow(o,ix,t);if(r)rows.push(r);}
- const head='<div class="dn-head"><span>Дата</span><span>Вечер</span><span>Доза</span><span>Утро</span><span>Δ</span></div>';
- body.innerHTML=rows.length?head+rows.join(''):'<div class="ns-note">Пока нет данных за этот период.</div>';
+ body.innerHTML=rows.length?nightHead()+rows.join(''):'<div class="ns-note">Пока нет данных за этот период.</div>';
 }
 function setNightDays(n){
  if(![10,20,30].includes(n)||n===nightDays)return;
@@ -5948,21 +5961,13 @@ function metricTouchEnd(e){
  metricAnimationTimer=setTimeout(()=>finishMetricAnimation(next),315);
 }
 /* Выбор даты на верхней карточке: окно с сахаром и инсулином за этот день. */
-function closeDayPopup(){
- const el=$('dayPopup');
- if(!el)return;
- el.classList.remove('visible');
- document.body.style.overflow=el._bodyOverflow||'';
- document.removeEventListener('keydown',el._onKey);
- setTimeout(()=>{if(!el.classList.contains('visible'))el.remove();},200);
-}
-function openDayPopup(off,opts){
- if(!hist)return;
- const old=$('dayPopup');if(old)old.remove();
- const d=dayInfo(off),ix=index(hist),t=target();
- const sugars=(ix.sugar.get(d.key)||[]).slice().sort((a,b)=>a.m-b.m);
- const shots=(ix.ins.get(d.key)||[]).slice().sort((a,b)=>a.m-b.m);
- const night=ix.night.get(d.key)||null;
+/* ===== Окно дня: сахар и инсулин в одном списке по времени; можно листать несколько дней ===== */
+const dpState={specs:[],idx:0};
+function dpWeekday(text){const p=String(text).split('.').map(Number);return WD[new Date(p[2],p[1]-1,p[0]).getDay()]||'';}
+function dpItems(list){return (list||[]).map(x=>{const p=String(x.time).split(':').map(Number);return {m:p[0]*60+p[1],t:x.time,v:x.value};});}
+function dpHtml(spec,multi){
+ const t=target();
+ const sugars=spec.sugars.slice().sort((a,b)=>a.m-b.m),shots=spec.shots.slice().sort((a,b)=>a.m-b.m);
  const avg=sugars.length?sugars.reduce((a,x)=>a+x.v,0)/sugars.length:null;
  const sum=shots.reduce((a,x)=>a+x.v,0);
  const cell=(x,fmt)=>x?'<div class="dp-c"><span class="dp-t">'+x.t+'</span>'+fmt(x)+'</div>':'<div class="dp-c"></div>';
@@ -5979,22 +5984,91 @@ function openDayPopup(off,opts){
  const sugarFmt=x=>'<b class="dp-v '+cls(x.v,t)+'">'+fs(x.v)+'</b>';
  const insFmt=x=>'<b class="dp-v">'+fmtDose(x.v)+'<small> ед.</small></b>';
  const timeline=pairs.length?pairs.map(p=>'<div class="dp-pair">'+cell(p.s,sugarFmt)+cell(p.i,insFmt)+'</div>').join(''):'<div class="dp-empty">нет записей за этот день</div>';
- const sumHtml=opts&&opts.night?(()=>{const r=nightRow(off,ix,t);return r?'<div class="dp-sum"><div class="dn-head"><span>Дата</span><span>Вечер</span><span>Доза</span><span>Утро</span><span>Δ</span></div>'+r.replace(' data-off="'+off+'"','')+'</div>':'';})():'';
+ const night=spec.night;
  const foot=[avg!==null?'ср. сахар '+fs(avg):'',shots.length?'Σ инсулин '+fmtDose(sum)+' ед.':'',night?'🌙 ночной '+(night.approx?'≈':'')+fmtDose(night.value)+' ед.':''].filter(Boolean).join(' · ');
+ return '<section class="dp'+(spec.sumHtml?' has-sum':'')+'" role="dialog" aria-modal="true" aria-label="Сахар и инсулин за день">'
+  +'<header class="dp-top"><div class="dp-title"><b>'+spec.name+'</b><span>'+spec.sub+'</span></div>'
+  +(multi?'<div class="dp-nav"><button class="dp-prev" type="button" aria-label="Предыдущий день">‹</button><button class="dp-next" type="button" aria-label="Следующий день">›</button></div>':'')
+  +'<button class="dp-close" type="button" aria-label="Закрыть">×</button></header>'
+  +(spec.sumHtml||'')+'<div class="dp-tl"><div class="dp-tlh"><span>🩸 Сахар</span><span>💉 Инсулин</span></div><div class="dp-list">'+timeline+'</div></div>'
+  +(foot?'<footer class="dp-foot">'+foot+'</footer>':'')+'</section>';
+}
+function dpRender(){
+ const el=$('dayPopup');
+ if(!el)return;
+ el.innerHTML=dpHtml(dpState.specs[dpState.idx](),dpState.specs.length>1);
+}
+function dpNav(delta){
+ const n=dpState.specs.length;
+ if(n<2)return;
+ dpState.idx=(dpState.idx+delta+n)%n;
+ dpRender();
+ if(typeof selectionHaptic==='function')selectionHaptic();
+}
+function closeDayPopup(){
+ const el=$('dayPopup');
+ if(!el)return;
+ el.classList.remove('visible');
+ document.body.style.overflow=el._bodyOverflow||'';
+ document.removeEventListener('keydown',el._onKey);
+ setTimeout(()=>{if(!el.classList.contains('visible'))el.remove();},200);
+}
+function dpOpen(specs,idx){
+ if(!specs||!specs.length)return;
+ const old=$('dayPopup');if(old)old.remove();
+ dpState.specs=specs;dpState.idx=Math.max(0,Math.min(specs.length-1,idx||0));
  const el=document.createElement('div');
  el.id='dayPopup';el.className='dp-backdrop';
- el.innerHTML='<section class="dp'+(sumHtml?' has-sum':'')+'" role="dialog" aria-modal="true" aria-label="Сахар и инсулин за день">'
-  +'<header class="dp-top"><div class="dp-title"><b>'+d.name+'</b><span>'+d.dm+' · '+d.wd+'</span></div><button class="dp-close" type="button" aria-label="Закрыть">×</button></header>'
-  +sumHtml+'<div class="dp-tl"><div class="dp-tlh"><span>🩸 Сахар</span><span>💉 Инсулин</span></div><div class="dp-list">'+timeline+'</div></div>'
-  +(foot?'<footer class="dp-foot">'+foot+'</footer>':'')+'</section>';
  document.body.appendChild(el);
+ dpRender();
  el._bodyOverflow=document.body.style.overflow;
  document.body.style.overflow='hidden';
- el._onKey=e=>{if(e.key==='Escape')closeDayPopup();};
+ el._onKey=e=>{if(e.key==='Escape')closeDayPopup();else if(e.key==='ArrowLeft')dpNav(-1);else if(e.key==='ArrowRight')dpNav(1);};
  document.addEventListener('keydown',el._onKey);
- el.addEventListener('click',e=>{if(e.target===el||e.target.closest('.dp-close'))closeDayPopup();});
+ el.addEventListener('click',e=>{
+  if(e.target===el||e.target.closest('.dp-close')){closeDayPopup();return;}
+  if(e.target.closest('.dp-prev')){dpNav(-1);return;}
+  if(e.target.closest('.dp-next')){dpNav(1);}
+ });
+ let sx=0,sy=0;
+ el.addEventListener('touchstart',e=>{if(e.touches.length===1){sx=e.touches[0].clientX;sy=e.touches[0].clientY;}},{passive:true});
+ el.addEventListener('touchend',e=>{
+  const t=e.changedTouches[0];if(!t)return;
+  const dx=t.clientX-sx,dy=t.clientY-sy;
+  if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.5)dpNav(dx<0?1:-1);
+ },{passive:true});
  requestAnimationFrame(()=>el.classList.add('visible'));
  if(typeof selectionHaptic==='function')selectionHaptic();
+}
+function daySpec(off,opts){
+ const d=dayInfo(off),ix=index(hist),t=target();
+ const night=ix.night.get(d.key)||null;
+ let sumHtml='';
+ if(opts&&opts.night){
+  const r=nightRow(off,ix,t);
+  if(r)sumHtml='<div class="dp-sum">'+nightHead()+r.replace(' data-off="'+off+'"','')+'</div>';
+ }
+ return {name:d.name,sub:d.dm+' · '+d.wd,sugars:ix.sugar.get(d.key)||[],shots:ix.ins.get(d.key)||[],night:night?{value:night.value,approx:night.approx}:null,sumHtml};
+}
+function openDayPopup(off,opts){
+ if(!hist)return;
+ dpOpen([()=>daySpec(off,opts)],0);
+}
+function caseDay(c){const d=c.day||{};return {sugars:dpItems(d.sugars),shots:dpItems(d.shots)};}
+function insCaseSpecs(){
+ const cases=(insSim.data&&insSim.data.cases)||[],n=cases.length;
+ return cases.map((c,i)=>()=>{
+  const day=caseDay(c);
+  return {name:'Топ '+(i+1)+' из '+n,sub:c.date+' · '+dpWeekday(c.date)+' · сахар '+insG(c.sugar.value)+' в '+c.sugar.time,sugars:day.sugars,shots:day.shots,night:c.basal!=null?{value:c.basal}:null,sumHtml:''};
+ });
+}
+function nightCaseSpecs(){
+ const data=nSim.data,cases=(data&&data.cases)||[],n=cases.length;
+ return cases.map((c,i)=>()=>{
+  const day=caseDay(c),t=target();
+  return {name:'Топ '+(i+1)+' из '+n,sub:c.date+' · '+dpWeekday(c.date),sugars:day.sugars,shots:day.shots,night:{value:c.basal},
+   sumHtml:'<div class="dp-sum">'+nightHead()+nightCaseRow(c,t,'')+'</div>'};
+ });
 }
 window.showDayInMetrics=function(off){
  off=Math.min(0,Math.trunc(Number(off)||0));
@@ -6011,10 +6085,10 @@ window.showDayInMetrics=function(off){
 /* ===== Оборот карточки «Инсулин»: похожие случаи из истории (sema_analytics.py) ===== */
 const insSim={data:null,loading:false,error:'',loadedAt:0,stale:true,idx:0,seq:0};
 const insFlipEl=()=>$('insFlip');
-function insTile(kind,label,value,unit,time,emptyText,i){
+function insTile(kind,label,value,unit,time,emptyText,i,timeHtml){
  return '<div class="yd-tile '+kind+(value?'':' empty')+'" style="--i:'+i+'"><div class="yd-label">'+label+'</div>'
   +'<div class="yd-value"><span>'+(value?escapeHtml(value):'—')+'</span>'+(value&&unit?'<small>'+unit+'</small>':'')+'</div>'
-  +'<div class="yd-time">'+(time?escapeHtml(time):(emptyText||'нет записи'))+'</div></div>';
+  +'<div class="yd-time">'+(timeHtml||(time?escapeHtml(time):(emptyText||'нет записи')))+'</div></div>';
 }
 const insG=v=>String(Math.round(Number(v)*10)/10).replace('.',',');
 function insDuration(min){
@@ -6027,6 +6101,13 @@ function insShotsLine(shots){
  if(shots.length===1)return shots[0].time;
  return shots.map(s=>insG(s.value)).join(' + ');
 }
+function insShotsHtml(shots,last){
+ if(!shots||!shots.length)return '';
+ const shown=last?shots.slice(-3):shots.slice(0,3),extra=shots.length-shown.length;
+ const line=x=>'<span class="ins-shot"><i>'+escapeHtml(x.time)+'</i><b>'+insG(x.value)+'</b></span>';
+ const more=extra>0?'<span class="ins-shot more">'+(last?'ещё '+extra+' ранее':'ещё '+extra+' позже')+'</span>':'';
+ return (last?more:'')+shown.map(line).join('')+(last?'':more);
+}
 function insRenderBack(){
  const body=$('insBackBody'),sub=$('insBackSub');
  if(!body)return;
@@ -6035,7 +6116,7 @@ function insRenderBack(){
  if(insSim.error&&!insSim.data){sub.textContent='';note(insSim.error+' Нажми, чтобы повторить.');return;}
  const data=insSim.data;
  if(!data||!data.cases||!data.cases.length){
-  sub.textContent='';
+  sub.textContent='';delete sub.dataset.open;
   note((data&&data.reason)||'Похожих случаев пока нет.');
   return;
  }
@@ -6043,11 +6124,12 @@ function insRenderBack(){
  insSim.idx=((insSim.idx%total)+total)%total;
  const c=data.cases[insSim.idx];
  sub.textContent=c.date.slice(0,5)+' · '+(insSim.idx+1)+'/'+total;
+ sub.dataset.open='1';
  const before=c.insulin_before_total>0?insG(c.insulin_before_total):'';
  const after=c.insulin_after_total>0?insG(c.insulin_after_total):'';
- const tiles=insTile('insulin','Инсулин до',before,'ед.',insShotsLine(c.insulin_before),'не кололи',0)
+ const tiles=insTile('insulin','Инсулин до',before,'ед.','','не кололи',0,insShotsHtml(c.insulin_before,true))
   +insTile('sugar','Сахар тогда',insG(c.sugar.value),'',c.sugar.time,'',1)
-  +insTile('insulin','Потом кололи',after,'ед.',insShotsLine(c.insulin_after),'не кололи',2);
+  +insTile('insulin','Потом кололи',after,'ед.','','не кололи',2,insShotsHtml(c.insulin_after,false));
  let foot='';
  if(c.next_sugar)foot='Через '+insDuration(c.next_sugar.after_min)+' сахар '+insG(c.next_sugar.value);
  else foot='После этого замеров в тот день не было';
@@ -6088,17 +6170,21 @@ function insToggle(){
  const flip=insFlipEl();
  if(!flip)return;
  const open=flip.dataset.side!=='back';
- if(open)insLoadSimilar(false);
+ if(open){const front=flip.querySelector('.ins-front');if(front&&front.offsetHeight)flip.style.setProperty('--ins-h',front.offsetHeight+'px');insLoadSimilar(false);}
  insSetSide(open?'back':'front');
  if(typeof selectionHaptic==='function')selectionHaptic();
 }
 (function(){
  const back=$('insBack'),btn=$('insBackBtn');
  if(btn)btn.addEventListener('click',e=>{e.stopPropagation();insToggle();});
- const lupa=$('insLupaBtn');
- if(lupa)lupa.addEventListener('click',e=>{e.stopPropagation();insToggle();});
+ const open=$('insOpenBtn');
+ if(open){
+  open.addEventListener('click',e=>{e.stopPropagation();insToggle();});
+  open.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();insToggle();}});
+ }
  if(back)back.addEventListener('click',e=>{
   if(e.target.closest('.ins-back-btn'))return;
+  if(e.target.closest('#insBackSub')&&insSim.data&&insSim.data.cases&&insSim.data.cases.length){dpOpen(insCaseSpecs(),insSim.idx);return;}
   if(e.target.closest('[data-retry]')){insLoadSimilar(true);return;}
   if(e.target.closest('[data-next]')&&insSim.data&&insSim.data.cases&&insSim.data.cases.length>1){
    insSim.idx+=1;insRenderBack();
@@ -6209,24 +6295,12 @@ function renderNightSim(){
   const d=data.doses;
   html+='<div class="ns-hint">В удачных вечерах ночной был '+(d.min===d.max?nG(d.min):nG(d.min)+'–'+nG(d.max))+' ед. <small>(медиана '+nG(d.median)+')</small></div>';
  }
- html+='<div class="ns-grid ns-gh"><span>Дата</span><span>Сахар</span><span>Инсулин</span><span>Ночной</span><span>Утро</span></div>';
+ html+=nightHead();
  const cur=data.current;
  if(cur){
-  const corr=cur.corrections_to_now.length;
-  html+='<div class="ns-grid ns-now"><div class="dn-day"><b>Сейчас</b><span>'+cur.time+'</span></div>'
-   +nCell(nG(cur.sugar),'',nSugarCls(cur.sugar,t))
-   +nCell(cur.insulin_to_now>0?nG(cur.insulin_to_now):'—',corr?'подколок '+corr:'')
-   +nCell('?','','dn-dose')+nCell('—','')+'</div>';
+  html+=nightRowHtml({main:'Сейчас',sub:'Σ'+nG(cur.insulin_to_now),ev:{v:cur.sugar,t:cur.time},mo:null,dose:null,cls:'ns-now'},t);
  }
- data.cases.forEach(c=>{
-  const corr=c.corrections_to_now.length;
-  const corrText=corr?'подколок '+corr:'без подколок';
-  html+='<div class="ns-grid ns-row"><div class="dn-day"><b>'+c.date.slice(0,5)+'</b><span>#'+c.rank+'</span></div>'
-   +'<div class="dn-c"><b class="'+nSugarCls(c.sugar.value,t)+'">'+nG(c.sugar.value)+'</b><span>'+c.sugar.time+'</span></div>'
-   +nCell(c.insulin_to_now>0?nG(c.insulin_to_now):'—',corrText)
-   +'<div class="dn-c dn-dose"><b>'+nG(c.basal)+'</b><span>ед.</span></div>'
-   +'<div class="dn-c"><b class="'+nSugarCls(c.morning.value,t)+'">'+nG(c.morning.value)+'</b><span>'+c.morning.date.slice(0,5)+' '+c.morning.time+'</span></div></div>';
- });
+ data.cases.forEach((c,i)=>{html+=nightCaseRow(c,t,' data-case="'+i+'"');});
  body.innerHTML=html;
 }
 async function loadNightSim(force){
@@ -6248,7 +6322,11 @@ async function loadNightSim(force){
  }
 }
 const nightSimEl=$('nightSim');
-if(nightSimEl)nightSimEl.addEventListener('click',e=>{if(e.target.closest('[data-retry]')&&nSim.error)loadNightSim(true);});
+if(nightSimEl)nightSimEl.addEventListener('click',e=>{
+ if(e.target.closest('[data-retry]')&&nSim.error){loadNightSim(true);return;}
+ const row=e.target.closest('.dn-row[data-case]');
+ if(row&&nSim.data&&nSim.data.cases&&nSim.data.cases.length)dpOpen(nightCaseSpecs(),Number(row.dataset.case));
+});
 /* сахар или инсулин изменились — расчёт устарел и пересчитается при следующем открытии вкладки */
 window.nightSimStale=function(){
  nSim.stale=true;
