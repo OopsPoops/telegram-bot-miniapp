@@ -1020,12 +1020,20 @@ button.st-ico:active{transform:scale(.88)}
 .food-empty{padding:14px 15px;font-size:15px;color:var(--st-sub)}
 
 /* ===== Карточка «Инсулин»: оборот с похожими случаями из истории ===== */
-.ins-flip{position:relative;perspective:1300px;-webkit-perspective:1300px;touch-action:none}
+.ins-flip{position:relative}
 .ins-flip .metric{margin-bottom:0}
-.ins-flipper{display:grid;transform-style:preserve-3d;-webkit-transform-style:preserve-3d}
-.ins-flipper>.metric{grid-area:1/1;-webkit-backface-visibility:hidden;backface-visibility:hidden}
-.ins-flipper>.ins-back{position:relative;overflow:hidden;transform:rotateX(180deg);--glow:32,169,155;background:radial-gradient(120% 95% at 0% 0%,rgba(32,169,155,.14),transparent 62%),var(--card-grad)}
-.ins-flip[data-side="back"] .ins-front,.ins-flip[data-side="front"] .ins-back{visibility:hidden;pointer-events:none}
+.ins-flipper{display:grid}
+.ins-flipper>.metric{grid-area:1/1;transition:opacity .24s ease,transform .24s ease,visibility 0s}
+.ins-flipper>.ins-back{position:relative;overflow:hidden;--glow:32,169,155;background:radial-gradient(120% 95% at 0% 0%,rgba(32,169,155,.14),transparent 62%),var(--card-grad)}
+.ins-flip[data-side="front"] .ins-back{opacity:0;transform:scale(.97);visibility:hidden;pointer-events:none;transition:opacity .2s ease,transform .2s ease,visibility 0s linear .2s}
+.ins-flip[data-side="back"] .ins-front{opacity:0;transform:scale(.97);visibility:hidden;pointer-events:none;transition:opacity .2s ease,transform .2s ease,visibility 0s linear .2s}
+.lupa-button{flex-shrink:0;width:46px;display:grid;place-items:center;padding:0;border:1px solid var(--line);border-radius:13px;background:var(--input-bg);color:#1a8f83;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .38s cubic-bezier(.34,1.5,.4,1)}
+.lupa-button svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}
+.lupa-button:active{transform:scale(.92)}
+:root[data-theme="dark"] .lupa-button{color:#6fe0d0}
+.ins-back .yd-strip{grid-template-columns:minmax(0,1fr) minmax(0,1.2fr) minmax(0,1fr)}
+.ins-back .yd-tile.sugar{padding-top:7px;padding-bottom:7px}
+.ins-back .yd-tile.sugar .yd-value{font-size:30px}
 .ins-back-in{position:absolute;inset:0;display:flex;flex-direction:column;padding:11px 14px 10px;min-height:0}
 .ins-back-head{flex:none;display:flex;align-items:center;gap:8px;height:26px;margin-bottom:7px}
 .ins-back-ico{font-size:15px;line-height:1}
@@ -1038,7 +1046,7 @@ button.st-ico:active{transform:scale(.88)}
 .ins-back .yd-tile{padding:5px 3px;gap:1px;animation:none}
 .ins-back .yd-tile:not(:last-child)::after{right:-13px;width:16px;height:16px;margin-top:-8px;font-size:13px}
 .ins-back .yd-value{font-size:23px}
-.ins-back .yd-label{font-size:11px}
+.ins-back .yd-label{font-size:10.5px;white-space:nowrap}
 .ins-back .yd-time{font-size:11px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ins-back-foot{flex:none;height:18px;margin-top:7px;font-size:12px;font-weight:650;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
 .ins-back-note{flex:1;display:flex;align-items:center;justify-content:center;text-align:center;padding:0 10px;border-radius:16px;background:rgba(125,135,170,.08);border:1px dashed rgba(125,135,170,.28);color:var(--muted);font-size:13px;line-height:1.35;cursor:pointer}
@@ -1076,8 +1084,13 @@ button.st-ico:active{transform:scale(.88)}
 /* окно дня */
 .dp-backdrop{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;padding:calc(18px + env(safe-area-inset-top)) 14px calc(18px + env(safe-area-inset-bottom));background:rgba(18,24,45,.38);-webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%);opacity:0;transition:opacity .2s ease}
 .dp-backdrop.visible{opacity:1}
-.dp{display:flex;flex-direction:column;width:100%;max-width:460px;height:min(100%,760px);background:var(--modal-bg);color:var(--text);border:1px solid var(--card-border);border-radius:26px;padding:18px 16px 14px;box-shadow:0 25px 80px rgba(0,0,0,.28);transform:translateY(14px) scale(.98);transition:transform .28s cubic-bezier(.22,1,.36,1)}
+.dp{display:flex;flex-direction:column;width:100%;max-width:460px;height:50vh;height:50dvh;min-height:300px;max-height:100%;background:var(--modal-bg);color:var(--text);border:1px solid var(--card-border);border-radius:26px;padding:18px 16px 14px;box-shadow:0 25px 80px rgba(0,0,0,.28);transform:translateY(14px) scale(.98);transition:transform .28s cubic-bezier(.22,1,.36,1)}
 .dp-backdrop.visible .dp{transform:none}
+.dp.has-sum{height:62vh;height:62dvh;min-height:400px}
+.dp-sum{margin:0 0 10px;padding:8px 10px 6px;border-radius:16px;background:var(--modal-content)}
+.dp-sum .dn-row{border-top:0;padding:2px 0}
+#nightStatsBody .dn-row[data-off]{cursor:pointer;-webkit-tap-highlight-color:transparent;border-radius:10px;transition:background .15s}
+#nightStatsBody .dn-row[data-off]:active{background:var(--nav-active)}
 .dp-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
 .dp-title b{display:block;font-size:21px;font-weight:800;line-height:1.15}
 .dp-title span{display:block;margin-top:3px;font-size:12.5px;font-weight:650;color:var(--muted)}
@@ -1157,6 +1170,7 @@ button.st-ico:active{transform:scale(.88)}
 </div>
 <div class="input-row">
 <input class="value-input" id="insulinInput" type="number" inputmode="numeric" step="1" min="0" max="15" placeholder="" aria-label="Новое значение инсулина">
+<button class="lupa-button" type="button" id="insLupaBtn" aria-label="Показать похожие случаи из истории" title="Похожие случаи"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg></button>
 <button class="undo-button" type="button" onclick="undoValue('insulin')" aria-label="Отменить последнюю запись инсулина" title="Отменить последнюю запись">↩︎</button>
 <button class="save-button" onclick="saveValue('insulin')">Сохранить</button>
 </div>
@@ -1180,7 +1194,7 @@ button.st-ico:active{transform:scale(.88)}
 </section>
 <section class="metric ins-back" id="insBack" aria-live="polite" aria-label="Похожие случаи из истории">
 <div class="ins-back-in">
-<div class="ins-back-head"><span class="ins-back-ico" aria-hidden="true">🔎</span><span class="ins-back-title">Похожий случай</span><span class="ins-back-sub" id="insBackSub"></span><button class="ins-back-btn" type="button" id="insBackBtn" aria-label="Вернуться к инсулину" title="Вернуться к инсулину"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg></button></div>
+<div class="ins-back-head"><span class="ins-back-ico" aria-hidden="true">🔎</span><span class="ins-back-title">Похожий случай</span><span class="ins-back-sub" id="insBackSub"></span><button class="ins-back-btn" type="button" id="insBackBtn" aria-label="Закрыть похожие случаи" title="Закрыть"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
 <div class="ins-back-body" id="insBackBody" style="display:contents"></div>
 </div>
 </section>
@@ -5316,9 +5330,14 @@ stRefresh();
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const APP_VERSION='v20261104_1';          /* ← менять при каждом обновлении: vГГГГММДД_N */
+const APP_VERSION='v20261104_2';          /* ← менять при каждом обновлении: vГГГГММДД_N */
 const DEV_CHAT='https://t.me/larik_11';
 const APP_CHANGES=[
+ {v:'v20261104_2',items:[
+  'Окно дня стало в два раза ниже и стоит по центру; длинные списки прокручиваются',
+  'Ночной: нажми на строку статистики — откроется окно этого дня, сверху данные выбранной строки',
+  'Инсулин: переворот карточки убран, похожие случаи открываются кнопкой с лупой прямо на карточке; сахар теперь по центру, инсулин до — слева, потом — справа'
+ ]},
  {v:'v20261104_1',items:[
   'Новая вкладка «Ночной»: карточка ночной дозы, похожие вечера и статистика за 10, 20 или 30 дней с датами факта',
   'Похожие вечера: тот же сахар в то же время, с учётом подколок и суммы инсулина, только с удачным утром 4–9',
@@ -5729,7 +5748,7 @@ function nightRow(off,ix,t){
   const c=mo.v<t.lo?'lo':diff<0?'down':diff>0?'up':'';
   delta='<span class="dn-d '+c+'">'+(diff>0?'+':diff<0?'−':'')+fs(Math.abs(diff))+'</span>';
  }
- return '<div class="dn-row"><div class="dn-day"><b>'+E.dm+'</b><span>'+(off===0?'сегодня':off===-1?'вчера':E.wd)+'</span></div>'
+ return '<div class="dn-row" data-off="'+off+'"><div class="dn-day"><b>'+E.dm+'</b><span>'+(off===0?'сегодня':off===-1?'вчера':E.wd)+'</span></div>'
   +cell(ev,ev?cls(ev.v,t):'')+doseCell+cell(mo,mo?cls(mo.v,t):'')+delta+'</div>';
 }
 let nightDays=10;
@@ -5752,6 +5771,12 @@ function setNightDays(n){
  if(DAYS<n+1){DAYS=Math.min(MAX_DAYS,n+1);getHistory(true).then(render).catch(error=>console.error('Не удалось подгрузить ночные дни:',error));}
  else render();
 }
+const nightBodyEl=$('nightStatsBody');
+if(nightBodyEl)nightBodyEl.addEventListener('click',e=>{
+ const row=e.target.closest('.dn-row[data-off]');
+ if(!row||!hist)return;
+ openDayPopup(Number(row.dataset.off),{night:true});
+});
 const nightRangeEl=$('nightRange');
 if(nightRangeEl)nightRangeEl.addEventListener('click',e=>{const b=e.target.closest('button[data-n]');if(b)setNightDays(Number(b.dataset.n));});
 /* страницы дней — ровно такой же высоты, как главная карточка, поэтому экран не прыгает */
@@ -5868,7 +5893,7 @@ function finishMetricAnimation(index){
 function metricTouchStart(e,car){
  if(metricGesture||!e.touches||e.touches.length!==1)return;
  const onControl=!!e.target.closest('input,button,textarea,select,a');
- if(onControl&&!(car.id==='insulinCar'&&e.target.closest('.ins-flip')))return;
+ if(onControl)return;
  if(metricAnimating){clearMetricTransforms();}
  const t=e.touches[0];
  const index=carouselIndex(car);
@@ -5885,9 +5910,7 @@ function metricTouchMove(e){
   g.axis=Math.abs(dx)>Math.abs(dy)*1.15?'x':'y';
   if(g.axis==='x'&&g.onControl){metricGesture=null;return;} /* с поля ввода листать дни по-прежнему нельзя */
   if(g.axis==='x'){for(const car of metricCars())car.style.scrollSnapType='none';metricTransforms(0,false);}
-  else if(g.car.id==='insulinCar'&&g.index===0&&insDragStart())g.flip=true;
  }
- if(g.axis==='y'&&g.flip){e.preventDefault();g.dy=dy;insDragMove(dy);return;}
  if(g.axis!=='x')return;
  e.preventDefault();
  const car=g.car,w=car.clientWidth;
@@ -5902,7 +5925,6 @@ function metricTouchEnd(e){
  if(!g)return;
  if(e.type==='touchend'&&[...e.touches].some(t=>t.identifier===g.id))return;
  metricGesture=null;
- if(g.axis==='y'&&g.flip){insDragEnd(Math.max(1,performance.now()-g.started));return;}
  if(g.axis!=='x')return;
  const w=g.car.clientWidth||1;
  const elapsed=Math.max(1,performance.now()-g.started);
@@ -5924,7 +5946,7 @@ function closeDayPopup(){
  document.removeEventListener('keydown',el._onKey);
  setTimeout(()=>{if(!el.classList.contains('visible'))el.remove();},200);
 }
-function openDayPopup(off){
+function openDayPopup(off,opts){
  if(!hist)return;
  const old=$('dayPopup');if(old)old.remove();
  const d=dayInfo(off),ix=index(hist),t=target();
@@ -5937,12 +5959,13 @@ function openDayPopup(off){
  const sugarList=list(sugars,x=>'<b class="dp-v '+cls(x.v,t)+'">'+fs(x.v)+'</b>','нет замеров');
  const insList=list(shots,x=>'<b class="dp-v">'+fmtDose(x.v)+'<small> ед.</small></b>','нет уколов')
   +(night?'<div class="dp-row dp-night"><span class="dp-t">🌙 ночной</span><b class="dp-v">'+(night.approx?'≈':'')+fmtDose(night.value)+'<small> ед.</small></b></div>':'');
+const sumHtml=opts&&opts.night?(()=>{const r=nightRow(off,ix,t);return r?'<div class="dp-sum"><div class="dn-head"><span>Дата</span><span>Вечер</span><span>Доза</span><span>Утро</span><span>Δ</span></div>'+r.replace(' data-off="'+off+'"','')+'</div>':'';})():'';
  const foot=[avg!==null?'ср. сахар '+fs(avg):'',shots.length?'Σ инсулин '+fmtDose(sum)+' ед.':''].filter(Boolean).join(' · ');
  const el=document.createElement('div');
  el.id='dayPopup';el.className='dp-backdrop';
- el.innerHTML='<section class="dp" role="dialog" aria-modal="true" aria-label="Сахар и инсулин за день">'
+ el.innerHTML='<section class="dp'+(sumHtml?' has-sum':'')+'" role="dialog" aria-modal="true" aria-label="Сахар и инсулин за день">'
   +'<header class="dp-top"><div class="dp-title"><b>'+d.name+'</b><span>'+d.dm+' · '+d.wd+'</span></div><button class="dp-close" type="button" aria-label="Закрыть">×</button></header>'
-  +'<div class="dp-cols"><div class="dp-col"><div class="dp-h"><span>🩸</span>Сахар</div><div class="dp-list">'+sugarList+'</div></div>'
+  +sumHtml+'<div class="dp-cols"><div class="dp-col"><div class="dp-h"><span>🩸</span>Сахар</div><div class="dp-list">'+sugarList+'</div></div>'
   +'<div class="dp-col"><div class="dp-h"><span>💉</span>Инсулин</div><div class="dp-list">'+insList+'</div></div></div>'
   +(foot?'<footer class="dp-foot">'+foot+'</footer>':'')+'</section>';
  document.body.appendChild(el);
@@ -6003,8 +6026,8 @@ function insRenderBack(){
  sub.textContent=c.date.slice(0,5)+' · '+(insSim.idx+1)+'/'+total;
  const before=c.insulin_before_total>0?insG(c.insulin_before_total):'';
  const after=c.insulin_after_total>0?insG(c.insulin_after_total):'';
- const tiles=insTile('sugar','Сахар тогда',insG(c.sugar.value),'',c.sugar.time,'',0)
-  +insTile('insulin','Инсулин до',before,'ед.',insShotsLine(c.insulin_before),'не кололи',1)
+ const tiles=insTile('insulin','Инсулин до',before,'ед.',insShotsLine(c.insulin_before),'не кололи',0)
+  +insTile('sugar','Сахар тогда',insG(c.sugar.value),'',c.sugar.time,'',1)
   +insTile('insulin','Потом кололи',after,'ед.',insShotsLine(c.insulin_after),'не кололи',2);
  let foot='';
  if(c.next_sugar)foot='Через '+insDuration(c.next_sugar.after_min)+' сахар '+insG(c.next_sugar.value);
@@ -6038,86 +6061,23 @@ window.insSimilarRefresh=function(){
  if(flip&&flip.dataset.side==='back')insLoadSimilar(true);
  else if(insSim.data)insSim.data=null; /* старый ответ больше не относится к текущему сахару */
 };
-const insFlipState={rot:0,anim:null,drag:null,half:false};
 function insSetSide(side){
  const flip=insFlipEl();
- if(flip)flip.dataset.side=side; /* front | back | flip (пока идёт переворот видны обе стороны) */
-}
-const insNorm=a=>(((Math.round(a/180)%2)+2)%2)*180;
-function insApply(angle){
- const el=$('insFlipper');
- if(!el)return;
- const s=1-.055*Math.abs(Math.sin(angle*Math.PI/180)); /* карточка чуть «приподнимается» посередине */
- el.style.transform='scale('+s.toFixed(4)+') rotateX('+angle.toFixed(2)+'deg)';
- const half=Math.round(angle/180)%2!==0;
- if(half!==insFlipState.half){insFlipState.half=half;if(typeof selectionHaptic==='function')selectionHaptic();}
-}
-function insStopAnim(){
- const a=insFlipState.anim;
- if(!a)return;
- insFlipState.anim=null;a.oncancel=null;a.onfinish=null;a.cancel();
-}
-function insSettle(target){
- const el=$('insFlipper');
- insFlipState.rot=insNorm(target);
- insFlipState.half=insFlipState.rot===180;
- insStopAnim();
- if(el)el.style.transform=insFlipState.rot===180?'rotateX(180deg)':'';
- insSetSide(insFlipState.rot===180?'back':'front');
-}
-/* from, target — углы в градусах: от текущего положения до края (или назад, если жест отменён) */
-function insFlipTo(from,target){
- const el=$('insFlipper');
- if(!el)return;
- insSetSide('flip');
- insStopAnim();
- const reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
- if(!el.animate||reduce||Math.abs(target-from)<.5){insSettle(target);return;}
- const frame=a=>'scale('+(1-.055*Math.abs(Math.sin(a*Math.PI/180))).toFixed(4)+') rotateX('+a.toFixed(2)+'deg)';
- const anim=el.animate(
-  [{transform:frame(from)},{transform:frame((from+target)/2),offset:.5},{transform:frame(target)}],
-  {duration:520,easing:'cubic-bezier(.22,1,.36,1)',fill:'forwards'}
- );
- insFlipState.anim=anim;
- anim.onfinish=()=>{if(insFlipState.anim===anim)insSettle(target);};
+ if(flip)flip.dataset.side=side; /* front | back */
 }
 function insToggle(){
- if(insFlipState.drag)return;
- const cur=insFlipState.rot;
- if(cur===0)insLoadSimilar(false);
- insFlipTo(cur,cur===0?180:0);
-}
-function insDragStart(){
- if(!$('insFlipper'))return false;
- if(insFlipState.anim)insSettle(insFlipState.rot); /* карточка ещё летела — подхватываем в покое */
- insFlipState.drag={base:insFlipState.rot,delta:0};
- insSetSide('flip');
- try{tg?.disableVerticalSwipes?.();}catch(e){}
- return true;
-}
-function insDragMove(dy){
- const d=insFlipState.drag;
- if(!d)return;
- let delta=-dy*(180/150);
- if(Math.abs(delta)>180)delta=Math.sign(delta)*(180+(Math.abs(delta)-180)*.18); /* резинка у края */
- d.delta=delta;
- insApply(d.base+delta);
-}
-function insDragEnd(elapsed){
- const d=insFlipState.drag;
- if(!d)return;
- insFlipState.drag=null;
- try{tg?.enableVerticalSwipes?.();}catch(e){}
- const speed=Math.abs(d.delta)/Math.max(16,elapsed)*1000;
- const flip=Math.abs(d.delta)>=55||(speed>380&&Math.abs(d.delta)>10);
- const from=d.base+d.delta;
- const target=flip?d.base+(d.delta>0?180:-180):d.base;
- if(flip&&insNorm(target)===180)insLoadSimilar(false);
- insFlipTo(from,target);
+ const flip=insFlipEl();
+ if(!flip)return;
+ const open=flip.dataset.side!=='back';
+ if(open)insLoadSimilar(false);
+ insSetSide(open?'back':'front');
+ if(typeof selectionHaptic==='function')selectionHaptic();
 }
 (function(){
  const back=$('insBack'),btn=$('insBackBtn');
  if(btn)btn.addEventListener('click',e=>{e.stopPropagation();insToggle();});
+ const lupa=$('insLupaBtn');
+ if(lupa)lupa.addEventListener('click',e=>{e.stopPropagation();insToggle();});
  if(back)back.addEventListener('click',e=>{
   if(e.target.closest('.ins-back-btn'))return;
   if(e.target.closest('[data-retry]')){insLoadSimilar(true);return;}
