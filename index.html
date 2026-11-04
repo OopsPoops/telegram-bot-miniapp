@@ -1029,6 +1029,7 @@ button.st-ico:active{transform:scale(.88)}
 .ins-flip[data-side="back"] .ins-front{position:absolute;left:0;right:0;top:0;opacity:0;transform:scale(.97);visibility:hidden;pointer-events:none;transition:opacity .2s ease,transform .2s ease,visibility 0s linear .2s}
 .ins-open{cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .3s cubic-bezier(.34,1.5,.4,1)}
 .ins-open:active{transform:scale(.9)}
+.ins-open.busy{animation:insBusy 1.4s ease-in-out infinite}
 .ins-shot{display:flex;justify-content:center;gap:5px;font-size:11px;line-height:1.35;font-variant-numeric:tabular-nums;white-space:nowrap}
 .ins-shot i{font-style:normal;color:var(--muted)}
 .ins-shot b{font-weight:750;color:var(--text)}
@@ -1087,7 +1088,8 @@ button.st-ico:active{transform:scale(.88)}
 .dp-sum .dn-row{border-top:0;padding:2px 0}
 #nightStatsBody .dn-row[data-off],#nightSimBody .dn-row[data-case]{cursor:pointer;-webkit-tap-highlight-color:transparent;border-radius:10px;transition:background .15s}
 #nightStatsBody .dn-row[data-off]:active,#nightSimBody .dn-row[data-case]:active{background:var(--nav-active)}
-.ns-now.dn-row{background:var(--nav-active);border-top:0;border-radius:10px;padding:4px 4px;margin:0 -4px 2px}
+.ns-now.dn-row{background:rgba(32,169,155,.16);border-top:0;border-radius:10px;padding:4px 4px;margin:0 -4px 2px}
+:root[data-theme="dark"] .ns-now.dn-row{background:rgba(69,224,203,.16)}
 .dp-nav{display:flex;gap:6px;margin-left:auto}
 .dp-nav button{width:38px;height:38px;border:0;border-radius:50%;background:var(--close-bg);color:var(--close-text);font-size:24px;line-height:1;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .dp-nav button:active{transform:scale(.92)}
@@ -1099,6 +1101,7 @@ button.st-ico:active{transform:scale(.88)}
 .dp-tlh{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 4px 8px;font-size:13px;font-weight:780;color:var(--muted)}
 .dp-pair{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:center;padding:8px 4px;border-top:1px solid var(--line)}
 .dp-pair:first-child{border-top:0}
+.dp-pair.mark{background:rgba(32,169,155,.14);border-radius:10px}
 .dp-c{display:flex;align-items:baseline;justify-content:space-between;gap:8px;min-height:26px;min-width:0}
 .dp-c+.dp-c{padding-left:12px;border-left:1px solid var(--line)}
 .dp-foot{line-height:1.45}
@@ -1196,12 +1199,6 @@ button.st-ico:active{transform:scale(.88)}
 <span class="insulin-timer-label">После инъекции</span>
 <span class="insulin-timer-next" id="insulinTimerNext"></span>
 </div>
-</div>
-</section>
-<section class="metric ins-back" id="insBack" aria-live="polite" aria-label="Похожие случаи из истории">
-<div class="ins-back-in">
-<div class="ins-back-head"><span class="ins-back-ico" aria-hidden="true">🔎</span><span class="ins-back-title">Похожий случай</span><span class="ins-back-sub" id="insBackSub"></span><button class="ins-back-btn" type="button" id="insBackBtn" aria-label="Закрыть похожие случаи" title="Закрыть"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
-<div class="ins-back-body" id="insBackBody" style="display:contents"></div>
 </div>
 </section>
 </div></div>
@@ -5335,9 +5332,15 @@ stRefresh();
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const APP_VERSION='v20261104_4';          /* ← менять при каждом обновлении: vГГГГММДД_N */
+const APP_VERSION='v20261104_5';          /* ← менять при каждом обновлении: vГГГГММДД_N */
 const DEV_CHAT='https://t.me/larik_11';
 const APP_CHANGES=[
+ {v:'v20261104_5',items:[
+  'Окно дня: инсулин ставится к ближайшему сахару в пределах часа в обе стороны',
+  'Инсулин: карточка с топом убрана — нажатие на шприц сразу открывает окно с топом 1–5',
+  'Карточки сахара и инсулина на главной больше не тянутся в стороны',
+  'Ночной: строка «Сейчас» выделена зелёным; похожие вечера доступны с 19:00 и ищутся по сахару ближе всего к 21:00'
+ ]},
  {v:'v20261104_4',items:[
   'Инсулин: лупа убрана — похожие случаи открываются нажатием на шприц',
   'Похожие случаи: инсулин до и после показан весь и со временем',
@@ -5971,19 +5974,18 @@ function dpHtml(spec,multi){
  const avg=sugars.length?sugars.reduce((a,x)=>a+x.v,0)/sugars.length:null;
  const sum=shots.reduce((a,x)=>a+x.v,0);
  const cell=(x,fmt)=>x?'<div class="dp-c"><span class="dp-t">'+x.t+'</span>'+fmt(x)+'</div>':'<div class="dp-c"></div>';
- /* инсулин ставим на одну строку с ближайшим сахаром (в пределах 30 мин) */
- const used=new Set(),pairs=[];
- sugars.forEach(sg=>{
-  let best=-1,bd=31;
-  shots.forEach((sh,i)=>{if(used.has(i))return;const dd=Math.abs(sh.m-sg.m);if(dd<bd){bd=dd;best=i;}});
-  if(best>=0)used.add(best);
-  pairs.push({m:sg.m,s:sg,i:best>=0?shots[best]:null});
- });
- shots.forEach((sh,i)=>{if(!used.has(i))pairs.push({m:sh.m,s:null,i:sh});});
+ /* инсулин ставим на одну строку с ближайшим по времени сахаром (до часа в обе стороны) */
+ const pairs=[],near=[];
+ sugars.forEach((sg,si)=>shots.forEach((sh,hi)=>{const dd=Math.abs(sh.m-sg.m);if(dd<=60)near.push({si,hi,dd});}));
+ near.sort((x,y)=>x.dd-y.dd);
+ const usedS=new Set(),usedH=new Set(),pairOf=new Map();
+ near.forEach(n=>{if(usedS.has(n.si)||usedH.has(n.hi))return;usedS.add(n.si);usedH.add(n.hi);pairOf.set(n.si,n.hi);});
+ sugars.forEach((sg,si)=>pairs.push({m:sg.m,s:sg,i:pairOf.has(si)?shots[pairOf.get(si)]:null}));
+ shots.forEach((sh,hi)=>{if(!usedH.has(hi))pairs.push({m:sh.m,s:null,i:sh});});
  pairs.sort((a,b)=>a.m-b.m);
  const sugarFmt=x=>'<b class="dp-v '+cls(x.v,t)+'">'+fs(x.v)+'</b>';
  const insFmt=x=>'<b class="dp-v">'+fmtDose(x.v)+'<small> ед.</small></b>';
- const timeline=pairs.length?pairs.map(p=>'<div class="dp-pair">'+cell(p.s,sugarFmt)+cell(p.i,insFmt)+'</div>').join(''):'<div class="dp-empty">нет записей за этот день</div>';
+ const timeline=pairs.length?pairs.map(p=>'<div class="dp-pair'+(spec.mark&&p.s&&p.s.t===spec.mark?' mark':'')+'">'+cell(p.s,sugarFmt)+cell(p.i,insFmt)+'</div>').join(''):'<div class="dp-empty">'+(spec.emptyText||'нет записей за этот день')+'</div>';
  const night=spec.night;
  const foot=[avg!==null?'ср. сахар '+fs(avg):'',shots.length?'Σ инсулин '+fmtDose(sum)+' ед.':'',night?'🌙 ночной '+(night.approx?'≈':'')+fmtDose(night.value)+' ед.':''].filter(Boolean).join(' · ');
  return '<section class="dp'+(spec.sumHtml?' has-sum':'')+'" role="dialog" aria-modal="true" aria-label="Сахар и инсулин за день">'
@@ -6059,14 +6061,14 @@ function insCaseSpecs(){
  const cases=(insSim.data&&insSim.data.cases)||[],n=cases.length;
  return cases.map((c,i)=>()=>{
   const day=caseDay(c);
-  return {name:'Топ '+(i+1)+' из '+n,sub:c.date+' · '+dpWeekday(c.date)+' · сахар '+insG(c.sugar.value)+' в '+c.sugar.time,sugars:day.sugars,shots:day.shots,night:c.basal!=null?{value:c.basal}:null,sumHtml:''};
+  return {name:'Топ '+(i+1)+' из '+n,sub:c.date+' · '+dpWeekday(c.date)+' · сахар '+insG(c.sugar.value)+' в '+c.sugar.time,sugars:day.sugars,shots:day.shots,night:c.basal!=null?{value:c.basal}:null,sumHtml:'',mark:c.sugar.time};
  });
 }
 function nightCaseSpecs(){
  const data=nSim.data,cases=(data&&data.cases)||[],n=cases.length;
  return cases.map((c,i)=>()=>{
   const day=caseDay(c),t=target();
-  return {name:'Топ '+(i+1)+' из '+n,sub:c.date+' · '+dpWeekday(c.date),sugars:day.sugars,shots:day.shots,night:{value:c.basal},
+  return {name:'Топ '+(i+1)+' из '+n,sub:c.date+' · '+dpWeekday(c.date),sugars:day.sugars,shots:day.shots,night:{value:c.basal},mark:c.sugar.time,
    sumHtml:'<div class="dp-sum">'+nightHead()+nightCaseRow(c,t,'')+'</div>'};
  });
 }
@@ -6166,13 +6168,14 @@ function insSetSide(side){
  const flip=insFlipEl();
  if(flip)flip.dataset.side=side; /* front | back */
 }
-function insToggle(){
- const flip=insFlipEl();
- if(!flip)return;
- const open=flip.dataset.side!=='back';
- if(open){const front=flip.querySelector('.ins-front');if(front&&front.offsetHeight)flip.style.setProperty('--ins-h',front.offsetHeight+'px');insLoadSimilar(false);}
- insSetSide(open?'back':'front');
- if(typeof selectionHaptic==='function')selectionHaptic();
+async function insToggle(){
+ if(insSim.loading)return;
+ const btn=$('insOpenBtn');
+ if(btn)btn.classList.add('busy');
+ try{await insLoadSimilar(false);}finally{if(btn)btn.classList.remove('busy');}
+ const d=insSim.data;
+ if(d&&d.cases&&d.cases.length)dpOpen(insCaseSpecs(),0);
+ else dpOpen([()=>({name:'Похожие случаи',sub:escapeHtml(insSim.error||(d&&d.reason)||'Пока нет данных'),sugars:[],shots:[],night:null,sumHtml:'',emptyText:'похожих случаев не нашлось'})],0);
 }
 (function(){
  const back=$('insBack'),btn=$('insBackBtn');
@@ -6198,10 +6201,7 @@ function setup(car){
  car._dcReady=true;
  if(car.id==='sugarCar'||car.id==='insulinCar'){
   car.style.touchAction='pan-y';
-  car.addEventListener('touchstart',e=>metricTouchStart(e,car),{passive:true});
-  car.addEventListener('touchmove',metricTouchMove,{passive:false});
-  car.addEventListener('touchend',metricTouchEnd,{passive:true});
-  car.addEventListener('touchcancel',metricTouchEnd,{passive:true});
+  car.style.overflowX='hidden';
  }
  let raf=0;
  car.addEventListener('scroll',()=>{
