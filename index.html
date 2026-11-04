@@ -1095,6 +1095,13 @@ button.st-ico:active{transform:scale(.88)}
 .dp-title b{display:block;font-size:21px;font-weight:800;line-height:1.15}
 .dp-title span{display:block;margin-top:3px;font-size:12.5px;font-weight:650;color:var(--muted)}
 .dp-close{flex:none;width:38px;height:38px;border:0;border-radius:50%;background:var(--close-bg);color:var(--close-text);font-size:24px;line-height:1;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.dp-tl{flex:1;min-height:0;display:flex;flex-direction:column;border-radius:18px;background:var(--modal-content);padding:10px 10px 4px}
+.dp-tlh{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 4px 8px;font-size:13px;font-weight:780;color:var(--muted)}
+.dp-pair{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:center;padding:8px 4px;border-top:1px solid var(--line)}
+.dp-pair:first-child{border-top:0}
+.dp-c{display:flex;align-items:baseline;justify-content:space-between;gap:8px;min-height:26px;min-width:0}
+.dp-c+.dp-c{padding-left:12px;border-left:1px solid var(--line)}
+.dp-foot{line-height:1.45}
 .dp-cols{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .dp-col{display:flex;flex-direction:column;min-height:0;border-radius:18px;background:var(--modal-content);padding:10px 10px 6px}
 .dp-h{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:780;color:var(--muted);padding:0 4px 8px}
@@ -1232,7 +1239,6 @@ button.st-ico:active{transform:scale(.88)}
 <!-- === ЭКРАН «ГРАФИКИ» === -->
 <!-- === ЭКРАН «НОЧНОЙ» === -->
 <section class="screen" id="screen-night">
-<div class="page-heading" style="margin-bottom:16px">Ночной</div>
 <!-- --- Карточка: инсулин (ночной) --- -->
 <div class="carousel shadowfix dcar" id="nightCar">
 <section class="metric insulin night">
@@ -5330,9 +5336,13 @@ stRefresh();
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const APP_VERSION='v20261104_2';          /* ← менять при каждом обновлении: vГГГГММДД_N */
+const APP_VERSION='v20261104_3';          /* ← менять при каждом обновлении: vГГГГММДД_N */
 const DEV_CHAT='https://t.me/larik_11';
 const APP_CHANGES=[
+ {v:'v20261104_3',items:[
+  'Окно дня: инсулин стоит на одной строке с ближайшим по времени сахаром (в пределах 30 минут), ночной вынесен вниз к среднему сахару и сумме',
+  'Вкладка «Ночной»: убран дублирующий заголовок'
+ ]},
  {v:'v20261104_2',items:[
   'Окно дня стало в два раза ниже и стоит по центру; длинные списки прокручиваются',
   'Ночной: нажми на строку статистики — откроется окно этого дня, сверху данные выбранной строки',
@@ -5955,18 +5965,27 @@ function openDayPopup(off,opts){
  const night=ix.night.get(d.key)||null;
  const avg=sugars.length?sugars.reduce((a,x)=>a+x.v,0)/sugars.length:null;
  const sum=shots.reduce((a,x)=>a+x.v,0);
- const list=(items,fmt,empty)=>items.length?items.map(x=>'<div class="dp-row"><span class="dp-t">'+x.t+'</span>'+fmt(x)+'</div>').join(''):'<div class="dp-empty">'+empty+'</div>';
- const sugarList=list(sugars,x=>'<b class="dp-v '+cls(x.v,t)+'">'+fs(x.v)+'</b>','нет замеров');
- const insList=list(shots,x=>'<b class="dp-v">'+fmtDose(x.v)+'<small> ед.</small></b>','нет уколов')
-  +(night?'<div class="dp-row dp-night"><span class="dp-t">🌙 ночной</span><b class="dp-v">'+(night.approx?'≈':'')+fmtDose(night.value)+'<small> ед.</small></b></div>':'');
-const sumHtml=opts&&opts.night?(()=>{const r=nightRow(off,ix,t);return r?'<div class="dp-sum"><div class="dn-head"><span>Дата</span><span>Вечер</span><span>Доза</span><span>Утро</span><span>Δ</span></div>'+r.replace(' data-off="'+off+'"','')+'</div>':'';})():'';
- const foot=[avg!==null?'ср. сахар '+fs(avg):'',shots.length?'Σ инсулин '+fmtDose(sum)+' ед.':''].filter(Boolean).join(' · ');
+ const cell=(x,fmt)=>x?'<div class="dp-c"><span class="dp-t">'+x.t+'</span>'+fmt(x)+'</div>':'<div class="dp-c"></div>';
+ /* инсулин ставим на одну строку с ближайшим сахаром (в пределах 30 мин) */
+ const used=new Set(),pairs=[];
+ sugars.forEach(sg=>{
+  let best=-1,bd=31;
+  shots.forEach((sh,i)=>{if(used.has(i))return;const dd=Math.abs(sh.m-sg.m);if(dd<bd){bd=dd;best=i;}});
+  if(best>=0)used.add(best);
+  pairs.push({m:sg.m,s:sg,i:best>=0?shots[best]:null});
+ });
+ shots.forEach((sh,i)=>{if(!used.has(i))pairs.push({m:sh.m,s:null,i:sh});});
+ pairs.sort((a,b)=>a.m-b.m);
+ const sugarFmt=x=>'<b class="dp-v '+cls(x.v,t)+'">'+fs(x.v)+'</b>';
+ const insFmt=x=>'<b class="dp-v">'+fmtDose(x.v)+'<small> ед.</small></b>';
+ const timeline=pairs.length?pairs.map(p=>'<div class="dp-pair">'+cell(p.s,sugarFmt)+cell(p.i,insFmt)+'</div>').join(''):'<div class="dp-empty">нет записей за этот день</div>';
+ const sumHtml=opts&&opts.night?(()=>{const r=nightRow(off,ix,t);return r?'<div class="dp-sum"><div class="dn-head"><span>Дата</span><span>Вечер</span><span>Доза</span><span>Утро</span><span>Δ</span></div>'+r.replace(' data-off="'+off+'"','')+'</div>':'';})():'';
+ const foot=[avg!==null?'ср. сахар '+fs(avg):'',shots.length?'Σ инсулин '+fmtDose(sum)+' ед.':'',night?'🌙 ночной '+(night.approx?'≈':'')+fmtDose(night.value)+' ед.':''].filter(Boolean).join(' · ');
  const el=document.createElement('div');
  el.id='dayPopup';el.className='dp-backdrop';
  el.innerHTML='<section class="dp'+(sumHtml?' has-sum':'')+'" role="dialog" aria-modal="true" aria-label="Сахар и инсулин за день">'
   +'<header class="dp-top"><div class="dp-title"><b>'+d.name+'</b><span>'+d.dm+' · '+d.wd+'</span></div><button class="dp-close" type="button" aria-label="Закрыть">×</button></header>'
-  +sumHtml+'<div class="dp-cols"><div class="dp-col"><div class="dp-h"><span>🩸</span>Сахар</div><div class="dp-list">'+sugarList+'</div></div>'
-  +'<div class="dp-col"><div class="dp-h"><span>💉</span>Инсулин</div><div class="dp-list">'+insList+'</div></div></div>'
+  +sumHtml+'<div class="dp-tl"><div class="dp-tlh"><span>🩸 Сахар</span><span>💉 Инсулин</span></div><div class="dp-list">'+timeline+'</div></div>'
   +(foot?'<footer class="dp-foot">'+foot+'</footer>':'')+'</section>';
  document.body.appendChild(el);
  el._bodyOverflow=document.body.style.overflow;
