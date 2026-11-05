@@ -562,6 +562,7 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .donut-sub{margin-top:6px;font-size:12px;font-weight:700;color:var(--muted)}
 .donut-avg{margin-top:4px;font-size:13px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums}
 .range-legend-row em{min-width:84px}
+.range-legend-name .rl-mm{margin-top:3px;font-weight:700;color:var(--text);opacity:.75;font-variant-numeric:tabular-nums}
 .range-legend-row em .rl-med{display:block;margin-top:3px;font-size:10.5px;font-weight:700;color:var(--text);opacity:.75}
 .range-cal-btn{flex:none;width:36px;height:34px;display:grid;place-items:center;padding:0;border:1px solid var(--line);border-radius:11px;background:var(--input-bg);color:var(--muted);cursor:pointer;-webkit-tap-highlight-color:transparent}
 .range-cal-btn svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
@@ -3054,6 +3055,7 @@ function onChartPeriodChange(){
  if(rsel&&rsel.value!=='custom')analyticsState.rangeCustom=null;
  const ropt=document.getElementById('range-custom-opt');
  if(ropt&&!analyticsState.rangeCustom)ropt.hidden=true;
+ saveRangePeriod();
  if(analyticsState.chart==='trend'){
   analyticsState.trendDays=Number(document.getElementById('trend-period').value)||3;
   analyticsState.selectedDates=null;
@@ -3557,10 +3559,35 @@ function applyRangeCustom(from,to){
  const days=Math.round((new Date(to).setHours(0,0,0,0)-new Date(from).setHours(0,0,0,0))/864e5)+1;
  opt.textContent=days+' '+ruPlural(days,'день','дня','дней')+' · '+rangeFmt(from)+'–'+rangeFmt(to);
  opt.hidden=false;sel.value='custom';
+ saveRangePeriod();
  const needed=requiredGraphHistoryDays();
  if(analyticsState.loaded&&needed>analyticsState.historyDays){loadAnalytics(true,needed);return;}
  renderAnalytics();
 }
+const RANGE_KEY='sema-range-period';
+function saveRangePeriod(){
+ try{
+  const sel=document.getElementById('range-period'),c=analyticsState.rangeCustom;
+  if(!sel)return;
+  if(sel.value==='custom'&&c)localStorage.setItem(RANGE_KEY,JSON.stringify({v:'custom',from:new Date(c.from).getTime(),to:new Date(c.to).getTime()}));
+  else localStorage.setItem(RANGE_KEY,JSON.stringify({v:sel.value}));
+ }catch(e){}
+}
+(function restoreRangePeriod(){
+ try{
+  const saved=JSON.parse(localStorage.getItem(RANGE_KEY)||'null'),sel=document.getElementById('range-period');
+  if(!saved||!sel)return;
+  if(saved.v==='custom'){
+   const from=new Date(saved.from),to=new Date(saved.to),min=new Date();min.setHours(0,0,0,0);min.setDate(min.getDate()-364);
+   if(isNaN(from)||isNaN(to)||to<from||from<min)return;
+   analyticsState.rangeCustom={from,to};
+   const opt=document.getElementById('range-custom-opt');
+   const days=Math.round((new Date(to).setHours(0,0,0,0)-new Date(from).setHours(0,0,0,0))/864e5)+1;
+   opt.textContent=days+' '+ruPlural(days,'день','дня','дней')+' · '+rangeFmt(from)+'–'+rangeFmt(to);
+   opt.hidden=false;sel.value='custom';
+  }else if([...sel.options].some(o=>o.value===saved.v&&o.value!=='custom'))sel.value=saved.v;
+ }catch(e){}
+})();
 function closeRangeCalendar(){
  const el=document.getElementById('rangeCal');
  if(!el)return;
@@ -3646,7 +3673,8 @@ function renderRangeDonut(){
    +`<div class="donut-center"><div class="donut-pct"><span id="donutNum">${p.in}</span><small>%</small></div><div class="donut-sub">в цели</div><div class="donut-avg">ср. ${fmtMmol(rows.reduce((a,x)=>a+x.value,0)/rows.length)}</div></div>`;
   const num=document.getElementById('donutNum');if(num)countUp(num,'donut');
   const medianOf=key=>{const v=rows.filter(r=>rangeClass(r.value)===key).map(r=>r.value).sort((a,b)=>a-b);if(!v.length)return '—';const m=Math.floor(v.length/2);return fmtMmol(v.length%2?v[m]:(v[m-1]+v[m])/2);};
-  const row=(k,name,hint,pct,count)=>`<div class="range-legend-row"><span class="range-dot ${k}"></span><div class="range-legend-name">${name}<small>${hint}</small></div><b>${pct}%</b><em>${count} ${ruPlural(count,...measureForms())}<small class="rl-med">медиана ${medianOf(k)}</small></em></div>`;
+  const minMaxOf=key=>{const v=rows.filter(r=>rangeClass(r.value)===key).map(r=>r.value);return v.length?`мин ${fmtMmol(Math.min(...v))} · макс ${fmtMmol(Math.max(...v))}`:'мин — · макс —';};
+  const row=(k,name,hint,pct,count)=>`<div class="range-legend-row"><span class="range-dot ${k}"></span><div class="range-legend-name">${name}<small>${hint}</small><small class="rl-mm">${minMaxOf(k)}</small></div><b>${pct}%</b><em>${count} ${ruPlural(count,...measureForms())}<small class="rl-med">медиана ${medianOf(k)}</small></em></div>`;
   legend.innerHTML=row('low','Ниже цели',`меньше ${fmtMmol(IDEAL_LOW)}`,p.low,st.low)
    +row('in','В цели',`${fmtMmol(IDEAL_LOW)}–${fmtMmol(IDEAL_HIGH)} ммоль/л`,p.in,st.in)
    +row('high','Выше цели',`больше ${fmtMmol(IDEAL_HIGH)}`,p.high,st.high);
