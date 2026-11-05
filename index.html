@@ -5050,7 +5050,9 @@ function ydRenderFace(face,data,label,day){
  const meal=face.dataset.meal,low=YD_MEAL_LOW[meal],rel=day-ydToday();
  face.querySelector('.yd-title').textContent=label;
  face.querySelector('.yd-sub').textContent=YD_MEAL_NAME[meal]+' · '+ydFormatDate(day).slice(0,5);
- if(face.closest('.yd-top')){const dateEl=face.querySelector('.yd-sub');dateEl.dataset.daySelect='';dateEl.setAttribute('role','button');dateEl.setAttribute('tabindex','0');dateEl.setAttribute('aria-label','Показать сахар и инсулин за '+ydFormatDate(day));}
+ {const dateEl=face.querySelector('.yd-sub');
+  if(rel<=0){dateEl.dataset.daySelect='';dateEl.dataset.off=String(rel);dateEl.setAttribute('role','button');dateEl.setAttribute('tabindex','0');dateEl.setAttribute('aria-label','Показать сахар и инсулин за '+ydFormatDate(day));}
+  else{delete dateEl.dataset.daySelect;delete dateEl.dataset.off;dateEl.removeAttribute('role');dateEl.removeAttribute('tabindex');dateEl.removeAttribute('aria-label');}} // завтра данных нет — дата не кликабельна
  const body=face.querySelector('.yd-body');
  if(!data.found){
   let ico='🌿',text='Не было основного укола на '+low+'.';
@@ -5211,14 +5213,12 @@ function initYdGestures(car){
   if(e.target.closest('.yd-mealsw')){ydFlip(1);return;}
   if(e.target.closest('.yd-chevron')){toggleTodayMeal();return;}
   if(e.target.closest('.yd-icon')&&ydGroup().classList.contains('away')){ydGoDefault();return;}
-  if(e.target.closest('.yd-top .yd-sub[data-day-select]')){
-   const page=e.target.closest('.yd-page');
-   if(page&&typeof window.showDayInMetrics==='function')window.showDayInMetrics(Number(page.dataset.k)-1);
-  }
+  const dateBtn=e.target.closest('.yd-sub[data-day-select]');
+  if(dateBtn&&typeof window.showDayInMetrics==='function')window.showDayInMetrics(Number(dateBtn.dataset.off));
  });
  car.addEventListener('keydown',e=>{
   if(e.key!=='Enter'&&e.key!==' ')return;
-  if(e.target.matches('.yd-top .yd-sub[data-day-select]')){
+  if(e.target.matches('.yd-sub[data-day-select]')){
    e.preventDefault();e.target.click();
   }else if(e.target.closest('.yd-mealsw')){
    e.preventDefault();ydFlip(1);
