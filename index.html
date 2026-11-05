@@ -1068,6 +1068,9 @@ button.st-ico:active{transform:scale(.88)}
 .ns-head{display:flex;align-items:center;gap:12px;margin-bottom:10px}
 .ns-ico{display:grid;place-items:center;flex:none;width:38px;height:38px;border-radius:13px;background:var(--icon-bg);font-size:19px}
 .ns-hcopy{min-width:0;flex:1}
+.ns-refresh{border:0;padding:0;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .3s cubic-bezier(.34,1.5,.4,1)}
+.ns-refresh:active{transform:scale(.9)}
+.ns-refresh.busy{animation:insBusy 1.4s ease-in-out infinite}
 .ns-title{font-size:17px;font-weight:780;line-height:1.2}
 .ns-sub{margin-top:2px;font-size:12px;font-weight:650;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ns-range{display:flex;gap:4px;padding:3px;border-radius:12px;background:var(--input-bg)}
@@ -1117,6 +1120,7 @@ button.st-ico:active{transform:scale(.88)}
 .dp-v.lo{color:#e2484d}.dp-v.hi{color:#d9831a}
 .dp-night .dp-v{color:#6a5ce0}
 :root[data-theme="dark"] .dp-night .dp-v{color:#a99dff}
+.dp-empty.busy{animation:metricShimmer 1.2s linear infinite;background:linear-gradient(90deg,transparent 25%,var(--nav-highlight) 50%,transparent 75%);background-size:200% 100%;border-radius:12px}
 .dp-empty{padding:18px 4px;font-size:13px;color:var(--muted);text-align:center}
 .dp-foot{margin-top:10px;text-align:center;font-size:12.5px;font-weight:700;color:var(--muted)}
 
@@ -1261,7 +1265,7 @@ button.st-ico:active{transform:scale(.88)}
 <div class="carousel-dots tight" id="nightDots" aria-hidden="true"><i class="on"></i></div>
 <!-- Похожие вечера: тот же сахар в то же время, удачное утро (4–9) -->
 <section class="metric ns-card" id="nightSim" aria-live="polite">
-<div class="ns-head"><span class="ns-ico" aria-hidden="true">🔎</span><div class="ns-hcopy"><div class="ns-title">Похожие вечера</div><div class="ns-sub" id="nightSimSub"></div></div></div>
+<div class="ns-head"><button class="ns-ico ns-refresh" type="button" id="nightSimRefresh" aria-label="Пересчитать похожие вечера" title="Пересчитать">🔎</button><div class="ns-hcopy"><div class="ns-title">Похожие вечера</div><div class="ns-sub" id="nightSimSub"></div></div></div>
 <div id="nightSimBody"><div class="ns-note busy">Ищу похожие вечера…</div></div>
 </section>
 <!-- Статистика ночных доз -->
@@ -2471,7 +2475,7 @@ function addFoodTyped(){
 }
 function openFoodSheet(food,entry,dose){
  if(!food||!food.enabled||!entry)return;
- foodState={entry,busy:false,chips:(food.items||[]).map(item=>({text:item.text,on:!!item.selected}))};
+ foodState={entry,busy:false,period:food.period||null,known:new Set((food.items||[]).map(item=>String(item.text).toLowerCase())),chips:(food.items||[]).map(item=>({text:item.text,on:!!item.selected}))};
  document.getElementById('foodTitle').textContent=food.title||'Что ешь?';
  document.getElementById('foodIco').textContent=FOOD_ICONS[food.period]||'🍽️';
  document.getElementById('foodSub').textContent='Инсулин '+dose+' ед. записан · добавь, что ешь';
@@ -2502,7 +2506,8 @@ async function submitFood(){
  save.disabled=true;save.textContent='Записываю…';
  setToast(toast,'');
  try{
-  await api('food_add',{entry:foodState.entry,food:text});
+  const newItems=foodState.chips.filter(c=>c.on&&!foodState.known.has(c.text.toLowerCase())).map(c=>c.text);
+  await api('food_add',{entry:foodState.entry,food:text,period:foodState.period,new_items:newItems});
   uiHaptic('success');
   save.textContent='Записано ✓';
   foodState.busy=false;
@@ -5332,9 +5337,16 @@ stRefresh();
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const APP_VERSION='v20261104_5';          /* ← менять при каждом обновлении: vГГГГММДД_N */
+const APP_VERSION='v20261104_6';          /* ← менять при каждом обновлении: vГГГГММДД_N */
 const DEV_CHAT='https://t.me/larik_11';
 const APP_CHANGES=[
+ {v:'v20261104_6',items:[
+  'Топы похожих дней ищутся за последние 180 дней',
+  'Инсулин: окно с топом открывается сразу, данные подгружаются в нём',
+  'В окне топа в подписи только дата; сумма инсулина везде считается за весь день',
+  'Ночной: под датой в статистике сумма инсулина за день; лупа в «Похожих вечерах» пересчитывает топ',
+  'Новое блюдо, которое ты вписал при записи еды, добавляется в список для следующих раз (убрать можно в настройках)'
+ ]},
  {v:'v20261104_5',items:[
   'Окно дня: инсулин ставится к ближайшему сахару в пределах часа в обе стороны',
   'Инсулин: карточка с топом убрана — нажатие на шприц сразу открывает окно с топом 1–5',
@@ -5772,10 +5784,10 @@ function nightRow(off,ix,t){
  const mo=(ix.sugar.get(D.key)||[]).find(x=>x.m>=MORNING_FROM&&x.m<MORNING_TO)||null;
  const dose=ix.night.get(E.key)||null;
  if(!ev&&!mo&&!dose)return null;
- return nightRowHtml({main:E.dm,sub:off===0?'сегодня':off===-1?'вчера':E.wd,ev,mo,dose,attr:' data-off="'+off+'"'},t);
+ return nightRowHtml({main:E.dm,sub:(()=>{const sh=ix.ins.get(E.key)||[];return sh.length?'Σ'+fmtDose(sh.reduce((a,x)=>a+x.v,0)):'';})(),ev,mo,dose,attr:' data-off="'+off+'"'},t);
 }
 function nightCaseRow(c,t,attr){
- return nightRowHtml({main:c.date.slice(0,5),sub:'Σ'+nG(c.insulin_to_now),
+ return nightRowHtml({main:c.date.slice(0,5),sub:'Σ'+nG(c.insulin_day),
   ev:{v:c.sugar.value,t:c.sugar.time},mo:{v:c.morning.value,t:c.morning.time},dose:{value:c.basal,fact:true},attr},t);
 }
 let nightDays=10;
@@ -5985,7 +5997,7 @@ function dpHtml(spec,multi){
  pairs.sort((a,b)=>a.m-b.m);
  const sugarFmt=x=>'<b class="dp-v '+cls(x.v,t)+'">'+fs(x.v)+'</b>';
  const insFmt=x=>'<b class="dp-v">'+fmtDose(x.v)+'<small> ед.</small></b>';
- const timeline=pairs.length?pairs.map(p=>'<div class="dp-pair'+(spec.mark&&p.s&&p.s.t===spec.mark?' mark':'')+'">'+cell(p.s,sugarFmt)+cell(p.i,insFmt)+'</div>').join(''):'<div class="dp-empty">'+(spec.emptyText||'нет записей за этот день')+'</div>';
+ const timeline=spec.loading?'<div class="dp-empty busy">Ищу похожие случаи…</div>':pairs.length?pairs.map(p=>'<div class="dp-pair'+(spec.mark&&p.s&&p.s.t===spec.mark?' mark':'')+'">'+cell(p.s,sugarFmt)+cell(p.i,insFmt)+'</div>').join(''):'<div class="dp-empty">'+(spec.emptyText||'нет записей за этот день')+'</div>';
  const night=spec.night;
  const foot=[avg!==null?'ср. сахар '+fs(avg):'',shots.length?'Σ инсулин '+fmtDose(sum)+' ед.':'',night?'🌙 ночной '+(night.approx?'≈':'')+fmtDose(night.value)+' ед.':''].filter(Boolean).join(' · ');
  return '<section class="dp'+(spec.sumHtml?' has-sum':'')+'" role="dialog" aria-modal="true" aria-label="Сахар и инсулин за день">'
@@ -6017,6 +6029,7 @@ function closeDayPopup(){
 }
 function dpOpen(specs,idx){
  if(!specs||!specs.length)return;
+ dpState.pending=false;
  const old=$('dayPopup');if(old)old.remove();
  dpState.specs=specs;dpState.idx=Math.max(0,Math.min(specs.length-1,idx||0));
  const el=document.createElement('div');
@@ -6061,14 +6074,14 @@ function insCaseSpecs(){
  const cases=(insSim.data&&insSim.data.cases)||[],n=cases.length;
  return cases.map((c,i)=>()=>{
   const day=caseDay(c);
-  return {name:'Топ '+(i+1)+' из '+n,sub:c.date+' · '+dpWeekday(c.date)+' · сахар '+insG(c.sugar.value)+' в '+c.sugar.time,sugars:day.sugars,shots:day.shots,night:c.basal!=null?{value:c.basal}:null,sumHtml:'',mark:c.sugar.time};
+  return {name:'Топ '+(i+1)+' из '+n,sub:c.date,sugars:day.sugars,shots:day.shots,night:c.basal!=null?{value:c.basal}:null,sumHtml:'',mark:c.sugar.time};
  });
 }
 function nightCaseSpecs(){
  const data=nSim.data,cases=(data&&data.cases)||[],n=cases.length;
  return cases.map((c,i)=>()=>{
   const day=caseDay(c),t=target();
-  return {name:'Топ '+(i+1)+' из '+n,sub:c.date+' · '+dpWeekday(c.date),sugars:day.sugars,shots:day.shots,night:{value:c.basal},mark:c.sugar.time,
+  return {name:'Топ '+(i+1)+' из '+n,sub:c.date,sugars:day.sugars,shots:day.shots,night:{value:c.basal},mark:c.sugar.time,
    sumHtml:'<div class="dp-sum">'+nightHead()+nightCaseRow(c,t,'')+'</div>'};
  });
 }
@@ -6169,13 +6182,27 @@ function insSetSide(side){
  if(flip)flip.dataset.side=side; /* front | back */
 }
 async function insToggle(){
- if(insSim.loading)return;
  const btn=$('insOpenBtn');
+ const emptySpec=text=>[()=>({name:'Похожие случаи',sub:'',sugars:[],shots:[],night:null,sumHtml:'',emptyText:escapeHtml(text)})];
+ const fresh=insSim.data&&!insSim.stale&&!insSim.loading&&Date.now()-insSim.loadedAt<5*60*1000;
+ if(fresh){
+  const d=insSim.data;
+  dpOpen(d.cases&&d.cases.length?insCaseSpecs():emptySpec(d.reason||'похожих случаев не нашлось'),0);
+  return;
+ }
+ dpOpen([()=>({name:'Похожие случаи',sub:'',sugars:[],shots:[],night:null,sumHtml:'',loading:true})],0);
+ dpState.pending=true;
  if(btn)btn.classList.add('busy');
- try{await insLoadSimilar(false);}finally{if(btn)btn.classList.remove('busy');}
+ try{
+  while(insSim.loading)await new Promise(r=>setTimeout(r,120));
+  await insLoadSimilar(false);
+ }finally{if(btn)btn.classList.remove('busy');}
+ if(!$('dayPopup')||!dpState.pending)return; /* окно закрыли, пока шёл поиск */
+ dpState.pending=false;
  const d=insSim.data;
- if(d&&d.cases&&d.cases.length)dpOpen(insCaseSpecs(),0);
- else dpOpen([()=>({name:'Похожие случаи',sub:escapeHtml(insSim.error||(d&&d.reason)||'Пока нет данных'),sugars:[],shots:[],night:null,sumHtml:'',emptyText:'похожих случаев не нашлось'})],0);
+ dpState.specs=d&&d.cases&&d.cases.length?insCaseSpecs():emptySpec(insSim.error||(d&&d.reason)||'похожих случаев не нашлось');
+ dpState.idx=0;
+ dpRender();
 }
 (function(){
  const back=$('insBack'),btn=$('insBackBtn');
@@ -6282,6 +6309,7 @@ function nSugarCls(v,t){return cls(v,t);}
 function renderNightSim(){
  const body=$('nightSimBody'),sub=$('nightSimSub');
  if(!body)return;
+ const rf=$('nightSimRefresh');if(rf)rf.classList.toggle('busy',nSim.loading);
  const note=(text,c)=>{body.innerHTML='<div class="ns-note'+(c?' '+c:'')+'" data-retry="1">'+escapeHtml(text)+'</div>';};
  if(nSim.loading&&!nSim.data){sub.textContent='';note('Ищу похожие вечера…','busy');return;}
  if(nSim.error&&!nSim.data){sub.textContent='';note(nSim.error+' Нажми, чтобы повторить.');return;}
@@ -6298,7 +6326,7 @@ function renderNightSim(){
  html+=nightHead();
  const cur=data.current;
  if(cur){
-  html+=nightRowHtml({main:'Сейчас',sub:'Σ'+nG(cur.insulin_to_now),ev:{v:cur.sugar,t:cur.time},mo:null,dose:null,cls:'ns-now'},t);
+  html+=nightRowHtml({main:'Сейчас',sub:'Σ'+nG(cur.insulin_day),ev:{v:cur.sugar,t:cur.time},mo:null,dose:null,cls:'ns-now'},t);
  }
  data.cases.forEach((c,i)=>{html+=nightCaseRow(c,t,' data-case="'+i+'"');});
  body.innerHTML=html;
@@ -6321,6 +6349,8 @@ async function loadNightSim(force){
   if(seq===nSim.seq){nSim.loading=false;renderNightSim();}
  }
 }
+const nightRefreshEl=$('nightSimRefresh');
+if(nightRefreshEl)nightRefreshEl.addEventListener('click',()=>{if(!nSim.loading)loadNightSim(true);});
 const nightSimEl=$('nightSim');
 if(nightSimEl)nightSimEl.addEventListener('click',e=>{
  if(e.target.closest('[data-retry]')&&nSim.error){loadNightSim(true);return;}
