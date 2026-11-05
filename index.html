@@ -573,6 +573,9 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .rc-nav{width:36px;height:36px;border:0;border-radius:50%;background:var(--close-bg);color:var(--close-text);font-size:22px;line-height:1;cursor:pointer}
 .rc-nav:disabled{opacity:.3;cursor:default}
 .rc-wd,.rc-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center}
+.rc-grid{grid-template-rows:repeat(6,40px);align-content:start}
+.range-total{margin:12px 0 0;text-align:center}
+.range-total:not(:empty)::before{content:"Всего: "}
 .rc-wd span{font-size:11px;font-weight:700;color:var(--muted);padding:4px 0}
 .rc-d{height:40px;border:0;border-radius:12px;background:transparent;color:var(--text);font-size:14px;font-weight:650;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .rc-d.empty{pointer-events:none}
@@ -1408,10 +1411,10 @@ button.st-ico:active{transform:scale(.88)}
 <option value="1">Сегодня</option><option value="3">3 дня</option><option value="7">7 дней</option><option value="14" selected>14 дней</option><option value="21">21 день</option><option value="30">30 дней</option><option value="45">45 дней</option><option value="custom" id="range-custom-opt" hidden>Свой период</option>
 </select>
 <button class="range-cal-btn" id="range-cal-btn" type="button" onclick="openRangeCalendar()" aria-label="Выбрать период в календаре" title="Календарь"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></button>
-<span class="toolbar-count" id="range-count" role="status"></span>
 </div>
 <div id="range-donut" class="range-donut"></div>
 <div id="range-legend" class="range-legend"></div>
+<div class="toolbar-count range-total" id="range-count" role="status"></div>
 <div id="range-compare" class="range-compare"></div>
 </section>
 <div class="analytics-panel trends-panel" data-panel="dynamics" hidden>
@@ -5473,9 +5476,13 @@ stRefresh();
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const APP_VERSION='v20261104_7';          /* ← менять при каждом обновлении: vГГГГММДД_N */
+const APP_VERSION='v20261104_8';          /* ← менять при каждом обновлении: vГГГГММДД_N */
 const DEV_CHAT='https://t.me/larik_11';
 const APP_CHANGES=[
+ {v:'v20261104_8',items:[
+  'Календарь периода больше не меняет высоту при смене месяца',
+  'ЦД сахар: общее количество измерений перенесено вниз, перед «в предыдущем периоде»'
+ ]},
  {v:'v20261104_7',items:[
   'Тренды: добавлены инсулин MoM и ночной WoW — слева недели, справа месяцы',
   'ЦД сахар: кнопка календаря для своего периода (в списке видно, сколько дней выбрано); в кольце среднее значение сахара, у каждой строки медиана',
