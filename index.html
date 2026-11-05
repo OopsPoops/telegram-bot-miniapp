@@ -982,9 +982,6 @@ button.st-ico:active{transform:scale(.88)}
 .ab-name{font-size:24px;font-weight:700;letter-spacing:-.02em;margin-top:6px}
 .ab-sub{font-size:15px;color:var(--st-sub)}
 .ab-ver{margin-top:2px;padding:3px 11px;border-radius:99px;background:var(--st-fill);font-size:13px;font-weight:600;color:var(--st-sub);font-variant-numeric:tabular-nums}
-.ab-log .st-row{align-items:flex-start;padding-top:12px;padding-bottom:12px}
-.ab-log .st-t{font-size:16px;line-height:21px}
-.ab-dot{flex:none;width:7px;height:7px;margin-top:7px;border-radius:50%;background:var(--st-blue)}
 
 /* ===== Свайп назад от левого края ===== */
 #screen-settings,.app{position:relative}
@@ -1487,7 +1484,6 @@ button.st-ico:active{transform:scale(.88)}
 <symbol id="i-check" viewBox="0 0 16 16"><path d="M2 8.5l4 4L14 3.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 <symbol id="i-chart" viewBox="0 0 24 24"><rect x="4" y="12" width="4.2" height="8" rx="1.3" fill="currentColor"/><rect x="9.9" y="4" width="4.2" height="16" rx="1.3" fill="currentColor"/><rect x="15.8" y="8.5" width="4.2" height="11.5" rx="1.3" fill="currentColor"/></symbol>
 <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.2" fill="currentColor"/><path d="M12 11v5.4" style="stroke:var(--ic)" stroke-width="2.3" stroke-linecap="round"/><circle cx="12" cy="7.7" r="1.4" style="fill:var(--ic)"/></symbol>
-<symbol id="i-spark" viewBox="0 0 24 24"><path d="M11 2.8l2.3 5.7 5.7 2.3-5.7 2.3L11 18.8l-2.3-5.7L3 10.8l5.7-2.3z" fill="currentColor"/><path d="M18.6 15.2l.9 2.2 2.2.9-2.2.9-.9 2.2-.9-2.2-2.2-.9 2.2-.9z" fill="currentColor"/></symbol>
 <symbol id="i-tg" viewBox="0 0 24 24"><path d="M20.8 4.3L3.4 11c-.9.35-.85 1.6.07 1.85l4.3 1.25 1.6 5.1c.25.8 1.3.95 1.8.3l2.3-2.9 4.2 3.1c.7.5 1.65.1 1.85-.75l2.7-12.9c.2-.85-.7-1.55-1.5-1.25z" fill="currentColor"/></symbol>
 <symbol id="i-meal" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="currentColor"/><circle cx="12" cy="12" r="5" style="fill:var(--ic)"/></symbol>
 <symbol id="i-grip" viewBox="0 0 18 14"><path d="M1.5 2h15M1.5 7h15M1.5 12h15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
@@ -1628,7 +1624,6 @@ button.st-ico:active{transform:scale(.88)}
 <div class="st-row"><span class="st-t">Дата сборки</span><span class="st-val" id="abDate"></span></div>
 </div>
 <div class="st-card">
-<button class="st-row has-ico st-nav" type="button" onclick="stOpen('changes')"><span class="st-ico c-orange"><svg class="g"><use href="#i-spark"/></svg></span><span class="st-t">Что нового</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
 </div>
 <div class="st-sec">Вопросы и предложения</div>
 <div class="st-card">
@@ -1637,10 +1632,6 @@ button.st-ico:active{transform:scale(.88)}
 <div class="st-foot">Нашёл ошибку или есть идея — напиши, так приложение становится лучше.<br><br>Данные записываются в вашу Google Таблицу через бота.</div>
 </div>
 
-<div class="st-page" data-p="changes">
-<div class="st-bar"><button class="st-back" type="button" onclick="stBack()" aria-label="Назад"><svg><use href="#i-back"/></svg></button><div class="st-title">Что нового</div></div>
-<div id="changeLog"></div>
-</div>
 </section>
 </main>
 <!-- === НИЖНЯЯ НАВИГАЦИЯ === -->
@@ -5385,7 +5376,7 @@ window.stOpen=function(name){
   if(typeof selectionHaptic==='function')selectionHaptic();
   stRefresh();
 };
-const ST_PARENT={charts:'theme',changes:'about'};
+const ST_PARENT={charts:'theme'};
 window.stBack=function(){const cur=document.querySelector('#screen-settings .st-page.active');stOpen((cur&&ST_PARENT[cur.dataset.p])||'root');};
 const sec=$('screen-settings');
 function edgeBack(get){
@@ -5478,103 +5469,6 @@ stRefresh();
 const $=id=>document.getElementById(id);
 const APP_VERSION='v20261104_8';          /* ← менять при каждом обновлении: vГГГГММДД_N */
 const DEV_CHAT='https://t.me/larik_11';
-const APP_CHANGES=[
- {v:'v20261104_8',items:[
-  'Календарь периода больше не меняет высоту при смене месяца',
-  'ЦД сахар: общее количество измерений перенесено вниз, перед «в предыдущем периоде»'
- ]},
- {v:'v20261104_7',items:[
-  'Тренды: добавлены инсулин MoM и ночной WoW — слева недели, справа месяцы',
-  'ЦД сахар: кнопка календаря для своего периода (в списке видно, сколько дней выбрано); в кольце среднее значение сахара, у каждой строки медиана',
-  'Окно дня: день недели не повторяется, у длинных списков виден скролл и стрелка вниз'
- ]},
- {v:'v20261104_6',items:[
-  'Топы похожих дней ищутся за последние 180 дней',
-  'Инсулин: окно с топом открывается сразу, данные подгружаются в нём',
-  'В окне топа в подписи только дата; сумма инсулина везде считается за весь день',
-  'Ночной: под датой в статистике сумма инсулина за день; лупа в «Похожих вечерах» пересчитывает топ',
-  'Новое блюдо, которое ты вписал при записи еды, добавляется в список для следующих раз (убрать можно в настройках)'
- ]},
- {v:'v20261104_5',items:[
-  'Окно дня: инсулин ставится к ближайшему сахару в пределах часа в обе стороны',
-  'Инсулин: карточка с топом убрана — нажатие на шприц сразу открывает окно с топом 1–5',
-  'Карточки сахара и инсулина на главной больше не тянутся в стороны',
-  'Ночной: строка «Сейчас» выделена зелёным; похожие вечера доступны с 19:00 и ищутся по сахару ближе всего к 21:00'
- ]},
- {v:'v20261104_4',items:[
-  'Инсулин: лупа убрана — похожие случаи открываются нажатием на шприц',
-  'Похожие случаи: инсулин до и после показан весь и со временем',
-  'Нажми на дату в топе — окно с сахаром и инсулином того дня; листай топ 1–5 стрелками или свайпом',
-  'Ночной: топ похожих вечеров выглядит как статистика, строки открывают то же окно'
- ]},
- {v:'v20261104_3',items:[
-  'Окно дня: инсулин стоит на одной строке с ближайшим по времени сахаром (в пределах 30 минут), ночной вынесен вниз к среднему сахару и сумме',
-  'Вкладка «Ночной»: убран дублирующий заголовок'
- ]},
- {v:'v20261104_2',items:[
-  'Окно дня стало в два раза ниже и стоит по центру; длинные списки прокручиваются',
-  'Ночной: нажми на строку статистики — откроется окно этого дня, сверху данные выбранной строки',
-  'Инсулин: переворот карточки убран, похожие случаи открываются кнопкой с лупой прямо на карточке; сахар теперь по центру, инсулин до — слева, потом — справа'
- ]},
- {v:'v20261104_1',items:[
-  'Новая вкладка «Ночной»: карточка ночной дозы, похожие вечера и статистика за 10, 20 или 30 дней с датами факта',
-  'Похожие вечера: тот же сахар в то же время, с учётом подколок и суммы инсулина, только с удачным утром 4–9',
-  'Нажми на дату на карточке завтрак/ужин — откроется окно с сахаром и инсулином за этот день',
-  'Убраны карточка AI и карточки прошлых дней под сахаром и инсулином'
- ]},
- {v:'v20261103_3',items:[
-  'Блюда для еды лежат на листе food (A — завтрак/ужин, B — блюдо, C — выбрано заранее); их можно править и в таблице, и в настройках'
- ]},
- {v:'v20261103_2',items:[
-  'Настройки еды и твои блюда теперь хранятся в Google Таблице (лист food) и не пропадают после перезапуска бота'
- ]},
- {v:'v20261103_1',items:[
-  'Еда: добавлен порог дозы — окно появляется, только если укол не меньше заданного (по умолчанию 5 ед.)',
-  'Карточки сахара и инсулина по дням: на каждой странице всегда два дня'
- ]},
- {v:'v20261102_2',items:[
-  'После записи инсулина появляется шторка «Что ешь?»: выбери слова из предвыбора или впиши своё, еда сохранится в таблицу рядом с уколом',
-  'Новый пункт в настройках «Еда»: включение, время завтрака и ужина, наборы слов и какие из них выбраны заранее — общее для всех пользователей'
- ]},
- {v:'v20261102_1',items:[
-  'Карточка «Инсулин» переворачивается вверх или вниз: на обороте похожий случай из истории — сахар тогда, сколько инсулина было до и сколько кололи потом',
-  'Поиск похожих случаев работает по таблице за год (листы sugar и total), без ИИ и без Groq; нажми на цифры, чтобы увидеть следующий случай',
-  'Расчёты AI и передача данных в Groq убраны; карточка AI на главной оставлена как заготовка'
- ]},
- {v:'v20261027_1',items:[
-  'AI-карточка оформлена как остальные карточки главной, текст больше не обрезается, открывается нажатием на любое место',
-  'AI теперь видит ночной инсулин (длинного действия) и делает выводы по истории, а не пересказывает цифры',
-  'История для AI сжата по дням и подгоняется под лимит Groq; при исчерпании дневного лимита на карточке появляется уведомление',
-  'AI-вывод приходит вместе с данными главной — на один запрос меньше при каждом открытии',
-  'AI сравнивает завтрак, дневную проверку, ужин, вечернюю проверку и ночь раздельно; показывает фактические дозы и последующие сахара из похожих случаев, без рейтинга доз',
-  'AI-карточка всегда показывает последний анализ из таблицы, кнопка «Обновить» пересчитывает; при загрузке мерцающая надпись под заголовком',
-  'AI-анализ идёт в фоне на сервере и не прерывается, если свернуть приложение; при сбое Groq автоповтор',
-  'AI-подробности стали короткими и по фактам; AI знает распорядок дня (завтрак, подколка, ужин) и проверяется часовой пояс',
-  'Лист ai_usage: новые строки вставляются сверху, под шапкой',
-  'AI-карточка теперь отвечает на главный вопрос: колоть сейчас или подождать и сколько ед. на еду; текст обычным шрифтом'
- ]},
- {v:'v20261025_2',items:[
-  'Новая AI-карточка под ночным инсулином с полноэкранным разбором',
-  'Последний вывод хранится в Google Sheets и открывается без нового запроса к Groq'
- ]},
- {v:'v20261025_1',items:[
-  'Точки под карточками видны сразу, данные дней грузятся в фоне — экран больше не прыгает',
-  'Напоминания: «Поменяй иголку🥺» и «Пора делять 🤗»; лист statist больше не используется'
- ]},
- {v:'v20261024_2',items:[
-  'Ночной: свайп вбок — по три ночи на странице: вечерний сахар, доза, утренний сахар',
-  'Сахар и инсулин: свайп вбок — замеры и уколы за несколько дней, у инсулина вместе с ночной дозой',
-  'Настройка графиков теперь в разделе «Оформление»',
-  'В «Оформлении» можно скрыть карточку «завтрак / ужин» на главной — для всех пользователей'
- ]},
- {v:'v20261024_1',items:[
-  'Карточки «Вчера» и «Сегодня» одного размера, даже если данных за сегодня ещё нет',
-  'Завтрак и ужин — две стороны карточки: проведи вверх или вниз, чтобы перевернуть',
-  'Карточки листаются по дням; смайл с «↺» возвращает к «вчера / сегодня»',
-  'Настройка графиков: порядок и видимость общие для всех пользователей',
-  'Новый раздел «О приложении»'
- ]}
-];
 const CH_IDS=['trend','compare','range','distribution','daily','activity','dynamics','effect','summary'];
 const CH_NAMES={trend:'Динамика по дням',compare:'Сравнение трёх недель',range:'Доля в целевом диапазоне',distribution:'Распределение измерений',daily:'Суточная сводка',activity:'Активность по времени',dynamics:'Тренды',effect:'Укол и сахар',summary:'Итоги'};
 const CH_COLOR={trend:'c-blue',compare:'c-purple',range:'c-green',distribution:'c-sky',daily:'c-orange',activity:'c-red',dynamics:'c-teal',effect:'c-pink',summary:'c-gray'};
@@ -5769,16 +5663,6 @@ function aboutRefresh(){
  set('abBot',botVersion||'…');
  if(!botVersion)api('about').then(r=>{botVersion=r&&r.version||'—';set('abBot',botVersion);}).catch(()=>set('abBot','—'));
 }
-function changesRefresh(){
- const box=$('changeLog');
- if(!box||box._done)return;
- box._done=true;
- box.innerHTML=APP_CHANGES.map(c=>{
-  const d=buildDate(c.v);
-  return '<div class="st-sec">'+c.v+(d?' · '+d.split(' · ')[0]:'')+'</div><div class="st-card ab-log">'
-   +c.items.map(t=>'<div class="st-row"><span class="ab-dot"></span><div class="st-t">'+t+'</div></div>').join('')+'</div>';
- }).join('');
-}
 window.openDevChat=function(){
  if(typeof selectionHaptic==='function')selectionHaptic();
  try{if(tg&&tg.openTelegramLink){tg.openTelegramLink(DEV_CHAT);return;}}catch(e){}
@@ -5791,7 +5675,6 @@ window.stOpen=function(name){
  so.apply(this,arguments);
  if(name==='charts'){renderList(false);load();}
  if(name==='about')aboutRefresh();
- if(name==='changes')changesRefresh();
 };
 const sw=window.switchTab;
 window.switchTab=function(name){
