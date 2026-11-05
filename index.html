@@ -560,6 +560,31 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .donut-pct{font-size:46px;font-weight:800;letter-spacing:-1.6px;line-height:1;font-variant-numeric:tabular-nums}
 .donut-pct small{font-size:22px;letter-spacing:0;margin-left:1px}
 .donut-sub{margin-top:6px;font-size:12px;font-weight:700;color:var(--muted)}
+.donut-avg{margin-top:4px;font-size:13px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums}
+.range-legend-row em{min-width:84px}
+.range-legend-row em .rl-med{display:block;margin-top:3px;font-size:10.5px;font-weight:700;color:var(--text);opacity:.75}
+.range-cal-btn{flex:none;width:36px;height:34px;display:grid;place-items:center;padding:0;border:1px solid var(--line);border-radius:11px;background:var(--input-bg);color:var(--muted);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.range-cal-btn svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.range-cal-btn:active{transform:scale(.92)}
+.rc{width:100%;max-width:360px;background:var(--modal-bg);color:var(--text);border:1px solid var(--card-border);border-radius:24px;padding:16px 14px 14px;box-shadow:0 25px 80px rgba(0,0,0,.28);transform:translateY(14px) scale(.98);transition:transform .28s cubic-bezier(.22,1,.36,1)}
+.dp-backdrop.visible .rc{transform:none}
+.rc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.rc-head b{font-size:17px;font-weight:800}
+.rc-nav{width:36px;height:36px;border:0;border-radius:50%;background:var(--close-bg);color:var(--close-text);font-size:22px;line-height:1;cursor:pointer}
+.rc-nav:disabled{opacity:.3;cursor:default}
+.rc-wd,.rc-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center}
+.rc-wd span{font-size:11px;font-weight:700;color:var(--muted);padding:4px 0}
+.rc-d{height:40px;border:0;border-radius:12px;background:transparent;color:var(--text);font-size:14px;font-weight:650;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.rc-d.empty{pointer-events:none}
+.rc-d:disabled{opacity:.28;cursor:default}
+.rc-d.today{box-shadow:inset 0 0 0 1.5px rgba(82,103,232,.55)}
+.rc-d.in{background:rgba(82,103,232,.16);border-radius:6px}
+.rc-d.edge{background:#5267e8;color:#fff}
+.rc-info{margin:12px 0 10px;text-align:center;font-size:13px;font-weight:750;color:var(--muted)}
+.rc-actions{display:flex;gap:8px}
+.rc-btn{flex:1;height:42px;border:0;border-radius:13px;background:var(--close-bg);color:var(--text);font-size:14px;font-weight:750;cursor:pointer}
+.rc-btn.primary{background:#5267e8;color:#fff}
+.rc-btn:disabled{opacity:.4;cursor:default}
 .range-legend{display:grid;gap:8px;margin-top:14px}
 .range-legend-row{display:flex;align-items:center;gap:11px;padding:11px 13px;border-radius:14px;background:var(--input-bg)}
 .range-dot{width:11px;height:11px;border-radius:50%;flex:none}
@@ -1111,6 +1136,13 @@ button.st-ico:active{transform:scale(.88)}
 .dp-cols{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .dp-col{display:flex;flex-direction:column;min-height:0;border-radius:18px;background:var(--modal-content);padding:10px 10px 6px}
 .dp-h{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:780;color:var(--muted);padding:0 4px 8px}
+.dp-tl{position:relative}
+.dp-tl::after{content:"⌄";position:absolute;left:0;right:0;bottom:0;height:34px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:1px;font-size:22px;font-weight:800;line-height:.8;color:var(--muted);background:linear-gradient(to top,var(--modal-content) 30%,transparent);border-radius:0 0 18px 18px;pointer-events:none;opacity:0;transition:opacity .2s}
+.dp-tl.has-more::after{opacity:1;animation:dpHint 1.4s ease-in-out infinite}
+@keyframes dpHint{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
+.dp-list{scrollbar-width:thin;scrollbar-color:rgba(120,130,170,.55) transparent}
+.dp-list::-webkit-scrollbar{width:5px;-webkit-appearance:none}
+.dp-list::-webkit-scrollbar-thumb{background:rgba(120,130,170,.5);border-radius:5px}
 .dp-list{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 .dp-row{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:9px 4px;border-top:1px solid var(--line)}
 .dp-row:first-child{border-top:0}
@@ -1373,8 +1405,9 @@ button.st-ico:active{transform:scale(.88)}
 <div class="analytics-toolbar">
 <span class="analytics-toolbar-label">Период</span>
 <select id="range-period" aria-label="Период для расчёта доли в цели" onchange="onChartPeriodChange()">
-<option value="1">Сегодня</option><option value="3">3 дня</option><option value="7">7 дней</option><option value="14" selected>14 дней</option><option value="21">21 день</option><option value="30">30 дней</option><option value="45">45 дней</option>
+<option value="1">Сегодня</option><option value="3">3 дня</option><option value="7">7 дней</option><option value="14" selected>14 дней</option><option value="21">21 день</option><option value="30">30 дней</option><option value="45">45 дней</option><option value="custom" id="range-custom-opt" hidden>Свой период</option>
 </select>
+<button class="range-cal-btn" id="range-cal-btn" type="button" onclick="openRangeCalendar()" aria-label="Выбрать период в календаре" title="Календарь"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></button>
 <span class="toolbar-count" id="range-count" role="status"></span>
 </div>
 <div id="range-donut" class="range-donut"></div>
@@ -3015,10 +3048,18 @@ function requiredGraphHistoryDays(){
  if(chart==='compare')return 21; // три календарные недели
  if(chart==='effect')return Number(document.getElementById('effect-period')?.value)||30;
  if(chart==='trend')return Number(document.getElementById('trend-period')?.value)||3;
+ if(chart==='range'&&analyticsState.metric==='sugar'&&analyticsState.rangeCustom){
+  const sel=rangeSelection();
+  return Math.min(365,rangeDaysSince(sel.start)+sel.days);
+ }
  const id={distribution:'distribution-period',daily:'daily-period',activity:'activity-period',range:analyticsState.metric==='sugar'?'range-period':'dose-period'}[chart];
  return id?(Number(document.getElementById(id)?.value)||14):DEFAULT_GRAPH_HISTORY_DAYS;
 }
 function onChartPeriodChange(){
+ const rsel=document.getElementById('range-period');
+ if(rsel&&rsel.value!=='custom')analyticsState.rangeCustom=null;
+ const ropt=document.getElementById('range-custom-opt');
+ if(ropt&&!analyticsState.rangeCustom)ropt.hidden=true;
  if(analyticsState.chart==='trend'){
   analyticsState.trendDays=Number(document.getElementById('trend-period').value)||3;
   analyticsState.selectedDates=null;
@@ -3497,12 +3538,104 @@ function previousPeriodMeasurements(days){
   const prevStart=new Date(start);prevStart.setDate(prevStart.getDate()-days);
   return metricMeasurements().filter(row=>row.dateObj>=prevStart&&row.dateObj<start);
 }
+/* ---- период для «Доли в цели»: шаблон или свой из календаря ---- */
+function rangeDaysSince(start){const t=new Date();t.setHours(0,0,0,0);return Math.round((t-start)/864e5)+1;}
+function rangeSelection(){
+ const sel=document.getElementById('range-period'),custom=analyticsState.rangeCustom;
+ let start,end,days;
+ if(sel&&sel.value==='custom'&&custom){
+  start=new Date(custom.from);start.setHours(0,0,0,0);
+  end=new Date(custom.to);end.setHours(23,59,59,999);
+  days=Math.round((new Date(custom.to).setHours(0,0,0,0)-start)/864e5)+1;
+ }else{
+  days=Number(sel&&sel.value)||14;
+  end=new Date();end.setHours(23,59,59,999);
+  start=new Date();start.setHours(0,0,0,0);start.setDate(start.getDate()-days+1);
+ }
+ const prevStart=new Date(start);prevStart.setDate(prevStart.getDate()-days);
+ const all=metricMeasurements();
+ return {days,start,end,rows:all.filter(r=>r.dateObj>=start&&r.dateObj<=end),prev:all.filter(r=>r.dateObj>=prevStart&&r.dateObj<start)};
+}
+function rangeFmt(d){return String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0');}
+function applyRangeCustom(from,to){
+ analyticsState.rangeCustom={from:new Date(from),to:new Date(to)};
+ const sel=document.getElementById('range-period'),opt=document.getElementById('range-custom-opt');
+ const days=Math.round((new Date(to).setHours(0,0,0,0)-new Date(from).setHours(0,0,0,0))/864e5)+1;
+ opt.textContent=days+' '+ruPlural(days,'день','дня','дней')+' · '+rangeFmt(from)+'–'+rangeFmt(to);
+ opt.hidden=false;sel.value='custom';
+ const needed=requiredGraphHistoryDays();
+ if(analyticsState.loaded&&needed>analyticsState.historyDays){loadAnalytics(true,needed);return;}
+ renderAnalytics();
+}
+function closeRangeCalendar(){
+ const el=document.getElementById('rangeCal');
+ if(!el)return;
+ el.classList.remove('visible');
+ document.body.style.overflow=el._bodyOverflow||'';
+ setTimeout(()=>el.remove(),200);
+}
+function openRangeCalendar(){
+ const old=document.getElementById('rangeCal');if(old)old.remove();
+ const today=new Date();today.setHours(0,0,0,0);
+ const minDay=new Date(today);minDay.setDate(minDay.getDate()-364);
+ const cur=analyticsState.rangeCustom;
+ let from=cur?new Date(cur.from):null,to=cur?new Date(cur.to):null;
+ if(from)from.setHours(0,0,0,0);if(to)to.setHours(0,0,0,0);
+ const shown=new Date((to||today).getFullYear(),(to||today).getMonth(),1);
+ const MONTHS=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+ const el=document.createElement('div');el.id='rangeCal';el.className='dp-backdrop';
+ document.body.appendChild(el);
+ el._bodyOverflow=document.body.style.overflow;document.body.style.overflow='hidden';
+ const same=(a,b)=>a&&b&&a.getTime()===b.getTime();
+ function paint(){
+  const first=new Date(shown),lead=(first.getDay()+6)%7,last=new Date(shown.getFullYear(),shown.getMonth()+1,0).getDate();
+  let cells='';
+  for(let i=0;i<lead;i++)cells+='<span class="rc-d empty"></span>';
+  for(let n=1;n<=last;n++){
+   const d=new Date(shown.getFullYear(),shown.getMonth(),n);
+   const off=d>today||d<minDay;
+   const edge=same(d,from)||same(d,to);
+   const inside=from&&to&&d>from&&d<to;
+   cells+='<button type="button" class="rc-d'+(edge?' edge':'')+(inside?' in':'')+(same(d,today)?' today':'')+'" data-t="'+d.getTime()+'"'+(off?' disabled':'')+'>'+n+'</button>';
+  }
+  const count=from?Math.round(((to||from)-from)/864e5)+1:0;
+  const info=from?(count+' '+ruPlural(count,'день','дня','дней')+' · '+rangeFmt(from)+(to&&!same(from,to)?'–'+rangeFmt(to):'')):'Выбери первый и последний день';
+  const nextOff=new Date(shown.getFullYear(),shown.getMonth()+1,1)>today;
+  el.innerHTML='<section class="rc" role="dialog" aria-modal="true" aria-label="Выбор периода">'
+   +'<header class="rc-head"><button type="button" class="rc-nav" data-m="-1" aria-label="Предыдущий месяц">‹</button><b>'+MONTHS[shown.getMonth()]+' '+shown.getFullYear()+'</b><button type="button" class="rc-nav" data-m="1" aria-label="Следующий месяц"'+(nextOff?' disabled':'')+'>›</button></header>'
+   +'<div class="rc-wd"><span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span></div>'
+   +'<div class="rc-grid">'+cells+'</div>'
+   +'<div class="rc-info">'+info+'</div>'
+   +'<div class="rc-actions"><button type="button" class="rc-btn" data-a="cancel">Отмена</button><button type="button" class="rc-btn primary" data-a="ok"'+(from?'':' disabled')+'>Показать</button></div></section>';
+ }
+ paint();
+ el.addEventListener('click',e=>{
+  if(e.target===el){closeRangeCalendar();return;}
+  const nav=e.target.closest('.rc-nav');
+  if(nav&&!nav.disabled){shown.setMonth(shown.getMonth()+Number(nav.dataset.m));paint();return;}
+  const day=e.target.closest('.rc-d[data-t]');
+  if(day&&!day.disabled){
+   const d=new Date(Number(day.dataset.t));
+   if(!from||(from&&to)){from=d;to=null;}
+   else if(d<from){to=from;from=d;}
+   else to=d;
+   paint();return;
+  }
+  const act=e.target.closest('.rc-btn');
+  if(!act||act.disabled)return;
+  if(act.dataset.a==='cancel'){closeRangeCalendar();return;}
+  const f=from,t=to||from;
+  closeRangeCalendar();
+  applyRangeCustom(f,t);
+ });
+ requestAnimationFrame(()=>el.classList.add('visible'));
+}
 function renderRangeDonut(){
   const host=document.getElementById('range-donut'),legend=document.getElementById('range-legend'),cmp=document.getElementById('range-compare');
   if(!host)return;
   const message=text=>{host.style.aspectRatio='auto';host.innerHTML='<div class="analytics-message">'+text+'</div>';legend.innerHTML='';cmp.innerHTML='';};
   if(analyticsState.metric!=='sugar'){setChartCount('range-count',0);message('Доля в цели считается только для сахара.');return;}
-  const days=Number(document.getElementById('range-period').value),rows=periodMeasurements(days);
+  const sel=rangeSelection(),days=sel.days,rows=sel.rows;
   setChartCount('range-count',rows.length);
   if(!rows.length){message(mw('За этот период нет измерений.'));return;}
   host.style.aspectRatio='';
@@ -3516,13 +3649,14 @@ function renderRangeDonut(){
     offset+=len;
   });
   host.innerHTML=`<svg viewBox="0 0 100 100" role="img" aria-label="В целевом диапазоне ${p.in}% ${mw('измерений')}"><circle class="donut-track" cx="50" cy="50" r="38"/>${segs}</svg>`
-   +`<div class="donut-center"><div class="donut-pct"><span id="donutNum">${p.in}</span><small>%</small></div><div class="donut-sub">в цели</div></div>`;
+   +`<div class="donut-center"><div class="donut-pct"><span id="donutNum">${p.in}</span><small>%</small></div><div class="donut-sub">в цели</div><div class="donut-avg">ср. ${fmtMmol(rows.reduce((a,x)=>a+x.value,0)/rows.length)}</div></div>`;
   const num=document.getElementById('donutNum');if(num)countUp(num,'donut');
-  const row=(k,name,hint,pct,count)=>`<div class="range-legend-row"><span class="range-dot ${k}"></span><div class="range-legend-name">${name}<small>${hint}</small></div><b>${pct}%</b><em>${count} ${ruPlural(count,...measureForms())}</em></div>`;
+  const medianOf=key=>{const v=rows.filter(r=>rangeClass(r.value)===key).map(r=>r.value).sort((a,b)=>a-b);if(!v.length)return '—';const m=Math.floor(v.length/2);return fmtMmol(v.length%2?v[m]:(v[m-1]+v[m])/2);};
+  const row=(k,name,hint,pct,count)=>`<div class="range-legend-row"><span class="range-dot ${k}"></span><div class="range-legend-name">${name}<small>${hint}</small></div><b>${pct}%</b><em>${count} ${ruPlural(count,...measureForms())}<small class="rl-med">медиана ${medianOf(k)}</small></em></div>`;
   legend.innerHTML=row('low','Ниже цели',`меньше ${fmtMmol(IDEAL_LOW)}`,p.low,st.low)
    +row('in','В цели',`${fmtMmol(IDEAL_LOW)}–${fmtMmol(IDEAL_HIGH)} ммоль/л`,p.in,st.in)
    +row('high','Выше цели',`больше ${fmtMmol(IDEAL_HIGH)}`,p.high,st.high);
-  const prev=previousPeriodMeasurements(days);
+  const prev=sel.prev;
   if(prev.length>=3){
     const pp=roundedPercents(rangeStats(prev)).in,diff=p.in-pp;
     const label=days===1?'вчера':'в предыдущем периоде';
@@ -4559,6 +4693,8 @@ const TREND_TILES=[
  {id:'sugar-week',kind:'sugar',icon:'🩸',name:'Сахар',period:'7 дней',badge:'WoW',unit:'ммоль/л',pick:d=>d.sugar&&d.sugar.week,flat:{abs:0.2},lowDays:4,daysLabel:'измерений'},
  {id:'sugar-month',kind:'sugar',icon:'🩸',name:'Сахар',period:'30 дней',badge:'MoM',unit:'ммоль/л',pick:d=>d.sugar&&d.sugar.month,flat:{abs:0.2},lowDays:15,daysLabel:'измерений'},
  {id:'insulin-week',kind:'insulin',icon:'💉',name:'Инсулин',period:'7 дней',badge:'WoW',unit:'ед./день',pick:d=>d.insulin&&d.insulin.week,flat:{pct:5},lowDays:4,daysLabel:'инъекций'},
+ {id:'insulin-month',kind:'insulin',icon:'💉',name:'Инсулин',period:'30 дней',badge:'MoM',unit:'ед./день',pick:d=>d.insulin&&d.insulin.month,flat:{pct:5},lowDays:15,daysLabel:'инъекций'},
+ {id:'night-week',kind:'night',icon:'🌙',name:'Ночной',period:'7 дней',badge:'WoW',unit:'ед.',pick:d=>d.night&&d.night.week,flat:{pct:3},lowDays:4,daysLabel:'дней'},
  {id:'night-month',kind:'night',icon:'🌙',name:'Ночной',period:'30 дней',badge:'MoM',unit:'ед.',pick:d=>d.night&&d.night.month,flat:{pct:3},lowDays:15,daysLabel:'дней'}
 ];
 let trendsBusy=false,lastTrendsJson=null,lastTrendsAt=0;
@@ -5337,9 +5473,14 @@ stRefresh();
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const APP_VERSION='v20261104_6';          /* ← менять при каждом обновлении: vГГГГММДД_N */
+const APP_VERSION='v20261104_7';          /* ← менять при каждом обновлении: vГГГГММДД_N */
 const DEV_CHAT='https://t.me/larik_11';
 const APP_CHANGES=[
+ {v:'v20261104_7',items:[
+  'Тренды: добавлены инсулин MoM и ночной WoW — слева недели, справа месяцы',
+  'ЦД сахар: кнопка календаря для своего периода (в списке видно, сколько дней выбрано); в кольце среднее значение сахара, у каждой строки медиана',
+  'Окно дня: день недели не повторяется, у длинных списков виден скролл и стрелка вниз'
+ ]},
  {v:'v20261104_6',items:[
   'Топы похожих дней ищутся за последние 180 дней',
   'Инсулин: окно с топом открывается сразу, данные подгружаются в нём',
@@ -6007,10 +6148,22 @@ function dpHtml(spec,multi){
   +(spec.sumHtml||'')+'<div class="dp-tl"><div class="dp-tlh"><span>🩸 Сахар</span><span>💉 Инсулин</span></div><div class="dp-list">'+timeline+'</div></div>'
   +(foot?'<footer class="dp-foot">'+foot+'</footer>':'')+'</section>';
 }
+function dpMoreCheck(){
+ const el=$('dayPopup');
+ if(!el)return;
+ const list=el.querySelector('.dp-list'),box=el.querySelector('.dp-tl');
+ if(!list||!box)return;
+ box.classList.toggle('has-more',list.scrollHeight-list.scrollTop-list.clientHeight>8);
+}
 function dpRender(){
  const el=$('dayPopup');
  if(!el)return;
  el.innerHTML=dpHtml(dpState.specs[dpState.idx](),dpState.specs.length>1);
+ const list=el.querySelector('.dp-list');
+ if(list)list.addEventListener('scroll',dpMoreCheck,{passive:true});
+ dpMoreCheck();
+ requestAnimationFrame(dpMoreCheck);
+ setTimeout(dpMoreCheck,320);
 }
 function dpNav(delta){
  const n=dpState.specs.length;
@@ -6063,7 +6216,7 @@ function daySpec(off,opts){
   const r=nightRow(off,ix,t);
   if(r)sumHtml='<div class="dp-sum">'+nightHead()+r.replace(' data-off="'+off+'"','')+'</div>';
  }
- return {name:d.name,sub:d.dm+' · '+d.wd,sugars:ix.sugar.get(d.key)||[],shots:ix.ins.get(d.key)||[],night:night?{value:night.value,approx:night.approx}:null,sumHtml};
+ return {name:d.name,sub:d.name.toLowerCase()===d.wd?d.dm:d.dm+' · '+d.wd,sugars:ix.sugar.get(d.key)||[],shots:ix.ins.get(d.key)||[],night:night?{value:night.value,approx:night.approx}:null,sumHtml};
 }
 function openDayPopup(off,opts){
  if(!hist)return;
