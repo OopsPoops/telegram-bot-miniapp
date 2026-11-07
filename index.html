@@ -1157,12 +1157,82 @@ button.st-ico:active{transform:scale(.88)}
 .dp-empty{padding:18px 4px;font-size:13px;color:var(--muted);text-align:center}
 .dp-foot{margin-top:10px;text-align:center;font-size:12.5px;font-weight:700;color:var(--muted)}
 
+
+/* ============================================================
+   МЕСЯЧНЫЙ AI-ДАЙДЖЕСТ: карточка на главной и страница дайджеста
+   ============================================================ */
+.metric.digest-card{position:relative;cursor:pointer;--glow:82,103,232;padding:13px 15px;overflow:hidden;transition:opacity .22s ease,transform .22s ease,max-height .28s ease,margin .28s ease,padding .28s ease}
+.metric.digest-card[hidden]{display:none}
+.metric.digest-card:active{transform:scale(.985)}
+.metric.digest-card.closing{opacity:0;transform:scale(.96);max-height:0!important;margin-bottom:0;padding-top:0;padding-bottom:0}
+.metric.digest-card .metric-head{margin-bottom:0;min-height:48px;padding-right:34px}
+.metric.digest-card .metric-icon{background:linear-gradient(145deg,#eef0ff,#d6dcfb)}
+:root[data-theme="dark"] .metric.digest-card .metric-icon{background:linear-gradient(145deg,#2a3068,#1b2046)}
+.metric.digest-card .metric-latest{color:var(--muted);font-weight:600}
+.digest-x{position:absolute;top:8px;right:8px;width:28px;height:28px;padding:0;border:0;border-radius:50%;background:var(--input-bg);color:var(--muted);font-size:19px;line-height:1;display:grid;place-items:center;cursor:pointer}
+.digest-x:active{transform:scale(.9)}
+
+.dg-refresh.busy{animation:spin .9s linear infinite;pointer-events:none}
+.dg-note{margin:0 0 10px;padding:10px 12px;border-radius:14px;background:var(--input-bg);font-size:13px;line-height:1.4}
+.dg-note.err{background:rgba(238,107,107,.14);color:#d6555b}
+.dg-note[hidden]{display:none}
+#digestBody.dg-busy .dg-page{opacity:.45;pointer-events:none}
+.dg-page{transition:opacity .2s}
+.dg-hero{border-radius:22px;padding:16px 16px 14px;margin-bottom:13px;color:#fff;background:linear-gradient(135deg,#5267e8 0%,#7d6be8 100%);box-shadow:0 16px 30px -16px rgba(82,103,232,.7)}
+.dg-hero-month{font-size:12px;font-weight:750;letter-spacing:.3px;text-transform:uppercase;opacity:.82}
+.dg-hero-title{margin-top:4px;font-size:21px;font-weight:800;letter-spacing:-.4px;line-height:1.2}
+.dg-hero-meta{margin-top:8px;font-size:11.5px;font-weight:600;opacity:.78}
+.dg-banner{margin-bottom:13px;padding:12px 14px;border-radius:16px;background:rgba(240,162,58,.15);color:var(--text);font-size:13px;line-height:1.45}
+.dg-banner b{color:#c98417}
+.dg-sec{background:var(--card-grad);border:1px solid var(--card-border);border-radius:20px;padding:15px 15px 14px;margin-bottom:13px;box-shadow:var(--shadow)}
+.dg-sec h3{margin:0 0 9px;display:flex;align-items:center;gap:9px;font-size:16px;font-weight:780;letter-spacing:-.2px}
+.dg-ico{display:grid;place-items:center;flex:none;width:30px;height:30px;border-radius:10px;background:var(--icon-bg);font-size:16px}
+.dg-text{margin:0;font-size:14.5px;line-height:1.5}
+.dg-list{margin:0;padding:0;list-style:none;display:grid;gap:9px}
+.dg-list li{position:relative;padding-left:19px;font-size:14.5px;line-height:1.45}
+.dg-list li::before{content:"";position:absolute;left:2px;top:.52em;width:8px;height:8px;border-radius:50%;background:var(--dg-dot,#5267e8)}
+.dg-sec.good{--dg-dot:#2ea66a}
+.dg-sec.warn{--dg-dot:#f0a23a}
+.dg-tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}
+.dg-tile{min-width:0;padding:10px 12px 9px;border-radius:14px;background:var(--input-bg)}
+.dg-tile small{display:block;font-size:11px;font-weight:650;line-height:1.25;color:var(--muted)}
+.dg-tile b{display:block;margin-top:3px;font-size:20px;font-weight:800;letter-spacing:-.4px;line-height:1.15;font-variant-numeric:tabular-nums;white-space:nowrap}
+.dg-tile b span{margin-left:3px;font-size:11.5px;font-weight:650;letter-spacing:0;color:var(--muted)}
+.dg-hint{display:block;margin-top:2px;font-size:10.5px;font-weight:600;color:var(--muted)}
+.dg-delta{display:block;margin-top:2px;font-size:11px;font-weight:750;color:var(--muted);font-variant-numeric:tabular-nums}
+.dg-delta.better{color:#23925a}
+.dg-delta.worse{color:#d6555b}
+.dg-foot{margin:9px 2px 0;font-size:11px;line-height:1.4;color:var(--muted)}
+.dg-empty{margin:10px 0 0;padding:12px;border-radius:14px;background:var(--input-bg);color:var(--muted);font-size:13px;text-align:center}
+.dg-chart{margin-top:16px}
+.dg-chart-title{margin:0 2px 6px;font-size:12px;font-weight:750;color:var(--muted)}
+.dg-seg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin:12px 0 4px;padding:3px;border-radius:999px;background:var(--input-bg)}
+.dg-seg button{height:34px;border:0;border-radius:999px;background:transparent;color:var(--muted);font-size:13px;font-weight:700;cursor:pointer;transition:background .2s,color .2s}
+.dg-seg button.active{background:var(--card);color:var(--text);box-shadow:0 1px 4px rgba(60,72,150,.16)}
+.dg-cov{display:grid;gap:10px;margin-top:4px}
+.dg-cov-row{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;font-size:13px}
+.dg-cov-row span:last-child{font-weight:750;font-variant-numeric:tabular-nums}
+.dg-bar{grid-column:1/-1;height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.dg-bar i{display:block;height:100%;border-radius:inherit;background:var(--blue)}
+.dg-level{display:inline-block;margin:0 0 8px;padding:4px 10px;border-radius:99px;font-size:12px;font-weight:750;background:var(--input-bg)}
+.dg-level.high{color:#23925a}
+.dg-level.medium{color:#c98417}
+.dg-level.low,.dg-level.none{color:#d6555b}
+.dg-meta{margin:2px 4px 10px;text-align:center;font-size:11px;line-height:1.5;color:var(--muted)}
 </style>
 </head>
 <body>
 <main class="app">
 <!-- === ЭКРАН «ГЛАВНАЯ» === -->
 <section class="screen active" id="screen-home">
+<!-- --- Карточка месячного AI-дайджеста: видна в первые дни месяца, закрывается крестиком --- -->
+<section class="metric digest-card" id="digestCard" role="button" tabindex="0" aria-label="Открыть дайджест за месяц" onclick="openDigest()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openDigest();}" hidden>
+<div class="metric-head">
+<div class="metric-icon" aria-hidden="true">✨</div>
+<div class="metric-copy"><div class="metric-name" id="digestCardTitle">Дайджест за месяц</div><div class="metric-latest">AI-итоги сахара и инсулина</div></div>
+</div>
+<button class="digest-x" type="button" aria-label="Закрыть карточку" onclick="event.stopPropagation();closeDigestCard()">×</button>
+</section>
 <!-- --- Карточки: вчера, а по нажатию ниже — сегодня --- -->
 <div class="yd-group" id="ydGroup" data-meal="breakfast">
 <div class="carousel shadowfix yd-carousel" id="ydCarousel">
@@ -1268,6 +1338,16 @@ button.st-ico:active{transform:scale(.88)}
 <div class="doctor-shot-note" id="doctorShotNote" hidden></div>
 <div class="doctor-undo-note" id="doctorUndoNote" hidden></div>
 <div id="doctorBody"><div class="loader-wrap"><div class="spinner"></div><div>Загружаю данные…</div></div></div>
+</section>
+<!-- === ЭКРАН «ДАЙДЖЕСТ МЕСЯЦА» === -->
+<section class="screen" id="screen-digest">
+<div class="doctor-head">
+<button class="doctor-back" type="button" onclick="switchTab('home')" aria-label="Назад">‹</button>
+<div class="doctor-head-copy"><div class="page-heading" id="digestHeading" style="margin:0">Дайджест</div></div>
+<button class="doctor-back dg-refresh" id="digestRefreshBtn" type="button" onclick="refreshDigest()" aria-label="Обновить анализ" title="Обновить анализ">↻</button>
+</div>
+<div class="dg-note" id="digestNote" role="status" hidden></div>
+<div id="digestBody"><div class="loader-wrap"><div class="spinner"></div><div>Готовлю дайджест…</div></div></div>
 </section>
 <!-- === ЭКРАН «ГРАФИКИ» === -->
 <!-- === ЭКРАН «НОЧНОЙ» === -->
@@ -2883,6 +2963,7 @@ function applyHomeData(data){
  };
  put('sugarAverage','ммоль/л',data.sugar_average);
  put('insulinTotal','ед.',data.insulin_total);
+ if(window.renderDigestCard)window.renderDigestCard(data.digest_card);
  renderNightFact(data.today);
  if(window.refreshDayCards)window.refreshDayCards(true);
  renderMealCards(data);
@@ -3407,9 +3488,10 @@ function renderDistribution(){
   updateRangeSummary('distribution-range',rows);
   setChartCount('distribution-count',rows.length);
 }
-function dailySummary(days){
+function dailySummary(days){return summarizeByDay(periodMeasurements(days));}
+function summarizeByDay(rows){
   const byDate=new Map();
-  periodMeasurements(days).forEach(row=>{
+  rows.forEach(row=>{
    if(!byDate.has(row.dateKey))byDate.set(row.dateKey,[]);
    byDate.get(row.dateKey).push(row.value);
   });
@@ -3424,7 +3506,12 @@ function renderDailySummary(){
   tooltip.textContent='';
   updateRangeSummary('daily-range',periodMeasurements(days));
   setChartCount('daily-count',periodMeasurements(days).length);
-  if(!summaries.length){host.innerHTML='<div class="analytics-message">'+mw('За этот период нет измерений.')+'</div>';return;}
+  drawDailySummary(host,tooltip,summaries,analyticsState.metric,mw('За этот период нет измерений.'));
+}
+// Рисует суточную сводку (мин · среднее · макс) — общая для вкладки «Графики» и дайджеста месяца
+function drawDailySummary(host,tooltip,summaries,metric,emptyText){
+  tooltip.textContent='';
+  if(!summaries.length){host.innerHTML='<div class="analytics-message">'+emptyText+'</div>';return;}
   const width=Math.max(240,Math.floor(host.clientWidth||320)),height=Number(host.dataset.height)||285;
   const margin={left:43,right:16,top:14,bottom:58},plotW=width-margin.left-margin.right,plotH=height-margin.top-margin.bottom;
   let low=Math.min(...summaries.map(day=>day.minimum)),high=Math.max(...summaries.map(day=>day.maximum));
@@ -3436,11 +3523,11 @@ function renderDailySummary(){
   const slot=plotW/summaries.length;
   let svg=`<svg class="chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="Суточные минимум, среднее и максимум показателей">`;
   let idealLines='';
-  if(analyticsState.metric==='sugar')svg+=idealZoneSvg(y,yMin,yMax,margin.left,width-margin.right,'ideal-'+host.id);
+  if(metric==='sugar')svg+=idealZoneSvg(y,yMin,yMax,margin.left,width-margin.right,'ideal-'+host.id);
   for(let value=yMin;value<=yMax+step*.01;value+=step){
    const py=y(value);idealLines+=`<line class="chart-grid-ideal" x1="${margin.left}" y1="${py}" x2="${width-margin.right}" y2="${py}"/>`;svg+=`<line class="chart-grid" x1="${margin.left}" y1="${py}" x2="${width-margin.right}" y2="${py}"/><text x="${margin.left-6}" y="${py+3}" text-anchor="end">${formatAxisValue(value)}</text>`;
   }
-  if(analyticsState.metric==='sugar')svg+=idealGridOverlay('ideal-'+host.id,idealLines);
+  if(metric==='sugar')svg+=idealGridOverlay('ideal-'+host.id,idealLines);
   summaries.forEach((day,index)=>{
    const x=margin.left+slot*(index+.5);
    svg+=`<line class="daily-range" x1="${x}" y1="${y(day.maximum)}" x2="${x}" y2="${y(day.minimum)}" stroke="#8998ff" stroke-width="${Math.min(12,Math.max(4,slot*.42))}" stroke-linecap="round"/><circle class="chart-point daily-point" cx="${x}" cy="${y(day.average)}" r="5" fill="#5267e8" tabindex="0" aria-label="${formatFullDate(day.key)} · мин ${formatAxisValue(day.minimum)} · среднее ${formatAxisValue(day.average)} · макс ${formatAxisValue(day.maximum)}"/><text transform="rotate(-90 ${x+4} ${margin.top+plotH+6})" x="${x+4}" y="${margin.top+plotH+6}" text-anchor="end">${formatShortDate(day.key)}</text>`;
@@ -3654,11 +3741,16 @@ function openRangeCalendar(){
 function renderRangeDonut(){
   const host=document.getElementById('range-donut'),legend=document.getElementById('range-legend'),cmp=document.getElementById('range-compare');
   if(!host)return;
-  const message=text=>{host.style.aspectRatio='auto';host.innerHTML='<div class="analytics-message">'+text+'</div>';legend.innerHTML='';cmp.innerHTML='';};
-  if(analyticsState.metric!=='sugar'){setChartCount('range-count',0);message('Доля в цели считается только для сахара.');return;}
+  if(analyticsState.metric!=='sugar'){setChartCount('range-count',0);drawRangeDonut({host,legend,cmp,rows:[],message:'Доля в цели считается только для сахара.'});return;}
   const sel=rangeSelection(),days=sel.days,rows=sel.rows;
   setChartCount('range-count',rows.length);
-  if(!rows.length){message(mw('За этот период нет измерений.'));return;}
+  drawRangeDonut({host,legend,cmp,rows,prev:sel.prev,prevLabel:days===1?'вчера':'в предыдущем периоде',numId:'donutNum',countKey:'donut'});
+}
+// Рисует бублик «доля измерений в диапазоне» — общий для вкладки «Графики» и дайджеста месяца
+function drawRangeDonut({host,legend,cmp,rows,prev=[],prevLabel='в предыдущем периоде',numId='donutNum',countKey='donut',message:fixed}){
+  const message=text=>{host.style.aspectRatio='auto';host.innerHTML='<div class="analytics-message">'+text+'</div>';legend.innerHTML='';cmp.innerHTML='';};
+  if(fixed){message(fixed);return;}
+  if(!rows.length){message('За этот период нет измерений.');return;}
   host.style.aspectRatio='';
   const st=rangeStats(rows),p=roundedPercents(st);
   let offset=0,segs='';
@@ -3669,19 +3761,18 @@ function renderRangeDonut(){
     segs+=`<circle class="donut-seg" cx="50" cy="50" r="38" pathLength="100" stroke="${color}" stroke-dasharray="${(len-gap).toFixed(2)} ${(100-len+gap).toFixed(2)}" stroke-dashoffset="${(-offset).toFixed(2)}" transform="rotate(-90 50 50)" style="--d:${(index*.12).toFixed(2)}s"/>`;
     offset+=len;
   });
-  host.innerHTML=`<svg viewBox="0 0 100 100" role="img" aria-label="В целевом диапазоне ${p.in}% ${mw('измерений')}"><circle class="donut-track" cx="50" cy="50" r="38"/>${segs}</svg>`
-   +`<div class="donut-center"><div class="donut-pct"><span id="donutNum">${p.in}</span><small>%</small></div><div class="donut-sub">в цели</div><div class="donut-avg">ср. ${fmtMmol(rows.reduce((a,x)=>a+x.value,0)/rows.length)}</div></div>`;
-  const num=document.getElementById('donutNum');if(num)countUp(num,'donut');
+  host.innerHTML=`<svg viewBox="0 0 100 100" role="img" aria-label="В целевом диапазоне ${p.in}% измерений"><circle class="donut-track" cx="50" cy="50" r="38"/>${segs}</svg>`
+   +`<div class="donut-center"><div class="donut-pct"><span id="${numId}">${p.in}</span><small>%</small></div><div class="donut-sub">в цели</div><div class="donut-avg">ср. ${fmtMmol(rows.reduce((a,x)=>a+x.value,0)/rows.length)}</div></div>`;
+  const num=document.getElementById(numId);if(num)countUp(num,countKey);
   const medianOf=key=>{const v=rows.filter(r=>rangeClass(r.value)===key).map(r=>r.value).sort((a,b)=>a-b);if(!v.length)return '—';const m=Math.floor(v.length/2);return fmtMmol(v.length%2?v[m]:(v[m-1]+v[m])/2);};
   const minMaxOf=key=>{const v=rows.filter(r=>rangeClass(r.value)===key).map(r=>r.value);return v.length?`мин ${fmtMmol(Math.min(...v))} · макс ${fmtMmol(Math.max(...v))}`:'мин — · макс —';};
-  const row=(k,name,hint,pct,count)=>`<div class="range-legend-row"><span class="range-dot ${k}"></span><div class="range-legend-name">${name}<small>${hint}</small><small class="rl-mm">${minMaxOf(k)}</small></div><b>${pct}%</b><em>${count} ${ruPlural(count,...measureForms())}<small class="rl-med">медиана ${medianOf(k)}</small></em></div>`;
+  const row=(k,name,hint,pct,count)=>`<div class="range-legend-row"><span class="range-dot ${k}"></span><div class="range-legend-name">${name}<small>${hint}</small><small class="rl-mm">${minMaxOf(k)}</small></div><b>${pct}%</b><em>${count} ${ruPlural(count,'измерение','измерения','измерений')}<small class="rl-med">медиана ${medianOf(k)}</small></em></div>`;
   legend.innerHTML=row('low','Ниже цели',`меньше ${fmtMmol(IDEAL_LOW)}`,p.low,st.low)
    +row('in','В цели',`${fmtMmol(IDEAL_LOW)}–${fmtMmol(IDEAL_HIGH)} ммоль/л`,p.in,st.in)
    +row('high','Выше цели',`больше ${fmtMmol(IDEAL_HIGH)}`,p.high,st.high);
-  const prev=sel.prev;
   if(prev.length>=3){
     const pp=roundedPercents(rangeStats(prev)).in,diff=p.in-pp;
-    const label=days===1?'вчера':'в предыдущем периоде';
+    const label=prevLabel;
     const sign=diff>0?`<b class="up">▲ +${diff} п.п.</b>`:diff<0?`<b class="down">▼ ${diff} п.п.</b>`:'<b>без изменений</b>';
     cmp.innerHTML=`${label[0].toUpperCase()+label.slice(1)}: ${pp}% в цели · ${sign}`;
   }else cmp.textContent='';
@@ -4496,10 +4587,16 @@ function renderDoseChart(){
  const summary=document.getElementById('dose-summary');
  const color=kind==='night'?'#8b6ee0':'#1f9d8f';
  const okSwatch=document.getElementById('dose-swatch-ok');if(okSwatch)okSwatch.style.background=color;
- tooltip.textContent='';
- const series=doseSeries(kind,days),filled=series.filter(day=>day.value!==null);
+ const series=doseSeries(kind,days);
  const count=document.getElementById('dose-count');
- if(count)count.textContent=filled.length?filled.length+' дн.':'';
+ if(count)count.textContent=series.some(day=>day.value!==null)?series.filter(day=>day.value!==null).length+' дн.':'';
+ drawDoseChart({host,tooltip,summary,kind,series,limit});
+}
+// Рисует столбики «доза за день» с ЦД — общие для вкладки «Графики» и дайджеста месяца
+function drawDoseChart({host,tooltip,summary,kind,series,limit}){
+ const color=kind==='night'?'#8b6ee0':'#1f9d8f';
+ const filled=series.filter(day=>day.value!==null);
+ tooltip.textContent='';
  if(!limit){
   host.innerHTML='<div class="analytics-message">Не удалось прочитать ЦД из листа get_ins ('+(kind==='night'?'ячейка O1':'ячейка M1')+').</div>';
   summary.innerHTML='';return;
@@ -4901,6 +4998,10 @@ function renderSummary(){
   if(legendEl)legendEl.innerHTML='';
   return;
  }
+ drawSummaryChart({host,tooltip,summary,legendEl,metric,group,items,filled});
+}
+// Рисует график «Итоги» (по дням, неделям или месяцам) — общий для вкладки «Графики» и дайджеста месяца
+function drawSummaryChart({host,tooltip,summary,legendEl,metric,group,items,filled}){
  const color=SUMMARY_COLORS[metric];
  const groupWord={days:'за день',weeks:'за неделю',months:'за месяц'}[group];
  // среднее за период: сахар по дням — как в /week (среднее дневных средних), иначе с весами
@@ -5470,6 +5571,11 @@ edgeBack(()=>{
   if(!top||!top.classList.contains('active'))return null;
   return {top,under:$('screen-home'),back:()=>switchTab('home')};
 });
+edgeBack(()=>{
+  const top=$('screen-digest');
+  if(!top||!top.classList.contains('active'))return null;
+  return {top,under:$('screen-home'),back:()=>switchTab('home')};
+});
 const swTab=window.switchTab;
 if(typeof swTab==='function')window.switchTab=function(){
   document.querySelectorAll('.screen').forEach(el=>{el.style.animation='';});
@@ -5495,7 +5601,7 @@ stRefresh();
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const APP_VERSION='v20261104_8';          /* ← менять при каждом обновлении: vГГГГММДД_N */
+const APP_VERSION='v20261107_1';          /* ← менять при каждом обновлении: vГГГГММДД_N */
 const DEV_CHAT='https://t.me/larik_11';
 const CH_IDS=['trend','compare','range','distribution','daily','activity','dynamics','effect','summary'];
 const CH_NAMES={trend:'Динамика по дням',compare:'Сравнение трёх недель',range:'Доля в целевом диапазоне',distribution:'Распределение измерений',daily:'Суточная сводка',activity:'Активность по времени',dynamics:'Тренды',effect:'Укол и сахар',summary:'Итоги'};
@@ -6439,6 +6545,317 @@ window.nightTabOpen=function(){
  window.refreshDayCards&&window.refreshDayCards(false);
 };
 
+})();
+</script>
+<script>
+/* ============================================================
+   МЕСЯЧНЫЙ AI-ДАЙДЖЕСТ: карточка на главной и страница дайджеста.
+   Текст и статистику присылает бот (action digest / digest_refresh). Графики рисуют те же
+   функции, что и вкладка «Графики»: drawRangeDonut, drawDailySummary, drawDoseChart,
+   drawSummaryChart — здесь задаются только данные и период (закрытый месяц + прошлый).
+   Окно показа карточки (с 1 по 10 число) настраивается на сервере: DIGEST_CARD_*_DAY в bot.py.
+   ============================================================ */
+(function(){
+'use strict';
+const $=id=>document.getElementById(id);
+const pad=n=>String(n).padStart(2,'0');
+const CLOSED_KEY='sema-digest-closed:';
+const S={month:null,data:null,seq:0,chartSeq:0,busy:false,sum:'sugar'};
+let card=null;
+
+/* ---------- карточка на главной ---------- */
+window.renderDigestCard=function(info){
+ card=info&&info.visible&&info.month?info:null;
+ const el=$('digestCard');
+ if(!el)return;
+ let closed=false;
+ try{closed=!!card&&localStorage.getItem(CLOSED_KEY+card.month)==='1';}catch(e){}
+ const show=!!card&&!closed;
+ if(show){
+  $('digestCardTitle').textContent=card.title||'Дайджест за месяц';
+  el.classList.remove('closing');el.style.maxHeight='';
+ }
+ el.hidden=!show;
+};
+window.closeDigestCard=function(){
+ const el=$('digestCard');
+ if(!el||!card)return;
+ try{localStorage.setItem(CLOSED_KEY+card.month,'1');}catch(e){}
+ if(typeof selectionHaptic==='function')selectionHaptic();
+ el.style.maxHeight=el.offsetHeight+'px';
+ void el.offsetHeight;
+ el.classList.add('closing');
+ setTimeout(()=>{el.hidden=true;el.classList.remove('closing');el.style.maxHeight='';},290);
+};
+
+/* ---------- помощники ---------- */
+const m1=v=>v==null?'—':fmtMmol(v);
+const u1=v=>v==null?'—':fmtDose(v);
+const pc=v=>v==null?'—':Math.round(v)+'%';
+const rng=v=>String(v).replace('.',',');
+const get=(o,a,b)=>(o&&o[a]&&o[a][b])||null;
+function prevMonthKey(key){
+ const [y,m]=key.split('-').map(Number),d=new Date(y,m-2,1);
+ return d.getFullYear()+'-'+pad(d.getMonth()+1);
+}
+function bounds(key){
+ const [y,m]=key.split('-').map(Number);
+ return {y,m,start:new Date(y,m-1,1),end:new Date(y,m,0,23,59,59,999),days:new Date(y,m,0).getDate()};
+}
+function defaultMonth(){
+ const d=new Date();d.setDate(1);d.setMonth(d.getMonth()-1);
+ return d.getFullYear()+'-'+pad(d.getMonth()+1);
+}
+function when(iso){
+ const d=new Date(iso);
+ return isNaN(d)?'':d.toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}).replace(',',' в');
+}
+function note(text,kind){
+ const el=$('digestNote');
+ if(!el)return;
+ clearTimeout(note.t);
+ if(!text){el.hidden=true;return;}
+ el.className='dg-note'+(kind?' '+kind:'');
+ el.textContent=text;el.hidden=false;
+ if(kind==='err')note.t=setTimeout(()=>{el.hidden=true;},6000);
+}
+
+/* ---------- разметка ---------- */
+const para=text=>text?'<p class="dg-text">'+escapeHtml(text)+'</p>':'';
+const list=items=>items&&items.length?'<ul class="dg-list">'+items.map(item=>'<li>'+escapeHtml(item)+'</li>').join('')+'</ul>':'';
+function section(cls,icon,title,inner){
+ return '<section class="dg-sec '+(cls||'')+'"><h3><span class="dg-ico">'+icon+'</span>'+escapeHtml(title)+'</h3>'+inner+'</section>';
+}
+function tile(label,value,unit,delta,hint){
+ return '<div class="dg-tile"><small>'+label+'</small><b>'+value+(unit?'<span>'+unit+'</span>':'')+'</b>'+(hint?'<span class="dg-hint">'+hint+'</span>':'')+(delta||'')+'</div>';
+}
+function delta(entry,opts){
+ if(!entry)return '';
+ const o=opts||{};
+ if(entry.dir==='flat')return '<span class="dg-delta">≈ без изменений</span>';
+ const cls=entry.assessment==='better'?'better':entry.assessment==='worse'?'worse':'';
+ const unit=o.pp?' п.п.':(o.unit?' '+o.unit:'');
+ return '<span class="dg-delta '+cls+'">'+(entry.dir==='up'?'▲':'▼')+' '+effectNum(entry.delta,true)+unit+'</span>';
+}
+function tiles(items){return '<div class="dg-tiles">'+items.join('')+'</div>';}
+function empty(text){return '<div class="dg-empty">'+text+'</div>';}
+function chartBox(title,inner){return '<div class="dg-chart"><div class="dg-chart-title">'+title+'</div>'+inner+'</div>';}
+const waiting='<div class="analytics-message">Загружаю график…</div>';
+const LEVELS={high:'высокая',medium:'средняя',low:'низкая',none:'данных нет'};
+
+function render(data){
+ const body=$('digestBody');
+ if(!data||!data.stats||!data.stats.current){
+  body.innerHTML='<div class="dg-banner">Дайджест пришёл в неожиданном формате. Нажми ↻, чтобы посчитать заново.</div>';
+  return;
+ }
+ const st=data.stats,cur=st.current,ch=st.changes_vs_previous||{},ai=data.ai||null;
+ const sg=cur.sugar,sh=cur.short,ng=cur.night,tt=cur.total,q=cur.data_quality;
+ const low=st.target_range.low,high=st.target_range.high;
+ const prevName=st.previous&&st.previous_period?st.previous_period.name:null;
+ const cap=prevName?'<div class="dg-foot">▲ ▼ — изменение к месяцу «'+escapeHtml(prevName)+'». Зелёным отмечено улучшение, красным — ухудшение.</div>'
+  :'<div class="dg-foot">Сравнить с прошлым месяцем нельзя: за него нет данных.</div>';
+ let html='<div class="dg-page">';
+ html+='<div class="dg-hero"><div class="dg-hero-month">'+escapeHtml(st.period.name)+'</div><div class="dg-hero-title">'+escapeHtml(ai?ai.title:'Статистика месяца')+'</div>'
+  +'<div class="dg-hero-meta">Рассчитано '+escapeHtml(when(data.created_at))+(ai?' · текст — AI, цифры — бот':'')+'</div></div>';
+ if(!ai)html+='<div class="dg-banner"><b>AI-комментарий не получился:</b> '+escapeHtml(String(data.ai_error||'модель не ответила').replace(/[.\s]+$/,''))+'. Статистика ниже посчитана по таблице. Нажми ↻, чтобы повторить.</div>';
+
+ // общий итог
+ html+=section('', '✨','Итог месяца',para(ai&&ai.overall)+tiles([
+  tile('Доля измерений в диапазоне '+rng(low)+'–'+rng(high),pc(sg.in_range_pct),'',delta(get(ch,'sugar','in_range_pct'),{pp:true}),sg.n?sg.in_range_n+' из '+sg.n:''),
+  tile('Средний сахар',m1(sg.mean),sg.mean==null?'':'ммоль/л',delta(get(ch,'sugar','mean'))),
+  tile('Инсулин за месяц',u1(tt.sum),tt.sum==null?'':'ед.',delta(get(ch,'total','sum'),{unit:'ед.'}),'короткий + ночной факт'),
+  tile('Дней со всеми данными',String(q.full_days),'из '+q.days_in_period,'','сахар, короткий и ночной')
+ ])+cap);
+
+ // сахар
+ let sugarInner=para(ai&&ai.sugar);
+ if(sg.has_data){
+  sugarInner+=tiles([
+   tile('Средний',m1(sg.mean),'ммоль/л',delta(get(ch,'sugar','mean'))),
+   tile('Медиана',m1(sg.median),'ммоль/л',delta(get(ch,'sugar','median'))),
+   tile('Минимум / максимум',m1(sg.min)+' / '+m1(sg.max),''),
+   tile('Разброс',m1(sg.sd),'ммоль/л',delta(get(ch,'sugar','sd')),'стандартное отклонение'+(sg.cv_pct!=null?' · '+Math.round(sg.cv_pct)+'%':'')),
+   tile('Измерений',String(sg.n),'',delta(get(ch,'sugar','n')),'в среднем '+(sg.per_day_with_data==null?'—':fmtDose(sg.per_day_with_data))+' в день с данными'),
+   tile('Дней с данными',String(sg.days_with_data),'из '+sg.days_in_period,'','с сахаром ниже '+rng(low)+': '+sg.days_with_low)
+  ]);
+  sugarInner+=chartBox('Доля измерений в диапазоне','<div id="dg-donut" class="range-donut"></div><div id="dg-legend" class="range-legend"></div><div id="dg-compare" class="range-compare"></div>');
+  sugarInner+=chartBox('Сахар по дням: минимум · среднее · максимум','<div id="dg-daily" class="chart-wrap">'+waiting+'</div><div id="dg-daily-tip" class="chart-tooltip" role="status"></div>');
+ }else sugarInner+=empty('За этот месяц нет измерений сахара.');
+ html+=section('','🩸','Сахар',sugarInner);
+
+ // короткий инсулин
+ let shortInner=para(ai&&ai.short_insulin);
+ if(sh.has_data){
+  shortInner+=tiles([
+   tile('Сумма за месяц',u1(sh.sum),'ед.',delta(get(ch,'short','sum'),{unit:'ед.'})),
+   tile('В среднем за день',u1(sh.avg_per_day),'ед.',delta(get(ch,'short','avg_per_day'),{unit:'ед.'}),'только дни с записями'),
+   tile('Дней с данными',String(sh.days_with_data),'из '+sh.days_in_period,delta(get(ch,'short','days_with_data'),{unit:'дн.'})),
+   tile('Инъекций',String(sh.injections),'','','в среднем '+u1(sh.avg_per_injection)+' ед.')
+  ]);
+  shortInner+=chartBox('Короткий инсулин по дням','<div id="dg-dose-ins" class="chart-wrap">'+waiting+'</div><div id="dg-dose-ins-sum" class="dose-summary"></div><div id="dg-dose-ins-tip" class="chart-tooltip" role="status"></div>');
+ }else shortInner+=empty('За этот месяц нет записей короткого инсулина.');
+ html+=section('','💉','Короткий инсулин',shortInner);
+
+ // ночной (факт)
+ let nightInner=para(ai&&ai.night_insulin);
+ if(ng.has_data){
+  nightInner+=tiles([
+   tile('Сумма за месяц',u1(ng.sum),'ед.',delta(get(ch,'night','sum'),{unit:'ед.'})),
+   tile('В среднем за день',u1(ng.avg_per_day),'ед.',delta(get(ch,'night','avg_per_day'),{unit:'ед.'}),'факт, записан на '+ng.at),
+   tile('Дней с данными',String(ng.days_with_data),'из '+ng.days_in_period,delta(get(ch,'night','days_with_data'),{unit:'дн.'})),
+   tile('Начало → конец месяца',u1(ng.first_value)+' → '+u1(ng.last_value),'ед.','','смен дозы: '+ng.changes)
+  ]);
+  nightInner+=chartBox('Ночной факт по дням','<div id="dg-dose-night" class="chart-wrap">'+waiting+'</div><div id="dg-dose-night-sum" class="dose-summary"></div><div id="dg-dose-night-tip" class="chart-tooltip" role="status"></div>');
+ }else nightInner+=empty('За этот месяц нет значений в столбце «Факт».');
+ html+=section('','🌙','Ночной (фактический базальный)',nightInner);
+
+ if(ai){
+  html+=section('good','🌱','Что улучшилось',list(ai.improved));
+  html+=section('warn','👀','На что обратить внимание',list(ai.attention));
+ }
+
+ // 6 месяцев
+ html+=section('','📊','Динамика за 6 месяцев',para(ai&&ai.six_months)
+  +'<div class="dg-seg" role="tablist" aria-label="Показатель">'
+  +'<button type="button" data-m="sugar" class="'+(S.sum==='sugar'?'active':'')+'" onclick="digestSumMetric(\'sugar\')">Сахар</button>'
+  +'<button type="button" data-m="insulin" class="'+(S.sum==='insulin'?'active':'')+'" onclick="digestSumMetric(\'insulin\')">Короткий</button>'
+  +'<button type="button" data-m="night" class="'+(S.sum==='night'?'active':'')+'" onclick="digestSumMetric(\'night\')">Ночной</button></div>'
+  +'<div id="dg-sum" class="chart-wrap"></div><div id="dg-sum-text" class="dose-summary"></div>'
+  +'<div id="dg-sum-legend" class="analytics-legend"></div><div id="dg-sum-tip" class="chart-tooltip" role="status"></div>');
+
+ if(ai)html+=section('','💬','Заключение',para(ai.conclusion));
+
+ // полнота данных
+ const bar=(label,item)=>'<div class="dg-cov-row"><span>'+label+'</span><span>'+item.days_with_data+' из '+item.days_in_period+' дн.</span><div class="dg-bar"><i style="width:'+Math.max(0,Math.min(100,item.coverage_pct||0))+'%"></i></div></div>';
+ html+=section('','🧾','Полнота данных',
+  '<span class="dg-level '+q.level+'">Полнота: '+(LEVELS[q.level]||q.level)+'</span>'
+  +'<div class="dg-cov">'+bar('Сахар',sg)+bar('Короткий инсулин',sh)+bar('Ночной факт',ng)+'</div>'
+  +(q.notes&&q.notes.length?'<div class="dg-foot">'+q.notes.map(escapeHtml).join('<br>')+'</div>':'')
+  +'<div class="dg-foot">Отсутствие записи не считается нулём: средние берутся только по дням, в которые записи были.</div>');
+
+ html+='<div class="dg-meta">Версия расчёта '+(data.revision||1)+(data.model?' · '+escapeHtml(data.model):'')+'<br>Обновить разбор можно кнопкой ↻ вверху.</div></div>';
+ body.innerHTML=html;
+ const heading=$('digestHeading');
+ if(heading&&data.month_name)heading.textContent='Дайджест · '+data.month_name.split(' ')[0];
+ drawCharts(data);
+}
+
+/* ---------- графики: те же функции, что на вкладке «Графики» ---------- */
+function monthDaySeries(kind,b,rows,doses){
+ const sums=new Map();
+ if(kind==='insulin')rows.forEach(row=>{if(row.type==='insulin')sums.set(row.dateKey,(sums.get(row.dateKey)||0)+row.value);});
+ const out=[];
+ for(let day=1;day<=b.days;day++){
+  const key=b.y+'-'+pad(b.m)+'-'+pad(day);
+  if(kind==='insulin')out.push({key,value:sums.has(key)?sums.get(key):null,fact:false,approx:false});
+  else{const item=doses.night.get(key);out.push({key,value:item&&item.fact?item.value:null,fact:true,approx:false});}
+ }
+ return out;
+}
+function chartsMessage(text){
+ ['dg-daily','dg-dose-ins','dg-dose-night'].forEach(id=>{const el=$(id);if(el)el.innerHTML='<div class="analytics-message">'+escapeHtml(text)+'</div>';});
+ const donut=$('dg-donut');if(donut){donut.style.aspectRatio='auto';donut.innerHTML='<div class="analytics-message">'+escapeHtml(text)+'</div>';}
+}
+async function drawCharts(data){
+ const my=++S.chartSeq;
+ drawSum();
+ const b=bounds(data.month),pb=bounds(prevMonthKey(data.month));
+ const today=new Date();today.setHours(0,0,0,0);
+ const days=Math.min(365,Math.max(1,Math.round((today-pb.start)/864e5)+1));
+ let result;
+ try{result=await historyWindow(days);}
+ catch(error){if(my===S.chartSeq)chartsMessage('Не удалось загрузить график: '+error.message);return;}
+ if(my!==S.chartSeq)return;
+ let all,doses;
+ try{all=normalizeHistory(result);doses=normalizeDoses(result);}
+ catch(error){chartsMessage(error.message);return;}
+ const within=(row,bb)=>row.dateObj>=bb.start&&row.dateObj<=bb.end;
+ const sugarRows=all.filter(row=>row.type==='sugar'&&within(row,b));
+ const prevRows=all.filter(row=>row.type==='sugar'&&within(row,pb));
+ const insulinRows=all.filter(row=>row.type==='insulin'&&within(row,b));
+ if($('dg-donut'))drawRangeDonut({host:$('dg-donut'),legend:$('dg-legend'),cmp:$('dg-compare'),rows:sugarRows,prev:prevRows,prevLabel:'в прошлом месяце',numId:'dgDonutNum',countKey:'dg-donut'});
+ if($('dg-daily'))drawDailySummary($('dg-daily'),$('dg-daily-tip'),summarizeByDay(sugarRows),'sugar','За этот месяц нет измерений.');
+ if($('dg-dose-ins'))drawDoseChart({host:$('dg-dose-ins'),tooltip:$('dg-dose-ins-tip'),summary:$('dg-dose-ins-sum'),kind:'insulin',series:monthDaySeries('insulin',b,insulinRows,doses),limit:doses.limitInsulin});
+ if($('dg-dose-night'))drawDoseChart({host:$('dg-dose-night'),tooltip:$('dg-dose-night-tip'),summary:$('dg-dose-night-sum'),kind:'night',series:monthDaySeries('night',b,[],doses),limit:doses.limitNight});
+}
+function drawSum(){
+ const host=$('dg-sum');
+ if(!host||!S.data||!S.data.stats)return;
+ const metric=S.sum,tip=$('dg-sum-tip');
+ const items=(S.data.stats.chart_buckets||[]).map(bucket=>({bucket,item:bucket[metric]}));
+ const filled=items.filter(entry=>entry.item);
+ tip.textContent='';
+ if(!filled.length){
+  host.innerHTML='<div class="analytics-message">За эти 6 месяцев нет данных.</div>';
+  $('dg-sum-text').innerHTML='';$('dg-sum-legend').innerHTML='';
+  return;
+ }
+ drawSummaryChart({host,tooltip:tip,summary:$('dg-sum-text'),legendEl:$('dg-sum-legend'),metric,group:'months',items,filled});
+}
+window.digestSumMetric=function(metric){
+ S.sum=metric;
+ document.querySelectorAll('#digestBody .dg-seg button').forEach(button=>button.classList.toggle('active',button.dataset.m===metric));
+ if(typeof selectionHaptic==='function')selectionHaptic();
+ drawSum();
+};
+
+/* ---------- загрузка и обновление ---------- */
+function setBusy(on){
+ S.busy=on;
+ const button=$('digestRefreshBtn');
+ if(button)button.classList.toggle('busy',on);
+}
+async function load(force){
+ const my=++S.seq;
+ const body=$('digestBody');
+ const cached=S.data&&S.data.month===S.month?S.data:null;
+ note('');
+ if(cached){
+  if(!force||!body.querySelector('.dg-page'))render(cached);
+  if(force)body.classList.add('dg-busy');
+  if(force)note('Пересчитываю дайджест — это займёт несколько секунд…');
+ }else{
+  S.data=null;
+  body.innerHTML=loadingContent(force?'Пересчитываю дайджест…':'Готовлю дайджест…');
+ }
+ setBusy(true);
+ try{
+  const data=await api(force?'digest_refresh':'digest',{month:S.month});
+  if(my!==S.seq)return;
+  setAccess(true,'Сервер подтвердил доступ');
+  const same=cached&&cached.created_at===data.created_at&&cached.revision===data.revision&&!!cached.ai===!!data.ai;
+  S.data=data;
+  if(!same||force)render(data);
+  note(force?'Анализ обновлён.':'');
+  if(force)setTimeout(()=>{if(my===S.seq)note('');},2500);
+ }catch(error){
+  if(my!==S.seq)return;
+  handleAccessError(error);
+  if(S.data&&S.data.month===S.month){
+   note('Не удалось обновить: '+error.message,'err');
+  }else{
+   body.innerHTML='<div class="dg-banner"><b>Не получилось открыть дайджест.</b> '+escapeHtml(error.message)+'<br><br><button class="analytics-retry" type="button" onclick="refreshDigest()">Повторить</button></div>';
+  }
+ }finally{
+  if(my===S.seq){setBusy(false);body.classList.remove('dg-busy');}
+ }
+}
+window.openDigest=function(){
+ if(typeof hideKeyboard==='function')hideKeyboard();
+ S.month=(card&&card.month)||defaultMonth();
+ document.querySelectorAll('.screen').forEach(screen=>screen.classList.toggle('active',screen.id==='screen-digest'));
+ window.scrollTo({top:0,behavior:'smooth'});
+ if(typeof selectionHaptic==='function')selectionHaptic();
+ const heading=$('digestHeading');
+ if(heading)heading.textContent=card&&card.title?card.title.replace('Дайджест за ','Дайджест · '):'Дайджест';
+ load(false);
+};
+window.refreshDigest=function(){
+ if(S.busy)return;
+ if(typeof selectionHaptic==='function')selectionHaptic();
+ load(true);
+};
 })();
 </script>
 </body>
