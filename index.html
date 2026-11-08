@@ -1161,7 +1161,7 @@ button.st-ico:active{transform:scale(.88)}
 /* ============================================================
    МЕСЯЧНЫЙ AI-ДАЙДЖЕСТ: карточка на главной и страница дайджеста
    ============================================================ */
-.metric.digest-card{position:relative;cursor:pointer;--glow:82,103,232;padding:13px 15px;overflow:hidden;transition:opacity .22s ease,transform .22s ease,max-height .28s ease,margin .28s ease,padding .28s ease}
+.metric.digest-card{margin-top:12px;position:relative;cursor:pointer;--glow:82,103,232;padding:13px 15px;overflow:hidden;transition:opacity .22s ease,transform .22s ease,max-height .28s ease,margin .28s ease,padding .28s ease}
 .metric.digest-card[hidden]{display:none}
 .metric.digest-card:active{transform:scale(.985)}
 .metric.digest-card.closing{opacity:0;transform:scale(.96);max-height:0!important;margin-bottom:0;padding-top:0;padding-bottom:0}
@@ -1178,10 +1178,13 @@ button.st-ico:active{transform:scale(.88)}
 .dg-note[hidden]{display:none}
 #digestBody.dg-busy .dg-page{opacity:.45;pointer-events:none}
 .dg-page{transition:opacity .2s}
-.dg-hero{border-radius:22px;padding:16px 16px 14px;margin-bottom:13px;color:#fff;background:linear-gradient(135deg,#5267e8 0%,#7d6be8 100%);box-shadow:0 16px 30px -16px rgba(82,103,232,.7)}
-.dg-hero-month{font-size:12px;font-weight:750;letter-spacing:.3px;text-transform:uppercase;opacity:.82}
-.dg-hero-title{margin-top:4px;font-size:21px;font-weight:800;letter-spacing:-.4px;line-height:1.2}
-.dg-hero-meta{margin-top:8px;font-size:11.5px;font-weight:600;opacity:.78}
+.dg-hero{display:grid;grid-template-columns:40px minmax(0,1fr) 40px;align-items:center;gap:6px;border-radius:22px;padding:14px 10px;margin-bottom:13px;color:#fff;background:linear-gradient(135deg,#5267e8 0%,#7d6be8 100%);box-shadow:0 16px 30px -16px rgba(82,103,232,.7)}
+.dg-hero-center{text-align:center;min-width:0}
+.dg-hero-month{font-size:23px;font-weight:800;letter-spacing:-.4px;line-height:1.15}
+.dg-hero-meta{margin-top:5px;font-size:12px;font-weight:600;opacity:.82}
+.dg-nav{width:40px;height:40px;padding:0 0 3px;border:0;border-radius:50%;background:rgba(255,255,255,.18);color:#fff;font-size:26px;line-height:1;display:grid;place-items:center;cursor:pointer}
+.dg-nav:active:not(:disabled){transform:scale(.92)}
+.dg-nav:disabled{opacity:.28;cursor:default}
 .dg-banner{margin-bottom:13px;padding:12px 14px;border-radius:16px;background:rgba(240,162,58,.15);color:var(--text);font-size:13px;line-height:1.45}
 .dg-banner b{color:#c98417}
 .dg-sec{background:var(--card-grad);border:1px solid var(--card-border);border-radius:20px;padding:15px 15px 14px;margin-bottom:13px;box-shadow:var(--shadow)}
@@ -1209,30 +1212,20 @@ button.st-ico:active{transform:scale(.88)}
 .dg-seg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin:12px 0 4px;padding:3px;border-radius:999px;background:var(--input-bg)}
 .dg-seg button{height:34px;border:0;border-radius:999px;background:transparent;color:var(--muted);font-size:13px;font-weight:700;cursor:pointer;transition:background .2s,color .2s}
 .dg-seg button.active{background:var(--card);color:var(--text);box-shadow:0 1px 4px rgba(60,72,150,.16)}
-.dg-cov{display:grid;gap:10px;margin-top:4px}
-.dg-cov-row{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;font-size:13px}
-.dg-cov-row span:last-child{font-weight:750;font-variant-numeric:tabular-nums}
-.dg-bar{grid-column:1/-1;height:8px;border-radius:99px;background:var(--line);overflow:hidden}
-.dg-bar i{display:block;height:100%;border-radius:inherit;background:var(--blue)}
-.dg-level{display:inline-block;margin:0 0 8px;padding:4px 10px;border-radius:99px;font-size:12px;font-weight:750;background:var(--input-bg)}
-.dg-level.high{color:#23925a}
-.dg-level.medium{color:#c98417}
-.dg-level.low,.dg-level.none{color:#d6555b}
 .dg-meta{margin:2px 4px 10px;text-align:center;font-size:11px;line-height:1.5;color:var(--muted)}
+
+/* Главная: «К врачу» — обычная кнопка, рядом постоянная кнопка «AI дайджест» */
+.quick-chip.q-doctor{background:linear-gradient(150deg,rgba(32,169,155,.15) 0%,transparent 62%),var(--card-grad)}
+:root[data-theme="dark"] .quick-chip.q-doctor{background:linear-gradient(150deg,rgba(69,224,203,.18) 0%,transparent 62%),var(--card-grad)}
+.quick-chip.q-digest{background:linear-gradient(150deg,rgba(104,92,232,.15) 0%,transparent 62%),var(--card-grad)}
+:root[data-theme="dark"] .quick-chip.q-digest{background:linear-gradient(150deg,rgba(143,155,255,.2) 0%,transparent 62%),var(--card-grad)}
+.screen.active>.quick-grid>:nth-child(8){animation-delay:.56s}
 </style>
 </head>
 <body>
 <main class="app">
 <!-- === ЭКРАН «ГЛАВНАЯ» === -->
 <section class="screen active" id="screen-home">
-<!-- --- Карточка месячного AI-дайджеста: видна в первые дни месяца, закрывается крестиком --- -->
-<section class="metric digest-card" id="digestCard" role="button" tabindex="0" aria-label="Открыть дайджест за месяц" onclick="openDigest()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openDigest();}" hidden>
-<div class="metric-head">
-<div class="metric-icon" aria-hidden="true">✨</div>
-<div class="metric-copy"><div class="metric-name" id="digestCardTitle">Дайджест за месяц</div><div class="metric-latest">AI-итоги сахара и инсулина</div></div>
-</div>
-<button class="digest-x" type="button" aria-label="Закрыть карточку" onclick="event.stopPropagation();closeDigestCard()">×</button>
-</section>
 <!-- --- Карточки: вчера, а по нажатию ниже — сегодня --- -->
 <div class="yd-group" id="ydGroup" data-meal="breakfast">
 <div class="carousel shadowfix yd-carousel" id="ydCarousel">
@@ -1311,6 +1304,14 @@ button.st-ico:active{transform:scale(.88)}
 </div></div>
 </div>
 <div class="carousel-dots tight" id="insulinDots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+<!-- --- Плашка месячного AI-дайджеста: видна в выбранные числа месяца, закрывается крестиком --- -->
+<section class="metric digest-card" id="digestCard" role="button" tabindex="0" aria-label="Открыть дайджест за месяц" onclick="openDigest()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openDigest();}" hidden>
+<div class="metric-head">
+<div class="metric-icon" aria-hidden="true">✨</div>
+<div class="metric-copy"><div class="metric-name" id="digestCardTitle">Дайджест за месяц</div><div class="metric-latest">AI-итоги сахара и инсулина</div></div>
+</div>
+<button class="digest-x" type="button" aria-label="Закрыть плашку" onclick="event.stopPropagation();closeDigestCard()">×</button>
+</section>
 <div class="quick-title">
 <div class="section-title">Быстрый доступ</div>
 <span></span>
@@ -1323,7 +1324,8 @@ button.st-ico:active{transform:scale(.88)}
 <button class="quick-button quick-chip" onclick="openAction('month')"><span class="quick-icon green">🗓️</span><span class="quick-label">Среднее за месяц</span></button>
 <button class="quick-button quick-chip" onclick="openAction('excel')"><span class="quick-icon yellow">📗</span><span class="quick-label">Excel</span></button>
 <button class="quick-button quick-chip" onclick="openAction('memory')"><span class="quick-icon gray">⚙️</span><span class="quick-label">Память</span></button>
-<button class="quick-button quick-big quick-wide q-doctor" onclick="openDoctor()"><span class="quick-icon green">🩺</span><span><div class="quick-label">К врачу</div></span></button>
+<button class="quick-button quick-chip q-doctor" onclick="openDoctor()"><span class="quick-icon green">🩺</span><span class="quick-label">К врачу</span></button>
+<button class="quick-button quick-chip q-digest" onclick="openDigest()"><span class="quick-icon purple">✨</span><span class="quick-label">AI дайджест</span></button>
 </section>
 </section>
 <!-- === ЭКРАН «К ВРАЧУ» === -->
@@ -1581,6 +1583,7 @@ button.st-ico:active{transform:scale(.88)}
 <button class="st-row has-ico st-nav" type="button" onclick="stOpen('report')"><span class="st-ico c-blue"><svg class="g"><use href="#i-cal"/></svg></span><span class="st-t">Ежедневный отчёт</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
 <button class="st-row has-ico st-nav" type="button" onclick="stOpen('food')"><span class="st-ico c-purple"><svg class="g"><use href="#i-meal"/></svg></span><span class="st-t">Еда</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
 <button class="st-row has-ico st-nav" type="button" onclick="stOpen('target')"><span class="st-ico c-green"><svg class="g"><use href="#i-target"/></svg></span><span class="st-t">Целевой диапазон</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
+<button class="st-row has-ico st-nav" type="button" onclick="stOpen('digest')"><span class="st-ico c-purple"><svg class="g"><use href="#i-cal"/></svg></span><span class="st-t">AI-дайджест</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
 </div>
 <div class="st-card">
 <button class="st-row has-ico st-nav" type="button" onclick="stOpen('theme')"><span class="st-ico c-sky"><svg class="g"><use href="#i-theme"/></svg></span><span class="st-t">Оформление</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
@@ -1675,6 +1678,23 @@ button.st-ico:active{transform:scale(.88)}
 <div class="st-foot"><span id="targetDescription">Общая настройка для всех пользователей бота</span><br>Зелёная полоса на графиках и расчёт «в цели».</div>
 <button class="save-button target-save" id="targetSaveButton" type="button" onclick="saveTargetRange()">Сохранить</button>
 <div class="toast st-toast" id="targetToast"></div>
+</div>
+
+<div class="st-page" data-p="digest">
+<div class="st-bar"><button class="st-back" type="button" onclick="stBack()" aria-label="Назад"><svg><use href="#i-back"/></svg></button><div class="st-title">AI-дайджест</div></div>
+<div class="st-sec">Когда формировать</div>
+<div class="st-card">
+<label class="st-row" for="digestDayInput"><span class="st-t">Число месяца</span><input class="st-in" id="digestDayInput" type="text" inputmode="numeric" maxlength="2" autocomplete="off" aria-label="Число месяца, когда формируется дайджест"></label>
+</div>
+<div class="st-foot">С этого числа бот сам подготовит дайджест за прошлый месяц (от 1 до 28, время московское). Открыть дайджест можно и раньше — тогда он посчитается сразу.</div>
+<div class="st-sec">Плашка на главной</div>
+<div class="st-card">
+<label class="st-row" for="digestFromInput"><span class="st-t">С числа</span><input class="st-in" id="digestFromInput" type="text" inputmode="numeric" maxlength="2" autocomplete="off" aria-label="Плашка видна с числа"></label>
+<label class="st-row" for="digestToInput"><span class="st-t">По число</span><input class="st-in" id="digestToInput" type="text" inputmode="numeric" maxlength="2" autocomplete="off" aria-label="Плашка видна по число"></label>
+</div>
+<div class="st-foot">Плашка видна на главной в эти числа каждого месяца, крестик прячет её до следующего месяца. Кнопка «AI дайджест» внизу главной доступна всегда. Настройка общая для всех пользователей бота.</div>
+<button class="save-button target-save" id="digestSaveButton" type="button" onclick="saveDigestSettings()">Сохранить</button>
+<div class="toast st-toast" id="digestToast"></div>
 </div>
 
 <div class="st-page" data-p="theme">
@@ -5498,6 +5518,7 @@ window.stRefresh=function(){
   set('stV-report',r.disabled?'':(on('reportEnabledSwitch')?$('reportTimeInput').value:'Выкл.'));
   set('stV-target',$('targetLowInput').value&&$('targetHighInput').value?$('targetLowInput').value+'–'+$('targetHighInput').value:'');
   set('stV-theme',document.documentElement.dataset.theme==='dark'?'Тёмная':'Светлая');
+  if(window.renderDigestSettings)window.renderDigestSettings();
 };
 window.stOpen=function(name){
   document.querySelectorAll('#screen-settings .st-page').forEach(p=>{p.style.animation='';p.classList.toggle('active',p.dataset.p===name);});
@@ -5601,7 +5622,7 @@ stRefresh();
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const APP_VERSION='v20261107_1';          /* ← менять при каждом обновлении: vГГГГММДД_N */
+const APP_VERSION='v20261107_2';          /* ← менять при каждом обновлении: vГГГГММДД_N */
 const DEV_CHAT='https://t.me/larik_11';
 const CH_IDS=['trend','compare','range','distribution','daily','activity','dynamics','effect','summary'];
 const CH_NAMES={trend:'Динамика по дням',compare:'Сравнение трёх недель',range:'Доля в целевом диапазоне',distribution:'Распределение измерений',daily:'Суточная сводка',activity:'Активность по времени',dynamics:'Тренды',effect:'Укол и сахар',summary:'Итоги'};
@@ -6560,7 +6581,7 @@ window.nightTabOpen=function(){
 const $=id=>document.getElementById(id);
 const pad=n=>String(n).padStart(2,'0');
 const CLOSED_KEY='sema-digest-closed:';
-const S={month:null,data:null,seq:0,chartSeq:0,busy:false,sum:'sugar'};
+const S={month:null,data:null,cache:{},months:[],seq:0,chartSeq:0,busy:false,sum:'sugar'};
 let card=null;
 
 /* ---------- карточка на главной ---------- */
@@ -6606,6 +6627,7 @@ function defaultMonth(){
  const d=new Date();d.setDate(1);d.setMonth(d.getMonth()-1);
  return d.getFullYear()+'-'+pad(d.getMonth()+1);
 }
+const up1=text=>text?text.charAt(0).toUpperCase()+text.slice(1):'';
 function when(iso){
  const d=new Date(iso);
  return isNaN(d)?'':d.toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}).replace(',',' в');
@@ -6641,7 +6663,6 @@ function tiles(items){return '<div class="dg-tiles">'+items.join('')+'</div>';}
 function empty(text){return '<div class="dg-empty">'+text+'</div>';}
 function chartBox(title,inner){return '<div class="dg-chart"><div class="dg-chart-title">'+title+'</div>'+inner+'</div>';}
 const waiting='<div class="analytics-message">Загружаю график…</div>';
-const LEVELS={high:'высокая',medium:'средняя',low:'низкая',none:'данных нет'};
 
 function render(data){
  const body=$('digestBody');
@@ -6650,22 +6671,21 @@ function render(data){
   return;
  }
  const st=data.stats,cur=st.current,ch=st.changes_vs_previous||{},ai=data.ai||null;
- const sg=cur.sugar,sh=cur.short,ng=cur.night,tt=cur.total,q=cur.data_quality;
+ const sg=cur.sugar,sh=cur.short,ng=cur.night;
  const low=st.target_range.low,high=st.target_range.high;
  const prevName=st.previous&&st.previous_period?st.previous_period.name:null;
  const cap=prevName?'<div class="dg-foot">▲ ▼ — изменение к месяцу «'+escapeHtml(prevName)+'». Зелёным отмечено улучшение, красным — ухудшение.</div>'
   :'<div class="dg-foot">Сравнить с прошлым месяцем нельзя: за него нет данных.</div>';
  let html='<div class="dg-page">';
- html+='<div class="dg-hero"><div class="dg-hero-month">'+escapeHtml(st.period.name)+'</div><div class="dg-hero-title">'+escapeHtml(ai?ai.title:'Статистика месяца')+'</div>'
-  +'<div class="dg-hero-meta">Рассчитано '+escapeHtml(when(data.created_at))+(ai?' · текст — AI, цифры — бот':'')+'</div></div>';
+ html+='<div class="dg-hero"><button class="dg-nav" id="dgPrev" type="button" onclick="digestGo(-1)" aria-label="Предыдущий месяц" disabled>‹</button>'
+  +'<div class="dg-hero-center"><div class="dg-hero-month">'+escapeHtml(up1(st.period.name))+'</div><div class="dg-hero-meta">Рассчитано '+escapeHtml(when(data.created_at))+'</div></div>'
+  +'<button class="dg-nav" id="dgNext" type="button" onclick="digestGo(1)" aria-label="Следующий месяц" disabled>›</button></div>';
  if(!ai)html+='<div class="dg-banner"><b>AI-комментарий не получился:</b> '+escapeHtml(String(data.ai_error||'модель не ответила').replace(/[.\s]+$/,''))+'. Статистика ниже посчитана по таблице. Нажми ↻, чтобы повторить.</div>';
 
  // общий итог
  html+=section('', '✨','Итог месяца',para(ai&&ai.overall)+tiles([
   tile('Доля измерений в диапазоне '+rng(low)+'–'+rng(high),pc(sg.in_range_pct),'',delta(get(ch,'sugar','in_range_pct'),{pp:true}),sg.n?sg.in_range_n+' из '+sg.n:''),
-  tile('Средний сахар',m1(sg.mean),sg.mean==null?'':'ммоль/л',delta(get(ch,'sugar','mean'))),
-  tile('Инсулин за месяц',u1(tt.sum),tt.sum==null?'':'ед.',delta(get(ch,'total','sum'),{unit:'ед.'}),'короткий + ночной факт'),
-  tile('Дней со всеми данными',String(q.full_days),'из '+q.days_in_period,'','сахар, короткий и ночной')
+  tile('Средний сахар',m1(sg.mean),sg.mean==null?'':'ммоль/л',delta(get(ch,'sugar','mean')))
  ])+cap);
 
  // сахар
@@ -6677,7 +6697,7 @@ function render(data){
    tile('Минимум / максимум',m1(sg.min)+' / '+m1(sg.max),''),
    tile('Разброс',m1(sg.sd),'ммоль/л',delta(get(ch,'sugar','sd')),'стандартное отклонение'+(sg.cv_pct!=null?' · '+Math.round(sg.cv_pct)+'%':'')),
    tile('Измерений',String(sg.n),'',delta(get(ch,'sugar','n')),'в среднем '+(sg.per_day_with_data==null?'—':fmtDose(sg.per_day_with_data))+' в день с данными'),
-   tile('Дней с данными',String(sg.days_with_data),'из '+sg.days_in_period,'','с сахаром ниже '+rng(low)+': '+sg.days_with_low)
+   tile('Дней с данными',String(sg.days_with_data),'','','с сахаром ниже '+rng(low)+': '+sg.days_with_low)
   ]);
   sugarInner+=chartBox('Доля измерений в диапазоне','<div id="dg-donut" class="range-donut"></div><div id="dg-legend" class="range-legend"></div><div id="dg-compare" class="range-compare"></div>');
   sugarInner+=chartBox('Сахар по дням: минимум · среднее · максимум','<div id="dg-daily" class="chart-wrap">'+waiting+'</div><div id="dg-daily-tip" class="chart-tooltip" role="status"></div>');
@@ -6690,7 +6710,7 @@ function render(data){
   shortInner+=tiles([
    tile('Сумма за месяц',u1(sh.sum),'ед.',delta(get(ch,'short','sum'),{unit:'ед.'})),
    tile('В среднем за день',u1(sh.avg_per_day),'ед.',delta(get(ch,'short','avg_per_day'),{unit:'ед.'}),'только дни с записями'),
-   tile('Дней с данными',String(sh.days_with_data),'из '+sh.days_in_period,delta(get(ch,'short','days_with_data'),{unit:'дн.'})),
+   tile('Дней с данными',String(sh.days_with_data),''),
    tile('Инъекций',String(sh.injections),'','','в среднем '+u1(sh.avg_per_injection)+' ед.')
   ]);
   shortInner+=chartBox('Короткий инсулин по дням','<div id="dg-dose-ins" class="chart-wrap">'+waiting+'</div><div id="dg-dose-ins-sum" class="dose-summary"></div><div id="dg-dose-ins-tip" class="chart-tooltip" role="status"></div>');
@@ -6702,13 +6722,13 @@ function render(data){
  if(ng.has_data){
   nightInner+=tiles([
    tile('Сумма за месяц',u1(ng.sum),'ед.',delta(get(ch,'night','sum'),{unit:'ед.'})),
-   tile('В среднем за день',u1(ng.avg_per_day),'ед.',delta(get(ch,'night','avg_per_day'),{unit:'ед.'}),'факт, записан на '+ng.at),
-   tile('Дней с данными',String(ng.days_with_data),'из '+ng.days_in_period,delta(get(ch,'night','days_with_data'),{unit:'дн.'})),
+   tile('В среднем за день',u1(ng.avg_per_day),'ед.',delta(get(ch,'night','avg_per_day'),{unit:'ед.'}),'доза на '+ng.at),
+   tile('Дней с данными',String(ng.days_with_data),''),
    tile('Начало → конец месяца',u1(ng.first_value)+' → '+u1(ng.last_value),'ед.','','смен дозы: '+ng.changes)
   ]);
-  nightInner+=chartBox('Ночной факт по дням','<div id="dg-dose-night" class="chart-wrap">'+waiting+'</div><div id="dg-dose-night-sum" class="dose-summary"></div><div id="dg-dose-night-tip" class="chart-tooltip" role="status"></div>');
- }else nightInner+=empty('За этот месяц нет значений в столбце «Факт».');
- html+=section('','🌙','Ночной (фактический базальный)',nightInner);
+  nightInner+=chartBox('Ночной по дням','<div id="dg-dose-night" class="chart-wrap">'+waiting+'</div><div id="dg-dose-night-sum" class="dose-summary"></div><div id="dg-dose-night-tip" class="chart-tooltip" role="status"></div>');
+ }else nightInner+=empty('За этот месяц нет записей ночного инсулина.');
+ html+=section('','🌙','Ночной',nightInner);
 
  if(ai){
   html+=section('good','🌱','Что улучшилось',list(ai.improved));
@@ -6726,18 +6746,9 @@ function render(data){
 
  if(ai)html+=section('','💬','Заключение',para(ai.conclusion));
 
- // полнота данных
- const bar=(label,item)=>'<div class="dg-cov-row"><span>'+label+'</span><span>'+item.days_with_data+' из '+item.days_in_period+' дн.</span><div class="dg-bar"><i style="width:'+Math.max(0,Math.min(100,item.coverage_pct||0))+'%"></i></div></div>';
- html+=section('','🧾','Полнота данных',
-  '<span class="dg-level '+q.level+'">Полнота: '+(LEVELS[q.level]||q.level)+'</span>'
-  +'<div class="dg-cov">'+bar('Сахар',sg)+bar('Короткий инсулин',sh)+bar('Ночной факт',ng)+'</div>'
-  +(q.notes&&q.notes.length?'<div class="dg-foot">'+q.notes.map(escapeHtml).join('<br>')+'</div>':'')
-  +'<div class="dg-foot">Отсутствие записи не считается нулём: средние берутся только по дням, в которые записи были.</div>');
-
- html+='<div class="dg-meta">Версия расчёта '+(data.revision||1)+(data.model?' · '+escapeHtml(data.model):'')+'<br>Обновить разбор можно кнопкой ↻ вверху.</div></div>';
+ html+='<div class="dg-meta">Обновить разбор можно кнопкой ↻ вверху.</div></div>';
  body.innerHTML=html;
- const heading=$('digestHeading');
- if(heading&&data.month_name)heading.textContent='Дайджест · '+data.month_name.split(' ')[0];
+ updateNav();
  drawCharts(data);
 }
 
@@ -6800,6 +6811,36 @@ window.digestSumMetric=function(metric){
  drawSum();
 };
 
+/* ---------- настройки: когда готовить дайджест и когда показывать плашку ---------- */
+window.renderDigestSettings=function(){
+ const rs=typeof reportSettings!=='undefined'?reportSettings:null;
+ if(!rs||rs.digest_day==null)return;
+ const fill=(id,value)=>{const el=$(id);if(el&&document.activeElement!==el)el.value=value;};
+ fill('digestDayInput',rs.digest_day);fill('digestFromInput',rs.digest_card_from);fill('digestToInput',rs.digest_card_to);
+};
+window.saveDigestSettings=async function(){
+ const toast=$('digestToast'),button=$('digestSaveButton');
+ const num=id=>{const text=$(id).value.trim();return /^\d{1,2}$/.test(text)?Number(text):NaN;};
+ const day=num('digestDayInput'),from=num('digestFromInput'),to=num('digestToInput');
+ setToast(toast,'');
+ if(!(day>=1&&day<=28)||!(from>=1&&from<=31)||!(to>=1&&to<=31)||from>to){
+  setToast(toast,'Число формирования — от 1 до 28. Плашка — от 1 до 31, и «с» не позже «по».','error');
+  uiHaptic('error');return;
+ }
+ button.disabled=true;
+ try{
+  const result=await api('report_settings_set',{digest_day:day,digest_card_from:from,digest_card_to:to});
+  if(result&&result.digest_day!=null)reportSettings=result;
+  uiHaptic('success');showSaveSuccess(button);
+  setToast(toast,'✓ Сохранено для всех пользователей','success');
+  window.renderDigestSettings();
+  if(typeof loadHomeCards==='function')loadHomeCards(false);
+ }catch(error){
+  uiHaptic('error');setToast(toast,'Не удалось сохранить: '+(error.message||'ошибка сервера'),'error');
+ }
+ button.disabled=false;
+};
+
 /* ---------- загрузка и обновление ---------- */
 function setBusy(on){
  S.busy=on;
@@ -6809,9 +6850,10 @@ function setBusy(on){
 async function load(force){
  const my=++S.seq;
  const body=$('digestBody');
- const cached=S.data&&S.data.month===S.month?S.data:null;
+ const cached=S.cache[S.month]||null;
  note('');
  if(cached){
+  S.data=cached;
   if(!force||!body.querySelector('.dg-page'))render(cached);
   if(force)body.classList.add('dg-busy');
   if(force)note('Пересчитываю дайджест — это займёт несколько секунд…');
@@ -6825,14 +6867,14 @@ async function load(force){
   if(my!==S.seq)return;
   setAccess(true,'Сервер подтвердил доступ');
   const same=cached&&cached.created_at===data.created_at&&cached.revision===data.revision&&!!cached.ai===!!data.ai;
-  S.data=data;
+  S.data=data;S.cache[S.month]=data;
   if(!same||force)render(data);
   note(force?'Анализ обновлён.':'');
   if(force)setTimeout(()=>{if(my===S.seq)note('');},2500);
  }catch(error){
   if(my!==S.seq)return;
   handleAccessError(error);
-  if(S.data&&S.data.month===S.month){
+  if(cached){
    note('Не удалось обновить: '+error.message,'err');
   }else{
    body.innerHTML='<div class="dg-banner"><b>Не получилось открыть дайджест.</b> '+escapeHtml(error.message)+'<br><br><button class="analytics-retry" type="button" onclick="refreshDigest()">Повторить</button></div>';
@@ -6847,8 +6889,27 @@ window.openDigest=function(){
  document.querySelectorAll('.screen').forEach(screen=>screen.classList.toggle('active',screen.id==='screen-digest'));
  window.scrollTo({top:0,behavior:'smooth'});
  if(typeof selectionHaptic==='function')selectionHaptic();
- const heading=$('digestHeading');
- if(heading)heading.textContent=card&&card.title?card.title.replace('Дайджест за ','Дайджест · '):'Дайджест';
+ load(false);
+ loadMonths();
+};
+async function loadMonths(){
+ try{
+  const info=await api('digest_list');
+  if(info&&Array.isArray(info.months)){S.months=info.months;updateNav();}
+ }catch(error){/* без списка просто нет стрелок */}
+}
+function updateNav(){
+ const i=S.months.indexOf(S.month),prev=$('dgPrev'),next=$('dgNext');
+ if(prev)prev.disabled=!(i>=0&&i<S.months.length-1);
+ if(next)next.disabled=!(i>0);
+}
+window.digestGo=function(step){
+ if(S.busy)return;
+ const i=S.months.indexOf(S.month),target=S.months[i-step];
+ if(i<0||!target)return;
+ if(typeof selectionHaptic==='function')selectionHaptic();
+ S.month=target;
+ window.scrollTo({top:0,behavior:'smooth'});
  load(false);
 };
 window.refreshDigest=function(){
