@@ -1161,13 +1161,13 @@ button.st-ico:active{transform:scale(.88)}
 /* ============================================================
    МЕСЯЧНЫЙ AI-ДАЙДЖЕСТ: карточка на главной и страница дайджеста
    ============================================================ */
-.metric.digest-card{margin-top:12px;position:relative;cursor:pointer;--glow:82,103,232;padding:13px 15px;overflow:hidden;transition:opacity .22s ease,transform .22s ease,max-height .28s ease,margin .28s ease,padding .28s ease}
+.metric.digest-card{margin-top:12px;position:relative;cursor:pointer;--glow:47,109,246;padding:13px 15px;overflow:hidden;transition:opacity .22s ease,transform .22s ease,max-height .28s ease,margin .28s ease,padding .28s ease}
 .metric.digest-card[hidden]{display:none}
 .metric.digest-card:active{transform:scale(.985)}
 .metric.digest-card.closing{opacity:0;transform:scale(.96);max-height:0!important;margin-bottom:0;padding-top:0;padding-bottom:0}
 .metric.digest-card .metric-head{margin-bottom:0;min-height:48px;padding-right:34px}
-.metric.digest-card .metric-icon{background:linear-gradient(145deg,#eef0ff,#d6dcfb)}
-:root[data-theme="dark"] .metric.digest-card .metric-icon{background:linear-gradient(145deg,#2a3068,#1b2046)}
+.metric.digest-card .metric-icon{background:linear-gradient(145deg,#e4efff,#c8defd)}
+:root[data-theme="dark"] .metric.digest-card .metric-icon{background:linear-gradient(145deg,#1f3a73,#16294f)}
 .metric.digest-card .metric-latest{color:var(--muted);font-weight:600}
 .digest-x{position:absolute;top:8px;right:8px;width:28px;height:28px;padding:0;border:0;border-radius:50%;background:var(--input-bg);color:var(--muted);font-size:19px;line-height:1;display:grid;place-items:center;cursor:pointer}
 .digest-x:active{transform:scale(.9)}
@@ -1178,7 +1178,7 @@ button.st-ico:active{transform:scale(.88)}
 .dg-note[hidden]{display:none}
 #digestBody.dg-busy .dg-page{opacity:.45;pointer-events:none}
 .dg-page{transition:opacity .2s}
-.dg-hero{display:grid;grid-template-columns:40px minmax(0,1fr) 40px;align-items:center;gap:6px;border-radius:22px;padding:14px 10px;margin-bottom:13px;color:#fff;background:linear-gradient(135deg,#5267e8 0%,#7d6be8 100%);box-shadow:0 16px 30px -16px rgba(82,103,232,.7)}
+.dg-hero{display:grid;grid-template-columns:40px minmax(0,1fr) 40px;align-items:center;gap:6px;border-radius:22px;padding:14px 10px;margin-bottom:13px;color:#fff;background:linear-gradient(135deg,#2f6df6 0%,#27b4e6 100%);box-shadow:0 16px 30px -16px rgba(47,109,246,.7)}
 .dg-hero-center{text-align:center;min-width:0}
 .dg-hero-month{font-size:23px;font-weight:800;letter-spacing:-.4px;line-height:1.15}
 .dg-hero-meta{margin-top:5px;font-size:12px;font-weight:600;opacity:.82}
@@ -1193,7 +1193,7 @@ button.st-ico:active{transform:scale(.88)}
 .dg-text{margin:0;font-size:14.5px;line-height:1.5}
 .dg-list{margin:0;padding:0;list-style:none;display:grid;gap:9px}
 .dg-list li{position:relative;padding-left:19px;font-size:14.5px;line-height:1.45}
-.dg-list li::before{content:"";position:absolute;left:2px;top:.52em;width:8px;height:8px;border-radius:50%;background:var(--dg-dot,#5267e8)}
+.dg-list li::before{content:"";position:absolute;left:2px;top:.52em;width:8px;height:8px;border-radius:50%;background:var(--dg-dot,#2f6df6)}
 .dg-sec.good{--dg-dot:#2ea66a}
 .dg-sec.warn{--dg-dot:#f0a23a}
 .dg-tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}
@@ -1212,13 +1212,23 @@ button.st-ico:active{transform:scale(.88)}
 .dg-seg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin:12px 0 4px;padding:3px;border-radius:999px;background:var(--input-bg)}
 .dg-seg button{height:34px;border:0;border-radius:999px;background:transparent;color:var(--muted);font-size:13px;font-weight:700;cursor:pointer;transition:background .2s,color .2s}
 .dg-seg button.active{background:var(--card);color:var(--text);box-shadow:0 1px 4px rgba(60,72,150,.16)}
-.dg-meta{margin:2px 4px 10px;text-align:center;font-size:11px;line-height:1.5;color:var(--muted)}
+.dg-top-wrap{display:flex;justify-content:center;margin:2px 0 18px}
+.dg-top{width:40px;height:40px;padding:0 0 2px;border:0;border-radius:50%;background:var(--card);color:var(--muted);box-shadow:var(--shadow);font-size:20px;line-height:1;display:grid;place-items:center;cursor:pointer}
+.dg-top:active{transform:scale(.92)}
+.dg-missing{text-align:center;padding:26px 18px 22px}
+.dg-missing-ico{font-size:36px;line-height:1;margin-bottom:10px}
+.dg-missing h3{justify-content:center;margin-bottom:8px}
+.dg-load{margin-top:16px;height:48px;padding:0 24px;border:0;border-radius:16px;background:linear-gradient(135deg,#2f6df6,#27b4e6);color:#fff;font-size:16px;font-weight:750;cursor:pointer;box-shadow:0 12px 22px -12px rgba(47,109,246,.7)}
+.dg-load:active{transform:scale(.97)}
+.quick-icon.azure{background:linear-gradient(145deg,#e4efff,#c8defd)}
+:root[data-theme="dark"] .quick-icon.azure{background:linear-gradient(145deg,#1f3a73,#16294f)}
+.dp-nav button:disabled{opacity:.28;cursor:default}
 
 /* Главная: «К врачу» — обычная кнопка, рядом постоянная кнопка «AI дайджест» */
 .quick-chip.q-doctor{background:linear-gradient(150deg,rgba(32,169,155,.15) 0%,transparent 62%),var(--card-grad)}
 :root[data-theme="dark"] .quick-chip.q-doctor{background:linear-gradient(150deg,rgba(69,224,203,.18) 0%,transparent 62%),var(--card-grad)}
-.quick-chip.q-digest{background:linear-gradient(150deg,rgba(104,92,232,.15) 0%,transparent 62%),var(--card-grad)}
-:root[data-theme="dark"] .quick-chip.q-digest{background:linear-gradient(150deg,rgba(143,155,255,.2) 0%,transparent 62%),var(--card-grad)}
+.quick-chip.q-digest{background:linear-gradient(150deg,rgba(47,109,246,.15) 0%,transparent 62%),var(--card-grad)}
+:root[data-theme="dark"] .quick-chip.q-digest{background:linear-gradient(150deg,rgba(90,150,255,.22) 0%,transparent 62%),var(--card-grad)}
 .screen.active>.quick-grid>:nth-child(8){animation-delay:.56s}
 </style>
 </head>
@@ -1318,14 +1328,14 @@ button.st-ico:active{transform:scale(.88)}
 </div>
 <!-- --- Быстрые кнопки --- -->
 <section class="quick-grid">
-<button class="quick-button quick-chip q-today" onclick="openAction('today')"><span class="quick-icon blue">☀️</span><span class="quick-label">Сегодня</span></button>
-<button class="quick-button quick-chip q-yest" onclick="openAction('yesterday')"><span class="quick-icon orange">🌙</span><span class="quick-label">Вчера</span></button>
+<button class="quick-button quick-chip q-today" onclick="openDayPager(0)"><span class="quick-icon blue">☀️</span><span class="quick-label">Сегодня</span></button>
+<button class="quick-button quick-chip q-yest" onclick="openDayPager(-1)"><span class="quick-icon orange">🌙</span><span class="quick-label">Вчера</span></button>
 <button class="quick-button quick-chip" onclick="openAction('week')"><span class="quick-icon purple">📊</span><span class="quick-label">Среднее за неделю</span></button>
 <button class="quick-button quick-chip" onclick="openAction('month')"><span class="quick-icon green">🗓️</span><span class="quick-label">Среднее за месяц</span></button>
 <button class="quick-button quick-chip" onclick="openAction('excel')"><span class="quick-icon yellow">📗</span><span class="quick-label">Excel</span></button>
 <button class="quick-button quick-chip" onclick="openAction('memory')"><span class="quick-icon gray">⚙️</span><span class="quick-label">Память</span></button>
+<button class="quick-button quick-chip q-digest" onclick="openDigest()"><span class="quick-icon azure">✨</span><span class="quick-label">AI дайджест</span></button>
 <button class="quick-button quick-chip q-doctor" onclick="openDoctor()"><span class="quick-icon green">🩺</span><span class="quick-label">К врачу</span></button>
-<button class="quick-button quick-chip q-digest" onclick="openDigest()"><span class="quick-icon purple">✨</span><span class="quick-label">AI дайджест</span></button>
 </section>
 </section>
 <!-- === ЭКРАН «К ВРАЧУ» === -->
@@ -1583,7 +1593,7 @@ button.st-ico:active{transform:scale(.88)}
 <button class="st-row has-ico st-nav" type="button" onclick="stOpen('report')"><span class="st-ico c-blue"><svg class="g"><use href="#i-cal"/></svg></span><span class="st-t">Ежедневный отчёт</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
 <button class="st-row has-ico st-nav" type="button" onclick="stOpen('food')"><span class="st-ico c-purple"><svg class="g"><use href="#i-meal"/></svg></span><span class="st-t">Еда</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
 <button class="st-row has-ico st-nav" type="button" onclick="stOpen('target')"><span class="st-ico c-green"><svg class="g"><use href="#i-target"/></svg></span><span class="st-t">Целевой диапазон</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
-<button class="st-row has-ico st-nav" type="button" onclick="stOpen('digest')"><span class="st-ico c-purple"><svg class="g"><use href="#i-cal"/></svg></span><span class="st-t">AI-дайджест</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
+<button class="st-row has-ico st-nav" type="button" onclick="stOpen('digest')"><span class="st-ico c-blue"><svg class="g"><use href="#i-cal"/></svg></span><span class="st-t">AI-дайджест</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
 </div>
 <div class="st-card">
 <button class="st-row has-ico st-nav" type="button" onclick="stOpen('theme')"><span class="st-ico c-sky"><svg class="g"><use href="#i-theme"/></svg></span><span class="st-t">Оформление</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
@@ -5622,7 +5632,7 @@ stRefresh();
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const APP_VERSION='v20261107_2';          /* ← менять при каждом обновлении: vГГГГММДД_N */
+const APP_VERSION='v20261108_1';          /* ← менять при каждом обновлении: vГГГГММДД_N */
 const DEV_CHAT='https://t.me/larik_11';
 const CH_IDS=['trend','compare','range','distribution','daily','activity','dynamics','effect','summary'];
 const CH_NAMES={trend:'Динамика по дням',compare:'Сравнение трёх недель',range:'Доля в целевом диапазоне',distribution:'Распределение измерений',daily:'Суточная сводка',activity:'Активность по времени',dynamics:'Тренды',effect:'Укол и сахар',summary:'Итоги'};
@@ -6204,6 +6214,11 @@ function dpRender(){
  const el=$('dayPopup');
  if(!el)return;
  el.innerHTML=dpHtml(dpState.specs[dpState.idx](),dpState.specs.length>1);
+ if(dpState.noWrap){ /* листание по дням: на краях стрелка неактивна, по кругу не ходим */
+  const pv=el.querySelector('.dp-prev'),nx=el.querySelector('.dp-next');
+  if(pv)pv.disabled=dpState.idx===0;
+  if(nx)nx.disabled=dpState.idx===dpState.specs.length-1;
+ }
  const list=el.querySelector('.dp-list');
  if(list)list.addEventListener('scroll',dpMoreCheck,{passive:true});
  dpMoreCheck();
@@ -6213,8 +6228,13 @@ function dpRender(){
 function dpNav(delta){
  const n=dpState.specs.length;
  if(n<2)return;
- dpState.idx=(dpState.idx+delta+n)%n;
+ if(dpState.noWrap){
+  const next=dpState.idx+delta;
+  if(next<0||next>=n)return;
+  dpState.idx=next;
+ }else dpState.idx=(dpState.idx+delta+n)%n;
  dpRender();
+ if(dpState.pager)pagerMaybeExtend();
  if(typeof selectionHaptic==='function')selectionHaptic();
 }
 function closeDayPopup(){
@@ -6225,9 +6245,10 @@ function closeDayPopup(){
  document.removeEventListener('keydown',el._onKey);
  setTimeout(()=>{if(!el.classList.contains('visible'))el.remove();},200);
 }
-function dpOpen(specs,idx){
+function dpOpen(specs,idx,opts){
  if(!specs||!specs.length)return;
  dpState.pending=false;
+ dpState.noWrap=!!(opts&&opts.noWrap);dpState.pager=!!(opts&&opts.pager);dpState.extending=false;
  const old=$('dayPopup');if(old)old.remove();
  dpState.specs=specs;dpState.idx=Math.max(0,Math.min(specs.length-1,idx||0));
  const el=document.createElement('div');
@@ -6293,6 +6314,37 @@ window.showDayInMetrics=function(off){
  off=Math.max(-(DAYS-1),off);
  if(!hist){getHistory(false).then(()=>openDayPopup(off)).catch(error=>console.error('Не удалось загрузить день:',error));return;}
  openDayPopup(off);
+};
+
+/* ===== «Сегодня» / «Вчера»: то же окно дня; стрелки листают дни назад и вперёд ===== */
+function pagerSpecs(){
+ const specs=[];
+ for(let k=DAYS-1;k>=0;k--){const off=-k;specs.push(()=>daySpec(off));} /* от старых к сегодняшнему */
+ return specs;
+}
+function pagerMaybeExtend(){
+ if(!dpState.pager||!$('dayPopup')||DAYS>=MAX_DAYS||dpState.idx>2||dpState.extending)return;
+ dpState.extending=true;
+ DAYS=Math.min(MAX_DAYS,DAYS+14);
+ fetchHist().then(()=>{
+  dpState.extending=false;
+  if(!$('dayPopup')||!dpState.pager)return;
+  const curOff=-(dpState.specs.length-1-dpState.idx); /* какой день открыт сейчас */
+  dpState.specs=pagerSpecs();dpState.idx=DAYS-1+curOff;dpRender();
+ }).catch(error=>{dpState.extending=false;console.error('Не удалось подгрузить прошлые дни:',error);});
+}
+window.openDayPager=function(off){
+ off=Math.min(0,Math.trunc(Number(off)||0));
+ const open=()=>dpOpen(pagerSpecs(),DAYS-1+off,{noWrap:true,pager:true});
+ if(hist){ /* окно сразу, свежие данные подтянутся и перерисуют его */
+  open();
+  getHistory(false).then(()=>{if($('dayPopup')&&dpState.pager)dpRender();}).catch(()=>{});
+  return;
+ }
+ getHistory(false).then(open).catch(error=>{
+  console.error('Не удалось загрузить день:',error);
+  if(typeof openAction==='function')openAction(off===0?'today':'yesterday'); /* запасной вариант: прежний текст */
+ });
 };
 
 /* ===== Оборот карточки «Инсулин»: похожие случаи из истории (sema_analytics.py) ===== */
@@ -6664,8 +6716,23 @@ function empty(text){return '<div class="dg-empty">'+text+'</div>';}
 function chartBox(title,inner){return '<div class="dg-chart"><div class="dg-chart-title">'+title+'</div>'+inner+'</div>';}
 const waiting='<div class="analytics-message">Загружаю график…</div>';
 
+function hero(name,meta){
+ return '<div class="dg-hero"><button class="dg-nav" id="dgPrev" type="button" onclick="digestGo(-1)" aria-label="Предыдущий месяц" disabled>‹</button>'
+  +'<div class="dg-hero-center"><div class="dg-hero-month">'+escapeHtml(up1(name))+'</div><div class="dg-hero-meta">'+escapeHtml(meta)+'</div></div>'
+  +'<button class="dg-nav" id="dgNext" type="button" onclick="digestGo(1)" aria-label="Следующий месяц" disabled>›</button></div>';
+}
+const toTop='<div class="dg-top-wrap"><button class="dg-top" type="button" aria-label="Наверх" onclick="window.scrollTo({top:0,behavior:\'smooth\'})">↑</button></div>';
+function renderMissing(data){
+ const month=data.month_name||'';
+ $('digestBody').innerHTML='<div class="dg-page">'+hero(month,'Ещё не загружен')
+  +'<section class="dg-sec dg-missing"><div class="dg-missing-ico">📭</div><h3>Дайджест за этот месяц ещё не создан</h3>'
+  +'<p class="dg-text">Прошлые месяцы сами не загружаются. Нажми кнопку, и бот посчитает дайджест по данным таблицы и сохранит его.</p>'
+  +'<button class="dg-load" type="button" onclick="refreshDigest()">Загрузить дайджест</button></section></div>';
+ updateNav();
+}
 function render(data){
  const body=$('digestBody');
+ if(data&&data.missing){renderMissing(data);return;}
  if(!data||!data.stats||!data.stats.current){
   body.innerHTML='<div class="dg-banner">Дайджест пришёл в неожиданном формате. Нажми ↻, чтобы посчитать заново.</div>';
   return;
@@ -6677,9 +6744,7 @@ function render(data){
  const cap=prevName?'<div class="dg-foot">▲ ▼ — изменение к месяцу «'+escapeHtml(prevName)+'». Зелёным отмечено улучшение, красным — ухудшение.</div>'
   :'<div class="dg-foot">Сравнить с прошлым месяцем нельзя: за него нет данных.</div>';
  let html='<div class="dg-page">';
- html+='<div class="dg-hero"><button class="dg-nav" id="dgPrev" type="button" onclick="digestGo(-1)" aria-label="Предыдущий месяц" disabled>‹</button>'
-  +'<div class="dg-hero-center"><div class="dg-hero-month">'+escapeHtml(up1(st.period.name))+'</div><div class="dg-hero-meta">Рассчитано '+escapeHtml(when(data.created_at))+'</div></div>'
-  +'<button class="dg-nav" id="dgNext" type="button" onclick="digestGo(1)" aria-label="Следующий месяц" disabled>›</button></div>';
+ html+=hero(st.period.name,'Рассчитано '+when(data.created_at));
  if(!ai)html+='<div class="dg-banner"><b>AI-комментарий не получился:</b> '+escapeHtml(String(data.ai_error||'модель не ответила').replace(/[.\s]+$/,''))+'. Статистика ниже посчитана по таблице. Нажми ↻, чтобы повторить.</div>';
 
  // общий итог
@@ -6696,8 +6761,8 @@ function render(data){
    tile('Медиана',m1(sg.median),'ммоль/л',delta(get(ch,'sugar','median'))),
    tile('Минимум / максимум',m1(sg.min)+' / '+m1(sg.max),''),
    tile('Разброс',m1(sg.sd),'ммоль/л',delta(get(ch,'sugar','sd')),'стандартное отклонение'+(sg.cv_pct!=null?' · '+Math.round(sg.cv_pct)+'%':'')),
-   tile('Измерений',String(sg.n),'',delta(get(ch,'sugar','n')),'в среднем '+(sg.per_day_with_data==null?'—':fmtDose(sg.per_day_with_data))+' в день с данными'),
-   tile('Дней с данными',String(sg.days_with_data),'','','с сахаром ниже '+rng(low)+': '+sg.days_with_low)
+   tile('Измерений',String(sg.n),'',delta(get(ch,'sugar','n')),sg.per_day_with_data==null?'':'в среднем '+fmtDose(sg.per_day_with_data)+' в день'),
+   tile('Дней с сахаром ниже '+rng(low),String(sg.days_with_low),'дн.')
   ]);
   sugarInner+=chartBox('Доля измерений в диапазоне','<div id="dg-donut" class="range-donut"></div><div id="dg-legend" class="range-legend"></div><div id="dg-compare" class="range-compare"></div>');
   sugarInner+=chartBox('Сахар по дням: минимум · среднее · максимум','<div id="dg-daily" class="chart-wrap">'+waiting+'</div><div id="dg-daily-tip" class="chart-tooltip" role="status"></div>');
@@ -6709,9 +6774,9 @@ function render(data){
  if(sh.has_data){
   shortInner+=tiles([
    tile('Сумма за месяц',u1(sh.sum),'ед.',delta(get(ch,'short','sum'),{unit:'ед.'})),
-   tile('В среднем за день',u1(sh.avg_per_day),'ед.',delta(get(ch,'short','avg_per_day'),{unit:'ед.'}),'только дни с записями'),
-   tile('Дней с данными',String(sh.days_with_data),''),
-   tile('Инъекций',String(sh.injections),'','','в среднем '+u1(sh.avg_per_injection)+' ед.')
+   tile('В среднем за день',u1(sh.avg_per_day),'ед.',delta(get(ch,'short','avg_per_day'),{unit:'ед.'})),
+   tile('Инъекций',String(sh.injections),'','','в среднем '+u1(sh.avg_per_injection)+' ед.'),
+   tile('Максимум за день',u1(sh.max_day_sum),'ед.')
   ]);
   shortInner+=chartBox('Короткий инсулин по дням','<div id="dg-dose-ins" class="chart-wrap">'+waiting+'</div><div id="dg-dose-ins-sum" class="dose-summary"></div><div id="dg-dose-ins-tip" class="chart-tooltip" role="status"></div>');
  }else shortInner+=empty('За этот месяц нет записей короткого инсулина.');
@@ -6723,7 +6788,7 @@ function render(data){
   nightInner+=tiles([
    tile('Сумма за месяц',u1(ng.sum),'ед.',delta(get(ch,'night','sum'),{unit:'ед.'})),
    tile('В среднем за день',u1(ng.avg_per_day),'ед.',delta(get(ch,'night','avg_per_day'),{unit:'ед.'}),'доза на '+ng.at),
-   tile('Дней с данными',String(ng.days_with_data),''),
+   tile('Минимум / максимум',u1(ng.min)+' / '+u1(ng.max),'ед.'),
    tile('Начало → конец месяца',u1(ng.first_value)+' → '+u1(ng.last_value),'ед.','','смен дозы: '+ng.changes)
   ]);
   nightInner+=chartBox('Ночной по дням','<div id="dg-dose-night" class="chart-wrap">'+waiting+'</div><div id="dg-dose-night-sum" class="dose-summary"></div><div id="dg-dose-night-tip" class="chart-tooltip" role="status"></div>');
@@ -6746,7 +6811,7 @@ function render(data){
 
  if(ai)html+=section('','💬','Заключение',para(ai.conclusion));
 
- html+='<div class="dg-meta">Обновить разбор можно кнопкой ↻ вверху.</div></div>';
+ html+=toTop+'</div>';
  body.innerHTML=html;
  updateNav();
  drawCharts(data);
