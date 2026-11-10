@@ -1023,6 +1023,18 @@ button.st-ico:active{transform:scale(.88)}
 .food-plus{flex:none;width:48px;height:48px;border:0;border-radius:15px;background:var(--input-bg);color:var(--teal);display:grid;place-items:center;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .3s cubic-bezier(.34,1.5,.4,1)}
 .food-plus:active{transform:scale(.9)}
 .food-plus svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round}
+.food-suggest{display:flex;flex-wrap:wrap;gap:8px;margin:-4px 0 14px}
+.food-suggest:empty{display:none}
+.food-sug{border:1.5px solid rgba(32,169,155,.5);background:rgba(32,169,155,.12);color:var(--text);font:inherit;font-size:15px;font-weight:600;padding:8px 14px;border-radius:999px;cursor:pointer;-webkit-tap-highlight-color:transparent;animation:foodChipIn .28s cubic-bezier(.22,1,.36,1) both;animation-delay:calc(var(--i,0)*24ms)}
+.food-sug b{font-weight:850;color:#13867a;background:rgba(32,169,155,.2);border-radius:5px;padding:0 1px}
+:root[data-theme="dark"] .food-sug b{color:#7cf0de;background:rgba(69,224,203,.2)}
+.food-sug:active{transform:scale(.94)}
+.timer-food-btn{flex:none;width:44px;height:44px;padding:0;border:0;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.6);color:#176d63;box-shadow:inset 0 0 0 1px rgba(32,169,155,.28);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .2s ease,opacity .2s}
+.timer-food-btn[hidden]{display:none}
+.timer-food-btn svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.timer-food-btn:active{transform:scale(.9)}
+.timer-food-btn.busy{opacity:.5;pointer-events:none}
+:root[data-theme="dark"] .timer-food-btn{background:rgba(255,255,255,.08);color:#9aeee2;box-shadow:inset 0 0 0 1px rgba(69,224,203,.28)}
 .food-preview{border-radius:16px;padding:11px 14px;margin-bottom:14px;background:rgba(32,169,155,.09);border:1px dashed rgba(32,169,155,.4)}
 .food-preview small{display:block;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
 .food-preview div{font-size:15px;font-weight:650;line-height:1.35;overflow-wrap:anywhere}
@@ -1309,6 +1321,7 @@ button.st-ico:active{transform:scale(.88)}
 <span class="insulin-timer-label">После инъекции</span>
 <span class="insulin-timer-next" id="insulinTimerNext"></span>
 </div>
+<button class="timer-food-btn" id="timerFoodBtn" type="button" hidden onclick="editTimerFood()" aria-label="Изменить еду" title="Изменить еду"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4l10.5-10.5a2.1 2.1 0 0 0-3-3L5 17v3z"/><path d="M13.5 8.5l3 3"/></svg></button>
 </div>
 </section>
 </div></div>
@@ -1792,7 +1805,8 @@ button.st-ico:active{transform:scale(.88)}
 <section class="food-sheet" role="dialog" aria-modal="true" aria-labelledby="foodTitle">
 <div class="food-top"><div class="food-ico" id="foodIco">🍽️</div><div><div class="food-title" id="foodTitle">Что ешь?</div><div class="food-sub" id="foodSub"></div></div></div>
 <div class="food-chips" id="foodChips"></div>
-<div class="food-add"><input class="food-input" id="foodInput" type="text" enterkeyhint="done" maxlength="40" autocomplete="off" placeholder="Добавь своё…" aria-label="Добавить блюдо"><button class="food-plus" id="foodPlus" type="button" aria-label="Добавить"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div>
+<div class="food-add"><input class="food-input" id="foodInput" type="text" enterkeyhint="done" maxlength="40" autocomplete="off" placeholder="Начни писать блюдо…" aria-label="Добавить блюдо"><button class="food-plus" id="foodPlus" type="button" aria-label="Добавить"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div>
+<div class="food-suggest" id="foodSuggest" aria-live="polite"></div>
 <div class="food-preview empty" id="foodPreview"></div>
 <div class="food-actions"><button class="food-skip" type="button" onclick="closeFoodSheet()">Пропустить</button><button class="food-save" id="foodSave" type="button" onclick="submitFood()">Записать</button></div>
 <div class="toast" id="foodToast"></div>
@@ -2090,7 +2104,7 @@ text.textContent='Доступ запрещён';
 description.textContent=message||'Обратись к администратору бота';
 }else{
 text.textContent='Ожидает проверки';
-description.textContent=message||'Статус будет уточнён сервером';
+description.textContent=message||'';
 }
 }
 function closeMiniApp(){
@@ -2106,7 +2120,7 @@ function initUser(){
 const user=tg?.initDataUnsafe?.user;
 document.getElementById('userName').textContent=user?[user.first_name,user.last_name].filter(Boolean).join(' '):'Не удалось получить имя';
 if(!tg||!tg.initData)setAccess(false,'Открой Mini App через Telegram');
-else setAccess(null,'Статус проверяется при обращении к серверу');
+else setAccess(null,'');
 }
 
 // ============================================================
@@ -2218,6 +2232,8 @@ function renderInsulinTimer(){
   return;
  }
  container.hidden=false;
+ const foodButton=document.getElementById('timerFoodBtn');
+ if(foodButton)foodButton.hidden=!activeInsulinTimer.entry;  /* кнопка живёт ровно столько же, сколько таймер */
  const elapsed=Math.min(TIMER_DURATION_MS,Math.max(0,Date.now()-activeInsulinTimer.startedAt));
  countdown.textContent=formatTimerElapsed(elapsed);
  countdown.setAttribute('aria-label',`${Math.floor(elapsed/60000)} минут прошло`);
@@ -2313,7 +2329,10 @@ function applyTimerPayload(data){
   if(activeInsulinTimer)clearInsulinTimer();
   return;
  }
- if(activeInsulinTimer&&activeInsulinTimer.id===timer.id)return;
+ if(activeInsulinTimer&&activeInsulinTimer.id===timer.id){
+  if(timer.entry&&!activeInsulinTimer.entry){activeInsulinTimer.entry=timer.entry;renderInsulinTimer();}
+  return;
+ }
  const offset=Number(data.server_now_ms)-Date.now();
  const startedAt=Number(timer.started_at_ms)-offset;
  const elapsed=Date.now()-startedAt;
@@ -2328,7 +2347,7 @@ function applyTimerPayload(data){
  }catch(error){}
  /* Если таймер подхвачен «на ходу», пропущенные напоминания не повторяем. */
  TIMER_REMINDERS_MS.forEach((reminder,index)=>{if(elapsed-reminder>15000)notified[index]=true;});
- activeInsulinTimer={id:timer.id,startedAt,dose:Number(timer.dose),notified};
+ activeInsulinTimer={id:timer.id,startedAt,dose:Number(timer.dose),notified,entry:timer.entry||null};
  persistTimerState();
  renderInsulinTimer();
  collapseYesterdayCard();
@@ -2349,6 +2368,24 @@ async function saveSharedTimerSettings(change){
   console.warn('Не удалось сохранить настройки таймера:',error);
   uiHaptic('error');
   await syncInsulinTimer();
+ }
+}
+let timerFoodBusy=false;
+async function editTimerFood(){
+ const entry=activeInsulinTimer&&activeInsulinTimer.entry;
+ if(!entry||timerFoodBusy)return;
+ const button=document.getElementById('timerFoodBtn');
+ timerFoodBusy=true;
+ if(button)button.classList.add('busy');
+ try{
+  const result=await api('food_edit',{entry});
+  openFoodSheet(result.food,entry,entry.value,{edit:true,current:result.current});
+ }catch(error){
+  setToast(document.getElementById('insulinToast'),'Не удалось открыть еду: '+error.message,'error');
+  handleAccessError(error);
+ }finally{
+  timerFoodBusy=false;
+  if(button)button.classList.remove('busy');
  }
 }
 function clearInsulinTimer(){
@@ -2572,6 +2609,84 @@ let foodState=null;
 function foodSplit(text){
  return String(text||'').split(/[,;\n]+/).map(s=>s.replace(/\s+/g,' ').trim().slice(0,40)).filter(Boolean);
 }
+/* ----- умный поиск по справочнику блюд ----- */
+const foodFold=text=>String(text||'').toLowerCase().replace(/ё/g,'е');          /* длина строки не меняется — нужно для подсветки */
+const foodNorm=text=>foodFold(text).replace(/\s+/g,' ').trim();
+function foodWords(text){
+ const out=[],re=/[a-zа-я0-9]+/g,folded=foodFold(text);
+ let m;
+ while((m=re.exec(folded)))out.push({w:m[0],start:m.index});
+ return out;
+}
+function foodDist(a,b){
+ let prev=Array.from({length:b.length+1},(_,j)=>j);
+ for(let i=1;i<=a.length;i++){
+  const cur=[i];
+  for(let j=1;j<=b.length;j++)cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));
+  prev=cur;
+ }
+ return prev[b.length];
+}
+/* Каждое слово запроса должно найтись в названии (в любом порядке): «чече» находит «суп чечевичный»
+   и «чечевичный суп». Слово ищется по началу слова, потом с одной опечаткой, потом внутри слова. */
+function foodMatch(tokens,text){
+ const words=foodWords(text),used=new Set(),marks=[];
+ let score=0;
+ for(const token of tokens){
+  let best=-1,bestScore=0,bestAt=0;
+  words.forEach((word,i)=>{
+   if(used.has(i))return;
+   let value=0,at=word.start;
+   if(word.w.startsWith(token))value=word.w===token?4:3;
+   else if(token.length>=4&&word.w.length>=token.length&&foodDist(token,word.w.slice(0,token.length))<=1)value=2;
+   else if(token.length>=3&&word.w.includes(token)){value=1;at=word.start+word.w.indexOf(token);}
+   if(value>bestScore){best=i;bestScore=value;bestAt=at;}
+  });
+  if(best<0)return null;
+  used.add(best);score+=bestScore;marks.push([bestAt,bestAt+token.length]);
+ }
+ return {score,marks};
+}
+function foodHighlight(text,marks){
+ const sorted=marks.slice().sort((a,b)=>a[0]-b[0]);
+ let html='',pos=0;
+ sorted.forEach(([from,to])=>{
+  if(from<pos)from=pos;
+  if(to<=from)return;
+  html+=escapeHtml(text.slice(pos,from))+'<b>'+escapeHtml(text.slice(from,to))+'</b>';
+  pos=to;
+ });
+ return html+escapeHtml(text.slice(pos));
+}
+function renderFoodSuggest(){
+ const box=document.getElementById('foodSuggest');
+ if(!box)return;
+ if(!foodState){box.innerHTML='';return;}
+ const tokens=foodFold(document.getElementById('foodInput').value).match(/[a-zа-я0-9]+/g)||[];
+ if(!tokens.length){foodState.suggest=[];box.innerHTML='';return;}
+ const taken=new Set(foodState.chips.filter(c=>c.on).map(c=>foodNorm(c.text)));
+ const found=[];
+ foodState.directory.forEach((text,order)=>{
+  if(taken.has(foodNorm(text)))return;
+  const match=foodMatch(tokens,text);
+  if(match)found.push({text,order,score:match.score,marks:match.marks});
+ });
+ found.sort((a,b)=>b.score-a.score||a.order-b.order);
+ foodState.suggest=found.slice(0,6);
+ box.innerHTML=foodState.suggest.map((item,i)=>'<button class="food-sug" type="button" style="--i:'+i+'" onmousedown="event.preventDefault()" onclick="pickFoodSuggestion('+i+')">'+foodHighlight(item.text,item.marks)+'</button>').join('');
+}
+function pickFoodSuggestion(i){
+ if(!foodState||foodState.busy||!foodState.suggest[i])return;
+ const text=foodState.suggest[i].text,key=foodNorm(text);
+ const existing=foodState.chips.find(c=>foodNorm(c.text)===key);
+ if(existing)existing.on=true;
+ else foodState.chips.push({text,on:true});
+ const input=document.getElementById('foodInput');
+ input.value='';
+ selectionHaptic();
+ renderFoodSheet();
+ input.focus({preventScroll:true});
+}
 function foodChosenText(){
  return foodState?foodState.chips.filter(c=>c.on).map(c=>c.text).join(', '):'';
 }
@@ -2587,8 +2702,9 @@ function updateFoodSummary(){
  const text=foodChosenText();
  const preview=document.getElementById('foodPreview');
  preview.classList.toggle('empty',!text);
- preview.innerHTML='<small>Запишу в таблицу</small><div>'+(text?escapeHtml(text):'Выбери из списка или напиши своё')+'</div>';
+ preview.innerHTML='<small>Запишу в таблицу</small><div>'+(text?escapeHtml(text):'Выбери блюдо или напиши своё')+'</div>';
  document.getElementById('foodSave').disabled=foodState.busy||(!text&&!document.getElementById('foodInput').value.trim());
+ renderFoodSuggest();
 }
 function toggleFoodChip(i){
  if(!foodState||foodState.busy||!foodState.chips[i])return;
@@ -2602,7 +2718,7 @@ function addFoodTyped(){
  const words=foodSplit(input.value);
  if(!words.length)return false;
  for(const word of words){
-  const existing=foodState.chips.find(c=>c.text.toLowerCase()===word.toLowerCase());
+  const existing=foodState.chips.find(c=>foodNorm(c.text)===foodNorm(word));
   if(existing)existing.on=true;
   else foodState.chips.push({text:word,on:true});
  }
@@ -2611,20 +2727,31 @@ function addFoodTyped(){
  renderFoodSheet();
  return true;
 }
-function openFoodSheet(food,entry,dose){
+function openFoodSheet(food,entry,dose,opts){
  if(!food||!food.enabled||!entry)return;
- foodState={entry,busy:false,period:food.period||null,known:new Set((food.items||[]).map(item=>String(item.text).toLowerCase())),chips:(food.items||[]).map(item=>({text:item.text,on:!!item.selected}))};
- document.getElementById('foodTitle').textContent=food.title||'Что ешь?';
+ const edit=!!(opts&&opts.edit);
+ const items=food.items||[];
+ /* Предлагаем только предвыбранные блюда (галочка в настройках). Остальные блюда справочника
+    подсказываются, когда пользователь начинает писать. При правке сверху — то, что уже записано. */
+ const chips=[],seen=new Set();
+ const push=(text,on)=>{const key=foodNorm(text);if(!key||seen.has(key))return;seen.add(key);chips.push({text,on});};
+ if(edit)foodSplit(opts.current||'').forEach(text=>push(text,true));
+ items.filter(item=>item.selected).forEach(item=>push(item.text,!edit));
+ const directory=[],known=new Set();
+ [...(food.directory||[]),...items.map(item=>item.text)].forEach(text=>{const key=foodNorm(text);if(key&&!known.has(key)){known.add(key);directory.push(String(text));}});
+ foodState={entry,busy:false,edit,period:food.period||null,known,directory,suggest:[],chips};
+ document.getElementById('foodTitle').textContent=edit?'Изменить еду':(food.title||'Что ешь?');
  document.getElementById('foodIco').textContent=FOOD_ICONS[food.period]||'🍽️';
- document.getElementById('foodSub').textContent='Инсулин '+dose+' ед. записан · добавь, что ешь';
+ document.getElementById('foodSub').textContent=edit?'Инсулин '+dose+' ед. · поправь или добавь что-нибудь':'Инсулин '+dose+' ед. записан · добавь, что ешь';
  document.getElementById('foodInput').value='';
  setToast(document.getElementById('foodToast'),'');
  const save=document.getElementById('foodSave');
- save.textContent='Записать';
- const chips=document.getElementById('foodChips');
- chips.classList.add('intro');
+ save.textContent=edit?'Сохранить':'Записать';
+ document.querySelector('#foodBackdrop .food-skip').textContent=edit?'Отмена':'Пропустить';
+ const chipsBox=document.getElementById('foodChips');
+ chipsBox.classList.add('intro');
  renderFoodSheet();
- setTimeout(()=>chips.classList.remove('intro'),900);
+ setTimeout(()=>chipsBox.classList.remove('intro'),900);
  document.getElementById('foodBackdrop').classList.add('visible');
 }
 function closeFoodSheet(){
@@ -2644,15 +2771,15 @@ async function submitFood(){
  save.disabled=true;save.textContent='Записываю…';
  setToast(toast,'');
  try{
-  const newItems=foodState.chips.filter(c=>c.on&&!foodState.known.has(c.text.toLowerCase())).map(c=>c.text);
+  const newItems=foodState.chips.filter(c=>c.on&&!foodState.known.has(foodNorm(c.text))).map(c=>c.text);
   await api('food_add',{entry:foodState.entry,food:text,period:foodState.period,new_items:newItems});
   uiHaptic('success');
-  save.textContent='Записано ✓';
+  save.textContent=foodState.edit?'Сохранено ✓':'Записано ✓';
   foodState.busy=false;
   setTimeout(closeFoodSheet,550);
  }catch(error){
   foodState.busy=false;
-  save.textContent='Записать';save.disabled=false;
+  save.textContent=foodState.edit?'Сохранить':'Записать';save.disabled=false;
   setToast(toast,'Не удалось записать: '+error.message,'error');
   uiHaptic('error');
   handleAccessError(error);
@@ -5632,7 +5759,7 @@ stRefresh();
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const APP_VERSION='v20261108_1';          /* ← менять при каждом обновлении: vГГГГММДД_N */
+const APP_VERSION='v20261109_1';          /* ← менять при каждом обновлении: vГГГГММДД_N */
 const DEV_CHAT='https://t.me/larik_11';
 const CH_IDS=['trend','compare','range','distribution','daily','activity','dynamics','effect','summary'];
 const CH_NAMES={trend:'Динамика по дням',compare:'Сравнение трёх недель',range:'Доля в целевом диапазоне',distribution:'Распределение измерений',daily:'Суточная сводка',activity:'Активность по времени',dynamics:'Тренды',effect:'Укол и сахар',summary:'Итоги'};
@@ -6635,6 +6762,7 @@ const pad=n=>String(n).padStart(2,'0');
 const CLOSED_KEY='sema-digest-closed:';
 const S={month:null,data:null,cache:{},months:[],seq:0,chartSeq:0,busy:false,sum:'sugar'};
 let card=null;
+const closedKey=info=>CLOSED_KEY+info.month+':'+(info.today||new Date().toISOString().slice(0,10)); /* закрыли — вернётся завтра */
 
 /* ---------- карточка на главной ---------- */
 window.renderDigestCard=function(info){
@@ -6642,7 +6770,10 @@ window.renderDigestCard=function(info){
  const el=$('digestCard');
  if(!el)return;
  let closed=false;
- try{closed=!!card&&localStorage.getItem(CLOSED_KEY+card.month)==='1';}catch(e){}
+ try{
+  closed=!!card&&localStorage.getItem(closedKey(card))==='1';
+  if(card)Object.keys(localStorage).filter(k=>k.startsWith(CLOSED_KEY)&&k!==closedKey(card)).forEach(k=>localStorage.removeItem(k)); /* вчерашние отметки не копим */
+ }catch(e){}
  const show=!!card&&!closed;
  if(show){
   $('digestCardTitle').textContent=card.title||'Дайджест за месяц';
@@ -6653,7 +6784,10 @@ window.renderDigestCard=function(info){
 window.closeDigestCard=function(){
  const el=$('digestCard');
  if(!el||!card)return;
- try{localStorage.setItem(CLOSED_KEY+card.month,'1');}catch(e){}
+ try{
+  localStorage.setItem(closedKey(card),'1');
+  Object.keys(localStorage).filter(k=>k.startsWith(CLOSED_KEY)&&k!==closedKey(card)).forEach(k=>localStorage.removeItem(k)); /* старые отметки не копим */
+ }catch(e){}
  if(typeof selectionHaptic==='function')selectionHaptic();
  el.style.maxHeight=el.offsetHeight+'px';
  void el.offsetHeight;
