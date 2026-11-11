@@ -607,7 +607,9 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .dose-split .range-legend-row em{min-width:74px;font-weight:800;font-size:13px;color:var(--text);white-space:nowrap}
 .dose-split .range-compare b.warn{color:#c98417}
 :root[data-theme="dark"] .dose-split .range-compare b.warn{color:#f0b95a}
-.dose-bars-title{margin:8px 2px 4px;padding-top:12px;border-top:1px solid var(--line)}
+.dose-bars-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:8px 0 4px;padding-top:12px;border-top:1px solid var(--line)}
+.dose-bars-head.solo{margin-top:0;padding-top:0;border-top:0}
+.dose-bars-head .chart-expand{margin-left:auto}
 
 .range-compare b.up{color:#23925a}
 .range-compare b.down{color:#d6555b}
@@ -965,8 +967,8 @@ button.st-ico:active{transform:scale(.88)}
 .st-seg .followup-preset{flex:1;border:0;border-radius:9px;background:transparent;color:var(--st-text);padding:7px 4px;font-size:15px;font-weight:500;letter-spacing:-.01em}
 .st-seg .followup-preset.active{background:var(--st-seg);color:var(--st-text);font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.18)}
 #reportOptions{margin-top:0}
-#targetSaveButton{width:100%;min-width:0;height:50px;margin:0 0 6px;border-radius:25px;font-size:17px;font-weight:600;letter-spacing:-.01em;color:#fff;background:var(--st-blue);box-shadow:none}
-#targetSaveButton.saved{background:#34c759!important;color:#fff!important;pointer-events:none}
+#targetSaveButton,#digestSaveButton,#similarSaveButton{width:100%;min-width:0;height:50px;margin:0 0 6px;border-radius:25px;font-size:17px;font-weight:600;letter-spacing:-.01em;color:#fff;background:var(--st-blue);box-shadow:none}
+#targetSaveButton.saved,#digestSaveButton.saved,#similarSaveButton.saved{background:#34c759!important;color:#fff!important;pointer-events:none}
 .st-toast{margin:6px 15px 0}
 
 /* ===== Настройка графиков, «О приложении» ===== */
@@ -1516,7 +1518,7 @@ button.st-ico:active{transform:scale(.88)}
 <div id="split-legend" class="range-legend"></div>
 <div id="split-note" class="range-compare"></div>
 </div>
-<div id="dose-bars-title" class="analytics-toolbar-label dose-bars-title" hidden>Доза за день · ЦД</div>
+<div class="dose-bars-head" id="dose-bars-head"><span class="analytics-toolbar-label" id="dose-bars-title">Доза за день · ЦД</span></div>
 <div id="dose-chart" class="chart-wrap"></div>
 <div id="dose-summary" class="dose-summary"></div>
 <div id="dose-tooltip" class="chart-tooltip" role="status"></div>
@@ -3451,7 +3453,8 @@ function closeChartFullscreen(){
 function initChartExpandButtons(){
   Object.entries(FS_CHARTS).forEach(([name,cfg])=>{
    const panel=document.querySelector(`.analytics-panel[data-panel="${name}"]`);
-   const bar=panel&&panel.querySelector('.analytics-toolbar');
+   // у «ЦД» кнопка стоит у столбчатого графика: полноэкранный режим разворачивает только его, а не бублик
+   const bar=panel&&((name==='dose'&&panel.querySelector('.dose-bars-head'))||panel.querySelector('.analytics-toolbar'));
    if(!bar||bar.querySelector('.chart-expand'))return;
    const button=document.createElement('button');
    button.type='button';button.className='chart-expand';button.textContent='⛶';
@@ -4917,9 +4920,10 @@ function renderDoseChart(){
  const summary=document.getElementById('dose-summary');
  const color=kind==='night'?'#8b6ee0':'#1f9d8f';
  const okSwatch=document.getElementById('dose-swatch-ok');if(okSwatch)okSwatch.style.background=color;
- const splitBox=document.getElementById('dose-split'),barsTitle=document.getElementById('dose-bars-title');
+ const splitBox=document.getElementById('dose-split'),barsHead=document.getElementById('dose-bars-head'),barsTitle=document.getElementById('dose-bars-title');
  if(splitBox)splitBox.hidden=kind!=='insulin';
- if(barsTitle)barsTitle.hidden=kind!=='insulin';
+ if(barsHead)barsHead.classList.toggle('solo',kind!=='insulin'); // без бублика над заголовком разделитель не нужен
+ if(barsTitle)barsTitle.textContent=kind==='insulin'?'Доза за день · ЦД':'Ночной за день · ЦД';
  if(kind==='insulin')renderInsulinSplit();
  const series=doseSeriesRange(kind,sel.start,sel.end);
  const count=document.getElementById('dose-count');
@@ -5938,7 +5942,7 @@ stRefresh();
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const APP_VERSION='v20261111_4';          /* ← менять при каждом обновлении: vГГГГММДД_N */
+const APP_VERSION='v20261111_5';          /* ← менять при каждом обновлении: vГГГГММДД_N */
 const DEV_CHAT='https://t.me/larik_11';
 const CH_IDS=['trend','compare','range','distribution','daily','activity','dynamics','effect','summary'];
 const CH_NAMES={trend:'Динамика по дням',compare:'Сравнение трёх недель',range:'Доля в целевом диапазоне',distribution:'Распределение измерений',daily:'Суточная сводка',activity:'Активность по времени',dynamics:'Тренды',effect:'Укол и сахар',summary:'Итоги'};
