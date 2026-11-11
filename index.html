@@ -600,6 +600,10 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .range-compare{margin-top:6px;font-size:12px;color:var(--muted);text-align:center;line-height:1.5}
 .range-dot.bf{background:#f0a840}.range-dot.dn{background:#6d63e6}.range-dot.co{background:#1f9d8f}.range-dot.un{background:#a2a8bd}
 .dose-split{margin-bottom:10px}
+.dose-split .donut-pct{font-size:26px;letter-spacing:-.8px}
+.dose-split .donut-pct small{font-size:13px}
+.dose-split .donut-pct.long{font-size:21px}
+.dose-split .donut-pct.long small{font-size:11px}
 .dose-split .range-legend-row em{min-width:74px;font-weight:800;font-size:13px;color:var(--text);white-space:nowrap}
 .dose-split .range-compare b.warn{color:#c98417}
 :root[data-theme="dark"] .dose-split .range-compare b.warn{color:#f0b95a}
@@ -1499,6 +1503,19 @@ button.st-ico:active{transform:scale(.88)}
 </div>
 </section>
 <section class="analytics-card analytics-panel" data-panel="dose" hidden>
+<div id="dose-split" class="dose-split" hidden>
+<div class="analytics-toolbar">
+<span class="analytics-toolbar-label">Период</span>
+<select id="split-period" aria-label="Период распределения инсулина" onchange="onChartPeriodChange()">
+<option value="1">Сегодня</option><option value="3">3 дня</option><option value="7">7 дней</option><option value="14" selected>14 дней</option><option value="21">21 день</option><option value="30">30 дней</option><option value="45">45 дней</option><option value="custom" id="split-custom-opt" hidden>Свой период</option>
+</select>
+<button class="range-cal-btn" id="split-cal-btn" type="button" onclick="openRangeCalendar('split')" aria-label="Выбрать период в календаре" title="Календарь"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></button>
+</div>
+<div id="split-donut" class="range-donut"></div>
+<div id="split-legend" class="range-legend"></div>
+<div id="split-note" class="range-compare"></div>
+</div>
+<div id="dose-bars-title" class="analytics-toolbar-label dose-bars-title" hidden>Доза за день · ЦД</div>
 <div class="analytics-toolbar">
 <span class="analytics-toolbar-label">Период</span>
 <select id="dose-period" aria-label="Период" onchange="onChartPeriodChange()">
@@ -1506,12 +1523,6 @@ button.st-ico:active{transform:scale(.88)}
 </select>
 <span class="toolbar-count" id="dose-count" role="status"></span>
 </div>
-<div id="dose-split" class="dose-split" hidden>
-<div id="split-donut" class="range-donut"></div>
-<div id="split-legend" class="range-legend"></div>
-<div id="split-note" class="range-compare"></div>
-</div>
-<div id="dose-bars-title" class="analytics-toolbar-label dose-bars-title" hidden>Доза за день · ЦД</div>
 <div id="dose-chart" class="chart-wrap"></div>
 <div id="dose-summary" class="dose-summary"></div>
 <div id="dose-tooltip" class="chart-tooltip" role="status"></div>
@@ -3323,6 +3334,10 @@ function requiredGraphHistoryDays(){
   const sel=rangeSelection();
   return Math.min(365,rangeDaysSince(sel.start)+sel.days);
  }
+ if(chart==='range'&&analyticsState.metric==='insulin'){
+  const barDays=Number(document.getElementById('dose-period')?.value)||14;
+  return Math.min(365,Math.max(barDays,rangeDaysSince(splitSelection().start)));
+ }
  const id={distribution:'distribution-period',daily:'daily-period',activity:'activity-period',range:analyticsState.metric==='sugar'?'range-period':'dose-period'}[chart];
  return id?(Number(document.getElementById(id)?.value)||14):DEFAULT_GRAPH_HISTORY_DAYS;
 }
@@ -3331,7 +3346,11 @@ function onChartPeriodChange(){
  if(rsel&&rsel.value!=='custom')analyticsState.rangeCustom=null;
  const ropt=document.getElementById('range-custom-opt');
  if(ropt&&!analyticsState.rangeCustom)ropt.hidden=true;
- saveRangePeriod();
+ const ssel=document.getElementById('split-period');
+ if(ssel&&ssel.value!=='custom')analyticsState.splitCustom=null;
+ const sopt=document.getElementById('split-custom-opt');
+ if(sopt&&!analyticsState.splitCustom)sopt.hidden=true;
+ saveRangePeriod();saveSplitPeriod();
  if(analyticsState.chart==='trend'){
   analyticsState.trendDays=Number(document.getElementById('trend-period').value)||3;
   analyticsState.selectedDates=null;
@@ -3835,13 +3854,14 @@ function rangeSelection(){
  return {days,start,end,rows:all.filter(r=>r.dateObj>=start&&r.dateObj<=end),prev:all.filter(r=>r.dateObj>=prevStart&&r.dateObj<start)};
 }
 function rangeFmt(d){return String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0');}
-function applyRangeCustom(from,to){
- analyticsState.rangeCustom={from:new Date(from),to:new Date(to)};
- const sel=document.getElementById('range-period'),opt=document.getElementById('range-custom-opt');
+function applyRangeCustom(from,to,target='range'){
+ const split=target==='split';
+ analyticsState[split?'splitCustom':'rangeCustom']={from:new Date(from),to:new Date(to)};
+ const sel=document.getElementById(split?'split-period':'range-period'),opt=document.getElementById(split?'split-custom-opt':'range-custom-opt');
  const days=Math.round((new Date(to).setHours(0,0,0,0)-new Date(from).setHours(0,0,0,0))/864e5)+1;
  opt.textContent=days+' '+ruPlural(days,'день','дня','дней')+' · '+rangeFmt(from)+'–'+rangeFmt(to);
  opt.hidden=false;sel.value='custom';
- saveRangePeriod();
+ if(split)saveSplitPeriod();else saveRangePeriod();
  const needed=requiredGraphHistoryDays();
  if(analyticsState.loaded&&needed>analyticsState.historyDays){loadAnalytics(true,needed);return;}
  renderAnalytics();
@@ -3855,6 +3875,30 @@ function saveRangePeriod(){
   else localStorage.setItem(RANGE_KEY,JSON.stringify({v:sel.value}));
  }catch(e){}
 }
+const SPLIT_KEY='sema-split-period';
+function saveSplitPeriod(){
+ try{
+  const sel=document.getElementById('split-period'),c=analyticsState.splitCustom;
+  if(!sel)return;
+  if(sel.value==='custom'&&c)localStorage.setItem(SPLIT_KEY,JSON.stringify({v:'custom',from:new Date(c.from).getTime(),to:new Date(c.to).getTime()}));
+  else localStorage.setItem(SPLIT_KEY,JSON.stringify({v:sel.value}));
+ }catch(e){}
+}
+(function restoreSplitPeriod(){
+ try{
+  const saved=JSON.parse(localStorage.getItem(SPLIT_KEY)||'null'),sel=document.getElementById('split-period');
+  if(!saved||!sel)return;
+  if(saved.v==='custom'){
+   const from=new Date(saved.from),to=new Date(saved.to),min=new Date();min.setHours(0,0,0,0);min.setDate(min.getDate()-364);
+   if(isNaN(from)||isNaN(to)||to<from||from<min)return;
+   analyticsState.splitCustom={from,to};
+   const opt=document.getElementById('split-custom-opt');
+   const days=Math.round((new Date(to).setHours(0,0,0,0)-new Date(from).setHours(0,0,0,0))/864e5)+1;
+   opt.textContent=days+' '+ruPlural(days,'день','дня','дней')+' · '+rangeFmt(from)+'–'+rangeFmt(to);
+   opt.hidden=false;sel.value='custom';
+  }else if([...sel.options].some(o=>o.value===saved.v&&o.value!=='custom'))sel.value=saved.v;
+ }catch(e){}
+})();
 (function restoreRangePeriod(){
  try{
   const saved=JSON.parse(localStorage.getItem(RANGE_KEY)||'null'),sel=document.getElementById('range-period');
@@ -3877,11 +3921,11 @@ function closeRangeCalendar(){
  document.body.style.overflow=el._bodyOverflow||'';
  setTimeout(()=>el.remove(),200);
 }
-function openRangeCalendar(){
+function openRangeCalendar(target='range'){
  const old=document.getElementById('rangeCal');if(old)old.remove();
  const today=new Date();today.setHours(0,0,0,0);
  const minDay=new Date(today);minDay.setDate(minDay.getDate()-364);
- const cur=analyticsState.rangeCustom;
+ const cur=target==='split'?analyticsState.splitCustom:analyticsState.rangeCustom;
  let from=cur?new Date(cur.from):null,to=cur?new Date(cur.to):null;
  if(from)from.setHours(0,0,0,0);if(to)to.setHours(0,0,0,0);
  const shown=new Date((to||today).getFullYear(),(to||today).getMonth(),1);
@@ -3929,7 +3973,7 @@ function openRangeCalendar(){
   if(act.dataset.a==='cancel'){closeRangeCalendar();return;}
   const f=from,t=to||from;
   closeRangeCalendar();
-  applyRangeCustom(f,t);
+  applyRangeCustom(f,t,target);
  });
  requestAnimationFrame(()=>el.classList.add('visible'));
 }
@@ -4807,12 +4851,26 @@ function splitPercents(values){
  raw.map((v,i)=>[v-base[i],i]).sort((a,b)=>b[0]-a[0]).forEach(([,i])=>{if(left>0){base[i]++;left--;}});
  return base;
 }
-function renderInsulinSplit(days){
+function splitSelection(){
+ const sel=document.getElementById('split-period'),custom=analyticsState.splitCustom;
+ let start,end,days;
+ if(sel&&sel.value==='custom'&&custom){
+  start=new Date(custom.from);start.setHours(0,0,0,0);
+  end=new Date(custom.to);end.setHours(23,59,59,999);
+  days=Math.round((new Date(custom.to).setHours(0,0,0,0)-start)/864e5)+1;
+ }else{
+  days=Number(sel&&sel.value)||14;
+  end=new Date();end.setHours(23,59,59,999);
+  start=new Date();start.setHours(0,0,0,0);start.setDate(start.getDate()-days+1);
+ }
+ return {days,start,end};
+}
+function renderInsulinSplit(){
  const host=document.getElementById('split-donut'),legend=document.getElementById('split-legend'),note=document.getElementById('split-note');
  if(!host||!legend||!note)return;
  const message=text=>{host.style.aspectRatio='auto';host.innerHTML='<div class="analytics-message">'+text+'</div>';legend.innerHTML='';note.innerHTML='';};
- const keys=new Set(doseSeries('insulin',days).map(day=>day.key));
- const rows=analyticsState.measurements.filter(row=>row.type==='insulin'&&keys.has(row.dateKey)&&row.value>0);
+ const sel=splitSelection();
+ const rows=analyticsState.measurements.filter(row=>row.type==='insulin'&&row.dateObj>=sel.start&&row.dateObj<=sel.end&&row.value>0);
  if(!rows.length){message('За этот период нет инъекций.');return;}
  const threshold=Number(insulinTimerSettings.threshold);
  if(!(threshold>0)){message('Порог подколок не задан: в настройках таймера инсулина стоит 0 ед.');return;}
@@ -4839,7 +4897,7 @@ function renderInsulinSplit(days){
  });
  const totalText=fmtDose(total);
  host.innerHTML=`<svg viewBox="0 0 100 100" role="img" aria-label="Короткий инсулин за период: ${totalText} ед."><circle class="donut-track" cx="50" cy="50" r="38"/>${segs}</svg>`
-  +`<div class="donut-center"><div class="donut-pct"><span style="font-size:${totalText.length>4?27:36}px">${totalText}</span><small>ед.</small></div><div class="donut-sub">всего</div><div class="donut-avg">ср. ${fmtDose(total/allDays)} в день</div></div>`;
+  +`<div class="donut-center"><div class="donut-pct${totalText.length>4?' long':''}"><span>${totalText}</span><small>ед.</small></div><div class="donut-sub">всего</div><div class="donut-avg">ср. ${fmtDose(total/allDays)} в день</div></div>`;
  legend.innerHTML=defs.map((def,index)=>{
   const has=def.n>0;
   return `<div class="range-legend-row"><span class="range-dot ${def.k}"></span><div class="range-legend-name">${def.name}<small>${def.hint}</small><small class="rl-mm">${has?`ср. ${fmtDose(def.sum/def.days)} ед./день · ${def.days} дн.`:'нет записей'}</small></div><b>${has?pcts[index]+'%':'—'}</b><em>${has?fmtDose(def.sum)+' ед.':'—'}<small class="rl-med">${has?def.n+' '+ruPlural(def.n,'инъекция','инъекции','инъекций'):''}</small></em></div>`;
@@ -4859,7 +4917,7 @@ function renderDoseChart(){
  const splitBox=document.getElementById('dose-split'),barsTitle=document.getElementById('dose-bars-title');
  if(splitBox)splitBox.hidden=kind!=='insulin';
  if(barsTitle)barsTitle.hidden=kind!=='insulin';
- if(kind==='insulin')renderInsulinSplit(days);
+ if(kind==='insulin')renderInsulinSplit();
  const series=doseSeries(kind,days);
  const count=document.getElementById('dose-count');
  if(count)count.textContent=series.some(day=>day.value!==null)?series.filter(day=>day.value!==null).length+' дн.':'';
@@ -5875,7 +5933,7 @@ stRefresh();
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const APP_VERSION='v20261111_2';          /* ← менять при каждом обновлении: vГГГГММДД_N */
+const APP_VERSION='v20261111_3';          /* ← менять при каждом обновлении: vГГГГММДД_N */
 const DEV_CHAT='https://t.me/larik_11';
 const CH_IDS=['trend','compare','range','distribution','daily','activity','dynamics','effect','summary'];
 const CH_NAMES={trend:'Динамика по дням',compare:'Сравнение трёх недель',range:'Доля в целевом диапазоне',distribution:'Распределение измерений',daily:'Суточная сводка',activity:'Активность по времени',dynamics:'Тренды',effect:'Укол и сахар',summary:'Итоги'};
