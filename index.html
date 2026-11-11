@@ -1503,26 +1503,20 @@ button.st-ico:active{transform:scale(.88)}
 </div>
 </section>
 <section class="analytics-card analytics-panel" data-panel="dose" hidden>
-<div id="dose-split" class="dose-split" hidden>
 <div class="analytics-toolbar">
 <span class="analytics-toolbar-label">Период</span>
-<select id="split-period" aria-label="Период распределения инсулина" onchange="onChartPeriodChange()">
-<option value="1">Сегодня</option><option value="3">3 дня</option><option value="7">7 дней</option><option value="14" selected>14 дней</option><option value="21">21 день</option><option value="30">30 дней</option><option value="45">45 дней</option><option value="custom" id="split-custom-opt" hidden>Свой период</option>
+<select id="dose-period" aria-label="Период" onchange="onChartPeriodChange()">
+<option value="1">Сегодня</option><option value="3">3 дня</option><option value="7">7 дней</option><option value="14" selected>14 дней</option><option value="21">21 день</option><option value="30">30 дней</option><option value="45">45 дней</option><option value="custom" id="dose-custom-opt" hidden>Свой период</option>
 </select>
-<button class="range-cal-btn" id="split-cal-btn" type="button" onclick="openRangeCalendar('split')" aria-label="Выбрать период в календаре" title="Календарь"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></button>
+<button class="range-cal-btn" id="dose-cal-btn" type="button" onclick="openRangeCalendar('dose')" aria-label="Выбрать период в календаре" title="Календарь"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></button>
+<span class="toolbar-count" id="dose-count" role="status"></span>
 </div>
+<div id="dose-split" class="dose-split" hidden>
 <div id="split-donut" class="range-donut"></div>
 <div id="split-legend" class="range-legend"></div>
 <div id="split-note" class="range-compare"></div>
 </div>
 <div id="dose-bars-title" class="analytics-toolbar-label dose-bars-title" hidden>Доза за день · ЦД</div>
-<div class="analytics-toolbar">
-<span class="analytics-toolbar-label">Период</span>
-<select id="dose-period" aria-label="Период" onchange="onChartPeriodChange()">
-<option value="7">7 дней</option><option value="14" selected>14 дней</option><option value="30">30 дней</option><option value="45">45 дней</option>
-</select>
-<span class="toolbar-count" id="dose-count" role="status"></span>
-</div>
 <div id="dose-chart" class="chart-wrap"></div>
 <div id="dose-summary" class="dose-summary"></div>
 <div id="dose-tooltip" class="chart-tooltip" role="status"></div>
@@ -1731,32 +1725,25 @@ button.st-ico:active{transform:scale(.88)}
 
 <div class="st-page" data-p="digest">
 <div class="st-bar"><button class="st-back" type="button" onclick="stBack()" aria-label="Назад"><svg><use href="#i-back"/></svg></button><div class="st-title">AI-дайджест</div></div>
-<div class="st-sec">Когда формировать</div>
+<div class="st-sec">Число месяца</div>
 <div class="st-card">
-<label class="st-row" for="digestDayInput"><span class="st-t">Число месяца</span><input class="st-in" id="digestDayInput" type="text" inputmode="numeric" maxlength="2" autocomplete="off" aria-label="Число месяца, когда формируется дайджест"></label>
+<label class="st-row" for="digestDayInput"><span class="st-t">Формировать с</span><input class="st-in" id="digestDayInput" type="text" inputmode="numeric" maxlength="2" autocomplete="off" aria-label="Число месяца, с которого формируется дайджест"></label>
+<label class="st-row" for="digestFromInput"><span class="st-t">Плашка с</span><input class="st-in" id="digestFromInput" type="text" inputmode="numeric" maxlength="2" autocomplete="off" aria-label="Плашка видна с числа"></label>
+<label class="st-row" for="digestToInput"><span class="st-t">Плашка по</span><input class="st-in" id="digestToInput" type="text" inputmode="numeric" maxlength="2" autocomplete="off" aria-label="Плашка видна по число"></label>
 </div>
-<div class="st-foot">С этого числа бот сам подготовит дайджест за прошлый месяц (от 1 до 28, время московское). Открыть дайджест можно и раньше — тогда он посчитается сразу.</div>
-<div class="st-sec">Плашка на главной</div>
-<div class="st-card">
-<label class="st-row" for="digestFromInput"><span class="st-t">С числа</span><input class="st-in" id="digestFromInput" type="text" inputmode="numeric" maxlength="2" autocomplete="off" aria-label="Плашка видна с числа"></label>
-<label class="st-row" for="digestToInput"><span class="st-t">По число</span><input class="st-in" id="digestToInput" type="text" inputmode="numeric" maxlength="2" autocomplete="off" aria-label="Плашка видна по число"></label>
-</div>
-<div class="st-foot">Плашка видна на главной в эти числа каждого месяца, крестик прячет её до следующего месяца. Кнопка «AI дайджест» внизу главной доступна всегда. Настройка общая для всех пользователей бота.</div>
+<div class="st-foot">Общая настройка для всех пользователей бота.<br>С первого числа (1–28, время московское) бот готовит дайджест за прошлый месяц. Плашка на главной видна с «с» по «по» включительно, крестик прячет её до следующего месяца. Кнопка «AI дайджест» доступна всегда.</div>
 <button class="save-button target-save" id="digestSaveButton" type="button" onclick="saveDigestSettings()">Сохранить</button>
 <div class="toast st-toast" id="digestToast"></div>
 </div>
 
 <div class="st-page" data-p="similar">
 <div class="st-bar"><button class="st-back" type="button" onclick="stBack()" aria-label="Назад"><svg><use href="#i-back"/></svg></button><div class="st-title">Топ-5 похожих случаев</div></div>
-<div class="st-sec">Короткий инсулин</div>
+<div class="st-sec">Искать за, дней</div>
 <div class="st-card">
-<label class="st-row" for="similarShortInput"><span class="st-t">Искать за, дней</span><input class="st-in" id="similarShortInput" type="text" inputmode="numeric" maxlength="3" autocomplete="off" aria-label="За сколько дней искать похожие случаи для короткого инсулина"></label>
+<label class="st-row" for="similarShortInput"><span class="st-t">Короткий инсулин</span><input class="st-in" id="similarShortInput" type="text" inputmode="numeric" maxlength="3" autocomplete="off" aria-label="За сколько дней искать похожие случаи для короткого инсулина"></label>
+<label class="st-row" for="similarNightInput"><span class="st-t">Ночной</span><input class="st-in" id="similarNightInput" type="text" inputmode="numeric" maxlength="3" autocomplete="off" aria-label="За сколько дней искать похожие случаи для ночного"></label>
 </div>
-<div class="st-sec">Ночной</div>
-<div class="st-card">
-<label class="st-row" for="similarNightInput"><span class="st-t">Искать за, дней</span><input class="st-in" id="similarNightInput" type="text" inputmode="numeric" maxlength="3" autocomplete="off" aria-label="За сколько дней искать похожие случаи для ночного"></label>
-</div>
-<div class="st-foot">Топ-5 похожих случаев ищется среди последних дней выбранного периода, отдельно для короткого инсулина и для ночного. Чем период больше, тем больше примеров, чем меньше — тем они свежее. От 7 до 365 дней, по умолчанию 60. Настройка общая для всех пользователей бота.</div>
+<div class="st-foot">Общая настройка для всех пользователей бота.<br>От 7 до 365 дней, по умолчанию 60. Чем период больше, тем больше примеров, чем меньше — тем они свежее.</div>
 <button class="save-button target-save" id="similarSaveButton" type="button" onclick="saveSimilarSettings()">Сохранить</button>
 <div class="toast st-toast" id="similarToast"></div>
 </div>
@@ -3334,9 +3321,8 @@ function requiredGraphHistoryDays(){
   const sel=rangeSelection();
   return Math.min(365,rangeDaysSince(sel.start)+sel.days);
  }
- if(chart==='range'&&analyticsState.metric==='insulin'){
-  const barDays=Number(document.getElementById('dose-period')?.value)||14;
-  return Math.min(365,Math.max(barDays,rangeDaysSince(splitSelection().start)));
+ if(chart==='range'&&analyticsState.metric!=='sugar'){
+  return Math.min(365,rangeDaysSince(doseSelection().start));
  }
  const id={distribution:'distribution-period',daily:'daily-period',activity:'activity-period',range:analyticsState.metric==='sugar'?'range-period':'dose-period'}[chart];
  return id?(Number(document.getElementById(id)?.value)||14):DEFAULT_GRAPH_HISTORY_DAYS;
@@ -3346,11 +3332,11 @@ function onChartPeriodChange(){
  if(rsel&&rsel.value!=='custom')analyticsState.rangeCustom=null;
  const ropt=document.getElementById('range-custom-opt');
  if(ropt&&!analyticsState.rangeCustom)ropt.hidden=true;
- const ssel=document.getElementById('split-period');
- if(ssel&&ssel.value!=='custom')analyticsState.splitCustom=null;
- const sopt=document.getElementById('split-custom-opt');
- if(sopt&&!analyticsState.splitCustom)sopt.hidden=true;
- saveRangePeriod();saveSplitPeriod();
+ const dsel=document.getElementById('dose-period');
+ if(dsel&&dsel.value!=='custom')analyticsState.doseCustom=null;
+ const dopt=document.getElementById('dose-custom-opt');
+ if(dopt&&!analyticsState.doseCustom)dopt.hidden=true;
+ saveRangePeriod();saveDosePeriod();
  if(analyticsState.chart==='trend'){
   analyticsState.trendDays=Number(document.getElementById('trend-period').value)||3;
   analyticsState.selectedDates=null;
@@ -3855,13 +3841,13 @@ function rangeSelection(){
 }
 function rangeFmt(d){return String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0');}
 function applyRangeCustom(from,to,target='range'){
- const split=target==='split';
- analyticsState[split?'splitCustom':'rangeCustom']={from:new Date(from),to:new Date(to)};
- const sel=document.getElementById(split?'split-period':'range-period'),opt=document.getElementById(split?'split-custom-opt':'range-custom-opt');
+ const dose=target==='dose';
+ analyticsState[dose?'doseCustom':'rangeCustom']={from:new Date(from),to:new Date(to)};
+ const sel=document.getElementById(dose?'dose-period':'range-period'),opt=document.getElementById(dose?'dose-custom-opt':'range-custom-opt');
  const days=Math.round((new Date(to).setHours(0,0,0,0)-new Date(from).setHours(0,0,0,0))/864e5)+1;
  opt.textContent=days+' '+ruPlural(days,'день','дня','дней')+' · '+rangeFmt(from)+'–'+rangeFmt(to);
  opt.hidden=false;sel.value='custom';
- if(split)saveSplitPeriod();else saveRangePeriod();
+ if(dose)saveDosePeriod();else saveRangePeriod();
  const needed=requiredGraphHistoryDays();
  if(analyticsState.loaded&&needed>analyticsState.historyDays){loadAnalytics(true,needed);return;}
  renderAnalytics();
@@ -3875,24 +3861,24 @@ function saveRangePeriod(){
   else localStorage.setItem(RANGE_KEY,JSON.stringify({v:sel.value}));
  }catch(e){}
 }
-const SPLIT_KEY='sema-split-period';
-function saveSplitPeriod(){
+const DOSE_KEY='sema-dose-period';
+function saveDosePeriod(){
  try{
-  const sel=document.getElementById('split-period'),c=analyticsState.splitCustom;
+  const sel=document.getElementById('dose-period'),c=analyticsState.doseCustom;
   if(!sel)return;
-  if(sel.value==='custom'&&c)localStorage.setItem(SPLIT_KEY,JSON.stringify({v:'custom',from:new Date(c.from).getTime(),to:new Date(c.to).getTime()}));
-  else localStorage.setItem(SPLIT_KEY,JSON.stringify({v:sel.value}));
+  if(sel.value==='custom'&&c)localStorage.setItem(DOSE_KEY,JSON.stringify({v:'custom',from:new Date(c.from).getTime(),to:new Date(c.to).getTime()}));
+  else localStorage.setItem(DOSE_KEY,JSON.stringify({v:sel.value}));
  }catch(e){}
 }
-(function restoreSplitPeriod(){
+(function restoreDosePeriod(){
  try{
-  const saved=JSON.parse(localStorage.getItem(SPLIT_KEY)||'null'),sel=document.getElementById('split-period');
+  const saved=JSON.parse(localStorage.getItem(DOSE_KEY)||'null'),sel=document.getElementById('dose-period');
   if(!saved||!sel)return;
   if(saved.v==='custom'){
    const from=new Date(saved.from),to=new Date(saved.to),min=new Date();min.setHours(0,0,0,0);min.setDate(min.getDate()-364);
    if(isNaN(from)||isNaN(to)||to<from||from<min)return;
-   analyticsState.splitCustom={from,to};
-   const opt=document.getElementById('split-custom-opt');
+   analyticsState.doseCustom={from,to};
+   const opt=document.getElementById('dose-custom-opt');
    const days=Math.round((new Date(to).setHours(0,0,0,0)-new Date(from).setHours(0,0,0,0))/864e5)+1;
    opt.textContent=days+' '+ruPlural(days,'день','дня','дней')+' · '+rangeFmt(from)+'–'+rangeFmt(to);
    opt.hidden=false;sel.value='custom';
@@ -3925,7 +3911,7 @@ function openRangeCalendar(target='range'){
  const old=document.getElementById('rangeCal');if(old)old.remove();
  const today=new Date();today.setHours(0,0,0,0);
  const minDay=new Date(today);minDay.setDate(minDay.getDate()-364);
- const cur=target==='split'?analyticsState.splitCustom:analyticsState.rangeCustom;
+ const cur=target==='dose'?analyticsState.doseCustom:analyticsState.rangeCustom;
  let from=cur?new Date(cur.from):null,to=cur?new Date(cur.to):null;
  if(from)from.setHours(0,0,0,0);if(to)to.setHours(0,0,0,0);
  const shown=new Date((to||today).getFullYear(),(to||today).getMonth(),1);
@@ -4801,6 +4787,23 @@ function normalizeDoses(result){
  return {limitInsulin:num(limits.insulin),limitNight:num(limits.night),night};
 }
 function fmtDose(value){return String(Math.round(value*10)/10).replace('.',',');}
+function doseSeriesRange(kind,start,end){
+ const sums=new Map();
+ if(kind==='insulin'){
+  analyticsState.measurements.forEach(row=>{
+   if(row.type!=='insulin')return;
+   sums.set(row.dateKey,(sums.get(row.dateKey)||0)+row.value);
+  });
+ }
+ const series=[],day=new Date(start),last=new Date(end);
+ day.setHours(12,0,0,0);last.setHours(12,0,0,0);
+ for(;day<=last;day.setDate(day.getDate()+1)){
+  const key=dateKey(day);
+  if(kind==='insulin'){series.push({key,value:sums.has(key)?sums.get(key):null,fact:false,approx:false});}
+  else{const item=analyticsState.doses.night.get(key);series.push({key,value:item?item.value:null,fact:!!(item&&item.fact),approx:!!(item&&item.approx)});}
+ }
+ return series;
+}
 function doseSeries(kind,days){
  const sums=new Map();
  if(kind==='insulin'){
@@ -4851,8 +4854,8 @@ function splitPercents(values){
  raw.map((v,i)=>[v-base[i],i]).sort((a,b)=>b[0]-a[0]).forEach(([,i])=>{if(left>0){base[i]++;left--;}});
  return base;
 }
-function splitSelection(){
- const sel=document.getElementById('split-period'),custom=analyticsState.splitCustom;
+function doseSelection(){
+ const sel=document.getElementById('dose-period'),custom=analyticsState.doseCustom;
  let start,end,days;
  if(sel&&sel.value==='custom'&&custom){
   start=new Date(custom.from);start.setHours(0,0,0,0);
@@ -4869,7 +4872,7 @@ function renderInsulinSplit(){
  const host=document.getElementById('split-donut'),legend=document.getElementById('split-legend'),note=document.getElementById('split-note');
  if(!host||!legend||!note)return;
  const message=text=>{host.style.aspectRatio='auto';host.innerHTML='<div class="analytics-message">'+text+'</div>';legend.innerHTML='';note.innerHTML='';};
- const sel=splitSelection();
+ const sel=doseSelection();
  const rows=analyticsState.measurements.filter(row=>row.type==='insulin'&&row.dateObj>=sel.start&&row.dateObj<=sel.end&&row.value>0);
  if(!rows.length){message('За этот период нет инъекций.');return;}
  const threshold=Number(insulinTimerSettings.threshold);
@@ -4897,7 +4900,7 @@ function renderInsulinSplit(){
  });
  const totalText=fmtDose(total);
  host.innerHTML=`<svg viewBox="0 0 100 100" role="img" aria-label="Короткий инсулин за период: ${totalText} ед."><circle class="donut-track" cx="50" cy="50" r="38"/>${segs}</svg>`
-  +`<div class="donut-center"><div class="donut-pct${totalText.length>4?' long':''}"><span>${totalText}</span><small>ед.</small></div><div class="donut-sub">всего</div><div class="donut-avg">ср. ${fmtDose(total/allDays)} в день</div></div>`;
+  +`<div class="donut-center"><div class="donut-pct${totalText.length>4?' long':''}"><span>${totalText}</span><small>ед.</small></div><div class="donut-sub">всего</div></div>`;
  legend.innerHTML=defs.map((def,index)=>{
   const has=def.n>0;
   return `<div class="range-legend-row"><span class="range-dot ${def.k}"></span><div class="range-legend-name">${def.name}<small>${def.hint}</small><small class="rl-mm">${has?`ср. ${fmtDose(def.sum/def.days)} ед./день · ${def.days} дн.`:'нет записей'}</small></div><b>${has?pcts[index]+'%':'—'}</b><em>${has?fmtDose(def.sum)+' ед.':'—'}<small class="rl-med">${has?def.n+' '+ruPlural(def.n,'инъекция','инъекции','инъекций'):''}</small></em></div>`;
@@ -4909,7 +4912,7 @@ function renderInsulinSplit(){
 function renderDoseChart(){
  const kind=analyticsState.metric==='night'?'night':'insulin';
  const [host,tooltip]=chartHosts('dose-chart','dose-tooltip');
- const days=Number(document.getElementById('dose-period').value)||30;
+ const sel=doseSelection();
  const limit=kind==='night'?analyticsState.doses.limitNight:analyticsState.doses.limitInsulin;
  const summary=document.getElementById('dose-summary');
  const color=kind==='night'?'#8b6ee0':'#1f9d8f';
@@ -4918,7 +4921,7 @@ function renderDoseChart(){
  if(splitBox)splitBox.hidden=kind!=='insulin';
  if(barsTitle)barsTitle.hidden=kind!=='insulin';
  if(kind==='insulin')renderInsulinSplit();
- const series=doseSeries(kind,days);
+ const series=doseSeriesRange(kind,sel.start,sel.end);
  const count=document.getElementById('dose-count');
  if(count)count.textContent=series.some(day=>day.value!==null)?series.filter(day=>day.value!==null).length+' дн.':'';
  drawDoseChart({host,tooltip,summary,kind,series,limit});
@@ -4943,7 +4946,8 @@ function drawDoseChart({host,tooltip,summary,kind,series,limit}){
  const step=[1,2,5,10,20,50,100].find(s=>s>=rough)||100;
  const yMax=Math.ceil(maxValue*1.12/step)*step;
  const y=value=>margin.top+plotH-(value/yMax)*plotH;
- const slot=plotW/series.length,barW=Math.min(28,Math.max(6,slot*.62));
+ const dense=series.length>45,labelEvery=dense?Math.ceil(series.length/32):1;
+ const slot=plotW/series.length,barW=Math.min(28,Math.max(dense?1.5:6,slot*.62));
  let svg=`<svg class="chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="Доза за день и ЦД">`;
  for(let value=0;value<=yMax+step*.01;value+=step){
   const py=y(value);
@@ -4962,7 +4966,7 @@ function drawDoseChart({host,tooltip,summary,kind,series,limit}){
    svg+=`<rect class="dose-bar" x="${x-barW/2}" y="${top}" width="${barW}" height="${barH}" rx="${Math.min(5,barW/3)}" fill="${isOver?'#e5484d':color}" tabindex="0" aria-label="${label}"/>`;
    if(slot>=22)svg+=`<text x="${x}" y="${top-4}" text-anchor="middle" font-size="10" font-weight="700">${fmtDose(day.value)}</text>`;
   }
-  svg+=`<text transform="rotate(-90 ${x+4} ${margin.top+plotH+6})" x="${x+4}" y="${margin.top+plotH+6}" text-anchor="end">${formatShortDate(day.key)}</text>`;
+  if(index%labelEvery===0)svg+=`<text transform="rotate(-90 ${x+4} ${margin.top+plotH+6})" x="${x+4}" y="${margin.top+plotH+6}" text-anchor="end">${formatShortDate(day.key)}</text>`;
  });
  const ly=y(limit);
  svg+=`<line x1="${margin.left}" y1="${ly}" x2="${width-margin.right}" y2="${ly}" stroke="#e5a13a" stroke-width="2" stroke-dasharray="6 4"/><text x="${width-margin.right}" y="${ly-5}" text-anchor="end" font-size="11" font-weight="800" fill="#c98417" stroke="var(--card)" stroke-width="4" paint-order="stroke" stroke-linejoin="round">ЦД ${fmtDose(limit)}</text>`;
@@ -5835,6 +5839,7 @@ window.stOpen=function(name){
   document.querySelectorAll('#screen-settings .st-page').forEach(p=>{p.style.animation='';p.classList.toggle('active',p.dataset.p===name);});
   window.scrollTo(0,0);
   if(typeof selectionHaptic==='function')selectionHaptic();
+  if(typeof window.dgSettingsReset==='function')window.dgSettingsReset(name);
   stRefresh();
 };
 const ST_PARENT={charts:'theme'};
@@ -5933,7 +5938,7 @@ stRefresh();
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const APP_VERSION='v20261111_3';          /* ← менять при каждом обновлении: vГГГГММДД_N */
+const APP_VERSION='v20261111_4';          /* ← менять при каждом обновлении: vГГГГММДД_N */
 const DEV_CHAT='https://t.me/larik_11';
 const CH_IDS=['trend','compare','range','distribution','daily','activity','dynamics','effect','summary'];
 const CH_NAMES={trend:'Динамика по дням',compare:'Сравнение трёх недель',range:'Доля в целевом диапазоне',distribution:'Распределение измерений',daily:'Суточная сводка',activity:'Активность по времени',dynamics:'Тренды',effect:'Укол и сахар',summary:'Итоги'};
@@ -7190,10 +7195,24 @@ window.digestSumMetric=function(metric){
 };
 
 /* ---------- настройки: когда готовить дайджест и когда показывать плашку ---------- */
+/* Поля настроек обновляются по таймеру (stRefresh каждые 600 мс). Раньше таймер возвращал в поле сохранённое значение,
+   как только оно теряло фокус, — поэтому введённое число «откатывалось» (например, на 10) ещё до нажатия «Сохранить».
+   Теперь поле, которое пользователь правил, не трогаем: пока не сохранит или не откроет страницу заново. */
+const DG_INPUTS={digest:['digestDayInput','digestFromInput','digestToInput'],similar:['similarShortInput','similarNightInput']};
+function dgBind(){
+ Object.values(DG_INPUTS).flat().forEach(id=>{
+  const el=$(id);
+  if(el&&!el._dgBound){el._dgBound=true;el.addEventListener('input',()=>{el.dataset.dirty='1';});}
+ });
+}
+window.dgSettingsReset=function(name){
+ (DG_INPUTS[name]||[]).forEach(id=>{const el=$(id);if(el)delete el.dataset.dirty;});
+};
 window.renderDigestSettings=function(){
  const rs=typeof reportSettings!=='undefined'?reportSettings:null;
  if(!rs||rs.digest_day==null)return;
- const fill=(id,value)=>{const el=$(id);if(el&&document.activeElement!==el)el.value=value;};
+ dgBind();
+ const fill=(id,value)=>{const el=$(id);if(el&&document.activeElement!==el&&el.dataset.dirty!=='1')el.value=value;};
  fill('digestDayInput',rs.digest_day);fill('digestFromInput',rs.digest_card_from);fill('digestToInput',rs.digest_card_to);
  fill('similarShortInput',rs.similar_days_short);fill('similarNightInput',rs.similar_days_night);
 };
@@ -7210,6 +7229,7 @@ window.saveDigestSettings=async function(){
  try{
   const result=await api('report_settings_set',{digest_day:day,digest_card_from:from,digest_card_to:to});
   if(result&&result.digest_day!=null)reportSettings=result;
+  window.dgSettingsReset('digest');
   uiHaptic('success');showSaveSuccess(button);
   setToast(toast,'✓ Сохранено для всех пользователей','success');
   window.renderDigestSettings();
@@ -7233,6 +7253,7 @@ window.saveSimilarSettings=async function(){
  try{
   const result=await api('report_settings_set',{similar_days_short:shortDays,similar_days_night:nightDays});
   if(result&&result.similar_days_short!=null)reportSettings=result;
+  window.dgSettingsReset('similar');
   uiHaptic('success');showSaveSuccess(button);
   setToast(toast,'✓ Сохранено для всех пользователей','success');
   window.renderDigestSettings();
