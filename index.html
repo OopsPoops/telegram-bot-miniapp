@@ -598,6 +598,13 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .range-legend-row b{font-size:16px;font-variant-numeric:tabular-nums}
 .range-legend-row em{min-width:62px;text-align:right;font-style:normal;font-size:11px;color:var(--muted)}
 .range-compare{margin-top:6px;font-size:12px;color:var(--muted);text-align:center;line-height:1.5}
+.range-dot.bf{background:#f0a840}.range-dot.dn{background:#6d63e6}.range-dot.co{background:#1f9d8f}.range-dot.un{background:#a2a8bd}
+.dose-split{margin-bottom:10px}
+.dose-split .range-legend-row em{min-width:74px;font-weight:800;font-size:13px;color:var(--text);white-space:nowrap}
+.dose-split .range-compare b.warn{color:#c98417}
+:root[data-theme="dark"] .dose-split .range-compare b.warn{color:#f0b95a}
+.dose-bars-title{margin:8px 2px 4px;padding-top:12px;border-top:1px solid var(--line)}
+
 .range-compare b.up{color:#23925a}
 .range-compare b.down{color:#d6555b}
 :root[data-theme="dark"] .range-compare b.up{color:#52e0a0}
@@ -1499,6 +1506,12 @@ button.st-ico:active{transform:scale(.88)}
 </select>
 <span class="toolbar-count" id="dose-count" role="status"></span>
 </div>
+<div id="dose-split" class="dose-split" hidden>
+<div id="split-donut" class="range-donut"></div>
+<div id="split-legend" class="range-legend"></div>
+<div id="split-note" class="range-compare"></div>
+</div>
+<div id="dose-bars-title" class="analytics-toolbar-label dose-bars-title" hidden>Доза за день · ЦД</div>
 <div id="dose-chart" class="chart-wrap"></div>
 <div id="dose-summary" class="dose-summary"></div>
 <div id="dose-tooltip" class="chart-tooltip" role="status"></div>
@@ -4761,6 +4774,80 @@ function doseSeries(kind,days){
  }
  return series;
 }
+// ===== Распределение короткого инсулина: завтрак / ужин / подколки =====
+// Берём только фактический короткий инсулин (столбец C листа total, type=insulin); ночной сюда не попадает.
+// Каждая инъекция получает ровно одну категорию:
+//  • доза меньше порога таймера (настройки) → подколка;
+//  • доза от порога: первая до 14:00 → завтрак, первая после 14:00 → ужин (то же деление, что в карточках «Вчера/Сегодня»);
+//  • всё остальное неоднозначно (вторая крупная доза в тот же приём, крупная доза около 14:00) → «Не отнесено», в категории не входит.
+const SPLIT_MEAL_MIN=14*60,SPLIT_BAND_MIN=60;
+function classifyShortInsulin(rows,threshold){
+ const cats={breakfast:[],dinner:[],corr:[],unclear:[]};
+ const byDay=new Map();
+ rows.forEach(row=>{if(!byDay.has(row.dateKey))byDay.set(row.dateKey,[]);byDay.get(row.dateKey).push(row);});
+ byDay.forEach(list=>{
+  list.sort((a,b)=>a.timeObj.minutes-b.timeObj.minutes);
+  const taken={breakfast:false,dinner:false};
+  list.forEach(row=>{
+   if(row.value<threshold){cats.corr.push(row);return;}
+   const m=row.timeObj.minutes;
+   if(m>=SPLIT_MEAL_MIN-SPLIT_BAND_MIN&&m<SPLIT_MEAL_MIN+SPLIT_BAND_MIN){cats.unclear.push(row);return;}
+   const meal=m<SPLIT_MEAL_MIN?'breakfast':'dinner';
+   if(taken[meal]){cats.unclear.push(row);return;}
+   taken[meal]=true;cats[meal].push(row);
+  });
+ });
+ return cats;
+}
+function splitPercents(values){
+ const total=values.reduce((a,v)=>a+v,0);
+ if(!(total>0))return values.map(()=>0);
+ const raw=values.map(v=>v/total*100),base=raw.map(Math.floor);
+ let left=100-base.reduce((a,v)=>a+v,0);
+ raw.map((v,i)=>[v-base[i],i]).sort((a,b)=>b[0]-a[0]).forEach(([,i])=>{if(left>0){base[i]++;left--;}});
+ return base;
+}
+function renderInsulinSplit(days){
+ const host=document.getElementById('split-donut'),legend=document.getElementById('split-legend'),note=document.getElementById('split-note');
+ if(!host||!legend||!note)return;
+ const message=text=>{host.style.aspectRatio='auto';host.innerHTML='<div class="analytics-message">'+text+'</div>';legend.innerHTML='';note.innerHTML='';};
+ const keys=new Set(doseSeries('insulin',days).map(day=>day.key));
+ const rows=analyticsState.measurements.filter(row=>row.type==='insulin'&&keys.has(row.dateKey)&&row.value>0);
+ if(!rows.length){message('За этот период нет инъекций.');return;}
+ const threshold=Number(insulinTimerSettings.threshold);
+ if(!(threshold>0)){message('Порог подколок не задан: в настройках таймера инсулина стоит 0 ед.');return;}
+ const cats=classifyShortInsulin(rows,threshold);
+ const sumOf=list=>list.reduce((a,row)=>a+row.value,0);
+ const dayCount=list=>new Set(list.map(row=>row.dateKey)).size;
+ const defs=[
+  {k:'bf',list:cats.breakfast,name:'Завтрак',hint:`от ${fmtDose(threshold)} ед., до 14:00`,color:'#f0a840'},
+  {k:'dn',list:cats.dinner,name:'Ужин',hint:`от ${fmtDose(threshold)} ед., после 14:00`,color:'#6d63e6'},
+  {k:'co',list:cats.corr,name:'Подколки',hint:`меньше ${fmtDose(threshold)} ед.`,color:'#1f9d8f'}
+ ];
+ if(cats.unclear.length)defs.push({k:'un',list:cats.unclear,name:'Не отнесено',hint:'неоднозначные записи',color:'#a2a8bd'});
+ defs.forEach(def=>{def.sum=sumOf(def.list);def.days=dayCount(def.list);def.n=def.list.length;});
+ const total=defs.reduce((a,def)=>a+def.sum,0),allDays=dayCount(rows);
+ const pcts=splitPercents(defs.map(def=>def.sum));
+ host.style.aspectRatio='';
+ let offset=0,segs='';
+ defs.forEach((def,index)=>{
+  const len=total>0?def.sum/total*100:0;
+  if(!len)return;
+  const gap=len<99.9?Math.min(1.4,len*.4):0;
+  segs+=`<circle class="donut-seg" cx="50" cy="50" r="38" pathLength="100" stroke="${def.color}" stroke-dasharray="${(len-gap).toFixed(2)} ${(100-len+gap).toFixed(2)}" stroke-dashoffset="${(-offset).toFixed(2)}" transform="rotate(-90 50 50)" style="--d:${(index*.12).toFixed(2)}s"/>`;
+  offset+=len;
+ });
+ const totalText=fmtDose(total);
+ host.innerHTML=`<svg viewBox="0 0 100 100" role="img" aria-label="Короткий инсулин за период: ${totalText} ед."><circle class="donut-track" cx="50" cy="50" r="38"/>${segs}</svg>`
+  +`<div class="donut-center"><div class="donut-pct"><span style="font-size:${totalText.length>4?27:36}px">${totalText}</span><small>ед.</small></div><div class="donut-sub">всего</div><div class="donut-avg">ср. ${fmtDose(total/allDays)} в день</div></div>`;
+ legend.innerHTML=defs.map((def,index)=>{
+  const has=def.n>0;
+  return `<div class="range-legend-row"><span class="range-dot ${def.k}"></span><div class="range-legend-name">${def.name}<small>${def.hint}</small><small class="rl-mm">${has?`ср. ${fmtDose(def.sum/def.days)} ед./день · ${def.days} дн.`:'нет записей'}</small></div><b>${has?pcts[index]+'%':'—'}</b><em>${has?fmtDose(def.sum)+' ед.':'—'}<small class="rl-med">${has?def.n+' '+ruPlural(def.n,'инъекция','инъекции','инъекций'):''}</small></em></div>`;
+ }).join('');
+ const unclear=defs.find(def=>def.k==='un');
+ note.innerHTML=`Всего: <b>${totalText} ед.</b> · ${rows.length} ${ruPlural(rows.length,'инъекция','инъекции','инъекций')} · дней с записями: ${allDays}. Дни без записей в средних не учитываются.`
+  +(unclear?`<br><b class="warn">⚠ Не отнесено: ${unclear.n} ${ruPlural(unclear.n,'инъекция','инъекции','инъекций')}, ${fmtDose(unclear.sum)} ед.</b> — вторая крупная доза в тот же приём или доза около 14:00. В завтрак, ужин и подколки они не входят, в общую сумму входят.`:'');
+}
 function renderDoseChart(){
  const kind=analyticsState.metric==='night'?'night':'insulin';
  const [host,tooltip]=chartHosts('dose-chart','dose-tooltip');
@@ -4769,6 +4856,10 @@ function renderDoseChart(){
  const summary=document.getElementById('dose-summary');
  const color=kind==='night'?'#8b6ee0':'#1f9d8f';
  const okSwatch=document.getElementById('dose-swatch-ok');if(okSwatch)okSwatch.style.background=color;
+ const splitBox=document.getElementById('dose-split'),barsTitle=document.getElementById('dose-bars-title');
+ if(splitBox)splitBox.hidden=kind!=='insulin';
+ if(barsTitle)barsTitle.hidden=kind!=='insulin';
+ if(kind==='insulin')renderInsulinSplit(days);
  const series=doseSeries(kind,days);
  const count=document.getElementById('dose-count');
  if(count)count.textContent=series.some(day=>day.value!==null)?series.filter(day=>day.value!==null).length+' дн.':'';
@@ -5784,7 +5875,7 @@ stRefresh();
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const APP_VERSION='v20261111_1';          /* ← менять при каждом обновлении: vГГГГММДД_N */
+const APP_VERSION='v20261111_2';          /* ← менять при каждом обновлении: vГГГГММДД_N */
 const DEV_CHAT='https://t.me/larik_11';
 const CH_IDS=['trend','compare','range','distribution','daily','activity','dynamics','effect','summary'];
 const CH_NAMES={trend:'Динамика по дням',compare:'Сравнение трёх недель',range:'Доля в целевом диапазоне',distribution:'Распределение измерений',daily:'Суточная сводка',activity:'Активность по времени',dynamics:'Тренды',effect:'Укол и сахар',summary:'Итоги'};
