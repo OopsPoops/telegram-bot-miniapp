@@ -607,6 +607,40 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .dose-split .range-legend-row em{min-width:74px;font-weight:800;font-size:13px;color:var(--text);white-space:nowrap}
 .dose-split .range-compare b.warn{color:#c98417}
 :root[data-theme="dark"] .dose-split .range-compare b.warn{color:#f0b95a}
+/* ===== Статистика по месяцам / неделям / дням (вкладка «Графики») ===== */
+.ms-card{padding:14px 10px 10px}
+.ms-title{font-size:15px;font-weight:800;letter-spacing:-.2px;margin:0 4px 2px}
+.ms-hint{font-size:11.5px;color:var(--muted);margin:0 4px 10px;line-height:1.4}
+.ms-head,.ms-row{display:grid;grid-template-columns:minmax(0,1.7fr) repeat(3,minmax(0,1fr));column-gap:6px;align-items:center}
+.ms-head{padding:0 10px 7px;border-bottom:1px solid var(--line);font-size:11px;font-weight:800;color:var(--muted)}
+.ms-head span{text-align:right;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ms-head span:first-child{text-align:left}
+.ms-head small{display:block;font-size:9.5px;font-weight:700;opacity:.8}
+.ms-row{width:100%;border:0;margin:0;background:none;color:var(--text);font:inherit;text-align:left;cursor:pointer;padding:9px 10px;border-radius:12px;-webkit-tap-highlight-color:transparent;transition:background .15s}
+.ms-row:active{background:var(--icon-bg)}
+.ms-name{display:flex;align-items:center;gap:5px;min-width:0}
+.ms-lbl{display:flex;flex-direction:column;min-width:0;line-height:1.2}
+.ms-lbl b{font-size:14px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ms-lbl small{font-size:10.5px;font-weight:700;color:var(--muted)}
+.ms-row .c{text-align:right;font-variant-numeric:tabular-nums;font-weight:800;font-size:13.5px}
+.ms-row .c.na{color:var(--muted);font-weight:600}
+.ms-chev{flex:none;width:15px;height:15px;fill:none;stroke:var(--muted);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;transition:transform .22s}
+.ms-row[aria-expanded="true"] .ms-chev{transform:rotate(90deg)}
+.ms-m{background:var(--icon-bg);margin-top:6px}
+.ms-w{margin-top:3px;padding-top:7px;padding-bottom:7px;background:rgba(125,135,170,.06);box-shadow:inset 3px 0 0 rgba(82,103,232,.5)}
+.ms-w .ms-name{padding-left:6px}
+.ms-w .ms-lbl b{font-size:13px;font-weight:700}
+.ms-w .c{font-size:13px;font-weight:700}
+.ms-d{margin-top:2px;padding-top:6px;padding-bottom:6px;box-shadow:inset 3px 0 0 rgba(32,169,155,.55)}
+.ms-d .ms-name{padding-left:16px;gap:6px;font-size:12.5px;font-weight:700;white-space:nowrap}
+.ms-d .ms-wd{color:var(--muted);font-size:11.5px;font-weight:700}
+.ms-d .c{font-size:12.5px;font-weight:700}
+.ms-nest{display:grid;grid-template-rows:0fr;transition:grid-template-rows .24s ease}
+.ms-nest.open{grid-template-rows:1fr}
+.ms-nest>.ms-nest-in{overflow:hidden;min-height:0;visibility:hidden;transition:visibility 0s .24s}
+.ms-nest.open>.ms-nest-in{visibility:visible;transition:none}
+.ms-state{padding:26px 8px;text-align:center;color:var(--muted);font-size:13px;line-height:1.5}
+@media (prefers-reduced-motion:reduce){.ms-nest,.ms-chev{transition:none}}
 .dose-bars-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:8px 0 4px;padding-top:12px;border-top:1px solid var(--line)}
 .dose-bars-head.solo{margin-top:0;padding-top:0;border-top:0}
 .dose-bars-head .chart-expand{margin-left:auto}
@@ -1593,6 +1627,12 @@ button.st-ico:active{transform:scale(.88)}
 <div class="analytics-note" id="effect-note"></div>
 </section>
 </div>
+<section class="analytics-card ms-card" id="monthStats" aria-label="Статистика по месяцам">
+<div class="ms-title">Статистика по месяцам</div>
+<div class="ms-hint">Нажми на месяц или неделю, чтобы раскрыть, на день — чтобы открыть его записи.</div>
+<div class="ms-head" aria-hidden="true"><span>Месяц</span><span>Сахар<small>ммоль/л</small></span><span>Короткий<small>ед./день</small></span><span>Ночной<small>ед./день</small></span></div>
+<div id="ms-body"><div class="ms-state">Загружаю статистику…</div></div>
+</section>
 </section>
 <!-- === ЭКРАН «НАСТРОЙКИ» === -->
 <section class="screen" id="screen-settings">
@@ -2002,6 +2042,7 @@ function timerStateStorageKey(){
 // Общая краткоживущая загрузка истории: одновременно запрошенные окна используют
 // один сетевой запрос. Данные не хранятся на сервере и не переживают закрытие вкладки.
 const semaHistoryCache={days:0,result:null,at:0,pending:null,pendingDays:0};
+const msState={loading:false,model:null,at:0,stale:true,error:''}; // статистика по месяцам (вкладка «Графики»)
 function historyWindow(days,force=false){
  days=Math.max(1,Math.min(365,Math.trunc(Number(days)||7)));
  if(!force&&semaHistoryCache.result&&semaHistoryCache.days>=days&&Date.now()-semaHistoryCache.at<25000){
@@ -2018,7 +2059,7 @@ function historyWindow(days,force=false){
  },()=>{if(semaHistoryCache.pending===task)semaHistoryCache.pending=null;});
  return task;
 }
-function invalidateHistoryWindow(){semaHistoryCache.result=null;semaHistoryCache.at=0;}
+function invalidateHistoryWindow(){semaHistoryCache.result=null;semaHistoryCache.at=0;msState.stale=true;}
 const analyticsState={loaded:false,loading:false,measurements:[],doses:{limitInsulin:null,limitNight:null,night:new Map()},chart:'trend',metric:'sugar',trendDays:3,historyDays:0,selectedDates:null,visibleWeeks:[true,true,true]};
 const weekColors=['#5267e8','#ec9438','#31a66d'];
 const labels={
@@ -2058,7 +2099,7 @@ function switchTab(name){
  document.querySelectorAll('.screen').forEach(screen=>screen.classList.toggle('active',screen.id==='screen-'+name));
  window.scrollTo(0,0); // мгновенно: плавная прокрутка во время смены экрана и давала «подвисание»
  selectionHaptic();
- if(name==='graphs')loadAnalytics(false);
+ if(name==='graphs'){loadAnalytics(false);setTimeout(()=>loadMonthStats(false),500);} // таблица по месяцам грузится после графиков
  if(name==='night'&&typeof window.nightTabOpen==='function')window.nightTabOpen();
  if(name==='settings')setTimeout(refreshSettingsLazy,350); // после отрисовки экрана
 }
@@ -3380,6 +3421,159 @@ async function loadAnalytics(force=false,requestedDays=null){
  }finally{
   analyticsState.loading=false;
  }
+}
+
+// ============================================================
+// СТАТИСТИКА ПО МЕСЯЦАМ / НЕДЕЛЯМ / ДНЯМ (вкладка «Графики»)
+// Всё считается по исходным записям, а не по готовым агрегатам:
+//  • сахар — среднее дневных средних (каждый день с одинаковым весом);
+//  • короткий инсулин — среднее дневных сумм (столбец C листа total);
+//  • ночной — среднее фактических доз (столбец F, отметка ✍️), расчётные значения не берутся.
+// Отсутствие записи не считается нулём; три показателя считаются независимо друг от друга.
+// ============================================================
+const MS_MONTHS=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+const MS_SHORT=['янв','фев','мар','апр','мая','июн','июл','авг','сен','окт','ноя','дек'];
+const MS_WD=['вс','пн','вт','ср','чт','пт','сб'];
+const MS_CHEV='<svg class="ms-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
+const msOpen=new Set();
+function msNum(value){return value==null?'—':(Math.round(value*10)/10).toFixed(1).replace('.',',');}
+function msDayValues(model,key){
+ const day=model.days.get(key),night=model.night.get(key);
+ return {
+  sugar:day&&day.sugars.length?day.sumS/day.sugars.length:null,
+  ins:day&&day.shots.length?day.sumI:null,
+  night:night&&night.fact?night.value:null
+ };
+}
+function msAverages(model,keys){
+ let s=0,sn=0,i=0,inn=0,n=0,nn=0;
+ keys.forEach(key=>{
+  const v=msDayValues(model,key);
+  if(v.sugar!=null){s+=v.sugar;sn++;}
+  if(v.ins!=null){i+=v.ins;inn++;}
+  if(v.night!=null){n+=v.night;nn++;}
+ });
+ return {sugar:sn?s/sn:null,ins:inn?i/inn:null,night:nn?n/nn:null};
+}
+function msBuildModel(measurements,nightMap,today){
+ const days=new Map();
+ measurements.forEach(row=>{
+  if(!(row.value>0))return;
+  let day=days.get(row.dateKey);
+  if(!day){day={sugars:[],shots:[],sumS:0,sumI:0};days.set(row.dateKey,day);}
+  const item={m:row.timeObj.minutes,t:row.timeObj.text,v:row.value};
+  if(row.type==='sugar'){day.sugars.push(item);day.sumS+=row.value;}
+  else{day.shots.push(item);day.sumI+=row.value;}
+ });
+ const noon=new Date(today);noon.setHours(12,0,0,0);
+ const months=[];
+ for(let i=0;i<12;i++){ // 12 календарных месяцев, от нового к старому
+  const y=new Date(noon.getFullYear(),noon.getMonth()-i,1,12).getFullYear();
+  const m=new Date(noon.getFullYear(),noon.getMonth()-i,1,12).getMonth();
+  const lastDay=new Date(y,m+1,0,12).getDate(),list=[];
+  for(let d=1;d<=lastDay;d++){const date=new Date(y,m,d,12);if(date>noon)break;list.push({key:dateKey(date),date});}
+  const weeks=[];let cur=null;
+  list.forEach(item=>{ // неделя пн–вс, но только в границах месяца
+   if(!cur||item.date.getDay()===1){cur={days:[]};weeks.push(cur);}
+   cur.days.push(item);
+  });
+  const mid=y+'-'+String(m+1).padStart(2,'0');
+  weeks.forEach((week,idx)=>{week.id='w:'+mid+':'+(idx+1);week.n=idx+1;});
+  months.push({id:'m:'+mid,label:MS_MONTHS[m],year:y,keys:list.map(x=>x.key),weeks});
+ }
+ return {days,night:nightMap,months};
+}
+function msNeededDays(){
+ const now=new Date();now.setHours(12,0,0,0);
+ const start=new Date(now.getFullYear(),now.getMonth()-11,1,12);
+ return Math.round((now-start)/864e5)+1;
+}
+function msCells(values){
+ return ['sugar','ins','night'].map(k=>values[k]==null?'<span class="c na">—</span>':'<span class="c">'+msNum(values[k])+'</span>').join('');
+}
+function msWeekRange(week){
+ const a=week.days[0].date,b=week.days[week.days.length-1].date;
+ return a.getTime()===b.getTime()?a.getDate()+' '+MS_SHORT[a.getMonth()]:a.getDate()+'–'+b.getDate()+' '+MS_SHORT[b.getMonth()];
+}
+function msDayRow(model,item){
+ return '<button class="ms-row ms-d" type="button" data-day="'+item.key+'"><span class="ms-name"><b>'+item.date.getDate()+' '+MS_SHORT[item.date.getMonth()]+'</b><span class="ms-wd">'+MS_WD[item.date.getDay()]+'</span></span>'+msCells(msDayValues(model,item.key))+'</button>';
+}
+function msWeekRow(model,week){
+ const open=msOpen.has(week.id);
+ return '<button class="ms-row ms-w" type="button" data-ms="'+week.id+'" aria-expanded="'+open+'"><span class="ms-name">'+MS_CHEV+'<span class="ms-lbl"><b>Неделя '+week.n+'</b><small>'+msWeekRange(week)+'</small></span></span>'+msCells(msAverages(model,week.days.map(x=>x.key)))+'</button>'
+  +'<div class="ms-nest'+(open?' open':'')+'" data-built="'+(open?1:0)+'"><div class="ms-nest-in">'+(open?msDaysHtml(model,week):'')+'</div></div>';
+}
+function msDaysHtml(model,week){return week.days.map(item=>msDayRow(model,item)).join('');}
+function msWeeksHtml(model,month){return month.weeks.map(week=>msWeekRow(model,week)).join('');}
+function msMonthRow(model,month){
+ const open=msOpen.has(month.id);
+ return '<button class="ms-row ms-m" type="button" data-ms="'+month.id+'" aria-expanded="'+open+'"><span class="ms-name">'+MS_CHEV+'<span class="ms-lbl"><b>'+month.label+'</b><small>'+month.year+'</small></span></span>'+msCells(msAverages(model,month.keys))+'</button>'
+  +'<div class="ms-nest'+(open?' open':'')+'" data-built="'+(open?1:0)+'"><div class="ms-nest-in">'+(open?msWeeksHtml(model,month):'')+'</div></div>';
+}
+function msFind(id){
+ const model=msState.model;if(!model)return null;
+ for(const month of model.months){
+  if(month.id===id)return {kind:'m',month};
+  for(const week of month.weeks)if(week.id===id)return {kind:'w',month,week};
+ }
+ return null;
+}
+function msRender(){
+ const host=document.getElementById('ms-body');if(!host)return;
+ if(!host._msBound){host._msBound=true;host.addEventListener('click',msClick);}
+ if(!msState.model){
+  host.innerHTML=msState.error
+   ?'<div class="ms-state">'+escapeHtml(msState.error)+'<br><button class="analytics-retry" type="button" onclick="loadMonthStats(true)">Повторить</button></div>'
+   :'<div class="ms-state">Загружаю статистику…</div>';
+  return;
+ }
+ const model=msState.model;
+ host.innerHTML=model.months.map(month=>msMonthRow(model,month)).join('');
+}
+function msClick(event){
+ const row=event.target.closest('.ms-row');if(!row)return;
+ if(row.dataset.day){msOpenDay(row.dataset.day);return;}
+ const id=row.dataset.ms,found=msFind(id),nest=row.nextElementSibling;
+ if(!found||!nest||!nest.classList.contains('ms-nest'))return;
+ const model=msState.model,open=!nest.classList.contains('open');
+ if(open&&nest.dataset.built!=='1'){ // содержимое строим при первом раскрытии
+  nest.firstElementChild.innerHTML=found.kind==='m'?msWeeksHtml(model,found.month):msDaysHtml(model,found.week);
+  nest.dataset.built='1';
+  void nest.offsetHeight;
+ }
+ nest.classList.toggle('open',open);
+ row.setAttribute('aria-expanded',open?'true':'false');
+ if(open)msOpen.add(id);else msOpen.delete(id);
+ if(typeof selectionHaptic==='function')selectionHaptic();
+}
+function msOpenDay(key){
+ const model=msState.model;if(!model)return;
+ const day=model.days.get(key),night=model.night.get(key);
+ const parts=key.split('-').map(Number),date=new Date(parts[0],parts[1]-1,parts[2],12);
+ const today=new Date();today.setHours(12,0,0,0);
+ const off=Math.round((date-today)/864e5);
+ // тот же попап дня, что и в статистике «Ночного»: передаём ему выбранную дату и её записи
+ if(typeof window.openDayWithData==='function')window.openDayWithData(off,{
+  sugars:day?day.sugars:[],shots:day?day.shots:[],
+  night:night?{value:night.value,approx:night.approx}:null
+ });
+}
+async function loadMonthStats(force=false){
+ if(msState.loading)return;
+ if(!force&&msState.model&&!msState.stale&&Date.now()-msState.at<300000)return;
+ msState.loading=true;msState.error='';
+ if(!msState.model)msRender();
+ try{
+  const result=await api('history',{days:Math.min(365,msNeededDays())});
+  msState.model=msBuildModel(normalizeHistory(result),normalizeDoses(result).night,new Date());
+  msState.at=Date.now();msState.stale=false;
+ }catch(error){
+  handleAccessError(error);
+  if(!msState.model)msState.error=(error&&error.message)||'Не удалось загрузить статистику.';
+ }finally{
+  msState.loading=false;
+ }
+ msRender();
 }
 
 // ============================================================
@@ -5942,7 +6136,7 @@ stRefresh();
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const APP_VERSION='v20261111_5';          /* ← менять при каждом обновлении: vГГГГММДД_N */
+const APP_VERSION='v20261113_1';          /* ← менять при каждом обновлении: vГГГГММДД_N */
 const DEV_CHAT='https://t.me/larik_11';
 const CH_IDS=['trend','compare','range','distribution','daily','activity','dynamics','effect','summary'];
 const CH_NAMES={trend:'Динамика по дням',compare:'Сравнение трёх недель',range:'Доля в целевом диапазоне',distribution:'Распределение измерений',daily:'Суточная сводка',activity:'Активность по времени',dynamics:'Тренды',effect:'Укол и сахар',summary:'Итоги'};
@@ -6625,6 +6819,15 @@ window.showDayInMetrics=function(off){
  off=Math.max(-(DAYS-1),off);
  if(!hist){getHistory(false).then(()=>openDayPopup(off)).catch(error=>console.error('Не удалось загрузить день:',error));return;}
  openDayPopup(off);
+};
+
+/* Попап дня для даты из таблицы «Статистика по месяцам»: тот же компонент, данные дня передаются готовыми */
+window.openDayWithData=function(off,data){
+ off=Math.min(0,Math.trunc(Number(off)||0));
+ const d=dayInfo(off),date=new Date();date.setHours(12,0,0,0);date.setDate(date.getDate()+off);
+ const dm=date.getFullYear()===new Date().getFullYear()?d.dm:d.dm+'.'+date.getFullYear();
+ const sub=d.name.toLowerCase()===d.wd?dm:dm+' · '+d.wd;
+ dpOpen([()=>({name:d.name,sub,sugars:data.sugars||[],shots:data.shots||[],night:data.night||null,sumHtml:''})],0);
 };
 
 /* ===== «Сегодня» / «Вчера»: то же окно дня; стрелки листают дни назад и вперёд ===== */
