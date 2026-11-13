@@ -608,10 +608,9 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .dose-split .range-compare b.warn{color:#c98417}
 :root[data-theme="dark"] .dose-split .range-compare b.warn{color:#f0b95a}
 /* ===== Статистика по месяцам / неделям / дням (вкладка «Графики») ===== */
-.ms-card{padding:14px 10px 10px}
-.ms-title{font-size:15px;font-weight:800;letter-spacing:-.2px;margin:0 4px 2px}
-.ms-hint{font-size:11.5px;color:var(--muted);margin:0 4px 10px;line-height:1.4}
-.ms-head,.ms-row{display:grid;grid-template-columns:minmax(0,1.7fr) repeat(3,minmax(0,1fr));column-gap:6px;align-items:center}
+.ms-card{padding:14px 10px 10px;--ms-c:clamp(46px,15.5vw,60px);--ms-step:clamp(9px,3.5vw,14px)}
+.ms-title{font-size:15px;font-weight:800;letter-spacing:-.2px;margin:0 4px 10px}
+.ms-head,.ms-row{display:grid;grid-template-columns:minmax(0,1fr) repeat(3,var(--ms-c));column-gap:6px;align-items:center}
 .ms-head{padding:0 10px 7px;border-bottom:1px solid var(--line);font-size:11px;font-weight:800;color:var(--muted)}
 .ms-head span{text-align:right;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ms-head span:first-child{text-align:left}
@@ -628,17 +627,17 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .ms-row[aria-expanded="true"] .ms-chev{transform:rotate(90deg)}
 .ms-m{background:var(--icon-bg);margin-top:6px}
 .ms-w{margin-top:3px;padding-top:7px;padding-bottom:7px;background:rgba(125,135,170,.06);box-shadow:inset 3px 0 0 rgba(82,103,232,.5)}
-.ms-w .ms-name{padding-left:6px}
 .ms-w .ms-lbl b{font-size:13px;font-weight:700}
 .ms-w .c{font-size:13px;font-weight:700}
 .ms-d{margin-top:2px;padding-top:6px;padding-bottom:6px;box-shadow:inset 3px 0 0 rgba(32,169,155,.55)}
-.ms-d .ms-name{padding-left:16px;gap:6px;font-size:12.5px;font-weight:700;white-space:nowrap}
+.ms-d .ms-name{gap:6px;font-size:12.5px;font-weight:700;white-space:nowrap}
 .ms-d .ms-wd{color:var(--muted);font-size:11.5px;font-weight:700}
 .ms-d .c{font-size:12.5px;font-weight:700}
 .ms-nest{display:grid;grid-template-rows:0fr;transition:grid-template-rows .24s ease}
 .ms-nest.open{grid-template-rows:1fr}
 .ms-nest>.ms-nest-in{overflow:hidden;min-height:0;visibility:hidden;transition:visibility 0s .24s}
 .ms-nest.open>.ms-nest-in{visibility:visible;transition:none}
+.ms-m+.ms-nest>.ms-nest-in,.ms-w+.ms-nest>.ms-nest-in{padding-left:var(--ms-step)} /* лесенка: неделя правее месяца, день правее недели; числа остаются в своих колонках */
 .ms-state{padding:26px 8px;text-align:center;color:var(--muted);font-size:13px;line-height:1.5}
 @media (prefers-reduced-motion:reduce){.ms-nest,.ms-chev{transition:none}}
 .dose-bars-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:8px 0 4px;padding-top:12px;border-top:1px solid var(--line)}
@@ -1473,6 +1472,7 @@ button.st-ico:active{transform:scale(.88)}
 <button class="analytics-tab" type="button" role="tab" aria-label="Тренды: неделя к неделе и месяц к месяцу" title="Тренды: неделя к неделе и месяц к месяцу" aria-selected="false" data-chart="dynamics" onclick="selectChart('dynamics')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 19V6M7 6 3.8 9.2M7 6l3.2 3.2"/><path d="M17 5v13M17 18l-3.2-3.2M17 18l3.2-3.2"/></svg><span class="tab-label">Тренды</span></button>
 <button class="analytics-tab" type="button" role="tab" aria-label="Укол и сахар до и после" title="Укол и сахар до и после" aria-selected="false" data-chart="effect" onclick="selectChart('effect')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4v16h16"/><circle cx="9" cy="9" r="1.6" fill="currentColor" stroke="none"/><circle cx="13" cy="12.5" r="1.6" fill="currentColor" stroke="none"/><circle cx="17" cy="15" r="1.6" fill="currentColor" stroke="none"/><path d="M7 7.5l11 8.5" stroke-dasharray="2 2.4"/></svg><span class="tab-label">Эффект</span></button>
 <button class="analytics-tab" type="button" role="tab" aria-label="Итоги по дням, неделям и месяцам" title="Итоги по дням, неделям и месяцам" aria-selected="false" data-chart="summary" onclick="selectChart('summary')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 20h17"/><path d="M6.5 20v-6M12 20V6M17.5 20v-9"/></svg><span class="tab-label">Итоги</span></button>
+<button class="analytics-tab" type="button" role="tab" aria-label="Статистика по месяцам, неделям и дням" title="Статистика по месяцам, неделям и дням" aria-selected="false" data-chart="stats" onclick="selectChart('stats')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M3.5 14.8h17M9.8 10v9.5"/></svg><span class="tab-label">Статистика</span></button>
 </div>
 <div class="metric-switch" role="group" aria-label="Показатель" data-active="sugar">
 <span class="metric-pill" aria-hidden="true"></span>
@@ -1626,13 +1626,12 @@ button.st-ico:active{transform:scale(.88)}
 </div>
 <div class="analytics-note" id="effect-note"></div>
 </section>
-</div>
-<section class="analytics-card ms-card" id="monthStats" aria-label="Статистика по месяцам">
+<section class="analytics-card analytics-panel ms-card" id="monthStats" data-panel="stats" hidden aria-label="Статистика по месяцам">
 <div class="ms-title">Статистика по месяцам</div>
-<div class="ms-hint">Нажми на месяц или неделю, чтобы раскрыть, на день — чтобы открыть его записи.</div>
 <div class="ms-head" aria-hidden="true"><span>Месяц</span><span>Сахар<small>ммоль/л</small></span><span>Короткий<small>ед./день</small></span><span>Ночной<small>ед./день</small></span></div>
 <div id="ms-body"><div class="ms-state">Загружаю статистику…</div></div>
 </section>
+</div>
 </section>
 <!-- === ЭКРАН «НАСТРОЙКИ» === -->
 <section class="screen" id="screen-settings">
@@ -1665,6 +1664,7 @@ button.st-ico:active{transform:scale(.88)}
 <button class="st-row has-ico st-nav" type="button" onclick="stOpen('sound')"><span class="st-ico c-red"><svg class="g"><use href="#i-sound"/></svg></span><span class="st-t">Звук и вибрация</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
 <button class="st-row has-ico st-nav" type="button" onclick="stOpen('timer')"><span class="st-ico c-orange"><svg class="g"><use href="#i-timer"/></svg></span><span class="st-t">Таймер инсулина</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
 <button class="st-row has-ico st-nav" type="button" onclick="stOpen('report')"><span class="st-ico c-blue"><svg class="g"><use href="#i-cal"/></svg></span><span class="st-t">Ежедневный отчёт</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
+<button class="st-row has-ico st-nav" type="button" onclick="stOpen('charts')"><span class="st-ico c-purple"><svg class="g"><use href="#i-chart"/></svg></span><span class="st-t">Настройка графиков</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
 <button class="st-row has-ico st-nav" type="button" onclick="stOpen('food')"><span class="st-ico c-purple"><svg class="g"><use href="#i-meal"/></svg></span><span class="st-t">Еда</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
 <button class="st-row has-ico st-nav" type="button" onclick="stOpen('target')"><span class="st-ico c-green"><svg class="g"><use href="#i-target"/></svg></span><span class="st-t">Целевой диапазон</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
 <button class="st-row has-ico st-nav" type="button" onclick="stOpen('digest')"><span class="st-ico c-blue"><svg class="g"><use href="#i-cal"/></svg></span><span class="st-t">AI-дайджест</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
@@ -1796,10 +1796,10 @@ button.st-ico:active{transform:scale(.88)}
 <div class="st-row two has-ico"><span class="st-ico c-sky"><svg class="g"><use href="#i-theme"/></svg><span id="themeIcon" hidden></span></span><div class="st-copy"><div class="st-t">Тёмная тема</div><div class="st-desc st-s" id="themeDescription">Комфортное оформление в темноте</div></div><button class="st-sw" id="themeSwitch" type="button" onclick="toggleTheme()" aria-label="Переключить тему"><span id="themeSwitchIcon"></span></button></div>
 </div>
 
-<div class="st-card"><button class="st-row has-ico st-nav" type="button" onclick="stOpen('charts')"><span class="st-ico c-purple"><svg class="g"><use href="#i-chart"/></svg></span><span class="st-t">Настройка графиков</span><span class="st-val" id="stV-charts"></span><svg class="st-chev"><use href="#i-chev"/></svg></button>
+<div class="st-card">
 <div class="st-row two has-ico"><span class="st-ico c-orange"><svg class="g"><use href="#i-meal"/></svg></span><div class="st-copy"><div class="st-t">Скрыть карточку «завтрак / ужин»</div><div class="st-desc st-s">Первая карточка на главной</div></div><button class="st-sw" id="hideMealSwitch" type="button" aria-pressed="false" aria-label="Скрыть карточку завтрака и ужина на главной"><span></span></button></div>
 </div>
-<div class="st-foot">Настройка графиков и скрытие карточки общие для всех пользователей бота.</div>
+<div class="st-foot">Скрытие карточки общее для всех пользователей бота.</div>
 </div>
 
 <div class="st-page" data-p="charts">
@@ -2099,7 +2099,7 @@ function switchTab(name){
  document.querySelectorAll('.screen').forEach(screen=>screen.classList.toggle('active',screen.id==='screen-'+name));
  window.scrollTo(0,0); // мгновенно: плавная прокрутка во время смены экрана и давала «подвисание»
  selectionHaptic();
- if(name==='graphs'){loadAnalytics(false);setTimeout(()=>loadMonthStats(false),500);} // таблица по месяцам грузится после графиков
+ if(name==='graphs')loadAnalytics(false);
  if(name==='night'&&typeof window.nightTabOpen==='function')window.nightTabOpen();
  if(name==='settings')setTimeout(refreshSettingsLazy,350); // после отрисовки экрана
 }
@@ -3681,7 +3681,7 @@ function syncAnalyticsLayout(){
   const onRange=analyticsState.chart==='range';
   const withNight=onRange||analyticsState.chart==='summary';
   const sw=document.querySelector('.metric-switch');
-  if(sw){if(withNight)sw.setAttribute('data-night','1');else sw.removeAttribute('data-night');sw.style.display=(analyticsState.chart==='dynamics'||analyticsState.chart==='effect')?'none':'';}
+  if(sw){if(withNight)sw.setAttribute('data-night','1');else sw.removeAttribute('data-night');sw.style.display=(analyticsState.chart==='dynamics'||analyticsState.chart==='effect'||analyticsState.chart==='stats')?'none':'';}
   const nightButton=document.querySelector('[data-metric="night"]');
   if(nightButton)nightButton.style.display=withNight?'':'none';
   const showDose=onRange&&analyticsState.metric!=='sugar';
@@ -3701,6 +3701,7 @@ function selectChart(name){
   syncAnalyticsLayout();
   if(name==='dynamics')loadTrends(false);
   if(name==='summary')loadSummary(false);
+  if(name==='stats')loadMonthStats(false);
   if(!analyticsState.loading&&analyticsState.loaded&&requiredGraphHistoryDays()>analyticsState.historyDays){loadAnalytics(true,requiredGraphHistoryDays());return;}
   renderAnalytics();
 }
@@ -3741,6 +3742,7 @@ function renderAnalytics(){
   else if(analyticsState.chart==='range'){if(analyticsState.metric==='sugar')renderRangeDonut();else renderDoseChart();}
   else if(analyticsState.chart==='effect')renderEffectChart();
   else if(analyticsState.chart==='summary')renderSummary();
+  else if(analyticsState.chart==='stats'){msRender();loadMonthStats(false);}
   else if(analyticsState.chart==='dynamics'){/* плитки грузятся отдельно: loadTrends */}
   else renderActivityHeatmap();
 }
@@ -6040,7 +6042,7 @@ window.stOpen=function(name){
   if(typeof window.dgSettingsReset==='function')window.dgSettingsReset(name);
   stRefresh();
 };
-const ST_PARENT={charts:'theme'};
+const ST_PARENT={};
 window.stBack=function(){const cur=document.querySelector('#screen-settings .st-page.active');stOpen((cur&&ST_PARENT[cur.dataset.p])||'root');};
 const sec=$('screen-settings');
 function edgeBack(get){
@@ -6136,11 +6138,11 @@ stRefresh();
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const APP_VERSION='v20261113_1';          /* ← менять при каждом обновлении: vГГГГММДД_N */
+const APP_VERSION='v20261113_2';          /* ← менять при каждом обновлении: vГГГГММДД_N */
 const DEV_CHAT='https://t.me/larik_11';
-const CH_IDS=['trend','compare','range','distribution','daily','activity','dynamics','effect','summary'];
-const CH_NAMES={trend:'Динамика по дням',compare:'Сравнение трёх недель',range:'Доля в целевом диапазоне',distribution:'Распределение измерений',daily:'Суточная сводка',activity:'Активность по времени',dynamics:'Тренды',effect:'Укол и сахар',summary:'Итоги'};
-const CH_COLOR={trend:'c-blue',compare:'c-purple',range:'c-green',distribution:'c-sky',daily:'c-orange',activity:'c-red',dynamics:'c-teal',effect:'c-pink',summary:'c-gray'};
+const CH_IDS=['trend','compare','range','distribution','daily','activity','dynamics','effect','summary','stats'];
+const CH_NAMES={trend:'Динамика по дням',compare:'Сравнение трёх недель',range:'Доля в целевом диапазоне',distribution:'Распределение измерений',daily:'Суточная сводка',activity:'Активность по времени',dynamics:'Тренды',effect:'Укол и сахар',summary:'Итоги',stats:'Статистика по месяцам'};
+const CH_COLOR={trend:'c-blue',compare:'c-purple',range:'c-green',distribution:'c-sky',daily:'c-orange',activity:'c-red',dynamics:'c-teal',effect:'c-pink',summary:'c-gray',stats:'c-teal'};
 const LS='sema-charts';
 function norm(v){
  const order=[];
