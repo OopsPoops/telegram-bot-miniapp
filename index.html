@@ -609,7 +609,11 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 :root[data-theme="dark"] .dose-split .range-compare b.warn{color:#f0b95a}
 /* ===== Статистика по месяцам / неделям / дням (вкладка «Графики») ===== */
 .ms-card{padding:14px 10px 10px;--ms-c:clamp(46px,15.5vw,60px);--ms-step:clamp(9px,3.5vw,14px)}
-.ms-title{font-size:15px;font-weight:800;letter-spacing:-.2px;margin:0 4px 10px}
+.ms-titlebar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 4px 10px;min-height:30px}
+.ms-title{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:15px;font-weight:800;letter-spacing:-.2px}
+.ms-collapse{flex:none;border:0;border-radius:999px;background:var(--icon-bg);color:var(--blue);font:inherit;font-size:12px;font-weight:700;padding:7px 12px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .2s,opacity .2s}
+.ms-collapse:active{transform:scale(.94)}
+.ms-collapse[hidden]{display:none}
 .ms-head,.ms-row{display:grid;grid-template-columns:minmax(0,1fr) repeat(3,var(--ms-c));column-gap:6px;align-items:center}
 .ms-head{padding:0 10px 7px;border-bottom:1px solid var(--line);font-size:11px;font-weight:800;color:var(--muted)}
 .ms-head span{text-align:right;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -1627,7 +1631,7 @@ button.st-ico:active{transform:scale(.88)}
 <div class="analytics-note" id="effect-note"></div>
 </section>
 <section class="analytics-card analytics-panel ms-card" id="monthStats" data-panel="stats" hidden aria-label="Статистика по месяцам">
-<div class="ms-title">Статистика по месяцам</div>
+<div class="ms-titlebar"><div class="ms-title">Статистика по месяцам</div><button class="ms-collapse" id="ms-collapse" type="button" hidden onclick="msCollapseAll()">Свернуть всё</button></div>
 <div class="ms-head" aria-hidden="true"><span>Месяц</span><span>Сахар<small>ммоль/л</small></span><span>Короткий<small>ед./день</small></span><span>Ночной<small>ед./день</small></span></div>
 <div id="ms-body"><div class="ms-state">Загружаю статистику…</div></div>
 </section>
@@ -3510,6 +3514,21 @@ function msMonthRow(model,month){
  return '<button class="ms-row ms-m" type="button" data-ms="'+month.id+'" aria-expanded="'+open+'"><span class="ms-name">'+MS_CHEV+'<span class="ms-lbl"><b>'+month.label+'</b><small>'+month.year+'</small></span></span>'+msCells(msAverages(model,month.keys))+'</button>'
   +'<div class="ms-nest'+(open?' open':'')+'" data-built="'+(open?1:0)+'"><div class="ms-nest-in">'+(open?msWeeksHtml(model,month):'')+'</div></div>';
 }
+function msSyncCollapse(){
+ const button=document.getElementById('ms-collapse');
+ if(button)button.hidden=msOpen.size===0; // кнопка видна, только пока что-то раскрыто
+}
+function msCollapseAll(){
+ const host=document.getElementById('ms-body');
+ if(host)host.querySelectorAll('.ms-nest.open').forEach(nest=>{
+  nest.classList.remove('open');
+  const row=nest.previousElementSibling;
+  if(row&&row.classList.contains('ms-row'))row.setAttribute('aria-expanded','false');
+ });
+ msOpen.clear();
+ msSyncCollapse();
+ if(typeof selectionHaptic==='function')selectionHaptic();
+}
 function msFind(id){
  const model=msState.model;if(!model)return null;
  for(const month of model.months){
@@ -3529,6 +3548,7 @@ function msRender(){
  }
  const model=msState.model;
  host.innerHTML=model.months.map(month=>msMonthRow(model,month)).join('');
+ msSyncCollapse();
 }
 function msClick(event){
  const row=event.target.closest('.ms-row');if(!row)return;
@@ -3544,6 +3564,7 @@ function msClick(event){
  nest.classList.toggle('open',open);
  row.setAttribute('aria-expanded',open?'true':'false');
  if(open)msOpen.add(id);else msOpen.delete(id);
+ msSyncCollapse();
  if(typeof selectionHaptic==='function')selectionHaptic();
 }
 function msOpenDay(key){
@@ -6138,7 +6159,7 @@ stRefresh();
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const APP_VERSION='v20261113_2';          /* ← менять при каждом обновлении: vГГГГММДД_N */
+const APP_VERSION='v20261113_3';          /* ← менять при каждом обновлении: vГГГГММДД_N */
 const DEV_CHAT='https://t.me/larik_11';
 const CH_IDS=['trend','compare','range','distribution','daily','activity','dynamics','effect','summary','stats'];
 const CH_NAMES={trend:'Динамика по дням',compare:'Сравнение трёх недель',range:'Доля в целевом диапазоне',distribution:'Распределение измерений',daily:'Суточная сводка',activity:'Активность по времени',dynamics:'Тренды',effect:'Укол и сахар',summary:'Итоги',stats:'Статистика по месяцам'};
