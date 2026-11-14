@@ -6159,7 +6159,7 @@ stRefresh();
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const APP_VERSION='v20261113_4';          /* ← менять при каждом обновлении: vГГГГММДД_N */
+const APP_VERSION='v20261114_1';          /* ← менять при каждом обновлении: vГГГГММДД_N */
 const DEV_CHAT='https://t.me/larik_11';
 const CH_IDS=['trend','compare','range','distribution','daily','activity','dynamics','effect','summary','stats'];
 const CH_NAMES={trend:'Динамика по дням',compare:'Сравнение трёх недель',range:'Доля в целевом диапазоне',distribution:'Распределение измерений',daily:'Суточная сводка',activity:'Активность по времени',dynamics:'Тренды',effect:'Укол и сахар',summary:'Итоги',stats:'Статистика по месяцам'};
@@ -6837,7 +6837,7 @@ function insCaseSpecs(){
  const cases=(insSim.data&&insSim.data.cases)||[],n=cases.length;
  return cases.map((c,i)=>()=>{
   const day=caseDay(c);
-  return {name:'Топ '+(i+1)+' из '+n,sub:c.date,sugars:day.sugars,shots:day.shots,night:c.basal!=null?{value:c.basal}:null,sumHtml:'',mark:c.sugar.time};
+  return {name:(c.approx?'Примерно · ':'Топ ')+(i+1)+' из '+n,sub:c.date,sugars:day.sugars,shots:day.shots,night:c.basal!=null?{value:c.basal}:null,sumHtml:'',mark:c.sugar.time};
  });
 }
 function nightCaseSpecs(){
@@ -6941,7 +6941,7 @@ function insRenderBack(){
  const total=data.cases.length;
  insSim.idx=((insSim.idx%total)+total)%total;
  const c=data.cases[insSim.idx];
- sub.textContent=c.date.slice(0,5)+' · '+(insSim.idx+1)+'/'+total;
+ sub.textContent=c.date.slice(0,5)+' · '+(insSim.idx+1)+'/'+total+(c.approx?' · примерно':'');
  sub.dataset.open='1';
  const before=c.insulin_before_total>0?insG(c.insulin_before_total):'';
  const after=c.insulin_after_total>0?insG(c.insulin_after_total):'';
