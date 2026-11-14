@@ -5693,6 +5693,8 @@ const yd={anchor:null,cache:new Map(),oldest:null,kmin:0,built:false,idx:null,lo
 function ydGroup(){return document.getElementById('ydGroup');}
 function ydCarousel(){return document.getElementById('ydCarousel');}
 function ydDayNumber(text){const [d,m,y]=text.split('.').map(Number);return Math.round(Date.UTC(y,m-1,d)/86400000);}
+const YD_WD=['вс','пн','вт','ср','чт','пт','сб'];
+function ydWeekday(day){return YD_WD[new Date(day*86400000).getUTCDay()];} // сокращённый день недели
 function ydFormatDate(day){
  const date=new Date(day*86400000);
  return String(date.getUTCDate()).padStart(2,'0')+'.'+String(date.getUTCMonth()+1).padStart(2,'0')+'.'+date.getUTCFullYear();
@@ -5734,9 +5736,9 @@ function ydPageHtml(k,expanded){
 function ydRenderFace(face,data,label,day){
  const meal=face.dataset.meal,low=YD_MEAL_LOW[meal],rel=day-ydToday();
  face.querySelector('.yd-title').textContent=label;
- face.querySelector('.yd-sub').textContent=YD_MEAL_NAME[meal]+' · '+ydFormatDate(day).slice(0,5);
+ face.querySelector('.yd-sub').textContent=YD_MEAL_NAME[meal]+' · '+ydFormatDate(day).slice(0,5)+' · '+ydWeekday(day);
  {const dateEl=face.querySelector('.yd-sub');
-  if(rel<=0){dateEl.dataset.daySelect='';dateEl.dataset.off=String(rel);dateEl.setAttribute('role','button');dateEl.setAttribute('tabindex','0');dateEl.setAttribute('aria-label','Показать сахар и инсулин за '+ydFormatDate(day));}
+  if(rel<=0){dateEl.dataset.daySelect='';dateEl.dataset.off=String(rel);dateEl.setAttribute('role','button');dateEl.setAttribute('tabindex','0');dateEl.setAttribute('aria-label','Показать сахар и инсулин за '+ydFormatDate(day)+', '+ydWeekday(day));}
   else{delete dateEl.dataset.daySelect;delete dateEl.dataset.off;dateEl.removeAttribute('role');dateEl.removeAttribute('tabindex');dateEl.removeAttribute('aria-label');}} // завтра данных нет — дата не кликабельна
  const body=face.querySelector('.yd-body');
  if(!data.found){
@@ -6159,7 +6161,7 @@ stRefresh();
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const APP_VERSION='v20261114_1';          /* ← менять при каждом обновлении: vГГГГММДД_N */
+const APP_VERSION='v20261114_2';          /* ← менять при каждом обновлении: vГГГГММДД_N */
 const DEV_CHAT='https://t.me/larik_11';
 const CH_IDS=['trend','compare','range','distribution','daily','activity','dynamics','effect','summary','stats'];
 const CH_NAMES={trend:'Динамика по дням',compare:'Сравнение трёх недель',range:'Доля в целевом диапазоне',distribution:'Распределение измерений',daily:'Суточная сводка',activity:'Активность по времени',dynamics:'Тренды',effect:'Укол и сахар',summary:'Итоги',stats:'Статистика по месяцам'};
@@ -6832,19 +6834,25 @@ function openDayPopup(off,opts){
  if(!hist)return;
  dpOpen([()=>daySpec(off,opts)],0);
 }
+function caseDateWd(text){ // «10.11.2026» → «10.11.2026 · вт»
+ const m=String(text||'').match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+ if(!m)return text;
+ const d=new Date(+m[3],+m[2]-1,+m[1],12);
+ return isNaN(d)?text:text+' · '+WD[d.getDay()];
+}
 function caseDay(c){const d=c.day||{};return {sugars:dpItems(d.sugars),shots:dpItems(d.shots)};}
 function insCaseSpecs(){
  const cases=(insSim.data&&insSim.data.cases)||[],n=cases.length;
  return cases.map((c,i)=>()=>{
   const day=caseDay(c);
-  return {name:(c.approx?'Примерно · ':'Топ ')+(i+1)+' из '+n,sub:c.date,sugars:day.sugars,shots:day.shots,night:c.basal!=null?{value:c.basal}:null,sumHtml:'',mark:c.sugar.time};
+  return {name:(c.approx?'Примерно · ':'Топ ')+(i+1)+' из '+n,sub:caseDateWd(c.date),sugars:day.sugars,shots:day.shots,night:c.basal!=null?{value:c.basal}:null,sumHtml:'',mark:c.sugar.time};
  });
 }
 function nightCaseSpecs(){
  const data=nSim.data,cases=(data&&data.cases)||[],n=cases.length;
  return cases.map((c,i)=>()=>{
   const day=caseDay(c),t=target();
-  return {name:'Топ '+(i+1)+' из '+n,sub:c.date,sugars:day.sugars,shots:day.shots,night:{value:c.basal},mark:c.sugar.time,
+  return {name:'Топ '+(i+1)+' из '+n,sub:caseDateWd(c.date),sugars:day.sugars,shots:day.shots,night:{value:c.basal},mark:c.sugar.time,
    sumHtml:'<div class="dp-sum">'+nightHead()+nightCaseRow(c,t,'')+'</div>'};
  });
 }
