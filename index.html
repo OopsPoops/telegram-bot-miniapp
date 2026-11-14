@@ -6159,7 +6159,7 @@ stRefresh();
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const APP_VERSION='v20261113_3';          /* ← менять при каждом обновлении: vГГГГММДД_N */
+const APP_VERSION='v20261113_4';          /* ← менять при каждом обновлении: vГГГГММДД_N */
 const DEV_CHAT='https://t.me/larik_11';
 const CH_IDS=['trend','compare','range','distribution','daily','activity','dynamics','effect','summary','stats'];
 const CH_NAMES={trend:'Динамика по дням',compare:'Сравнение трёх недель',range:'Доля в целевом диапазоне',distribution:'Распределение измерений',daily:'Суточная сводка',activity:'Активность по времени',dynamics:'Тренды',effect:'Укол и сахар',summary:'Итоги',stats:'Статистика по месяцам'};
@@ -6404,7 +6404,8 @@ const pad=n=>String(n).padStart(2,'0');
 let hist=null,histAt=0,histStart=0,histPromise=null,failed=false;
 function fetchHist(){
  histStart=Date.now();
- return historyWindow(DAYS).then(r=>{hist={rows:normalizeHistory(r),doses:normalizeDoses(r)};histAt=Date.now();failed=false;return hist;});
+ const loadedDays=DAYS; // окно истории: сегодня и loadedDays-1 дней назад
+ return historyWindow(loadedDays).then(r=>{hist={rows:normalizeHistory(r),doses:normalizeDoses(r),days:loadedDays};histAt=Date.now();failed=false;return hist;});
 }
 function getHistory(force){
  if(force&&hist&&Date.now()-histAt<1500)force=false;
@@ -6521,17 +6522,32 @@ function renderNightStats(ix,t){
  if(!body)return;
  document.querySelectorAll('#nightRange button').forEach(b=>b.classList.toggle('active',Number(b.dataset.n)===nightDays));
  const rows=[];
- for(let o=0;o>-nightDays;o--){const r=nightRow(o,ix,t);if(r)rows.push(r);}
- body.innerHTML=rows.length?nightHead()+rows.join(''):'<div class="ns-note">Пока нет данных за этот период.</div>';
+ const loaded=(hist&&hist.days)||DAYS;
+ // строка за день E берёт вечер дня E и утро E+1; за границей загруженного окна данных нет вовсе,
+ // поэтому там остался бы «полупустой» ряд только с утренним замером — такие дни не рисуем
+ for(let o=0;o>-nightDays&&o>=-(loaded-1);o--){const r=nightRow(o,ix,t);if(r)rows.push(r);}
+ const pending=loaded<Math.min(MAX_DAYS,nightDays+1);
+ body.innerHTML=(rows.length?nightHead()+rows.join(''):(pending?'':'<div class="ns-note">Пока нет данных за этот период.</div>'))
+  +(pending?'<div class="ns-note">Загружаю остальные дни…</div>':'');
 }
+/* Окно истории должно покрывать выбранный период «Ночного» (+1 день запаса). Раньше сохранённые 20/30 дней
+   открывались при окне в 14 дней: строки обрывались, а последняя была наполовину пустой. */
+function ensureNightHistory(){
+ const need=Math.min(MAX_DAYS,nightDays+1);
+ if(DAYS<need)DAYS=need;
+ if(hist&&hist.days>=need)return;
+ histAt=0;histStart=0; // сбрасываем защиту getHistory от частых запросов, иначе запрос с новым окном мог бы не уйти
+ getHistory(true).then(render).catch(error=>console.error('Не удалось подгрузить ночные дни:',error));
+}
+window.ensureNightHistory=ensureNightHistory;
 function setNightDays(n){
  if(![10,20,30].includes(n)||n===nightDays)return;
  nightDays=n;
  try{localStorage.setItem('sema-night-days',String(n));}catch(e){}
  if(typeof selectionHaptic==='function')selectionHaptic();
  document.querySelectorAll('#nightRange button').forEach(b=>b.classList.toggle('active',Number(b.dataset.n)===nightDays));
- if(DAYS<n+1){DAYS=Math.min(MAX_DAYS,n+1);getHistory(true).then(render).catch(error=>console.error('Не удалось подгрузить ночные дни:',error));}
- else render();
+ ensureNightHistory(); // догружает окно истории, если оно короче выбранного периода
+ render();
 }
 const nightBodyEl=$('nightStatsBody');
 if(nightBodyEl)nightBodyEl.addEventListener('click',e=>{
@@ -7156,6 +7172,7 @@ window.nightSimStale=function(){
 };
 window.nightTabOpen=function(){
  loadNightSim(false);
+ if(window.ensureNightHistory)window.ensureNightHistory();
  window.refreshDayCards&&window.refreshDayCards(false);
 };
 
