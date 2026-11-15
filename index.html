@@ -1294,6 +1294,95 @@ button.st-ico:active{transform:scale(.88)}
 :root[data-theme="dark"] .quick-chip.q-digest{background:linear-gradient(150deg,rgba(90,150,255,.22) 0%,transparent 62%),var(--card-grad)}
 .app-intro .screen.active>.quick-grid>:nth-child(8){animation-delay:.56s}
 </style>
+<style id="budgetStyles">
+/* ============================================================
+   БЮДЖЕТ: кнопка на главной, шапка периода, список статей, формы
+   ============================================================ */
+.quick-chip.q-budget{grid-column:1 / -1;background:linear-gradient(150deg,rgba(236,168,40,.17) 0%,transparent 62%),var(--card-grad)}
+:root[data-theme="dark"] .quick-chip.q-budget{background:linear-gradient(150deg,rgba(255,200,90,.20) 0%,transparent 62%),var(--card-grad)}
+.app-intro .screen.active>.quick-grid>:nth-child(9){animation-delay:.60s}
+
+:root{--bd-ok:#168653;--bd-over:#cf3434;--bd-over-bg:rgba(207,52,52,.10)}
+:root[data-theme="dark"]{--bd-ok:#48cc83;--bd-over:#ff7474;--bd-over-bg:rgba(255,116,116,.14)}
+
+.bd-hero{background:var(--card-grad);border:1px solid var(--card-border);border-radius:24px;padding:14px 16px 16px;box-shadow:var(--shadow);margin-bottom:12px;transition:background .3s,border-color .3s}
+.bd-hero.over{background:linear-gradient(180deg,var(--bd-over-bg) 0%,transparent 70%),var(--card-grad);border-color:rgba(207,52,52,.28)}
+.bd-month{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+.bd-month-title{font-size:19px;font-weight:800;letter-spacing:-.3px;text-align:center;flex:1}
+.bd-step{flex:none;width:40px;height:40px;border-radius:13px;border:1px solid var(--card-border);background:var(--input-bg);color:var(--text);font-size:23px;line-height:1;display:grid;place-items:center;padding:0;cursor:pointer;transition:transform .3s cubic-bezier(.34,1.5,.4,1),opacity .2s}
+.bd-step:disabled{opacity:.28;cursor:default}
+.bd-step:active:not(:disabled){transform:scale(.9)}
+.bd-tabs{display:flex;gap:4px;padding:3px;border-radius:15px;background:var(--input-bg);margin-bottom:16px}
+.bd-tab{flex:1;min-width:0;min-height:50px;border:0;border-radius:12px;background:transparent;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:6px 4px;cursor:pointer;transition:background .2s,color .2s,box-shadow .2s}
+.bd-tab span{font-size:15px;font-weight:750}
+.bd-tab small{font-size:11px;font-weight:600;opacity:.8}
+.bd-tab.on{background:var(--card);color:var(--text);box-shadow:0 2px 8px rgba(60,72,150,.16)}
+.bd-label{display:block;font-size:12px;font-weight:700;color:var(--muted)}
+.bd-balance{text-align:center;margin-bottom:14px}
+.bd-big{display:block;margin-top:2px;font-size:clamp(30px,10vw,40px);font-weight:800;letter-spacing:-1.2px;line-height:1.1;font-variant-numeric:tabular-nums;white-space:nowrap}
+.bd-hero.ok .bd-big{color:var(--bd-ok)}
+.bd-hero.over .bd-big{color:var(--bd-over)}
+.bd-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.bd-stat{display:block;text-align:left;border:0;border-radius:15px;background:var(--input-bg);padding:10px 12px;color:var(--text);font:inherit;min-width:0}
+button.bd-stat{cursor:pointer;transition:transform .3s cubic-bezier(.34,1.5,.4,1)}
+button.bd-stat:active{transform:scale(.97)}
+.bd-stat b{display:block;margin-top:2px;font-size:clamp(16px,5.2vw,21px);font-weight:800;letter-spacing:-.4px;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bd-stat .bd-label i{font-style:normal;margin-left:4px;opacity:.7}
+.bd-bar{height:7px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:14px}
+.bd-bar i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,#7d8cf5,#5267e8);transition:width .5s cubic-bezier(.22,1,.36,1)}
+.bd-hero.over .bd-bar i{background:linear-gradient(90deg,#ff8c8c,#e5484d)}
+.bd-month-sum{margin-top:12px;font-size:12px;line-height:1.45;color:var(--muted);text-align:center}
+.bd-month-sum b{font-weight:700;color:var(--text);white-space:nowrap}
+
+.bd-card{background:var(--card-grad);border:1px solid var(--card-border);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}
+.bd-card-head{display:flex;justify-content:space-between;align-items:baseline;padding:14px 16px 10px;font-size:16px;font-weight:800}
+.bd-card-head span{font-size:12px;font-weight:600;color:var(--muted)}
+.bd-list{position:relative}
+.bd-row{position:relative;display:flex;align-items:center;gap:6px;height:62px;padding:0 15px 0 2px;background:var(--card);border-top:1px solid var(--line);cursor:pointer;touch-action:pan-y;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;transition:transform .25s cubic-bezier(.22,1,.36,1),box-shadow .2s,opacity .2s}
+.bd-list.noanim .bd-row{transition:none}
+.bd-row:active{background:var(--input-bg)}
+.bd-row.lifted{z-index:6;border-radius:16px;border-top-color:transparent;box-shadow:0 14px 34px rgba(0,0,0,.24),0 0 0 .5px var(--card-border);transition:box-shadow .2s;cursor:grabbing;background:var(--card)}
+.bd-grip{flex:none;width:38px;height:62px;display:grid;place-items:center;color:var(--muted);opacity:.7;cursor:grab;touch-action:none;-webkit-tap-highlight-color:transparent}
+.bd-grip svg{width:18px;height:14px}
+.bd-row.lifted .bd-grip{color:var(--blue);opacity:1}
+.bd-name{flex:1;min-width:0}
+.bd-name b{display:block;font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bd-name small{display:block;margin-top:2px;font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bd-sum{flex:none;max-width:44%;font-size:17px;font-weight:800;letter-spacing:-.3px;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bd-row.zero .bd-name b,.bd-row.zero .bd-sum{color:var(--muted);font-weight:650}
+.bd-row.zero{opacity:.72}
+.bd-empty{padding:20px 18px 22px;border-top:1px solid var(--line);text-align:center;color:var(--muted);font-size:14px;line-height:1.45}
+
+.bd-add,.bd-month-add{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:52px;border-radius:16px;font-size:16px;font-weight:750;cursor:pointer;transition:transform .3s cubic-bezier(.34,1.5,.4,1),opacity .2s}
+.bd-add{margin-top:12px;border:0;background:linear-gradient(180deg,#6a7cf0 0%,#4a5fe0 100%);color:#fff;box-shadow:0 10px 22px -10px rgba(82,103,232,.65)}
+.bd-month-add{margin-top:10px;min-height:48px;border:1px solid var(--card-border);background:var(--card-grad);color:var(--text);font-size:15px;box-shadow:var(--shadow)}
+.bd-add:active,.bd-month-add:active{transform:scale(.97)}
+.bd-add:disabled,.bd-month-add:disabled{opacity:.55;pointer-events:none}
+.bd-plus{font-size:22px;font-weight:600;line-height:1;margin-top:-2px}
+
+.bd-first{padding:22px 18px;text-align:center}
+.bd-first .bd-ico{width:56px;height:56px;margin:0 auto 12px;border-radius:19px;display:grid;place-items:center;font-size:28px;background:var(--icon-bg)}
+.bd-first h3{margin:0 0 6px;font-size:19px;font-weight:800}
+.bd-first p{margin:0 0 6px;font-size:14px;line-height:1.45;color:var(--muted)}
+.bd-error{padding:22px 18px;text-align:center;color:var(--muted);font-size:14px;line-height:1.45}
+.bd-error .bd-month-add{width:auto;display:inline-flex;padding:0 22px;margin-top:14px}
+
+/* формы и подтверждения */
+.bd-save{flex:1;min-height:46px;font-size:16px;background:linear-gradient(180deg,#6a7cf0 0%,#4a5fe0 100%);color:#fff}
+.bd-seg{display:flex;gap:4px;padding:3px;border-radius:14px;background:var(--input-bg);border:1px solid var(--line)}
+.bd-seg button{flex:1;min-height:40px;border:0;border-radius:11px;background:transparent;color:var(--muted);font-size:15px;font-weight:700;cursor:pointer;transition:background .2s,color .2s,box-shadow .2s}
+.bd-seg button.on{background:var(--card);color:var(--text);box-shadow:0 2px 8px rgba(60,72,150,.16)}
+.bd-hint{margin:-2px 2px 0;font-size:12px;line-height:1.4;color:var(--muted);text-align:center}
+#budgetFormBackdrop .value-input.bd-left{text-align:left;padding-left:14px;padding-right:14px}
+#budgetFormBackdrop input[type="month"]{overflow:hidden;padding-left:10px;padding-right:10px}
+#budgetFormBackdrop input[type="month"]::-webkit-date-and-time-value{text-align:center;margin:0;min-width:0}
+.bd-links{display:flex;justify-content:center;gap:6px;margin-top:10px}
+.bd-links:empty{display:none}
+.bd-link{flex:1;min-height:42px;border:0;border-radius:12px;background:transparent;color:var(--blue);font-size:14.5px;font-weight:700;cursor:pointer}
+.bd-link.danger{color:var(--bd-over,#cf3434)}
+.bd-link:active{background:var(--input-bg)}
+.bd-link:disabled{opacity:.5}
+</style>
 </head>
 <body class="app-intro">
 <main class="app">
@@ -1400,6 +1489,7 @@ button.st-ico:active{transform:scale(.88)}
 <button class="quick-button quick-chip" onclick="openAction('memory')"><span class="quick-icon gray">⚙️</span><span class="quick-label">Память</span></button>
 <button class="quick-button quick-chip q-digest" onclick="openDigest()"><span class="quick-icon azure">✨</span><span class="quick-label">AI дайджест</span></button>
 <button class="quick-button quick-chip q-doctor" onclick="openDoctor()"><span class="quick-icon green">🩺</span><span class="quick-label">К врачу</span></button>
+<button class="quick-button quick-chip q-budget" onclick="openBudget()"><span class="quick-icon yellow">💰</span><span class="quick-label">Бюджет</span></button>
 </section>
 </section>
 <!-- === ЭКРАН «К ВРАЧУ» === -->
@@ -1424,6 +1514,14 @@ button.st-ico:active{transform:scale(.88)}
 </div>
 <div class="dg-note" id="digestNote" role="status" hidden></div>
 <div id="digestBody"><div class="loader-wrap"><div class="spinner"></div><div>Готовлю дайджест…</div></div></div>
+</section>
+<!-- === ЭКРАН «БЮДЖЕТ» === -->
+<section class="screen" id="screen-budget">
+<div class="doctor-head">
+<button class="doctor-back" type="button" onclick="switchTab('home')" aria-label="Назад">‹</button>
+<div class="doctor-head-copy"><div class="page-heading" style="margin:0">Бюджет</div></div>
+</div>
+<div id="budgetBody"><div class="loader-wrap"><div class="spinner"></div><div>Загружаю бюджет…</div></div></div>
 </section>
 <!-- === ЭКРАН «ГРАФИКИ» === -->
 <!-- === ЭКРАН «НОЧНОЙ» === -->
@@ -1929,6 +2027,22 @@ button.st-ico:active{transform:scale(.88)}
 <button class="save-button doctor-save" id="doctorSave" type="button" onclick="saveDoctor()">Сохранить</button>
 </div>
 </div>
+</section>
+</div>
+<!-- === ФОРМА «БЮДЖЕТ»: статья, зарплата, первый месяц === -->
+<div class="modal-backdrop doctor-backdrop" id="budgetFormBackdrop">
+<section class="modal" role="dialog" aria-modal="true" aria-labelledby="bdFormTitle">
+<div class="modal-top">
+<div class="modal-icon" id="bdFormIcon">💰</div>
+<div class="modal-title" id="bdFormTitle">Статья</div>
+</div>
+<div class="doctor-form" id="bdFormBody"></div>
+<div class="toast" id="bdFormToast"></div>
+<div class="doctor-form-actions">
+<button class="undo-button doctor-cancel" id="bdFormCancel" type="button">Отмена</button>
+<button class="save-button bd-save" id="bdFormSave" type="button">Сохранить</button>
+</div>
+<div class="bd-links" id="bdFormLinks"></div>
 </section>
 </div>
 <!-- === ОКНО «ДОСТУП ЗАПРЕЩЁН» === -->
@@ -6161,7 +6275,7 @@ stRefresh();
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const APP_VERSION='v20261114_2';          /* ← менять при каждом обновлении: vГГГГММДД_N */
+const APP_VERSION='v20261114_3';          /* ← менять при каждом обновлении: vГГГГММДД_N */
 const DEV_CHAT='https://t.me/larik_11';
 const CH_IDS=['trend','compare','range','distribution','daily','activity','dynamics','effect','summary','stats'];
 const CH_NAMES={trend:'Динамика по дням',compare:'Сравнение трёх недель',range:'Доля в целевом диапазоне',distribution:'Распределение измерений',daily:'Суточная сводка',activity:'Активность по времени',dynamics:'Тренды',effect:'Укол и сахар',summary:'Итоги',stats:'Статистика по месяцам'};
@@ -7596,6 +7710,594 @@ window.refreshDigest=function(){
  if(S.busy)return;
  if(typeof selectionHaptic==='function')selectionHaptic();
  load(true);
+};
+})();
+</script>
+<script>
+// ============================================================
+// БЮДЖЕТ: зарплатные периоды и статьи расходов (лист cost)
+// ============================================================
+(function(){
+'use strict';
+const $=id=>document.getElementById(id);
+const MONTHS=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+const MONTHS_GEN=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+const WEEKDAYS=['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
+const S={state:null,sel:null,busy:false,loading:false,seq:0,dragging:false,pendingRender:false,noClick:false};
+const nf=new Intl.NumberFormat('ru-RU',{maximumFractionDigits:2});
+const money=n=>nf.format(n)+'\u00a0₽';
+const r2=n=>Math.round(n*100)/100;
+const esc=value=>escapeHtml(value);
+
+// ---------- даты ----------
+function todayIso(){
+ // «сегодня» считаем по Москве, как и на сервере
+ try{
+  const s=new Date().toLocaleDateString('en-CA',{timeZone:'Europe/Moscow'});
+  if(/^\d{4}-\d{2}-\d{2}$/.test(s))return s;
+ }catch(e){}
+ const d=new Date();
+ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function dayInfo(iso){
+ const [y,m,d]=iso.split('-').map(Number);
+ return {y,m,d,wd:new Date(Date.UTC(y,m-1,d)).getUTCDay()};
+}
+const dayLabel=iso=>{const i=dayInfo(iso);return i.d+' '+MONTHS_GEN[i.m-1];};
+const monthTitle=key=>{const [y,m]=key.split('-').map(Number);return MONTHS[m-1]+' '+y;};
+function plural(n,forms){
+ const a=Math.abs(n)%100,b=a%10;
+ return a>10&&a<20?forms[2]:b===1?forms[0]:b>=2&&b<=4?forms[1]:forms[2];
+}
+
+// ---------- состояние ----------
+// Открываем ближайшую будущую зарплату (14-го — зарплату 17-го); если будущих нет — последнюю.
+function defaultSel(periods){
+ const today=todayIso();
+ const upcoming=periods.find(p=>p.pay_date>=today);
+ return (upcoming||periods[periods.length-1]).pay_date;
+}
+function adopt(data,focus){
+ S.state=data;
+ const dates=data.periods.map(p=>p.pay_date);
+ if(focus&&dates.includes(focus))S.sel=focus;
+ else if(!S.sel||!dates.includes(S.sel))S.sel=dates.length?defaultSel(data.periods):null;
+}
+const current=()=>S.state?S.state.periods.find(p=>p.pay_date===S.sel)||null:null;
+
+// ---------- отрисовка ----------
+function heroHtml(p){
+ const periods=S.state.periods;
+ const months=[...new Set(periods.map(x=>x.month))];
+ const mi=months.indexOf(p.month);
+ const inMonth=periods.filter(x=>x.month===p.month);
+ const over=p.balance<0;
+ const cls=over?'over':(p.balance>0?'ok':'');
+ const pct=p.salary>0?Math.min(100,Math.round(p.expenses/p.salary*100)):(p.expenses>0?100:0);
+ const tabs=inMonth.map(x=>'<button class="bd-tab'+(x.pay_date===p.pay_date?' on':'')+'" type="button" data-act="tab" data-date="'+x.pay_date+'"><span>'+dayLabel(x.pay_date)+'</span><small>'+WEEKDAYS[dayInfo(x.pay_date).wd]+'</small></button>').join('');
+ let monthSum='';
+ if(inMonth.length>1){
+  const sal=r2(inMonth.reduce((a,x)=>a+x.salary,0)),exp=r2(inMonth.reduce((a,x)=>a+x.expenses,0));
+  monthSum='<div class="bd-month-sum">За месяц: зарплаты <b>'+money(sal)+'</b> · расходы <b>'+money(exp)+'</b> · '+(sal-exp<0?'превышение':'остаток')+' <b>'+money(r2(sal-exp))+'</b></div>';
+ }
+ return '<section class="bd-hero '+cls+'">'
+  +'<div class="bd-month"><button class="bd-step" type="button" data-act="prev" aria-label="Предыдущий месяц"'+(mi<=0?' disabled':'')+'>‹</button>'
+  +'<div class="bd-month-title">'+monthTitle(p.month)+'</div>'
+  +'<button class="bd-step" type="button" data-act="next" aria-label="Следующий месяц"'+(mi>=months.length-1?' disabled':'')+'>›</button></div>'
+  +'<div class="bd-tabs">'+tabs+'</div>'
+  +'<div class="bd-balance"><span class="bd-label">'+(over?'Превышение расходов':'Остаток')+'</span><span class="bd-big">'+money(p.balance)+'</span></div>'
+  +'<div class="bd-pair"><button class="bd-stat" type="button" data-act="salary" aria-label="Изменить зарплату"><span class="bd-label">Зарплата<i>✎</i></span><b>'+money(p.salary)+'</b></button>'
+  +'<div class="bd-stat"><span class="bd-label">Расходы</span><b>'+money(p.expenses)+'</b></div></div>'
+  +'<div class="bd-bar" aria-hidden="true"><i style="width:'+pct+'%"></i></div>'
+  +monthSum+'</section>';
+}
+function rowHtml(it){
+ const zero=it.amount===0;
+ return '<div class="bd-row'+(zero?' zero':'')+'" data-id="'+it.id+'">'
+  +'<span class="bd-grip" role="img" aria-label="Перетащить, чтобы изменить порядок"><svg><use href="#i-grip"/></svg></span>'
+  +'<div class="bd-name"><b>'+esc(it.name)+'</b><small>'+(it.permanent?'Постоянная':'Разовая')+(zero?' · не учитывается':'')+'</small></div>'
+  +'<div class="bd-sum">'+money(it.amount)+'</div></div>';
+}
+function firstHtml(){
+ return '<section class="bd-card bd-first"><div class="bd-ico">💰</div><h3>Бюджета пока нет</h3>'
+  +'<p>Создай первый месяц: выбери месяц и укажи две зарплаты. Даты (3-е и 17-е, а на выходных — предыдущая пятница) посчитаются сами.</p>'
+  +'<button class="bd-add" type="button" data-act="first"><span class="bd-plus">+</span>Создать первый месяц</button></section>';
+}
+function errorHtml(message){
+ return '<section class="bd-card bd-error">'+esc(message)+'<br><button class="bd-month-add" type="button" data-act="retry">Повторить</button></section>';
+}
+function bodyHtml(){
+ const st=S.state;
+ if(!st.periods.length)return firstHtml();
+ const p=current()||st.periods[0];
+ const n=p.items.length;
+ return heroHtml(p)
+  +'<section class="bd-card"><div class="bd-card-head">Статьи расходов<span>'+n+' '+plural(n,['статья','статьи','статей'])+'</span></div>'
+  +'<div class="bd-list" id="bdList">'+(n?p.items.map(rowHtml).join(''):'<div class="bd-empty">Статей пока нет. Добавь первую кнопкой ниже.</div>')+'</div></section>'
+  +'<button class="bd-add" type="button" data-act="add"><span class="bd-plus">+</span>Добавить статью</button>'
+  +'<button class="bd-month-add" type="button" data-act="month">Добавить месяц · '+monthTitle(st.next_month)+'</button>';
+}
+function render(){
+ if(S.dragging){S.pendingRender=true;return;}
+ const body=$('budgetBody');
+ const y=window.scrollY;
+ body.innerHTML=S.state?bodyHtml():loadingContent('Загружаю бюджет…');
+ if(Math.abs(window.scrollY-y)>1)window.scrollTo(0,y);
+}
+
+// ---------- запросы ----------
+function newRequestId(){
+ if(window.crypto&&typeof crypto.randomUUID==='function')return crypto.randomUUID();
+ return 'r'+Date.now().toString(36)+Math.random().toString(36).slice(2,12);
+}
+function errText(error){
+ const text=error&&error.message?String(error.message):'';
+ if(!text||/failed to fetch|networkerror|load failed|network request/i.test(text))return 'Нет связи с сервером. Попробуй ещё раз.';
+ return text;
+}
+async function call(action,extra){
+ // request_id нужен серверу, чтобы повторная отправка того же действия не выполнилась дважды
+ const data=await api(action,{...extra,request_id:newRequestId()});
+ setAccess(true,'Сервер подтвердил доступ');
+ return data;
+}
+function alertError(error){
+ uiHaptic('error');
+ const text=errText(error);
+ try{if(tg&&tg.showAlert)tg.showAlert(text);else alert(text);}catch(e){alert(text);}
+ handleAccessError(error);
+}
+async function load(spinner){
+ if(S.loading)return;
+ S.loading=true;
+ const seq=++S.seq;
+ if(spinner||!S.state){S.state=null;render();}
+ try{
+  const data=await api('budget_periods');
+  setAccess(true,'Сервер подтвердил доступ');
+  if(seq!==S.seq)return;        // пока грузилось, пользователь уже что-то изменил — не затираем свежее
+  adopt(data);
+  render();
+ }catch(error){
+  handleAccessError(error);
+  if(seq===S.seq&&!S.state){S.dragging=false;$('budgetBody').innerHTML=errorHtml(errText(error));}
+ }finally{
+  S.loading=false;
+ }
+}
+function setBusy(on){
+ S.busy=on;
+ document.querySelectorAll('#budgetBody .bd-add,#budgetBody .bd-month-add').forEach(b=>{b.disabled=on;});
+}
+// Изменение без формы (месяц, порядок): блокирует повторные нажатия, обновляет экран ответом сервера.
+async function mutate(action,extra){
+ if(S.busy)return null;
+ setBusy(true);
+ S.seq++;
+ try{
+  const data=await call(action,extra);
+  S.seq++;
+  adopt(data,data.focus);
+  S.busy=false;
+  render();
+  uiHaptic('success');
+  return data;
+ }catch(error){
+  S.busy=false;
+  alertError(error);
+  if(error&&(error.status===404||error.status===409))load(false);
+  else render();
+  return null;
+ }
+}
+
+// ---------- подтверждения (родное окно Telegram) ----------
+let asking=false;
+function ask(title,message,buttons){
+ return new Promise(resolve=>{
+  if(asking){resolve(null);return;}
+  asking=true;
+  const done=id=>{asking=false;resolve(id||null);};
+  try{
+   if(tg&&typeof tg.showPopup==='function'&&(!tg.isVersionAtLeast||tg.isVersionAtLeast('6.2'))){
+    tg.showPopup({
+     title,message,
+     buttons:buttons.map(b=>b.type==='cancel'?{id:b.id,type:'cancel'}:{id:b.id,type:b.type||'default',text:b.text})
+    },done);
+    return;
+   }
+  }catch(e){}
+  for(const b of buttons){
+   if(b.type==='cancel')continue;
+   if(window.confirm(title+'\n'+message+'\n\n'+b.text+'?')){done(b.id);return;}
+  }
+  done(null);
+ });
+}
+
+// ---------- форма в окне ----------
+const form={busy:false,save:null,links:null,label:'Сохранить'};
+function showForm(cfg){
+ $('bdFormIcon').textContent=cfg.icon;
+ $('bdFormTitle').textContent=cfg.title;
+ $('bdFormBody').innerHTML=cfg.html;
+ $('bdFormLinks').innerHTML=cfg.links?cfg.links.map(l=>'<button class="bd-link'+(l.danger?' danger':'')+'" type="button" data-fa="'+l.id+'">'+l.text+'</button>').join(''):'';
+ form.label=cfg.saveLabel||'Сохранить';
+ $('bdFormSave').textContent=form.label;
+ form.save=cfg.onSave;
+ form.links=cfg.links?Object.fromEntries(cfg.links.map(l=>[l.id,l.run])):null;
+ form.busy=false;
+ setToast($('bdFormToast'),'');
+ $('budgetFormBackdrop').classList.add('visible');
+ try{tg?.disableVerticalSwipes?.();}catch(e){}
+}
+function hideForm(){
+ if(form.busy)return;
+ hideKeyboard();
+ $('budgetFormBackdrop').classList.remove('visible');
+ try{tg?.enableVerticalSwipes?.();}catch(e){}
+}
+function setFormBusy(on){
+ form.busy=on;
+ $('bdFormSave').disabled=on;
+ $('bdFormCancel').disabled=on;
+ $('bdFormSave').textContent=on?'Сохраняю…':form.label;
+ document.querySelectorAll('#bdFormLinks .bd-link').forEach(b=>{b.disabled=on;});
+}
+function formError(message){
+ setToast($('bdFormToast'),message,'error');
+ uiHaptic('error');
+}
+function formFail(error){
+ formError(errText(error));
+ handleAccessError(error);
+ if(error&&(error.status===404||error.status===409))load(false);
+}
+async function runForm(fn){
+ if(form.busy||!fn)return;
+ setFormBusy(true);
+ let ok=false;
+ try{ok=await fn();}catch(error){formFail(error);}
+ setFormBusy(false);
+ if(ok)hideForm();
+}
+$('bdFormSave').addEventListener('click',()=>runForm(form.save));
+$('bdFormCancel').addEventListener('click',hideForm);
+$('budgetFormBackdrop').addEventListener('click',e=>{if(e.target===e.currentTarget)hideForm();});
+$('bdFormLinks').addEventListener('click',e=>{
+ const b=e.target.closest('[data-fa]');
+ if(b&&form.links&&form.links[b.dataset.fa])runForm(form.links[b.dataset.fa]);
+});
+$('bdFormBody').addEventListener('click',e=>{
+ const b=e.target.closest('.bd-seg button');
+ if(!b)return;
+ b.parentNode.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
+ selectionHaptic();
+});
+$('bdFormBody').addEventListener('keydown',e=>{
+ if(e.key==='Enter'&&e.target.matches('input')){e.preventDefault();e.target.blur();}
+});
+
+function parseMoney(raw,title){
+ const t=String(raw||'').replace(/[\s\u00a0₽]/g,'').replace(',','.');
+ if(!t)return {error:title+': укажи сумму'};
+ if(!/^\d+(\.\d{1,2})?$/.test(t))return {error:title+': только число, например 1500 или 1500,50'};
+ const n=Number(t);
+ if(!(n<=1e9))return {error:title+': слишком большая сумма'};
+ return {value:n};
+}
+const amountText=n=>String(n).replace('.',',');
+
+// ---------- статьи ----------
+function itemFields(it){
+ const perm=it?it.permanent:false;
+ return '<label class="doctor-field"><span>Название</span><input class="value-input bd-left" id="bdName" type="text" maxlength="60" autocomplete="off" enterkeyhint="next" placeholder="Например, Аренда" value="'+esc(it?it.name:'')+'"></label>'
+  +'<label class="doctor-field"><span>Сумма, ₽</span><input class="value-input" id="bdAmount" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" placeholder="0" value="'+(it?amountText(it.amount):'')+'"></label>'
+  +'<div class="doctor-field"><span>Постоянная статья</span><div class="bd-seg" id="bdPerm"><button type="button" data-v="1" class="'+(perm?'on':'')+'">Да</button><button type="button" data-v="0" class="'+(perm?'':'on')+'">Нет</button></div></div>'
+  +'<div class="bd-hint">«Да» — статья копируется в новые месяцы. «Нет» — только в этой зарплате.</div>';
+}
+function readItemForm(){
+ const name=$('bdName').value.replace(/\s+/g,' ').trim();
+ if(!name){formError('Введи название статьи');return null;}
+ const m=parseMoney($('bdAmount').value,'Сумма');
+ if(m.error){formError(m.error);return null;}
+ return {name,amount:m.value,permanent:$('bdPerm').querySelector('.on').dataset.v==='1'};
+}
+async function commit(action,extra){
+ const data=await call(action,extra);
+ S.seq++;
+ adopt(data,data.focus);
+ render();
+ uiHaptic('success');
+}
+function openAddItem(){
+ const p=current();
+ if(!p||S.busy)return;
+ const pay=p.pay_date;
+ showForm({
+  icon:'🧾',title:'Новая статья · '+dayLabel(pay),html:itemFields(null),saveLabel:'Добавить',
+  onSave:async()=>{
+   const v=readItemForm();
+   if(!v)return false;
+   await commit('budget_item_add',{pay_date:pay,...v});
+   return true;
+  }
+ });
+}
+async function saveItem(it,forceAmount){
+ const v=readItemForm();
+ if(!v)return false;
+ if(forceAmount!==null)v.amount=forceAmount;
+ if(v.name===it.name&&v.amount===it.amount&&v.permanent===it.permanent)return true;
+ await commit('budget_item_update',{id:it.id,...v});
+ return true;
+}
+function openEditItem(id){
+ const p=current();
+ const it=p&&p.items.find(x=>x.id===id);
+ if(!it||S.busy)return;
+ showForm({
+  icon:'✏️',title:'Статья',html:itemFields(it),
+  onSave:()=>saveItem(it,null),
+  links:[
+   {id:'zero',text:'Поставить 0 ₽',run:()=>saveItem(it,0)},
+   {id:'delete',text:'Удалить запись',danger:true,run:async()=>{
+     uiHaptic('error');
+     const choice=await ask('Удалить запись?','Статья «'+it.name+'» исчезнет из этой зарплаты. В таблице запись останется с пометкой удаления.',[{id:'del',type:'destructive',text:'Удалить'},{id:'cancel',type:'cancel'}]);
+     if(choice!=='del')return false;
+     await commit('budget_item_delete',{id:it.id});
+     return true;
+   }}
+  ]
+ });
+}
+
+// ---------- зарплата ----------
+function openSalary(){
+ const p=current();
+ if(!p||S.busy)return;
+ const pay=p.pay_date;
+ showForm({
+  icon:'💼',title:'Зарплата · '+dayLabel(pay),
+  html:'<label class="doctor-field"><span>Сумма зарплаты, ₽</span><input class="value-input" id="bdSalary" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" placeholder="0" value="'+amountText(p.salary)+'"></label>',
+  onSave:async()=>{
+   const m=parseMoney($('bdSalary').value,'Зарплата');
+   if(m.error){formError(m.error);return false;}
+   if(m.value===p.salary)return true;
+   const choice=await ask('Как применить новую сумму?','Зарплата '+dayLabel(pay)+': '+money(m.value),[
+    {id:'one',type:'default',text:'Только эта зарплата'},
+    {id:'future',type:'default',text:'Эта и все будущие зарплаты'},
+    {id:'cancel',type:'cancel'}
+   ]);
+   if(choice!=='one'&&choice!=='future')return false;
+   await commit('budget_salary_set',{pay_date:pay,salary:m.value,scope:choice});
+   return true;
+  }
+ });
+}
+
+// ---------- месяцы ----------
+async function addMonth(){
+ const st=S.state;
+ if(!st||!st.periods.length||S.busy)return;
+ const lastMonth=st.periods[st.periods.length-1].month;
+ const choice=await ask('Новый месяц','Добавить '+monthTitle(st.next_month)+'? Постоянные статьи и зарплаты скопируются из '+monthTitle(lastMonth)+', потом их можно изменить.',[
+  {id:'ok',type:'default',text:'Добавить'},
+  {id:'cancel',type:'cancel'}
+ ]);
+ if(choice!=='ok')return;
+ const button=document.querySelector('#budgetBody [data-act="month"]');
+ if(button)button.textContent='Создаю месяц…';
+ // сервер сверяет month с тем, что получится по таблице: повторное нажатие не создаст лишний месяц
+ await mutate('budget_month_add',{month:st.next_month});
+}
+function openFirstMonth(){
+ if(S.busy)return;
+ const field=(id,label)=>'<label class="doctor-field"><span>'+label+'</span><input class="value-input" id="'+id+'" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="next" placeholder="0"></label>';
+ showForm({
+  icon:'🗓️',title:'Первый месяц',saveLabel:'Создать',
+  html:'<label class="doctor-field"><span>Месяц</span><input class="value-input" id="bdMonth" type="month" value="'+todayIso().slice(0,7)+'"></label>'
+   +field('bdSal1','Первая зарплата (3-го), ₽')+field('bdSal2','Вторая зарплата (17-го), ₽'),
+  onSave:async()=>{
+   const month=$('bdMonth').value;
+   if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(month)){formError('Выбери месяц');return false;}
+   const a=parseMoney($('bdSal1').value,'Первая зарплата');
+   if(a.error){formError(a.error);return false;}
+   const b=parseMoney($('bdSal2').value,'Вторая зарплата');
+   if(b.error){formError(b.error);return false;}
+   await commit('budget_month_add',{month,salary_1:a.value,salary_2:b.value});
+   return true;
+  }
+ });
+}
+
+// ---------- навигация по периодам ----------
+function selectPeriod(date){
+ if(date===S.sel)return;
+ S.sel=date;
+ render();
+ selectionHaptic();
+}
+function stepMonth(dir){
+ const periods=S.state.periods,p=current();
+ if(!p)return;
+ const months=[...new Set(periods.map(x=>x.month))];
+ const target=months[months.indexOf(p.month)+dir];
+ if(!target)return;
+ const was=periods.filter(x=>x.month===p.month).findIndex(x=>x.pay_date===p.pay_date);
+ const inTarget=periods.filter(x=>x.month===target);
+ S.sel=inTarget[Math.min(Math.max(was,0),inTarget.length-1)].pay_date;
+ render();
+ selectionHaptic();
+}
+
+// ---------- события на странице ----------
+const host=$('budgetBody');
+host.addEventListener('click',e=>{
+ const t=e.target.closest('[data-act]');
+ if(t){
+  if(t.disabled)return;
+  switch(t.dataset.act){
+   case 'tab':selectPeriod(t.dataset.date);break;
+   case 'prev':stepMonth(-1);break;
+   case 'next':stepMonth(1);break;
+   case 'salary':openSalary();break;
+   case 'add':openAddItem();break;
+   case 'month':addMonth();break;
+   case 'first':openFirstMonth();break;
+   case 'retry':load(true);break;
+  }
+  return;
+ }
+ if(S.noClick)return;
+ const row=e.target.closest('.bd-row');
+ if(row&&!e.target.closest('.bd-grip'))openEditItem(Number(row.dataset.id));
+});
+
+// ---------- перетаскивание статей ----------
+// За три полоски — сразу; за саму строку — после удержания. Порядок сохраняется на сервере.
+(function initDrag(){
+ let d=null,press=null,raf=0,lastY=0;
+ const swipes=on=>{try{on?tg?.enableVerticalSwipes?.():tg?.disableVerticalSwipes?.();}catch(e){}};
+ // постоянный слушатель: пока тащим строку, страница не должна прокручиваться пальцем
+ host.addEventListener('touchmove',ev=>{if(d&&ev.cancelable)ev.preventDefault();},{passive:false});
+ function update(){
+  if(!d)return;
+  const sy=window.scrollY;
+  const lo=d.tops[0]-d.tops[d.from],hi=d.tops[d.rows.length-1]-d.tops[d.from];
+  const dy=Math.max(lo,Math.min(hi,lastY+sy-d.y0));
+  d.row.style.transform='translateY('+dy+'px) scale(1.02)';
+  // строки одной высоты: новая позиция — на сколько строк сдвинули, но в пределах списка
+  const to=Math.max(0,Math.min(d.rows.length-1,d.from+Math.round(dy/d.h)));
+  if(to===d.to)return;
+  d.to=to;
+  selectionHaptic();
+  d.rows.forEach((r,i)=>{
+   if(i===d.from)return;
+   let shift=0;
+   if(d.from<to&&i>d.from&&i<=to)shift=-d.h;
+   else if(d.from>to&&i>=to&&i<d.from)shift=d.h;
+   r.style.transform=shift?'translateY('+shift+'px)':'';
+  });
+ }
+ function tick(){
+  if(!d)return;
+  // у края экрана страница сама прокручивается, чтобы длинный список можно было переставить целиком
+  if(lastY<95)window.scrollBy(0,-12);
+  else if(lastY>window.innerHeight-135)window.scrollBy(0,12);
+  update();
+  raf=requestAnimationFrame(tick);
+ }
+ function start(list,row,pointerId,clientY,handle){
+  if(S.busy||S.dragging)return false;
+  const rows=[...list.querySelectorAll('.bd-row')];
+  if(rows.length<2)return false;
+  const sy=window.scrollY;
+  const tops=rows.map(r=>r.getBoundingClientRect().top+sy);
+  const from=rows.indexOf(row);
+  d={id:pointerId,list,row,rows,tops,from,to:from,y0:clientY+sy,h:row.getBoundingClientRect().height,handle};
+  lastY=clientY;
+  try{handle.setPointerCapture(pointerId);}catch(_){}
+  row.classList.add('lifted');
+  S.dragging=true;
+  swipes(false);
+  selectionHaptic();
+  raf=requestAnimationFrame(tick);
+  return true;
+ }
+ host.addEventListener('pointerdown',e=>{
+  if(d||(e.pointerType==='mouse'&&e.button!==0))return;
+  const row=e.target.closest('.bd-row');
+  const list=row&&row.closest('.bd-list');
+  if(!row||!list)return;
+  const grip=e.target.closest('.bd-grip');
+  if(grip){
+   if(start(list,row,e.pointerId,e.clientY,grip))e.preventDefault();
+   return;
+  }
+  const p={id:e.pointerId,x:e.clientX,y:e.clientY};
+  p.timer=setTimeout(()=>{
+   if(press!==p)return;
+   press=null;
+   start(list,row,p.id,p.y,row);
+  },380);
+  press=p;
+ });
+ host.addEventListener('pointermove',e=>{
+  if(press&&e.pointerId===press.id){
+   if(Math.abs(e.clientX-press.x)>8||Math.abs(e.clientY-press.y)>8){clearTimeout(press.timer);press=null;}
+   return;
+  }
+  if(!d||e.pointerId!==d.id)return;
+  lastY=e.clientY;
+  update();
+ });
+ const end=e=>{
+  if(press&&e.pointerId===press.id){clearTimeout(press.timer);press=null;}
+  if(!d||e.pointerId!==d.id)return;
+  const g=d;
+  d=null;
+  cancelAnimationFrame(raf);
+  try{g.handle.releasePointerCapture(g.id);}catch(_){}
+  swipes(true);
+  S.noClick=true;
+  setTimeout(()=>{S.noClick=false;},350);
+  g.row.style.transform='translateY('+((g.to-g.from)*g.h)+'px)';
+  g.row.classList.remove('lifted');
+  setTimeout(()=>{
+   const rows=[...g.list.querySelectorAll('.bd-row')];
+   g.list.classList.add('noanim');
+   rows.forEach(r=>{r.style.transform='';});
+   S.dragging=false;
+   if(g.to!==g.from&&g.list.isConnected){
+    const ref=rows[g.to>g.from?g.to+1:g.to]||null;
+    g.list.insertBefore(g.row,ref);
+    commitOrder([...g.list.querySelectorAll('.bd-row')].map(r=>Number(r.dataset.id)));
+   }else if(S.pendingRender){
+    render();
+   }
+   S.pendingRender=false;
+   requestAnimationFrame(()=>requestAnimationFrame(()=>g.list.classList.remove('noanim')));
+  },240);
+ };
+ host.addEventListener('pointerup',end);
+ host.addEventListener('pointercancel',end);
+})();
+
+async function commitOrder(ids){
+ const p=current();
+ if(!p)return;
+ const before=p.items.slice();
+ const byId=new Map(before.map(i=>[i.id,i]));
+ p.items=ids.map(id=>byId.get(id)).filter(Boolean);      // экран уже показывает новый порядок
+ setBusy(true);
+ S.seq++;
+ try{
+  const data=await call('budget_reorder',{pay_date:p.pay_date,ids});
+  S.seq++;
+  adopt(data,data.focus);
+  S.busy=false;
+  render();
+  uiHaptic('success');
+ }catch(error){
+  S.busy=false;
+  p.items=before;
+  render();
+  alertError(error);
+  if(error&&(error.status===404||error.status===409))load(false);
+ }
+}
+
+// ---------- вход на экран ----------
+window.openBudget=function(){
+ hideKeyboard();
+ document.body.classList.remove('app-intro');
+ document.querySelectorAll('.screen').forEach(screen=>screen.classList.toggle('active',screen.id==='screen-budget'));
+ window.scrollTo(0,0);
+ selectionHaptic();
+ S.sel=null;                           // каждый раз начинаем с ближайшей будущей зарплаты
+ if(S.state){adopt(S.state);render();} // сразу показываем то, что уже загружали, свежее подтянется следом
+ load(false);
 };
 })();
 </script>
