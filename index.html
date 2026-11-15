@@ -1345,7 +1345,12 @@ button.bd-stat:active{transform:scale(.97)}
 .bd-row:active{background:var(--input-bg)}
 .bd-row.lifted{z-index:6;border-radius:16px;border-top-color:transparent;box-shadow:0 14px 34px rgba(0,0,0,.24),0 0 0 .5px var(--card-border);transition:box-shadow .2s;cursor:grabbing;background:var(--card)}
 .bd-grip{flex:none;width:38px;height:62px;display:grid;place-items:center;color:var(--muted);opacity:.7;cursor:grab;touch-action:none;-webkit-tap-highlight-color:transparent}
-.bd-grip svg{width:18px;height:14px}
+.bd-grip{position:relative}
+.bd-grip svg{position:relative;width:18px;height:14px}
+.bd-grip::before{content:"";position:absolute;left:3px;right:3px;top:13px;bottom:13px;border-radius:14px;background:var(--blue);opacity:0;transform:scale(.3)}
+.bd-grip.holding::before{animation:bdHold var(--hold,2000ms) linear forwards}
+.bd-grip.holding{color:var(--text);opacity:1}
+@keyframes bdHold{from{opacity:.05;transform:scale(.3)}to{opacity:.3;transform:scale(1)}}
 .bd-row.lifted .bd-grip{color:var(--blue);opacity:1}
 .bd-name{flex:1;min-width:0}
 .bd-name b{display:block;font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -6317,7 +6322,7 @@ stRefresh();
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const APP_VERSION='v20261115_1';          /* ← менять при каждом обновлении: vГГГГММДД_N */
+const APP_VERSION='v20261115_2';          /* ← менять при каждом обновлении: vГГГГММДД_N */
 const DEV_CHAT='https://t.me/larik_11';
 const CH_IDS=['trend','compare','range','distribution','daily','activity','dynamics','effect','summary','stats'];
 const CH_NAMES={trend:'Динамика по дням',compare:'Сравнение трёх недель',range:'Доля в целевом диапазоне',distribution:'Распределение измерений',daily:'Суточная сводка',activity:'Активность по времени',dynamics:'Тренды',effect:'Укол и сахар',summary:'Итоги',stats:'Статистика по месяцам'};
@@ -7886,7 +7891,7 @@ function summaryHtml(p){
 function rowHtml(it){
  const zero=it.amount===0;
  return '<div class="bd-row'+(zero?' zero':'')+'" data-id="'+it.id+'">'
-  +'<span class="bd-grip" role="img" aria-label="Перетащить, чтобы изменить порядок"><svg><use href="#i-grip"/></svg></span>'
+  +'<span class="bd-grip" role="img" aria-label="Чтобы изменить порядок, подержи и тащи"><svg><use href="#i-grip"/></svg></span>'
   +'<div class="bd-name"><b>'+esc(it.name)+'</b><small>'+(it.permanent?'Постоянная':'Разовая')+(zero?' · не учитывается':'')+'</small></div>'
   +'<div class="bd-sum">'+money(it.amount)+'</div></div>';
 }
@@ -8173,7 +8178,7 @@ function openSalary(){
   icon:'💼',title:'Зарплата · '+dayLabel(pay),saveLabel:'Сохранить',
   html:'<label class="doctor-field"><span>Зарплата, ₽</span><input class="value-input" id="bdSalary" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="next" placeholder="0" value="'+amountText(p.salary)+'"></label>'
    +'<label class="doctor-field"><span>Доп. заработок, ₽</span><input class="value-input" id="bdExtra" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" placeholder="0" value="'+(p.extra?amountText(p.extra):'')+'"></label>'
-   +'<div class="bd-hint">Доп. заработок записывается только в эту зарплату и в новые месяцы не копируется. Если изменишь саму зарплату, спросим: разово или постоянно.</div>',
+   +'<div class="bd-hint">Доп. заработок записывается только в эту зарплату и в новые месяцы не копируется.</div>',
   onSave:async()=>{
    const s=parseMoney($('bdSalary').value,'Зарплата');
    if(s.error){formError(s.error);return false;}
@@ -8295,8 +8300,10 @@ host.addEventListener('click',e=>{
 });
 
 // ---------- перетаскивание статей ----------
-// За три полоски — сразу; за саму строку — после удержания. Порядок сохраняется на сервере.
+// Порядок меняется только за три полоски и только после удержания HOLD_MS: так статью не сдвинуть случайно.
+// Пока палец держат, полоски заполняются цветом; когда строка «поднялась», её можно тащить.
 (function initDrag(){
+ const HOLD_MS=2000;
  let d=null,press=null,raf=0,lastY=0;
  const swipes=on=>{try{on?tg?.enableVerticalSwipes?.():tg?.disableVerticalSwipes?.();}catch(e){}};
  // постоянный слушатель: пока тащим строку, страница не должна прокручиваться пальцем
@@ -8341,39 +8348,51 @@ host.addEventListener('click',e=>{
   row.classList.add('lifted');
   S.dragging=true;
   swipes(false);
-  selectionHaptic();
+  uiHaptic('success');
   raf=requestAnimationFrame(tick);
   return true;
  }
+ function cancelHold(){
+  if(!press)return;
+  clearTimeout(press.timer);
+  press.grip.classList.remove('holding');
+  press=null;
+ }
  host.addEventListener('pointerdown',e=>{
   if(d||(e.pointerType==='mouse'&&e.button!==0))return;
-  const row=e.target.closest('.bd-row');
-  const list=row&&row.closest('.bd-list');
-  if(!row||!list)return;
   const grip=e.target.closest('.bd-grip');
-  if(grip){
-   if(start(list,row,e.pointerId,e.clientY,grip))e.preventDefault();
-   return;
-  }
-  const p={id:e.pointerId,x:e.clientX,y:e.clientY};
+  const row=grip&&grip.closest('.bd-row');
+  const list=row&&row.closest('.bd-list');
+  if(!grip||!row||!list||S.busy||S.dragging)return;
+  e.preventDefault();
+  cancelHold();
+  const p={id:e.pointerId,ox:e.clientX,oy:e.clientY,y:e.clientY,grip};
+  try{grip.setPointerCapture(e.pointerId);}catch(_){}
+  grip.style.setProperty('--hold',HOLD_MS+'ms');
+  grip.classList.add('holding');
   p.timer=setTimeout(()=>{
    if(press!==p)return;
    press=null;
-   start(list,row,p.id,p.y,row);
-  },380);
+   grip.classList.remove('holding');
+   if(!grip.isConnected)return;          // экран успели перерисовать — начинать нечего
+   start(list,row,p.id,p.y,grip);
+  },HOLD_MS);
   press=p;
  });
  host.addEventListener('pointermove',e=>{
   if(press&&e.pointerId===press.id){
-   if(Math.abs(e.clientX-press.x)>8||Math.abs(e.clientY-press.y)>8){clearTimeout(press.timer);press=null;}
+   press.y=e.clientY;
+   // палец ушёл в сторону до конца удержания — это не перетаскивание
+   if(Math.abs(e.clientX-press.ox)>12||Math.abs(e.clientY-press.oy)>12)cancelHold();
    return;
   }
   if(!d||e.pointerId!==d.id)return;
   lastY=e.clientY;
   update();
  });
+ host.addEventListener('contextmenu',e=>{if(e.target.closest('.bd-grip'))e.preventDefault();});
  const end=e=>{
-  if(press&&e.pointerId===press.id){clearTimeout(press.timer);press=null;}
+  if(press&&e.pointerId===press.id)cancelHold();
   if(!d||e.pointerId!==d.id)return;
   const g=d;
   d=null;
