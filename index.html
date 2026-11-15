@@ -1328,6 +1328,10 @@ button.bd-stat{cursor:pointer;transition:transform .3s cubic-bezier(.34,1.5,.4,1
 button.bd-stat:active{transform:scale(.97)}
 .bd-stat b{display:block;margin-top:2px;font-size:clamp(16px,5.2vw,21px);font-weight:800;letter-spacing:-.4px;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bd-stat .bd-label i{font-style:normal;margin-left:4px;opacity:.7}
+.bd-extra{display:flex;align-items:baseline;justify-content:space-between;gap:8px;width:100%;margin-top:10px;padding:10px 12px;border:0;border-radius:15px;background:var(--input-bg);color:var(--text);font:inherit;cursor:pointer;transition:transform .3s cubic-bezier(.34,1.5,.4,1)}
+.bd-extra:active{transform:scale(.98)}
+.bd-extra span{font-size:13px;font-weight:700;color:var(--muted)}
+.bd-extra b{font-size:16px;font-weight:800;letter-spacing:-.3px;font-variant-numeric:tabular-nums;color:var(--bd-ok);white-space:nowrap}
 .bd-bar{height:7px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:14px}
 .bd-bar i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,#7d8cf5,#5267e8);transition:width .5s cubic-bezier(.22,1,.36,1)}
 .bd-hero.over .bd-bar i{background:linear-gradient(90deg,#ff8c8c,#e5484d)}
@@ -6313,7 +6317,7 @@ stRefresh();
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const APP_VERSION='v20261114_4';          /* ← менять при каждом обновлении: vГГГГММДД_N */
+const APP_VERSION='v20261115_1';          /* ← менять при каждом обновлении: vГГГГММДД_N */
 const DEV_CHAT='https://t.me/larik_11';
 const CH_IDS=['trend','compare','range','distribution','daily','activity','dynamics','effect','summary','stats'];
 const CH_NAMES={trend:'Динамика по дням',compare:'Сравнение трёх недель',range:'Доля в целевом диапазоне',distribution:'Распределение измерений',daily:'Суточная сводка',activity:'Активность по времени',dynamics:'Тренды',effect:'Укол и сахар',summary:'Итоги',stats:'Статистика по месяцам'};
@@ -7828,13 +7832,14 @@ function heroHtml(p){
  const inMonth=periods.filter(x=>x.month===p.month);
  const over=p.balance<0;
  const cls=over?'over':(p.balance>0?'ok':'');
- const pct=p.salary>0?Math.min(100,Math.round(p.expenses/p.salary*100)):(p.expenses>0?100:0);
+ const pct=p.income>0?Math.min(100,Math.round(p.expenses/p.income*100)):(p.expenses>0?100:0);
  const tabs=inMonth.map(x=>'<button class="bd-tab'+(x.pay_date===p.pay_date?' on':'')+'" type="button" data-act="tab" data-date="'+x.pay_date+'"><span>'+dayLabel(x.pay_date)+'</span><small>'+WEEKDAYS[dayInfo(x.pay_date).wd]+'</small></button>').join('');
  return '<section class="bd-hero '+cls+'">'+monthNavHtml(p.month)
   +'<div class="bd-tabs">'+tabs+'</div>'
   +'<div class="bd-balance"><span class="bd-label">'+(over?'Превышение расходов':'Остаток')+'</span><span class="bd-big">'+signed(p.balance)+'</span></div>'
   +'<div class="bd-pair"><button class="bd-stat" type="button" data-act="salary" aria-label="Изменить зарплату"><span class="bd-label">Зарплата<i>✎</i></span><b>'+money(p.salary)+'</b></button>'
   +'<div class="bd-stat"><span class="bd-label">Расходы</span><b>'+money(p.expenses)+'</b></div></div>'
+  +(p.extra>0?'<button class="bd-extra" type="button" data-act="salary" aria-label="Изменить доп. заработок"><span>Доп. заработок</span><b>+'+money(p.extra)+'</b></button>':'')
   +'<div class="bd-bar" aria-hidden="true"><i style="width:'+pct+'%"></i></div></section>';
 }
 // Месяц, которого ещё нет в таблице: пустой экран с кнопкой «Добавить».
@@ -7854,23 +7859,26 @@ function ghostHtml(key){
 function summaryHtml(p){
  const inMonth=S.state.periods.filter(x=>x.month===p.month);
  const sal=r2(inMonth.reduce((a,x)=>a+x.salary,0));
+ const ext=r2(inMonth.reduce((a,x)=>a+x.extra,0));
+ const inc=r2(sal+ext);
  const exp=r2(inMonth.reduce((a,x)=>a+x.expenses,0));
- const bal=r2(sal-exp);
+ const bal=r2(inc-exp);
  const tone=bal<0?'over':(bal>0?'ok':'');
- const pct=sal>0?exp/sal*100:(exp>0?100:0);
+ const pct=inc>0?exp/inc*100:(exp>0?100:0);
  const C=2*Math.PI*40,off=C*(1-Math.min(100,pct)/100);
  const rows=inMonth.map(x=>{
   const t=x.balance<0?'over':(x.balance>0?'ok':'');
-  const w=x.salary>0?Math.min(100,Math.round(x.expenses/x.salary*100)):(x.expenses>0?100:0);
+  const w=x.income>0?Math.min(100,Math.round(x.expenses/x.income*100)):(x.expenses>0?100:0);
   return '<div class="bd-mrow '+t+(x.pay_date===p.pay_date?' on':'')+'"><div class="bd-mrow-top"><span>'+dayLabel(x.pay_date)+'</span><em>'+signed(x.balance)+'</em></div>'
    +'<div class="bd-bar" aria-hidden="true"><i style="width:'+w+'%"></i></div>'
-   +'<div class="bd-mrow-sub">Расходы '+money(x.expenses)+' из '+money(x.salary)+'</div></div>';
+   +'<div class="bd-mrow-sub">Расходы '+money(x.expenses)+' из '+money(x.income)+(x.extra>0?' (с доп. заработком)':'')+'</div></div>';
  }).join('');
  return '<section class="bd-card bd-sumcard '+tone+'"><div class="bd-card-head">Итоги месяца<span>'+monthTitle(p.month)+'</span></div>'
-  +'<div class="bd-sumtop"><div class="bd-ring" role="img" aria-label="Потрачено '+(sal>0?Math.round(pct)+'% зарплат':'без зарплаты')+'">'
+  +'<div class="bd-sumtop"><div class="bd-ring" role="img" aria-label="Потрачено '+(inc>0?Math.round(pct)+'% дохода':'без дохода')+'">'
   +'<svg viewBox="0 0 100 100"><circle class="trk" cx="50" cy="50" r="40"/><circle class="val" cx="50" cy="50" r="40" stroke-dasharray="'+C.toFixed(2)+'" stroke-dashoffset="'+off.toFixed(2)+'" transform="rotate(-90 50 50)"/></svg>'
-  +'<div class="bd-ring-in"><b>'+(sal>0?Math.min(999,Math.round(pct))+'%':'—')+'</b><small>потрачено</small></div></div>'
+  +'<div class="bd-ring-in"><b>'+(inc>0?Math.min(999,Math.round(pct))+'%':'—')+'</b><small>потрачено</small></div></div>'
   +'<div class="bd-legend"><div class="bd-lg"><span>Зарплаты</span><b>'+money(sal)+'</b></div>'
+  +(ext>0?'<div class="bd-lg"><span>Доп. заработок</span><b>+'+money(ext)+'</b></div>':'')
   +'<div class="bd-lg"><span>Расходы</span><b>'+money(exp)+'</b></div>'
   +'<div class="bd-lg tot"><span>'+(bal<0?'Превышение':'Остаток')+'</span><b>'+signed(bal)+'</b></div></div></div>'
   +'<div class="bd-mrows">'+rows+'</div></section>';
@@ -8162,19 +8170,30 @@ function openSalary(){
  if(!p||S.busy)return;
  const pay=p.pay_date;
  showForm({
-  icon:'💼',title:'Зарплата · '+dayLabel(pay),
-  html:'<label class="doctor-field"><span>Сумма зарплаты, ₽</span><input class="value-input" id="bdSalary" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" placeholder="0" value="'+amountText(p.salary)+'"></label>',
+  icon:'💼',title:'Зарплата · '+dayLabel(pay),saveLabel:'Сохранить',
+  html:'<label class="doctor-field"><span>Зарплата, ₽</span><input class="value-input" id="bdSalary" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="next" placeholder="0" value="'+amountText(p.salary)+'"></label>'
+   +'<label class="doctor-field"><span>Доп. заработок, ₽</span><input class="value-input" id="bdExtra" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" placeholder="0" value="'+(p.extra?amountText(p.extra):'')+'"></label>'
+   +'<div class="bd-hint">Доп. заработок записывается только в эту зарплату и в новые месяцы не копируется. Если изменишь саму зарплату, спросим: разово или постоянно.</div>',
   onSave:async()=>{
-   const m=parseMoney($('bdSalary').value,'Зарплата');
-   if(m.error){formError(m.error);return false;}
-   if(m.value===p.salary)return true;
-   const choice=await ask('Как применить новую сумму?','Зарплата '+dayLabel(pay)+': '+money(m.value),[
-    {id:'one',type:'default',text:'Только эта зарплата'},
-    {id:'future',type:'default',text:'Эта и все будущие зарплаты'},
-    {id:'cancel',type:'cancel'}
-   ]);
-   if(choice!=='one'&&choice!=='future')return false;
-   await commit('budget_salary_set',{pay_date:pay,salary:m.value,scope:choice});
+   const s=parseMoney($('bdSalary').value,'Зарплата');
+   if(s.error){formError(s.error);return false;}
+   const e=$('bdExtra').value.trim()===''?{value:0}:parseMoney($('bdExtra').value,'Доп. заработок');
+   if(e.error){formError(e.error);return false;}
+   const salaryChanged=s.value!==p.salary,extraChanged=e.value!==p.extra;
+   if(!salaryChanged&&!extraChanged)return true;
+   const payload={pay_date:pay};
+   if(extraChanged)payload.extra=e.value;
+   if(salaryChanged){
+    const choice=await ask('Как применить новую сумму?','Зарплата '+dayLabel(pay)+': '+money(s.value),[
+     {id:'one',type:'default',text:'Разово: только эта зарплата'},
+     {id:'future',type:'default',text:'Постоянно: эта и все будущие'},
+     {id:'cancel',type:'cancel'}
+    ]);
+    if(choice!=='one'&&choice!=='future')return false;
+    payload.salary=s.value;
+    payload.scope=choice;
+   }
+   await commit('budget_salary_set',payload);
    return true;
   }
  });
