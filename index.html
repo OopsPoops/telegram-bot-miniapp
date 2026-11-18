@@ -386,12 +386,12 @@ body.keyboard-open .bottom-nav-wrap{transform:translateY(140%);opacity:0;pointer
    ============================================================ */
 .modal-backdrop{position:fixed;inset:0;background:rgba(18,24,45,.48);display:none;align-items:center;justify-content:center;padding:22px;z-index:30;backdrop-filter:blur(5px)}
 .modal-backdrop.visible{display:flex;animation:fade .18s ease}
-.modal{width:100%;max-width:420px;max-height:82vh;overflow:hidden;background:var(--modal-bg);color:var(--text);border-radius:25px;padding:23px 20px 17px;box-shadow:0 25px 80px rgba(0,0,0,.2);display:flex;flex-direction:column}
+.modal{width:100%;max-width:420px;max-height:calc(100vh - 44px);max-height:calc(100dvh - 44px);overflow:hidden;background:var(--modal-bg);color:var(--text);border-radius:25px;padding:23px 20px 17px;box-shadow:0 25px 80px rgba(0,0,0,.2);display:flex;flex-direction:column}
 .modal-top{display:flex;align-items:center;gap:12px;margin-bottom:16px}
 .modal-icon{width:45px;height:45px;border-radius:15px;background:var(--icon-bg);display:grid;place-items:center;font-size:22px}
 .modal-title{font-size:19px;font-weight:800}
 .modal-subtitle{font-size:12px;color:var(--muted);margin-top:4px}
-.modal-content{overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:1.6;min-height:55px;max-height:48vh;padding:14px;border-radius:15px;background:var(--modal-content)}
+.modal-content{overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:1.6;min-height:55px;max-height:60vh;max-height:60dvh;padding:14px;border-radius:15px;background:var(--modal-content)}
 .loading-overlay{position:fixed;inset:0;z-index:40;display:none;align-items:center;justify-content:center;background:rgba(120,125,140,.45);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 .loading-overlay.visible{display:flex;animation:fade .15s ease}
 .modal-close{display:block;margin:16px auto 0;border:0;border-radius:50%;width:46px;height:46px;background:var(--close-bg);color:var(--close-text);font-size:25px;cursor:pointer}
@@ -1184,9 +1184,9 @@ button.st-ico:active{transform:scale(.88)}
 /* окно дня */
 .dp-backdrop{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;padding:calc(18px + env(safe-area-inset-top)) 14px calc(18px + env(safe-area-inset-bottom));background:rgba(18,24,45,.38);-webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%);opacity:0;transition:opacity .2s ease}
 .dp-backdrop.visible{opacity:1}
-.dp{display:flex;flex-direction:column;width:100%;max-width:460px;height:50vh;height:50dvh;min-height:300px;max-height:100%;background:var(--modal-bg);color:var(--text);border:1px solid var(--card-border);border-radius:26px;padding:18px 16px 14px;box-shadow:0 25px 80px rgba(0,0,0,.28);transform:translateY(14px) scale(.98);transition:transform .28s cubic-bezier(.22,1,.36,1)}
+.dp{display:flex;flex-direction:column;width:100%;max-width:460px;height:62.5vh;height:62.5dvh;min-height:375px;max-height:100%;background:var(--modal-bg);color:var(--text);border:1px solid var(--card-border);border-radius:26px;padding:18px 16px 14px;box-shadow:0 25px 80px rgba(0,0,0,.28);transform:translateY(14px) scale(.98);transition:transform .28s cubic-bezier(.22,1,.36,1)}
 .dp-backdrop.visible .dp{transform:none}
-.dp.has-sum{height:62vh;height:62dvh;min-height:400px}
+.dp.has-sum{height:77.5vh;height:77.5dvh;min-height:500px}
 .dp-sum{margin:0 0 10px;padding:8px 10px 6px;border-radius:16px;background:var(--modal-content)}
 .dp-sum .dn-row{border-top:0;padding:2px 0}
 #nightStatsBody .dn-row[data-off],#nightSimBody .dn-row[data-case]{cursor:pointer;-webkit-tap-highlight-color:transparent;border-radius:10px;transition:background .15s}
@@ -1292,6 +1292,8 @@ button.st-ico:active{transform:scale(.88)}
 .dg-tile small{display:block;font-size:11px;font-weight:650;line-height:1.25;color:var(--muted)}
 .dg-tile b{display:block;margin-top:3px;font-size:20px;font-weight:800;letter-spacing:-.4px;line-height:1.15;font-variant-numeric:tabular-nums;white-space:nowrap}
 .dg-tile b span{margin-left:3px;font-size:11.5px;font-weight:650;letter-spacing:0;color:var(--muted)}
+.dg-tiles .dg-tile:last-child:nth-child(odd){grid-column:1/-1}
+.dg-pending{font-style:normal}
 .dg-hint{display:block;margin-top:2px;font-size:10.5px;font-weight:600;color:var(--muted)}
 .dg-delta{display:block;margin-top:2px;font-size:11px;font-weight:750;color:var(--muted);font-variant-numeric:tabular-nums}
 .dg-delta.better{color:#23925a}
@@ -5831,7 +5833,7 @@ function ydRenderFace(face,data,label,day){
   delta='<div class="yd-delta '+toneOf(after)+'">'+(data.delta>0?'▲ ':'▼ ')+trendSigned(data.delta,1)+'</div>';
  }
  const tiles=ydTile('sugar','До еды',before&&before.value,'',before&&before.time,'','',0,toneOf(before))
-  +ydTile('insulin','Укол',data.bolus.value,'',data.bolus.time,'','',1)
+  +ydTile('insulin','Укол',data.bolus.value,'ед.',data.bolus.time,'','',1)
   +ydTile('sugar',after?'Через '+ydDuration(after.after_min):'После',after&&after.value,'',after&&after.time,delta,rel===0?'ещё нет':'нет записи',2,toneOf(after));
  const pre=(data.pre_shots||[]).map(item=>'<span class="yd-shot"><small>до еды</small>+'+escapeHtml(item.value)+' ед. <small>'+escapeHtml(item.time)+'</small></span>');
  const post=(data.post_shots||[]).map(item=>'<span class="yd-shot">+'+escapeHtml(item.value)+' ед. <small>'+escapeHtml(item.time)+'</small></span>');
@@ -6242,7 +6244,7 @@ stRefresh();
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const APP_VERSION='v20261118_2';          /* ← менять при каждом обновлении: vГГГГММДД_N */
+const APP_VERSION='v20261118_3';          /* ← менять при каждом обновлении: vГГГГММДД_N */
 const DEV_CHAT='https://t.me/larik_11';
 const CH_IDS=['trend','compare','range','distribution','daily','activity','dynamics','effect','summary','stats'];
 const CH_NAMES={trend:'Динамика по дням',compare:'Сравнение трёх недель',range:'Доля в целевом диапазоне',distribution:'Распределение измерений',daily:'Суточная сводка',activity:'Активность по времени',dynamics:'Тренды',effect:'Укол и сахар',summary:'Итоги',stats:'Статистика по месяцам'};
@@ -7430,13 +7432,16 @@ function render(data){
  // сахар
  let sugarInner=para(ai&&ai.sugar);
  if(sg.has_data){
+  /* дни вне диапазона — парой; у старых сохранённых дайджестов нет days_with_high, их досчитаем по графику ниже */
+  const daysHigh=typeof sg.days_with_high==='number'?String(sg.days_with_high):'<i id="dg-days-high" class="dg-pending">—</i>';
   sugarInner+=tiles([
    tile('Средний',m1(sg.mean),'ммоль/л',delta(get(ch,'sugar','mean'))),
    tile('Медиана',m1(sg.median),'ммоль/л',delta(get(ch,'sugar','median'))),
    tile('Минимум / максимум',m1(sg.min)+' / '+m1(sg.max),''),
    tile('Разброс',m1(sg.sd),'ммоль/л',delta(get(ch,'sugar','sd')),'стандартное отклонение'+(sg.cv_pct!=null?' · '+Math.round(sg.cv_pct)+'%':'')),
-   tile('Измерений',String(sg.n),'',delta(get(ch,'sugar','n')),sg.per_day_with_data==null?'':'в среднем '+fmtDose(sg.per_day_with_data)+' в день'),
-   tile('Дней с сахаром ниже '+rng(low),String(sg.days_with_low),'дн.')
+   tile('Дней с сахаром ниже '+rng(low),String(sg.days_with_low),'дн.'),
+   tile('Дней с сахаром выше '+rng(high),daysHigh,'дн.'),
+   tile('Измерений',String(sg.n),'',delta(get(ch,'sugar','n')),sg.per_day_with_data==null?'':'в среднем '+fmtDose(sg.per_day_with_data)+' в день')
   ]);
   sugarInner+=chartBox('Доля измерений в диапазоне','<div id="dg-donut" class="range-donut"></div><div id="dg-legend" class="range-legend"></div><div id="dg-compare" class="range-compare"></div>');
   sugarInner+=chartBox('Сахар по дням: минимум · среднее · максимум','<div id="dg-daily" class="chart-wrap">'+waiting+'</div><div id="dg-daily-tip" class="chart-tooltip" role="status"></div>');
@@ -7523,6 +7528,11 @@ async function drawCharts(data){
  const within=(row,bb)=>row.dateObj>=bb.start&&row.dateObj<=bb.end;
  const sugarRows=all.filter(row=>row.type==='sugar'&&within(row,b));
  const prevRows=all.filter(row=>row.type==='sugar'&&within(row,pb));
+ const highEl=$('dg-days-high'); /* старый сохранённый дайджест: число дней выше цели считаем по измерениям месяца */
+ if(highEl){
+  const hiLimit=Number(data.stats&&data.stats.target_range&&data.stats.target_range.high);
+  highEl.textContent=Number.isFinite(hiLimit)?String(new Set(sugarRows.filter(row=>row.value>hiLimit).map(row=>row.dateKey)).size):'—';
+ }
  const insulinRows=all.filter(row=>row.type==='insulin'&&within(row,b));
  if($('dg-donut'))drawRangeDonut({host:$('dg-donut'),legend:$('dg-legend'),cmp:$('dg-compare'),rows:sugarRows,prev:prevRows,prevLabel:'в прошлом месяце',numId:'dgDonutNum',countKey:'dg-donut'});
  if($('dg-daily'))drawDailySummary($('dg-daily'),$('dg-daily-tip'),summarizeByDay(sugarRows),'sugar','За этот месяц нет измерений.');
