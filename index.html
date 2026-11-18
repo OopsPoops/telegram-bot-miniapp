@@ -2913,6 +2913,7 @@ async function submitFood(){
 
 let foodSettings=null;
 const FOOD_PERIOD_NAMES={breakfast:'Breakfast',dinner:'Dinner'};
+const foodSortKey=text=>foodNorm(text);   /* для алфавита: без регистра, «ё» как «е» */
 function renderFoodSettings(){
  if(!foodSettings)return;
  const sw=document.getElementById('foodEnabledSwitch');
@@ -2931,7 +2932,12 @@ function renderFoodSettings(){
    if(input&&document.activeElement!==input)input.value=block[key];
   }
   const list=document.getElementById('food'+name+'List');
-  list.innerHTML=block.items.length?block.items.map((item,i)=>
+  /* Выбранные заранее — сверху, дальше всё по алфавиту (внутри каждой группы). Кнопки получают исходный индекс
+     блюда в сохранённом списке, поэтому порядок на экране не влияет на то, что переключается и удаляется. */
+  const order=block.items.map((item,i)=>({item,i})).sort((a,b)=>
+   (b.item.selected?1:0)-(a.item.selected?1:0)||foodSortKey(a.item.text).localeCompare(foodSortKey(b.item.text),'ru',{numeric:true})
+  );
+  list.innerHTML=order.length?order.map(({item,i})=>
    '<div class="st-row food-item"><button class="food-dot" type="button" aria-pressed="'+item.selected+'" aria-label="Выбрано заранее: '+escapeHtml(item.text)+'" onclick="foodItemToggle(\''+period+'\','+i+')">'+FOOD_CHECK+'</button>'
    +'<div class="st-t">'+escapeHtml(item.text)+'</div>'
    +'<button class="food-del" type="button" aria-label="Убрать: '+escapeHtml(item.text)+'" onclick="foodItemRemove(\''+period+'\','+i+')">×</button></div>'
@@ -6236,7 +6242,7 @@ stRefresh();
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const APP_VERSION='v20261118_1';          /* ← менять при каждом обновлении: vГГГГММДД_N */
+const APP_VERSION='v20261118_2';          /* ← менять при каждом обновлении: vГГГГММДД_N */
 const DEV_CHAT='https://t.me/larik_11';
 const CH_IDS=['trend','compare','range','distribution','daily','activity','dynamics','effect','summary','stats'];
 const CH_NAMES={trend:'Динамика по дням',compare:'Сравнение трёх недель',range:'Доля в целевом диапазоне',distribution:'Распределение измерений',daily:'Суточная сводка',activity:'Активность по времени',dynamics:'Тренды',effect:'Укол и сахар',summary:'Итоги',stats:'Статистика по месяцам'};
