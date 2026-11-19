@@ -1698,6 +1698,7 @@ button.st-ico:active{transform:scale(.88)}
 <button class="st-row has-ico st-nav" type="button" onclick="stOpen('sound')"><span class="st-ico c-red"><svg class="g"><use href="#i-sound"/></svg></span><span class="st-t">Звук и вибрация</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
 <button class="st-row has-ico st-nav" type="button" onclick="stOpen('timer')"><span class="st-ico c-orange"><svg class="g"><use href="#i-timer"/></svg></span><span class="st-t">Таймер инсулина</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
 <button class="st-row has-ico st-nav" type="button" onclick="stOpen('report')"><span class="st-ico c-blue"><svg class="g"><use href="#i-cal"/></svg></span><span class="st-t">Ежедневный отчёт</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
+<button class="st-row has-ico st-nav" type="button" onclick="stOpen('reminders')"><span class="st-ico c-orange"><svg class="g"><use href="#i-bell"/></svg></span><span class="st-t">Напоминания</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
 <button class="st-row has-ico st-nav" type="button" onclick="stOpen('charts')"><span class="st-ico c-purple"><svg class="g"><use href="#i-chart"/></svg></span><span class="st-t">Настройка графиков</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
 <button class="st-row has-ico st-nav" type="button" onclick="stOpen('food')"><span class="st-ico c-purple"><svg class="g"><use href="#i-meal"/></svg></span><span class="st-t">Еда</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
 <button class="st-row has-ico st-nav" type="button" onclick="stOpen('target')"><span class="st-ico c-green"><svg class="g"><use href="#i-target"/></svg></span><span class="st-t">Целевой диапазон</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
@@ -1758,6 +1759,20 @@ button.st-ico:active{transform:scale(.88)}
 <div class="st-foot">Приходит через выбранное время после отчёта. 0 минут — вопрос не приходит.</div>
 </div>
 <div class="toast st-toast" id="reportToast"></div>
+</div>
+
+<div class="st-page" data-p="reminders">
+<div class="st-bar"><button class="st-back" type="button" onclick="stBack()" aria-label="Назад"><svg><use href="#i-back"/></svg></button><div class="st-title">Напоминания</div></div>
+<div class="st-sec">Поменять иголку</div>
+<div class="st-card"><label class="st-row" for="needleTimeInput"><span class="st-t">Время (МСК)</span><input class="st-in" id="needleTimeInput" type="time" value="09:20" onchange="saveReminderTime('needle')" aria-label="Время напоминания поменять иголку по Москве"></label></div>
+<div class="st-foot">Приходит через день — по нечётным числам месяца.</div>
+<div class="st-sec">Записаться за инсулином</div>
+<div class="st-card"><label class="st-row" for="doctorTimeInput"><span class="st-t">Время (МСК)</span><input class="st-in" id="doctorTimeInput" type="time" value="11:00" onchange="saveReminderTime('doctor')" aria-label="Время напоминания записаться за инсулином по Москве"></label></div>
+<div class="st-foot">Приходит в день, который указан в столбце E листа get_ins: отдельно для короткого и ночного.</div>
+<div class="st-foot">Если после отправки поставить время позже, напоминание придёт ещё раз — уже в новое время.</div>
+<div class="st-sec">Другие напоминания</div>
+<div class="st-card"><button class="st-row st-nav" type="button" onclick="stOpen('report')"><span class="st-t">Ежедневный отчёт и вопрос «Сделяля?»</span><svg class="st-chev"><use href="#i-chev"/></svg></button></div>
+<div class="toast st-toast" id="remindersToast"></div>
 </div>
 
 <div class="st-page" data-p="food">
@@ -3038,6 +3053,10 @@ function renderReportSettings(){
  const followupInput=document.getElementById('followupInput');
  if(document.activeElement!==followupInput)followupInput.value=reportSettings.followup_minutes;
  document.querySelectorAll('.followup-preset').forEach(button=>button.classList.toggle('active',Number(button.dataset.minutes)===reportSettings.followup_minutes));
+ [['needleTimeInput','needle_time'],['doctorTimeInput','doctor_time']].forEach(([id,key])=>{
+  const input=document.getElementById(id);
+  if(input&&reportSettings[key]&&document.activeElement!==input)input.value=reportSettings[key];
+ });
  syncTargetFromServer();
 }
 async function loadReportSettings(){
@@ -3048,8 +3067,8 @@ async function loadReportSettings(){
   document.getElementById('reportDescription').textContent='Не удалось загрузить настройки';
  }
 }
-async function saveReportSettings(change){
- const toast=document.getElementById('reportToast');
+async function saveReportSettings(change,toastId='reportToast'){
+ const toast=document.getElementById(toastId);
  setToast(toast,'');
  try{
   reportSettings=await api('report_settings_set',change);
@@ -3074,6 +3093,15 @@ function saveReportTime(){
   return;
  }
  saveReportSettings({time:value});
+}
+function saveReminderTime(kind){
+ const value=document.getElementById(kind+'TimeInput').value;
+ if(!/^([01]\d|2[0-3]):[0-5]\d$/.test(value)){
+  setToast(document.getElementById('remindersToast'),'Выбери время напоминания.','error');
+  renderReportSettings();
+  return;
+ }
+ saveReportSettings({[kind+'_time']:value},'remindersToast');
 }
 function saveFollowupMinutes(minutes){
  if(!Number.isInteger(minutes)||minutes<0||minutes>180){
@@ -6244,7 +6272,7 @@ stRefresh();
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const APP_VERSION='v20261118_3';          /* ← менять при каждом обновлении: vГГГГММДД_N */
+const APP_VERSION='v20261118_4';          /* ← менять при каждом обновлении: vГГГГММДД_N */
 const DEV_CHAT='https://t.me/larik_11';
 const CH_IDS=['trend','compare','range','distribution','daily','activity','dynamics','effect','summary','stats'];
 const CH_NAMES={trend:'Динамика по дням',compare:'Сравнение трёх недель',range:'Доля в целевом диапазоне',distribution:'Распределение измерений',daily:'Суточная сводка',activity:'Активность по времени',dynamics:'Тренды',effect:'Укол и сахар',summary:'Итоги',stats:'Статистика по месяцам'};
