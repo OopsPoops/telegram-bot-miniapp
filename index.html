@@ -1041,10 +1041,8 @@ button.st-ico:active{transform:scale(.88)}
 .ch-row.lifted .ch-grip{color:var(--st-blue);cursor:grabbing}
 .ch-list.noanim .ch-row{transition:none}
 .ab-hero{display:flex;flex-direction:column;align-items:center;gap:6px;margin:2px 0 22px}
-.ab-logo{width:84px;height:84px;border-radius:24px;display:grid;place-items:center;color:#fff;font-size:42px;font-weight:800;letter-spacing:-1px;background:linear-gradient(145deg,#6f84ff,#7a5be8);box-shadow:0 14px 28px -10px rgba(95,90,240,.65),inset 0 1px 0 rgba(255,255,255,.35)}
+.ab-logo{display:block;width:112px;height:112px;border-radius:30px;object-fit:cover;object-position:50% 28%;background:#efe3c2;box-shadow:0 16px 30px -14px rgba(120,84,20,.6),0 0 0 1px rgba(0,0,0,.07)}
 .ab-name{font-size:24px;font-weight:700;letter-spacing:-.02em;margin-top:6px}
-.ab-sub{font-size:15px;color:var(--st-sub)}
-.ab-ver{margin-top:2px;padding:3px 11px;border-radius:99px;background:var(--st-fill);font-size:13px;font-weight:600;color:var(--st-sub);font-variant-numeric:tabular-nums}
 
 /* ===== Свайп назад от левого края ===== */
 #screen-settings,.app{position:relative}
@@ -1860,7 +1858,7 @@ button.st-ico:active{transform:scale(.88)}
 
 <div class="st-page" data-p="about">
 <div class="st-bar"><button class="st-back" type="button" onclick="stBack()" aria-label="Назад"><svg><use href="#i-back"/></svg></button><div class="st-title">О приложении</div></div>
-<div class="ab-hero"><div class="ab-logo" aria-hidden="true">С</div><div class="ab-name">Сёма</div><div class="ab-sub">Сахар и инсулин в одном месте</div><div class="ab-ver" id="abVer"></div></div>
+<div class="ab-hero"><img class="ab-logo" src="sema_sch.png" width="112" height="112" alt="Сёма" loading="lazy" decoding="async"><div class="ab-name">Сёма</div></div>
 <div class="st-card">
 <div class="st-row"><span class="st-t">Версия приложения</span><span class="st-val" id="abApp"></span></div>
 <div class="st-row"><span class="st-t">Версия бота</span><span class="st-val" id="abBot">…</span></div>
@@ -1872,7 +1870,6 @@ button.st-ico:active{transform:scale(.88)}
 <div class="st-card">
 <button class="st-row has-ico st-nav" type="button" onclick="openDevChat()"><span class="st-ico c-sky"><svg class="g"><use href="#i-tg"/></svg></span><span class="st-t">Написать разработчику</span><span class="st-val">@larik_11</span><svg class="st-chev"><use href="#i-chev"/></svg></button>
 </div>
-<div class="st-foot">Нашёл ошибку или есть идея — напиши, так приложение становится лучше.<br><br>Данные записываются в вашу Google Таблицу через бота.</div>
 </div>
 
 </section>
@@ -6272,7 +6269,7 @@ stRefresh();
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const APP_VERSION='v20261118_4';          /* ← менять при каждом обновлении: vГГГГММДД_N */
+const APP_VERSION='v20261119_1';          /* ← менять при каждом обновлении: vГГГГММДД_N */
 const DEV_CHAT='https://t.me/larik_11';
 const CH_IDS=['trend','compare','range','distribution','daily','activity','dynamics','effect','summary','stats'];
 const CH_NAMES={trend:'Динамика по дням',compare:'Сравнение трёх недель',range:'Доля в целевом диапазоне',distribution:'Распределение измерений',daily:'Суточная сводка',activity:'Активность по времени',dynamics:'Тренды',effect:'Укол и сахар',summary:'Итоги',stats:'Статистика по месяцам'};
@@ -6465,7 +6462,7 @@ function buildDate(v){
 }
 function aboutRefresh(){
  const set=(id,t)=>{const e=$(id);if(e)e.textContent=t;};
- set('abApp',APP_VERSION);set('abVer',APP_VERSION);set('abDate',buildDate(APP_VERSION)||'—');
+ set('abApp',APP_VERSION);set('abDate',buildDate(APP_VERSION)||'—');
  set('abBot',botVersion||'…');
  if(!botVersion)api('about').then(r=>{botVersion=r&&r.version||'—';set('abBot',botVersion);}).catch(()=>set('abBot','—'));
 }
