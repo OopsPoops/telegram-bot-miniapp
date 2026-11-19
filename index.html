@@ -1112,6 +1112,11 @@ button.st-ico:active{transform:scale(.88)}
 .food-dot[aria-pressed="true"]{background:var(--st-on,#34c759);border-color:var(--st-on,#34c759)}
 .food-dot[aria-pressed="true"] svg{opacity:1}
 .food-del{flex:none;width:30px;height:30px;border:0;border-radius:50%;background:var(--st-fill);color:var(--st-sub);font-size:19px;line-height:1;padding:0;cursor:pointer}
+.food-edit{flex:none;width:30px;height:30px;border:0;border-radius:50%;background:var(--st-fill);color:var(--st-sub);padding:0;cursor:pointer;display:grid;place-items:center}
+.food-edit svg,.food-ok svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.food-rename{flex:1;min-width:0;height:36px;border:0;border-radius:10px;padding:0 12px;background:var(--st-fill);color:inherit;font:inherit;font-size:16px;outline:2px solid var(--st-on,#34c759);outline-offset:-2px}
+.food-ok{flex:none;width:34px;height:34px;border:0;border-radius:50%;background:var(--st-on,#34c759);color:#fff;padding:0;cursor:pointer;display:grid;place-items:center}
+.food-ok svg{width:16px;height:16px;stroke-width:2.2}
 .food-new{flex:1;width:auto;min-width:0;text-align:left}
 #screen-settings .food-plus{width:34px;height:34px;border-radius:10px;background:var(--st-fill)}
 #screen-settings .food-plus svg{width:16px;height:16px}
@@ -2730,6 +2735,7 @@ async function saveValue(type){
 // ============================================================
 const FOOD_ICONS={breakfast:'🍳',dinner:'🍝'};
 const FOOD_CHECK='<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 8.5l3.8 3.8L13.5 4"/></svg>';
+const FOOD_PENCIL='<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.6 13.4l.7-3.3 7.5-7.5a1.4 1.4 0 012 0l.6.6a1.4 1.4 0 010 2L5.9 12.7l-3.3.7z"/><path d="M9.4 4l2.6 2.6"/></svg>';
 let foodState=null;
 function foodSplit(text){
  return String(text||'').split(/[,;\n]+/).map(s=>s.replace(/\s+/g,' ').trim().slice(0,40)).filter(Boolean);
@@ -2952,8 +2958,9 @@ function renderFoodSettings(){
    (b.item.selected?1:0)-(a.item.selected?1:0)||foodSortKey(a.item.text).localeCompare(foodSortKey(b.item.text),'ru',{numeric:true})
   );
   list.innerHTML=order.length?order.map(({item,i})=>
-   '<div class="st-row food-item"><button class="food-dot" type="button" aria-pressed="'+item.selected+'" aria-label="Выбрано заранее: '+escapeHtml(item.text)+'" onclick="foodItemToggle(\''+period+'\','+i+')">'+FOOD_CHECK+'</button>'
+   '<div class="st-row food-item" data-period="'+period+'" data-i="'+i+'"><button class="food-dot" type="button" aria-pressed="'+item.selected+'" aria-label="Выбрано заранее: '+escapeHtml(item.text)+'" onclick="foodItemToggle(\''+period+'\','+i+')">'+FOOD_CHECK+'</button>'
    +'<div class="st-t">'+escapeHtml(item.text)+'</div>'
+   +'<button class="food-edit" type="button" aria-label="Переименовать: '+escapeHtml(item.text)+'" onclick="foodItemRename(\''+period+'\','+i+')">'+FOOD_PENCIL+'</button>'
    +'<button class="food-del" type="button" aria-label="Убрать: '+escapeHtml(item.text)+'" onclick="foodItemRemove(\''+period+'\','+i+')">×</button></div>'
   ).join(''):'<div class="food-empty">Список пуст — добавь слово ниже</div>';
  }
@@ -3016,6 +3023,45 @@ function foodItemRemove(period,index){
  const items=foodItems(period);
  if(!items||!items[index])return;
  items.splice(index,1);
+ saveFoodSettings({[period]:{items}});
+}
+/* Переименование блюда: карандаш превращает строку в поле ввода. Enter, галочка или тап мимо — сохранить,
+   Esc — отмена. Меняется только название: «выбрано заранее» и всё остальное остаётся как было. */
+function foodItemRename(period,index){
+ if(!foodSettings||!foodSettings[period].items[index])return;
+ const row=document.querySelector('.food-item[data-period="'+period+'"][data-i="'+index+'"]');
+ if(!row)return;
+ row.classList.add('editing');
+ row.innerHTML='<input class="food-rename" type="text" maxlength="40" autocomplete="off" enterkeyhint="done" aria-label="Новое название блюда" value="'+escapeHtml(foodSettings[period].items[index].text)+'">'
+  +'<button class="food-ok" type="button" aria-label="Сохранить название">'+FOOD_CHECK+'</button>';
+ const input=row.querySelector('.food-rename'),ok=row.querySelector('.food-ok');
+ let finished=false;
+ const finish=save=>{
+  if(finished)return;
+  finished=true;
+  if(save)foodItemRenameCommit(period,index,input.value);else renderFoodSettings();
+ };
+ input.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){e.preventDefault();finish(true);}
+  else if(e.key==='Escape'){e.preventDefault();finish(false);}
+ });
+ input.addEventListener('blur',()=>setTimeout(()=>finish(true),0));
+ ok.addEventListener('pointerdown',e=>e.preventDefault()); /* тап по галочке не должен сначала снимать фокус с поля */
+ ok.addEventListener('click',()=>finish(true));
+ input.focus();
+ input.select();
+}
+function foodItemRenameCommit(period,index,raw){
+ const items=foodItems(period);
+ const text=String(raw||'').replace(/[,;\n]+/g,' ').replace(/\s+/g,' ').trim().slice(0,40);
+ if(!items||!items[index]||!text||text===items[index].text){renderFoodSettings();return;}
+ if(items.some((item,i)=>i!==index&&foodNorm(item.text)===foodNorm(text))){
+  setToast(document.getElementById('foodSettingsToast'),'Блюдо с таким названием уже есть.','error');
+  uiHaptic('error');
+  renderFoodSettings();
+  return;
+ }
+ items[index].text=text;
  saveFoodSettings({[period]:{items}});
 }
 function foodItemAdd(period){
@@ -6269,7 +6315,7 @@ stRefresh();
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const APP_VERSION='v20261119_2';          /* ← менять при каждом обновлении: vГГГГММДД_N */
+const APP_VERSION='v20261119_3';          /* ← менять при каждом обновлении: vГГГГММДД_N */
 const DEV_CHAT='https://t.me/larik_11';
 const CH_IDS=['trend','compare','range','distribution','daily','activity','dynamics','effect','summary','stats'];
 const CH_NAMES={trend:'Динамика по дням',compare:'Сравнение трёх недель',range:'Доля в целевом диапазоне',distribution:'Распределение измерений',daily:'Суточная сводка',activity:'Активность по времени',dynamics:'Тренды',effect:'Укол и сахар',summary:'Итоги',stats:'Статистика по месяцам'};
