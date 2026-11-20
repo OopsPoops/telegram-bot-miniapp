@@ -664,6 +664,19 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .toolbar-count{margin-left:auto;font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
 .toolbar-count:empty{display:none}
 .toolbar-count:not(:empty)+.chart-expand{margin-left:0}
+
+/* --- «Период:» — чипы, календарь, раскрытие на весь экран --- */
+#trend-period,#distribution-period,#daily-period,#range-period,#dose-period,#activity-period,#effect-period{display:none}
+.analytics-toolbar.period-bar{justify-content:flex-start;align-content:flex-start;gap:8px 9px}
+.period-note{margin-left:auto;font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.period-note:empty{display:none}
+.period-row{flex:1 0 100%;display:flex;align-items:center;gap:6px;min-width:0}
+.period-chips{flex:1 1 0;min-width:0;display:flex;gap:4px}
+.period-chip{flex:1 1 auto;min-width:0;height:34px;padding:0 5px;border:1px solid var(--line);border-radius:11px;background:var(--input-bg);color:var(--text);font:inherit;font-size:13px;font-weight:650;white-space:nowrap;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .2s,background .2s,color .2s,border-color .2s}
+.period-chip:active{transform:scale(.94)}
+.period-chip.active,.period-row .range-cal-btn.active{background:#5267e8;border-color:#5267e8;color:#fff}
+.period-row .range-cal-btn{width:34px}
+.period-row .chart-expand{margin-left:0}
 .range-summary{margin-top:6px}
 
 /* --- К врачу --- */
@@ -1525,7 +1538,6 @@ button.st-ico:active{transform:scale(.88)}
 <select id="trend-period" aria-label="Период графика динамики" onchange="changeTrendPeriod()">
 <option value="1">1 день</option><option value="2">2 дня</option><option value="3" selected>3 дня</option><option value="7">7 дней</option><option value="14">14 дней</option><option value="21">21 день</option><option value="30">30 дней</option><option value="45">45 дней</option>
 </select>
-<span class="toolbar-count" id="trend-count" role="status"></span>
 </div>
 <div id="trend-chart" class="chart-wrap"></div>
 <div id="trend-range" class="range-summary" hidden></div>
@@ -1539,7 +1551,6 @@ button.st-ico:active{transform:scale(.88)}
 <select id="compare-weekday" aria-label="День недели для сравнения" onchange="renderComparison()">
 <option value="all">Все дни</option><option value="1">Понедельник</option><option value="2">Вторник</option><option value="3">Среда</option><option value="4">Четверг</option><option value="5">Пятница</option><option value="6">Суббота</option><option value="0">Воскресенье</option>
 </select>
-<span class="toolbar-count" id="compare-count" role="status"></span>
 </div>
 <div id="compare-chart" class="chart-wrap"></div>
 <div id="compare-range" class="range-summary" hidden></div>
@@ -1552,7 +1563,6 @@ button.st-ico:active{transform:scale(.88)}
 <select id="distribution-period" aria-label="Период графика распределения" onchange="onChartPeriodChange()">
 <option value="3">3 дня</option><option value="7">7 дней</option><option value="14" selected>14 дней</option><option value="21">21 день</option><option value="30">30 дней</option><option value="45">45 дней</option>
 </select>
-<span class="toolbar-count" id="distribution-count" role="status"></span>
 </div>
 <div id="distribution-chart" class="chart-wrap"></div>
 <div id="distribution-range" class="range-summary" hidden></div>
@@ -1565,7 +1575,6 @@ button.st-ico:active{transform:scale(.88)}
 <select id="daily-period" aria-label="Период суточной сводки" onchange="onChartPeriodChange()">
 <option value="3">3 дня</option><option value="7">7 дней</option><option value="14" selected>14 дней</option><option value="21">21 день</option><option value="30">30 дней</option><option value="45">45 дней</option>
 </select>
-<span class="toolbar-count" id="daily-count" role="status"></span>
 </div>
 <div id="daily-chart" class="chart-wrap"></div>
 <div id="daily-range" class="range-summary" hidden></div>
@@ -1582,7 +1591,6 @@ button.st-ico:active{transform:scale(.88)}
 <option value="1">Сегодня</option><option value="3">3 дня</option><option value="7">7 дней</option><option value="14" selected>14 дней</option><option value="21">21 день</option><option value="30">30 дней</option><option value="45">45 дней</option><option value="custom" id="dose-custom-opt" hidden>Свой период</option>
 </select>
 <button class="range-cal-btn" id="dose-cal-btn" type="button" onclick="openRangeCalendar('dose')" aria-label="Выбрать период в календаре" title="Календарь"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></button>
-<span class="toolbar-count" id="dose-count" role="status"></span>
 </div>
 <div id="dose-split" class="dose-split" hidden>
 <div id="split-donut" class="range-donut"></div>
@@ -1621,7 +1629,6 @@ button.st-ico:active{transform:scale(.88)}
 <select id="activity-period" aria-label="Период тепловой карты" onchange="onChartPeriodChange()">
 <option value="3">3 дня</option><option value="7">7 дней</option><option value="14" selected>14 дней</option><option value="21">21 день</option><option value="30">30 дней</option><option value="45">45 дней</option>
 </select>
-<span class="toolbar-count" id="activity-count" role="status"></span>
 </div>
 <div id="activity-chart" class="chart-wrap"></div>
 <div id="activity-tooltip" class="chart-tooltip" role="status"></div>
@@ -1636,7 +1643,6 @@ button.st-ico:active{transform:scale(.88)}
 <option value="days" selected>По дням</option><option value="weeks">По неделям</option><option value="months">По месяцам</option>
 </select>
 <select id="summary-period" aria-label="Период итогов" onchange="renderSummary()"></select>
-<span class="toolbar-count" id="summary-count" role="status"></span>
 </div>
 <div id="summary-chart" class="chart-wrap"></div>
 <div id="summary-summary" class="dose-summary"></div>
@@ -1649,7 +1655,6 @@ button.st-ico:active{transform:scale(.88)}
 <select id="effect-period" aria-label="Период графика" onchange="onChartPeriodChange()">
 <option value="14">14 дней</option><option value="30" selected>30 дней</option><option value="45">45 дней</option>
 </select>
-<span class="toolbar-count" id="effect-count" role="status"></span>
 </div>
 <div id="effect-slots" class="effect-slots" role="group" aria-label="Приём пищи"></div>
 <div id="effect-chart" class="chart-wrap"></div>
@@ -3468,6 +3473,10 @@ function normalizeHistory(result){
 const DEFAULT_GRAPH_HISTORY_DAYS=14;
 function requiredGraphHistoryDays(){
  const chart=analyticsState.chart;
+ if(CUSTOM_CHARTS.includes(chart)){
+  const sel=document.getElementById(PERIOD_CHARTS[chart]);
+  if(sel&&sel.value==='custom'&&analyticsState.customPeriods[chart])return Math.min(365,rangeDaysSince(chartPeriodWindow(chart).start));
+ }
  if(chart==='compare')return 21; // три календарные недели
  if(chart==='effect')return Number(document.getElementById('effect-period')?.value)||30;
  if(chart==='trend')return Number(document.getElementById('trend-period')?.value)||3;
@@ -3491,10 +3500,15 @@ function onChartPeriodChange(){
  const dopt=document.getElementById('dose-custom-opt');
  if(dopt&&!analyticsState.doseCustom)dopt.hidden=true;
  saveRangePeriod();saveDosePeriod();
+ CUSTOM_CHARTS.forEach(chart=>{ // выбрали обычный период — свой период этого графика сбрасывается
+  const s=document.getElementById(PERIOD_CHARTS[chart]);
+  if(s&&s.value!=='custom')delete analyticsState.customPeriods[chart];
+ });
  if(analyticsState.chart==='trend'){
-  analyticsState.trendDays=Number(document.getElementById('trend-period').value)||3;
+  analyticsState.trendDays=chartPeriodWindow('trend').days;
   analyticsState.selectedDates=null;
  }
+ syncPeriodChips();
  const needed=requiredGraphHistoryDays();
  if(analyticsState.loaded&&needed>analyticsState.historyDays){loadAnalytics(true,needed);return;}
  renderAnalytics();
@@ -3773,6 +3787,7 @@ function closeChartFullscreen(){
   renderAnalytics();
 }
 function initChartExpandButtons(){
+  initPeriodBars(); // сначала «Период:», чтобы кнопка раскрытия встала в его ряд
   Object.entries(FS_CHARTS).forEach(([name,cfg])=>{
    const panel=document.querySelector(`.analytics-panel[data-panel="${name}"]`);
    // у «ЦД» кнопка стоит у столбчатого графика: полноэкранный режим разворачивает только его, а не бублик
@@ -3782,7 +3797,7 @@ function initChartExpandButtons(){
    button.type='button';button.className='chart-expand';button.textContent='⛶';
    button.title='Развернуть на весь экран';button.setAttribute('aria-label','Развернуть график на весь экран');
    button.addEventListener('click',()=>openChartFullscreen(name));
-   bar.appendChild(button);
+   (bar.querySelector('.period-row')||bar).appendChild(button);
   });
   let timer=null;
   const relayout=()=>{
@@ -3862,6 +3877,7 @@ function selectMetric(metric){
   renderAnalytics();
 }
 function renderAnalytics(){
+  syncPeriodChips();
   if(!analyticsState.loaded)return;
   if(analyticsState.chart==='trend')renderTrend();
   else if(analyticsState.chart==='compare')renderComparison();
@@ -3877,9 +3893,13 @@ function renderAnalytics(){
 function metricMeasurements(){
   return analyticsState.measurements.filter(row=>row.type===analyticsState.metric);
 }
-function periodMeasurements(days){
-  const end=new Date();end.setHours(23,59,59,999);
-  const start=new Date();start.setHours(0,0,0,0);start.setDate(start.getDate()-days+1);
+function periodMeasurements(days,chart){
+  let start,end;
+  if(chart){const win=chartPeriodWindow(chart);start=win.start;end=win.end;} // период графика, в том числе свой
+  else{
+   end=new Date();end.setHours(23,59,59,999);
+   start=new Date();start.setHours(0,0,0,0);start.setDate(start.getDate()-days+1);
+  }
   return metricMeasurements().filter(row=>row.dateObj>=start&&row.dateObj<=end);
 }
 function formatShortDate(key){
@@ -3896,10 +3916,10 @@ function formatFullDate(key){
 // ============================================================
 function renderTrendDays(rows){
   const host=document.getElementById('trend-days');
-  const end=new Date();end.setHours(0,0,0,0);
-  const dates=Array.from({length:analyticsState.trendDays},(_,index)=>{
-   const date=new Date(end);
-   date.setDate(date.getDate()-analyticsState.trendDays+1+index);
+  const win=chartPeriodWindow('trend');
+  const dates=Array.from({length:win.days},(_,index)=>{
+   const date=new Date(win.start);date.setHours(0,0,0,0);
+   date.setDate(date.getDate()+index);
    return dateKey(date);
   }).reverse();
   if(!analyticsState.selectedDates){
@@ -3937,7 +3957,7 @@ function dayColor(key,dates){
   return `hsl(${(index*137.508+212)%360} 67% 52%)`;
 }
 function renderTrend(){
-  const rows=periodMeasurements(analyticsState.trendDays);
+  const rows=periodMeasurements(analyticsState.trendDays,'trend');
   const dates=renderTrendDays(rows);
   const visible=rows.filter(row=>analyticsState.selectedDates.has(row.dateKey));
   const groups=dates.filter(key=>analyticsState.selectedDates.has(key)).map(key=>{
@@ -4007,7 +4027,7 @@ function renderComparison(){
 const weekdayNames=['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
 function renderDistribution(){
   const days=Number(document.getElementById('distribution-period').value);
-  const rows=periodMeasurements(days);
+  const rows=periodMeasurements(days,'distribution');
   const dates=[...new Set(rows.map(row=>row.dateKey))].sort();
   const groups=dates.map(key=>({label:formatShortDate(key),color:dayColor(key,dates),points:rows.filter(row=>row.dateKey===key)}));
   renderTimeChart('distribution-chart',groups,{metric:analyticsState.metric,tooltipId:'distribution-tooltip',connect:false,emptyText:mw('За этот период нет измерений.')});
@@ -4015,7 +4035,7 @@ function renderDistribution(){
   updateRangeSummary('distribution-range',rows);
   setChartCount('distribution-count',rows.length);
 }
-function dailySummary(days){return summarizeByDay(periodMeasurements(days));}
+function dailySummary(days,chart){return summarizeByDay(periodMeasurements(days,chart));}
 function summarizeByDay(rows){
   const byDate=new Map();
   rows.forEach(row=>{
@@ -4029,11 +4049,10 @@ function summarizeByDay(rows){
 }
 function renderDailySummary(){
   const [host,tooltip]=chartHosts('daily-chart','daily-tooltip');
-  const days=Number(document.getElementById('daily-period').value),summaries=dailySummary(days);
+  const days=Number(document.getElementById('daily-period').value),summaries=dailySummary(days,'daily');
   tooltip.textContent='';
-  updateRangeSummary('daily-range',periodMeasurements(days));
-  setChartCount('daily-count',periodMeasurements(days).length);
-  drawDailySummary(host,tooltip,summaries,analyticsState.metric,mw('За этот период нет измерений.'));
+  updateRangeSummary('daily-range',periodMeasurements(days,'daily'));
+    drawDailySummary(host,tooltip,summaries,analyticsState.metric,mw('За этот период нет измерений.'));
 }
 // Рисует суточную сводку (мин · среднее · макс) — общая для вкладки «Графики» и дайджеста месяца
 function drawDailySummary(host,tooltip,summaries,metric,emptyText){
@@ -4156,6 +4175,99 @@ function previousPeriodMeasurements(days){
   return metricMeasurements().filter(row=>row.dateObj>=prevStart&&row.dateObj<start);
 }
 /* ---- период для «Доли в цели»: шаблон или свой из календаря ---- */
+/* ---- «Период:» на графиках: чипы Сегодня / 3 дня / 7 / 14 / 21 / 30 + календарь (+ раскрытие, где оно есть).
+   Значение, как и раньше, хранит скрытый <select>: чипы только рисуют его и меняют, прежняя логика не тронута. ---- */
+const PERIOD_CHIPS=[[1,'Сегодня'],[3,'3 дня'],[7,'7'],[14,'14'],[21,'21'],[30,'30']];
+const PERIOD_CHARTS={trend:'trend-period',distribution:'distribution-period',daily:'daily-period',range:'range-period',dose:'dose-period',activity:'activity-period',effect:'effect-period'};
+const PERIOD_DEFAULTS={trend:3,distribution:14,daily:14,range:14,dose:14,activity:14,effect:30};
+const CUSTOM_CHARTS=['trend','distribution','daily','activity','effect']; // у ЦД («range», «dose») свой период свой код
+const CUSTOM_MAX_DAYS={trend:45}; // в «Динамике» каждый день — отдельная линия
+analyticsState.customPeriods={};
+const CAL_ICON='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>';
+function chartPeriodWindow(chart){
+ const sel=document.getElementById(PERIOD_CHARTS[chart]),custom=analyticsState.customPeriods[chart];
+ let start,end,days;
+ if(custom&&sel&&sel.value==='custom'){
+  start=new Date(custom.from);start.setHours(0,0,0,0);
+  end=new Date(custom.to);end.setHours(23,59,59,999);
+  days=Math.round((new Date(custom.to).setHours(0,0,0,0)-start)/864e5)+1;
+ }else{
+  days=Number(sel&&sel.value)||PERIOD_DEFAULTS[chart];
+  end=new Date();end.setHours(23,59,59,999);
+  start=new Date();start.setHours(0,0,0,0);start.setDate(start.getDate()-days+1);
+ }
+ return {start,end,days};
+}
+function setChartPeriod(chart,value){
+ const sel=document.getElementById(PERIOD_CHARTS[chart]);
+ if(!sel)return;
+ sel.value=String(value);
+ sel.dispatchEvent(new Event('change',{bubbles:true})); // сработает прежний onchange и сохранение выбора
+}
+function applyChartCustom(chart,from,to){
+ const f=new Date(from),t=new Date(to);f.setHours(0,0,0,0);t.setHours(0,0,0,0);
+ analyticsState.customPeriods[chart]={from:f,to:t};
+ const sel=document.getElementById(PERIOD_CHARTS[chart]);
+ let opt=sel.querySelector('option[value="custom"]');
+ if(!opt){opt=document.createElement('option');opt.value='custom';opt.hidden=true;sel.appendChild(opt);}
+ const days=Math.round((t-f)/864e5)+1;
+ opt.textContent=days+' '+ruPlural(days,'день','дня','дней')+' · '+rangeFmt(f)+'–'+rangeFmt(t);
+ sel.value='custom';
+ if(chart==='trend'){analyticsState.trendDays=days;analyticsState.selectedDates=null;}
+ syncPeriodChips();
+ const needed=requiredGraphHistoryDays();
+ if(analyticsState.loaded&&needed>analyticsState.historyDays){loadAnalytics(true,needed);return;}
+ renderAnalytics();
+}
+function syncPeriodChips(){
+ Object.entries(PERIOD_CHARTS).forEach(([chart,id])=>{
+  const sel=document.getElementById(id),bar=document.querySelector('.period-bar[data-chart="'+chart+'"]');
+  if(!sel||!bar)return;
+  const custom=sel.value==='custom';
+  bar.querySelectorAll('.period-chip').forEach(button=>{
+   const on=!custom&&button.dataset.v===sel.value;
+   button.classList.toggle('active',on);
+   button.setAttribute('aria-pressed',on?'true':'false');
+  });
+  const cal=bar.querySelector('.range-cal-btn');
+  if(cal)cal.classList.toggle('active',custom);
+  const note=bar.querySelector('.period-note');
+  if(note)note.textContent=custom&&sel.selectedOptions[0]?sel.selectedOptions[0].textContent:'';
+ });
+}
+function initPeriodBars(){
+ Object.entries(PERIOD_CHARTS).forEach(([chart,id])=>{
+  const sel=document.getElementById(id),bar=sel&&sel.closest('.analytics-toolbar');
+  if(!bar||bar.classList.contains('period-bar'))return;
+  bar.classList.add('period-bar');bar.dataset.chart=chart;
+  let label=bar.querySelector('.analytics-toolbar-label');
+  if(!label){label=document.createElement('span');label.className='analytics-toolbar-label';bar.prepend(label);}
+  label.textContent='Период:';
+  const note=document.createElement('span');note.className='period-note';note.setAttribute('role','status');label.after(note);
+  PERIOD_CHIPS.forEach(([value,text])=>{ // у селекта должны быть все значения чипов
+   if([...sel.options].some(option=>option.value===String(value)))return;
+   const option=document.createElement('option');option.value=String(value);option.textContent=text;sel.appendChild(option);
+  });
+  const row=document.createElement('div');row.className='period-row';
+  const chips=document.createElement('div');chips.className='period-chips';chips.setAttribute('role','group');chips.setAttribute('aria-label','Период');
+  PERIOD_CHIPS.forEach(([value,text])=>{
+   const button=document.createElement('button');
+   button.type='button';button.className='period-chip';button.dataset.v=String(value);button.textContent=text;
+   button.addEventListener('click',()=>setChartPeriod(chart,value));
+   chips.appendChild(button);
+  });
+  row.appendChild(chips);
+  let cal=bar.querySelector('.range-cal-btn');
+  if(!cal){
+   cal=document.createElement('button');
+   cal.type='button';cal.className='range-cal-btn';cal.title='Календарь';cal.setAttribute('aria-label','Выбрать период в календаре');
+   cal.innerHTML=CAL_ICON;cal.addEventListener('click',()=>openRangeCalendar(chart));
+  }
+  row.appendChild(cal); // у ЦД календарь уже был в шапке — переносим в общий ряд
+  bar.appendChild(row);
+ });
+ syncPeriodChips();
+}
 function rangeDaysSince(start){const t=new Date();t.setHours(0,0,0,0);return Math.round((t-start)/864e5)+1;}
 function rangeSelection(){
  const sel=document.getElementById('range-period'),custom=analyticsState.rangeCustom;
@@ -4245,7 +4357,8 @@ function openRangeCalendar(target='range'){
  const old=document.getElementById('rangeCal');if(old)old.remove();
  const today=new Date();today.setHours(0,0,0,0);
  const minDay=new Date(today);minDay.setDate(minDay.getDate()-364);
- const cur=target==='dose'?analyticsState.doseCustom:analyticsState.rangeCustom;
+ const cur=CUSTOM_CHARTS.includes(target)?analyticsState.customPeriods[target]:(target==='dose'?analyticsState.doseCustom:analyticsState.rangeCustom);
+ const maxDays=CUSTOM_MAX_DAYS[target]||0;
  let from=cur?new Date(cur.from):null,to=cur?new Date(cur.to):null;
  if(from)from.setHours(0,0,0,0);if(to)to.setHours(0,0,0,0);
  const shown=new Date((to||today).getFullYear(),(to||today).getMonth(),1);
@@ -4266,7 +4379,7 @@ function openRangeCalendar(target='range'){
    cells+='<button type="button" class="rc-d'+(edge?' edge':'')+(inside?' in':'')+(same(d,today)?' today':'')+'" data-t="'+d.getTime()+'"'+(off?' disabled':'')+'>'+n+'</button>';
   }
   const count=from?Math.round(((to||from)-from)/864e5)+1:0;
-  const info=from?(count+' '+ruPlural(count,'день','дня','дней')+' · '+rangeFmt(from)+(to&&!same(from,to)?'–'+rangeFmt(to):'')):'Выбери первый и последний день';
+  const info=from?(count+' '+ruPlural(count,'день','дня','дней')+' · '+rangeFmt(from)+(to&&!same(from,to)?'–'+rangeFmt(to):'')):'Выбери первый и последний день'+(maxDays?' (не больше '+maxDays+')':'');
   const nextOff=new Date(shown.getFullYear(),shown.getMonth()+1,1)>today;
   el.innerHTML='<section class="rc" role="dialog" aria-modal="true" aria-label="Выбор периода">'
    +'<header class="rc-head"><button type="button" class="rc-nav" data-m="-1" aria-label="Предыдущий месяц">‹</button><b>'+MONTHS[shown.getMonth()]+' '+shown.getFullYear()+'</b><button type="button" class="rc-nav" data-m="1" aria-label="Следующий месяц"'+(nextOff?' disabled':'')+'>›</button></header>'
@@ -4286,6 +4399,7 @@ function openRangeCalendar(target='range'){
    if(!from||(from&&to)){from=d;to=null;}
    else if(d<from){to=from;from=d;}
    else to=d;
+   if(maxDays&&from&&to&&Math.round((to-from)/864e5)+1>maxDays){from=new Date(to);from.setDate(from.getDate()-maxDays+1);} // для этого графика период ограничен
    paint();return;
   }
   const act=e.target.closest('.rc-btn');
@@ -4293,7 +4407,7 @@ function openRangeCalendar(target='range'){
   if(act.dataset.a==='cancel'){closeRangeCalendar();return;}
   const f=from,t=to||from;
   closeRangeCalendar();
-  applyRangeCustom(f,t,target);
+  if(CUSTOM_CHARTS.includes(target))applyChartCustom(target,f,t);else applyRangeCustom(f,t,target);
  });
  requestAnimationFrame(()=>el.classList.add('visible'));
 }
@@ -4381,7 +4495,7 @@ function idealGridOverlay(clipId,lines){
 }
 function renderActivityHeatmap(){
   const [host,tooltip]=chartHosts('activity-chart','activity-tooltip');
-  const days=Number(document.getElementById('activity-period').value),rows=periodMeasurements(days);
+  const days=Number(document.getElementById('activity-period').value),rows=periodMeasurements(days,'activity');
   setChartCount('activity-count',rows.length);
   const counts=Array.from({length:7},()=>Array(24).fill(0));
   rows.forEach(row=>counts[row.dateObj.getDay()][row.timeObj.hour]++);
@@ -5377,8 +5491,8 @@ function effectNum(value,signed){
  if(!signed)return (rounded<0?'−':'')+text;
  return rounded>0?'+'+text:rounded<0?'−'+text:'0';
 }
-function effectMeals(days){
- const cutoff=new Date();cutoff.setHours(0,0,0,0);cutoff.setDate(cutoff.getDate()-days+1);
+function effectMeals(win){
+ const cutoff=win.start;
  const stamp=row=>Date.UTC(row.dateObj.getFullYear(),row.dateObj.getMonth(),row.dateObj.getDate())/60000+row.timeObj.minutes;
  const sugar=[],shots=[];
  analyticsState.measurements.forEach(row=>{
@@ -5395,7 +5509,7 @@ function effectMeals(days){
  });
  const out=[];
  meals.forEach((meal,index)=>{
-  if(meal.row.dateObj<cutoff)return;
+  if(meal.row.dateObj<cutoff||meal.row.dateObj>win.end)return;
   const nextStart=index+1<meals.length?meals[index+1].startT:Infinity;
   let before=null,after=null;
   sugar.forEach(item=>{
@@ -5429,8 +5543,8 @@ function renderEffectSlots(meals){
 function renderEffectChart(){
  if(!analyticsState.loaded)return;
  const [host,tooltip]=chartHosts('effect-chart','effect-tooltip');
- const days=Number(document.getElementById('effect-period').value)||30;
- const meals=effectMeals(days);
+ const win=chartPeriodWindow('effect'),days=win.days;
+ const meals=effectMeals(win);
  renderEffectSlots(meals);
  const slotInfo=EFFECT_SLOTS.find(slot=>slot.key===effectSlot);
  const mine=meals.filter(m=>m.slot===effectSlot);
@@ -5451,9 +5565,8 @@ function renderEffectChart(){
  const yMin=Math.max(0,Math.floor(Math.min(...values,IDEAL_LOW)-0.3)),yMax=Math.ceil(Math.max(...values,IDEAL_HIGH)+0.3);
  const yStep=(yMax-yMin)>12?2:1;
  const y=value=>margin.top+plotH-((value-yMin)/(yMax-yMin))*plotH;
- const today=new Date();today.setHours(12,0,0,0);
  const keys=[];
- for(let i=days-1;i>=0;i--){const d=new Date(today);d.setDate(d.getDate()-i);keys.push(dateKey(d));}
+ for(let i=0;i<days;i++){const d=new Date(win.start);d.setHours(12,0,0,0);d.setDate(d.getDate()+i);keys.push(dateKey(d));}
  const colW=plotW/days,cx=index=>margin.left+(index+.5)*colW;
  const clip='ideal-'+host.id;
  let svg=`<svg class="chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="Сахар при уколе и после него, доза по дням">`;
@@ -5677,7 +5790,7 @@ function summaryTip(group,bucket,metric){
 function renderSummary(){
  const [host,tooltip]=chartHosts('summary-chart','summary-tooltip');
  const summary=document.getElementById('summary-summary');
- const count=document.getElementById('summary-count');
+ const count=document.getElementById('summary-count')||{};
  const legendEl=document.querySelector('.analytics-panel[data-panel="summary"] > .analytics-legend');
  const metric=analyticsState.metric;
  const group=document.getElementById('summary-group').value;
@@ -6315,7 +6428,7 @@ stRefresh();
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const APP_VERSION='v20261119_3';          /* ← менять при каждом обновлении: vГГГГММДД_N */
+const APP_VERSION='v20261119_4';          /* ← менять при каждом обновлении: vГГГГММДД_N */
 const DEV_CHAT='https://t.me/larik_11';
 const CH_IDS=['trend','compare','range','distribution','daily','activity','dynamics','effect','summary','stats'];
 const CH_NAMES={trend:'Динамика по дням',compare:'Сравнение трёх недель',range:'Доля в целевом диапазоне',distribution:'Распределение измерений',daily:'Суточная сводка',activity:'Активность по времени',dynamics:'Тренды',effect:'Укол и сахар',summary:'Итоги',stats:'Статистика по месяцам'};
