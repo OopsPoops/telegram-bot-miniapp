@@ -606,6 +606,10 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .dose-split .donut-pct.long small{font-size:11px}
 .dose-split .range-legend-row em{min-width:74px;font-weight:800;font-size:13px;color:var(--text);white-space:nowrap}
 .dose-split .range-compare b.warn{color:#c98417}
+.range-legend-row.rl-sub{margin-left:18px;padding-top:4px;padding-bottom:4px}
+.range-legend-row.rl-sub .range-dot{width:9px;height:9px}
+.rl-chev{display:inline-block;margin-left:7px;font-style:normal;font-weight:800;color:var(--muted);transition:transform .2s}
+.rl-open .rl-chev{transform:rotate(90deg)}
 :root[data-theme="dark"] .dose-split .range-compare b.warn{color:#f0b95a}
 /* ===== Статистика по месяцам / неделям / дням (вкладка «Графики») ===== */
 .ms-card{padding:14px 10px 10px;--ms-c:clamp(46px,15.5vw,60px);--ms-step:clamp(9px,3.5vw,14px)}
@@ -1438,7 +1442,7 @@ button.st-ico:active{transform:scale(.88)}
 <!-- --- Быстрые кнопки --- -->
 <section class="quick-grid">
 <button class="quick-button quick-chip q-today" onclick="openDayPager(0)"><span class="quick-icon blue">☀️</span><span class="quick-label">Сегодня</span></button>
-<button class="quick-button quick-chip q-yest" onclick="openDayPager(-1)"><span class="quick-icon orange">🌙</span><span class="quick-label">Вчера</span></button>
+<button class="quick-button quick-chip q-yest" onclick="openRangeCalendar('day')"><span class="quick-icon orange">📅</span><span class="quick-label">Календарь</span></button>
 <button class="quick-button quick-chip" onclick="openAction('week')"><span class="quick-icon purple">📊</span><span class="quick-label">Среднее за неделю</span></button>
 <button class="quick-button quick-chip" onclick="openAction('month')"><span class="quick-icon green">🗓️</span><span class="quick-label">Среднее за месяц</span></button>
 <button class="quick-button quick-chip" onclick="openAction('excel')"><span class="quick-icon yellow">📗</span><span class="quick-label">Excel</span></button>
@@ -1497,16 +1501,16 @@ button.st-ico:active{transform:scale(.88)}
 </section>
 </div>
 <div class="carousel-dots tight" id="nightDots" aria-hidden="true"><i class="on"></i></div>
-<!-- Похожие вечера: тот же сахар в то же время, удачное утро (4–9) -->
-<section class="metric ns-card" id="nightSim" aria-live="polite">
-<div class="ns-head"><button class="ns-ico ns-refresh" type="button" id="nightSimRefresh" aria-label="Пересчитать похожие вечера" title="Пересчитать">🔎</button><div class="ns-hcopy"><div class="ns-title">Похожие вечера</div><div class="ns-sub" id="nightSimSub"></div></div></div>
-<div id="nightSimBody"><div class="ns-note busy">Ищу похожие вечера…</div></div>
-</section>
 <!-- Статистика ночных доз -->
 <section class="metric ns-card" id="nightStats">
 <div class="ns-head"><span class="ns-ico" aria-hidden="true">🌙</span><div class="ns-hcopy"><div class="ns-title">Статистика</div><div class="ns-sub">Вечер → доза → утро</div></div>
 <div class="ns-range" id="nightRange" role="tablist" aria-label="Период"><button type="button" data-n="10" class="active">10</button><button type="button" data-n="20">20</button><button type="button" data-n="30">30</button></div></div>
 <div id="nightStatsBody"></div>
+</section>
+<!-- Похожие вечера: тот же сахар в то же время, удачное утро (4–9) -->
+<section class="metric ns-card" id="nightSim" aria-live="polite">
+<div class="ns-head"><button class="ns-ico ns-refresh" type="button" id="nightSimRefresh" aria-label="Пересчитать похожие вечера" title="Пересчитать">🔎</button><div class="ns-hcopy"><div class="ns-title">Похожие вечера</div><div class="ns-sub" id="nightSimSub"></div></div></div>
+<div id="nightSimBody"><div class="ns-note busy">Ищу похожие вечера…</div></div>
 </section>
 </section>
 <section class="screen" id="screen-graphs">
@@ -4324,7 +4328,7 @@ function openRangeCalendar(target='range'){
  const old=document.getElementById('rangeCal');if(old)old.remove();
  const today=new Date();today.setHours(0,0,0,0);
  const minDay=new Date(today);minDay.setDate(minDay.getDate()-364);
- const cur=CUSTOM_CHARTS.includes(target)?analyticsState.customPeriods[target]:(target==='dose'?analyticsState.doseCustom:analyticsState.rangeCustom);
+ const cur=target==='day'?null:CUSTOM_CHARTS.includes(target)?analyticsState.customPeriods[target]:(target==='dose'?analyticsState.doseCustom:analyticsState.rangeCustom);
  const maxDays=CUSTOM_MAX_DAYS[target]||0;
  let from=cur?new Date(cur.from):null,to=cur?new Date(cur.to):null;
  if(from)from.setHours(0,0,0,0);if(to)to.setHours(0,0,0,0);
@@ -4346,14 +4350,14 @@ function openRangeCalendar(target='range'){
    cells+='<button type="button" class="rc-d'+(edge?' edge':'')+(inside?' in':'')+(same(d,today)?' today':'')+'" data-t="'+d.getTime()+'"'+(off?' disabled':'')+'>'+n+'</button>';
   }
   const count=from?Math.round(((to||from)-from)/864e5)+1:0;
-  const info=from?(count+' '+ruPlural(count,'день','дня','дней')+' · '+rangeFmt(from)+(to&&!same(from,to)?'–'+rangeFmt(to):'')):'Выбери первый и последний день'+(maxDays?' (не больше '+maxDays+')':'');
+  const info=from?(count+' '+ruPlural(count,'день','дня','дней')+' · '+rangeFmt(from)+(to&&!same(from,to)?'–'+rangeFmt(to):'')):(target==='day'?'Выбери день — откроются сахар и инсулин за него':'Выбери первый и последний день'+(maxDays?' (не больше '+maxDays+')':''));
   const nextOff=new Date(shown.getFullYear(),shown.getMonth()+1,1)>today;
   el.innerHTML='<section class="rc" role="dialog" aria-modal="true" aria-label="Выбор периода">'
    +'<header class="rc-head"><button type="button" class="rc-nav" data-m="-1" aria-label="Предыдущий месяц">‹</button><b>'+MONTHS[shown.getMonth()]+' '+shown.getFullYear()+'</b><button type="button" class="rc-nav" data-m="1" aria-label="Следующий месяц"'+(nextOff?' disabled':'')+'>›</button></header>'
    +'<div class="rc-wd"><span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span></div>'
    +'<div class="rc-grid">'+cells+'</div>'
    +'<div class="rc-info">'+info+'</div>'
-   +'<div class="rc-actions"><button type="button" class="rc-btn" data-a="cancel">Отмена</button><button type="button" class="rc-btn primary" data-a="ok"'+(from?'':' disabled')+'>Показать</button></div></section>';
+   +'<div class="rc-actions"><button type="button" class="rc-btn" data-a="cancel">Отмена</button>'+(target==='day'?'':'<button type="button" class="rc-btn primary" data-a="ok"'+(from?'':' disabled')+'>Показать</button>')+'</div></section>';
  }
  paint();
  el.addEventListener('click',e=>{
@@ -4363,6 +4367,7 @@ function openRangeCalendar(target='range'){
   const day=e.target.closest('.rc-d[data-t]');
   if(day&&!day.disabled){
    const d=new Date(Number(day.dataset.t));
+   if(target==='day'){closeRangeCalendar();openDayFromCalendar(Math.round((d-today)/864e5));return;} /* «Календарь» на главной: один день → окно дня */
    if(!from||(from&&to)){from=d;to=null;}
    else if(d<from){to=from;from=d;}
    else to=d;
@@ -5340,15 +5345,21 @@ function renderInsulinSplit(){
  const cats=classifyShortInsulin(rows,threshold);
  const sumOf=list=>list.reduce((a,row)=>a+row.value,0);
  const dayCount=list=>new Set(list.map(row=>row.dateKey)).size;
+ const hintLt=`меньше ${fmtDose(threshold)} ед.`;
+ /* подколки свёрнуты в одну строку «Подколки»; по нажатию делятся на «до завтрака / между завтраком и ужином / после ужина» (и кольцо тоже) */
+ const open=!!analyticsState.splitCorrOpen&&cats.corr.length>0;
+ const co={k:'co',list:cats.corr,name:'Подколки',hint:hintLt,color:'#1f9d8f'};
+ const corrDefs=[
+  {k:'cb',list:cats.corrBefore,name:'До завтрака',hint:hintLt,color:'#58c8ba'},
+  {k:'cm',list:cats.corrBetween,name:'Между завтраком и ужином',hint:hintLt,color:'#1f9d8f'},
+  {k:'ca',list:cats.corrAfter,name:'После ужина',hint:hintLt,color:'#0e675f'}
+ ];
  const defs=[
   {k:'bf',list:cats.breakfast,name:'Завтрак',hint:`от ${fmtDose(threshold)} ед., до 14:00`,color:'#f0a840'},
-  {k:'dn',list:cats.dinner,name:'Ужин',hint:`от ${fmtDose(threshold)} ед., после 14:00`,color:'#6d63e6'},
-  {k:'cb',list:cats.corrBefore,name:'Подколки до завтрака',hint:`меньше ${fmtDose(threshold)} ед.`,color:'#58c8ba'},
-  {k:'cm',list:cats.corrBetween,name:'Подколки между завтраком и ужином',hint:`меньше ${fmtDose(threshold)} ед.`,color:'#1f9d8f'},
-  {k:'ca',list:cats.corrAfter,name:'Подколки после ужина',hint:`меньше ${fmtDose(threshold)} ед.`,color:'#0e675f'}
- ];
+  {k:'dn',list:cats.dinner,name:'Ужин',hint:`от ${fmtDose(threshold)} ед., после 14:00`,color:'#6d63e6'}
+ ].concat(open?corrDefs:[co]);
  if(cats.unclear.length)defs.push({k:'un',list:cats.unclear,name:'Не отнесено',hint:'неоднозначные записи',color:'#a2a8bd'});
- defs.forEach(def=>{def.sum=sumOf(def.list);def.days=dayCount(def.list);def.n=def.list.length;});
+ defs.concat(open?[co]:[]).forEach(def=>{def.sum=sumOf(def.list);def.days=dayCount(def.list);def.n=def.list.length;});
  const total=defs.reduce((a,def)=>a+def.sum,0),allDays=dayCount(rows);
  const pcts=splitPercents(defs.map(def=>def.sum));
  host.style.aspectRatio='';
@@ -5363,13 +5374,34 @@ function renderInsulinSplit(){
  const totalText=fmtDose(total);
  host.innerHTML=`<svg viewBox="0 0 100 100" role="img" aria-label="Короткий инсулин за период: ${totalText} ед."><circle class="donut-track" cx="50" cy="50" r="38"/>${segs}</svg>`
   +`<div class="donut-center"><div class="donut-pct${totalText.length>4?' long':''}"><span>${totalText}</span><small>ед.</small></div><div class="donut-sub">всего</div></div>`;
- legend.innerHTML=defs.map((def,index)=>{
-  const has=def.n>0;
-  return `<div class="range-legend-row"><span class="range-dot ${def.k}"></span><div class="range-legend-name">${def.name}<small>${def.hint}</small><small class="rl-mm">${has?`ср. ${fmtDose(def.sum/def.days)} ед./день · ${def.days} дн.`:'нет записей'}</small></div><b>${has?pcts[index]+'%':'—'}</b><em>${has?fmtDose(def.sum)+' ед.':'—'}<small class="rl-med">${has?def.n+' '+ruPlural(def.n,'инъекция','инъекции','инъекций'):''}</small></em></div>`;
+ const pctOf=new Map(defs.map((def,i)=>[def,pcts[i]]));
+ const legendRow=(def,pct,mode)=>{ /* mode: 'toggle' — строка «Подколки» (раскрывает), 'sub' — вложенная строка раскрытых подколок */
+  const has=def.n>0,toggle=mode==='toggle'&&has;
+  return `<div class="range-legend-row${toggle?' rl-click rl-toggle'+(open?' rl-open':''):''}${mode==='sub'?' rl-sub':''}"${toggle?` data-split="corr" role="button" tabindex="0" aria-expanded="${open}" aria-label="Подколки: ${open?'свернуть':'разделить по времени'}"`:''}><span class="range-dot ${def.k}"></span><div class="range-legend-name">${def.name}${toggle?'<i class="rl-chev" aria-hidden="true">›</i>':''}<small>${def.hint}</small><small class="rl-mm">${has?`ср. ${fmtDose(def.sum/def.days)} ед./день · ${def.days} дн.`:'нет записей'}</small></div><b>${has?pct+'%':'—'}</b><em>${has?fmtDose(def.sum)+' ед.':'—'}<small class="rl-med">${has?def.n+' '+ruPlural(def.n,'инъекция','инъекции','инъекций'):''}</small></em></div>`;
+ };
+ legend.innerHTML=defs.map(def=>{
+  if(def===corrDefs[0]){ /* раскрыто: сверху итоговая строка «Подколки», под ней три вложенных */
+   const sumPct=corrDefs.reduce((a,d)=>a+pctOf.get(d),0);
+   return legendRow(co,sumPct,'toggle')+legendRow(def,pctOf.get(def),'sub');
+  }
+  return legendRow(def,pctOf.get(def),corrDefs.includes(def)?'sub':def===co?'toggle':'');
  }).join('');
+ if(!legend._splitBound){ /* нажатие на «Подколки» раскрывает / сворачивает деление и перерисовывает кольцо */
+  legend._splitBound=true;
+  const toggleSplit=e=>{
+   const r=e.target.closest('.range-legend-row[data-split]');
+   if(!r)return;
+   e.preventDefault();
+   analyticsState.splitCorrOpen=!analyticsState.splitCorrOpen;
+   renderInsulinSplit();
+   if(typeof selectionHaptic==='function')selectionHaptic();
+  };
+  legend.addEventListener('click',toggleSplit);
+  legend.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' ')toggleSplit(e);});
+ }
  const unclear=defs.find(def=>def.k==='un'),corrSum=sumOf(cats.corr);
  note.innerHTML=`Всего: <b>${totalText} ед.</b> · ${rows.length} ${ruPlural(rows.length,'инъекция','инъекции','инъекций')} · дней с записями: ${allDays}. Дни без записей в средних не учитываются.`
-  +(cats.corr.length?`<br>Подколки: <b>${fmtDose(corrSum)} ед.</b> — делятся по времени дозы на завтрак и ужин в этот день; если приёма в тот день не было, берётся его обычное время за период.`:'')
+  +(cats.corr.length?(open?`<br>Подколки: <b>${fmtDose(corrSum)} ед.</b> — делятся по времени дозы на завтрак и ужин в этот день; если приёма в тот день не было, берётся его обычное время за период.`:`<br>Подколки: <b>${fmtDose(corrSum)} ед.</b> — нажми на строку «Подколки», чтобы разделить: до завтрака, между завтраком и ужином, после ужина.`):'')
   +(unclear?`<br><b class="warn">⚠ Не отнесено: ${unclear.n} ${ruPlural(unclear.n,'инъекция','инъекции','инъекций')}, ${fmtDose(unclear.sum)} ед.</b> — вторая крупная доза в тот же приём или доза около 14:00. В завтрак, ужин и подколки они не входят, в общую сумму входят.`:'');
 }
 function renderDoseChart(){
@@ -7051,6 +7083,7 @@ function closeDayPopup(){
  const el=$('dayPopup');
  if(!el)return;
  el.classList.remove('visible');
+ if(dpState.calDays){DAYS=dpState.calDays;dpState.calDays=0;} /* вернуть обычное окно истории после «Календаря» */
  document.body.style.overflow=el._bodyOverflow||'';
  document.removeEventListener('keydown',el._onKey);
  setTimeout(()=>{if(!el.classList.contains('visible'))el.remove();},200);
@@ -7092,7 +7125,9 @@ function daySpec(off,opts){
   const r=nightRow(off,ix,t);
   if(r)sumHtml='<div class="dp-sum">'+nightHead()+r.replace(' data-off="'+off+'"','')+'</div>';
  }
- return {name:d.name,sub:d.name.toLowerCase()===d.wd?d.dm:d.dm+' · '+d.wd,sugars:ix.sugar.get(d.key)||[],shots:ix.ins.get(d.key)||[],night:night?{value:night.value,approx:night.approx}:null,sumHtml};
+ const dt=new Date();dt.setHours(12,0,0,0);dt.setDate(dt.getDate()+off);
+ const dm=dt.getFullYear()===new Date().getFullYear()?d.dm:d.dm+'.'+dt.getFullYear(); /* год — для дат из «Календаря» прошлого года */
+ return {name:d.name,sub:d.name.toLowerCase()===d.wd?dm:dm+' · '+d.wd,sugars:ix.sugar.get(d.key)||[],shots:ix.ins.get(d.key)||[],night:night?{value:night.value,approx:night.approx}:null,sumHtml};
 }
 function openDayPopup(off,opts){
  if(!hist)return;
@@ -7185,6 +7220,23 @@ window.openDayPager=function(off){
   console.error('Не удалось загрузить день:',error);
   if(typeof openAction==='function')openAction(off===0?'today':'yesterday'); /* запасной вариант: прежний текст */
  });
+};
+
+/* Кнопка «Календарь» на главной: выбранный день открывается в том же окне дня; стрелки листают вперёд и назад от него.
+   Для далёких дат окно истории временно расширяется (до года), при закрытии окна возвращается обычное. */
+window.openDayFromCalendar=function(off){
+ off=Math.min(0,Math.trunc(Number(off)||0));
+ const need=Math.min(365,-off+15); /* выбранный день и запас, чтобы листать назад */
+ if(DAYS<need){
+  if(!dpState.calDays)dpState.calDays=DAYS;
+  DAYS=need;
+  getHistory(true).then(h=>h&&h.days>=need?h:fetchHist()).then(()=>openDayPager(off)).catch(error=>{
+   if(dpState.calDays){DAYS=dpState.calDays;dpState.calDays=0;}
+   console.error('Не удалось загрузить день:',error);
+  });
+  return;
+ }
+ openDayPager(off);
 };
 
 /* ===== Оборот карточки «Инсулин»: похожие случаи из истории (sema_analytics.py) ===== */
