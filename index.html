@@ -800,6 +800,8 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .dn-head,.dn-row{display:grid;grid-template-columns:46px repeat(3,minmax(0,1fr)) 54px;gap:6px;align-items:center}
 .dn-head{font-size:10px;font-weight:700;color:var(--muted);padding:0 0 3px;text-align:center}
 .dn-head span:first-child{text-align:left}
+.dn-head span:nth-child(3){padding-left:20px}
+.dn-head span:nth-child(4){padding-left:14px}
 .dn-row{padding:4px 0;border-top:1px solid var(--line)}
 .dn-day{line-height:1.2}
 .dn-day b{display:block;font-size:12.5px;font-weight:750}
@@ -810,9 +812,12 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .dn-c b.ok{color:var(--sg-ok)}
 .dn-c b.hi{color:var(--sg-hi)}
 .dn-c b.none{color:var(--muted);font-weight:600}
-.dn-low{font-style:normal;margin-right:2px;font-weight:800;color:var(--sg-lo)}
-.dn-shot{font-style:normal;margin-right:3px;font-size:13px;font-weight:400;vertical-align:0}
+.dn-low,.dn-shot{display:inline-block;text-align:center;font-style:normal}
+.dn-low{width:12px;margin-right:2px;font-weight:800;color:var(--sg-lo)}
+.dn-shot{width:17px;margin-right:3px;font-size:13px;font-weight:400;vertical-align:0}
 .dn-c span{font-size:10px;color:var(--muted)}
+.dn-dose span{padding-left:20px}
+.dn-mo span{padding-left:14px}
 .dn-dose b{color:#6a5ce0}
 .dn-d{justify-self:end;font-size:12px;font-weight:750;padding:3px 7px;border-radius:99px;font-variant-numeric:tabular-nums;background:rgba(125,135,170,.15);color:var(--muted);white-space:nowrap}
 /* пилюля Δ (ночная таблица и «Через …» в карточке еды): цвет по итоговому сахару, а не по направлению стрелки */
@@ -6723,13 +6728,13 @@ function insulinRow(off,ix){
 function nightHead(){return '<div class="dn-head"><span>Дата</span><span>Вечер</span><span>Доза</span><span>Утро</span><span>Δ</span></div>';}
 function nightRowHtml(o,t){
  const ev=o.ev,mo=o.mo,dose=o.dose;
- const cell=(x,c,pre)=>x?'<div class="dn-c"><b class="'+c+'">'+(pre||'')+fs(x.v)+'</b><span>'+x.t+'</span></div>':'<div class="dn-c"><b class="none">—</b><span>&nbsp;</span></div>';
+ const cell=(x,c,pre,k)=>x?'<div class="dn-c'+(k?' '+k:'')+'"><b class="'+c+'">'+(pre||'')+fs(x.v)+'</b><span>'+x.t+'</span></div>':'<div class="dn-c'+(k?' '+k:'')+'"><b class="none">'+(pre||'')+'—</b><span>&nbsp;</span></div>';
  /* ↓ перед утренним сахаром: до утреннего замера (ночью) был сахар ниже цели */
  const lowText=o.low&&o.low.length?'До утреннего замера был сахар ниже цели: '+o.low.map(x=>fs(x.v)+' в '+x.t).join(', '):'';
- const lowMark=lowText?'<i class="dn-low" title="'+lowText+'" aria-label="'+lowText+'">↓</i>':'';
+ const lowMark=lowText?'<i class="dn-low" title="'+lowText+'" aria-label="'+lowText+'">↓</i>':'<i class="dn-low"></i>';
  /* 💉 слева от ночной дозы: с 19:00 до 22:00 была подколка */
  const shotText=o.late&&o.late.length?'Подколка перед ночным: '+o.late.map(x=>x.t+' · '+fmtDose(x.v)+' ед.').join(', '):'';
- const shotMark=shotText?'<i class="dn-shot" title="'+shotText+'" aria-label="'+shotText+'">💉</i>':'';
+ const shotMark=shotText?'<i class="dn-shot" title="'+shotText+'" aria-label="'+shotText+'">💉</i>':'<i class="dn-shot"></i>';
  const doseCell=dose?'<div class="dn-c dn-dose"><b>'+shotMark+(dose.approx?'≈':'')+fmtDose(dose.value)+'</b><span>'+(dose.fact?'факт':dose.approx?'расчёт':'')+'&nbsp;</span></div>':'<div class="dn-c dn-dose"><b class="none">'+shotMark+'—</b><span>&nbsp;</span></div>';
  let delta='<span class="dn-d">—</span>';
  if(ev&&mo){
@@ -6738,7 +6743,7 @@ function nightRowHtml(o,t){
   delta='<span class="dn-d '+c+'">'+(diff>0?'+':diff<0?'−':'')+fs(Math.abs(diff))+'</span>';
  }
  return '<div class="dn-row'+(o.cls?' '+o.cls:'')+'"'+(o.attr||'')+'><div class="dn-day"><b>'+o.main+'</b><span>'+o.sub+'</span></div>'
-  +cell(ev,ev?cls(ev.v,t):'')+doseCell+cell(mo,mo?cls(mo.v,t):'',lowMark)+delta+'</div>';
+  +cell(ev,ev?cls(ev.v,t):'')+doseCell+cell(mo,mo?cls(mo.v,t):'',lowMark,'dn-mo')+delta+'</div>';
 }
 function nightRow(off,ix,t,keepEmpty){
  const E=dayInfo(off),D=dayInfo(off+1);
