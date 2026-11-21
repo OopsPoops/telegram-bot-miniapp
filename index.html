@@ -3493,7 +3493,27 @@ function requiredGraphHistoryDays(){
  const id={distribution:'distribution-period',daily:'daily-period',activity:'activity-period',range:analyticsState.metric==='sugar'?'range-period':'dose-period'}[chart];
  return id?(Number(document.getElementById(id)?.value)||14):DEFAULT_GRAPH_HISTORY_DAYS;
 }
+/* График «ЦД»: у сахара («range») и у инсулина / ночного («dose») раньше были два отдельных периода.
+   Теперь выбранный период один на все подвкладки этого графика; остальные графики со своими периодами не затрагиваются. */
+function syncRangeDose(from){
+ const a=from==='dose'?'dose':'range',b=a==='dose'?'range':'dose';
+ const sa=document.getElementById(a+'-period'),sb=document.getElementById(b+'-period');
+ if(!sa||!sb)return;
+ const ca=analyticsState[a+'Custom'],ob=document.getElementById(b+'-custom-opt'),oa=document.getElementById(a+'-custom-opt');
+ if(sa.value==='custom'&&ca){
+  analyticsState[b+'Custom']={from:new Date(ca.from),to:new Date(ca.to)};
+  if(ob&&oa){ob.textContent=oa.textContent;ob.hidden=false;}
+  sb.value='custom';
+ }else{
+  analyticsState[b+'Custom']=null;
+  if(ob)ob.hidden=true;
+  if([...sb.options].some(o=>o.value===sa.value&&o.value!=='custom'))sb.value=sa.value;
+ }
+ saveRangePeriod();saveDosePeriod();
+ syncPeriodBars();
+}
 function onChartPeriodChange(){
+ if(analyticsState.chart==='range')syncRangeDose(analyticsState.metric==='sugar'?'range':'dose'); /* период меняли на активной подвкладке — копируем на остальные */
  const rsel=document.getElementById('range-period');
  if(rsel&&rsel.value!=='custom')analyticsState.rangeCustom=null;
  const ropt=document.getElementById('range-custom-opt');
@@ -4264,6 +4284,7 @@ function applyRangeCustom(from,to,target='range'){
  const days=Math.round((new Date(to).setHours(0,0,0,0)-new Date(from).setHours(0,0,0,0))/864e5)+1;
  opt.textContent=days+' '+ruPlural(days,'день','дня','дней')+' · '+rangeFmt(from)+'–'+rangeFmt(to);
  opt.hidden=false;sel.value='custom';
+ syncRangeDose(dose?'dose':'range'); /* свой период — на все подвкладки ЦД (сахар / инсулин / ночной) */
  if(dose)saveDosePeriod();else saveRangePeriod();
  const needed=requiredGraphHistoryDays();
  if(analyticsState.loaded&&needed>analyticsState.historyDays){loadAnalytics(true,needed);return;}
@@ -4317,6 +4338,8 @@ function saveDosePeriod(){
   }else if([...sel.options].some(o=>o.value===saved.v&&o.value!=='custom'))sel.value=saved.v;
  }catch(e){}
 })();
+/* при запуске приводим период сахара и инсулина / ночного к одному значению (пользовательский период в приоритете) */
+try{syncRangeDose(document.getElementById('range-period')?.value!=='custom'&&document.getElementById('dose-period')?.value==='custom'?'dose':'range');}catch(e){}
 function closeRangeCalendar(){
  const el=document.getElementById('rangeCal');
  if(!el)return;
@@ -4350,7 +4373,7 @@ function openRangeCalendar(target='range'){
    cells+='<button type="button" class="rc-d'+(edge?' edge':'')+(inside?' in':'')+(same(d,today)?' today':'')+'" data-t="'+d.getTime()+'"'+(off?' disabled':'')+'>'+n+'</button>';
   }
   const count=from?Math.round(((to||from)-from)/864e5)+1:0;
-  const info=from?(count+' '+ruPlural(count,'день','дня','дней')+' · '+rangeFmt(from)+(to&&!same(from,to)?'–'+rangeFmt(to):'')):(target==='day'?'Выбери день — откроются сахар и инсулин за него':'Выбери первый и последний день'+(maxDays?' (не больше '+maxDays+')':''));
+  const info=from?(count+' '+ruPlural(count,'день','дня','дней')+' · '+rangeFmt(from)+(to&&!same(from,to)?'–'+rangeFmt(to):'')):(target==='day'?'':'Выбери первый и последний день'+(maxDays?' (не больше '+maxDays+')':''));
   const nextOff=new Date(shown.getFullYear(),shown.getMonth()+1,1)>today;
   el.innerHTML='<section class="rc" role="dialog" aria-modal="true" aria-label="Выбор периода">'
    +'<header class="rc-head"><button type="button" class="rc-nav" data-m="-1" aria-label="Предыдущий месяц">‹</button><b>'+MONTHS[shown.getMonth()]+' '+shown.getFullYear()+'</b><button type="button" class="rc-nav" data-m="1" aria-label="Следующий месяц"'+(nextOff?' disabled':'')+'>›</button></header>'
@@ -7030,7 +7053,7 @@ function dpHtml(spec,multi){
  pairs.sort((a,b)=>a.m-b.m);
  const sugarFmt=x=>'<b class="dp-v '+cls(x.v,t)+'">'+fs(x.v)+'</b>';
  const insFmt=x=>'<b class="dp-v">'+fmtDose(x.v)+'<small> ед.</small></b>';
- const timeline=spec.loading?'<div class="dp-empty busy">Ищу похожие случаи…</div>':pairs.length?pairs.map(p=>'<div class="dp-pair'+(spec.mark&&p.s&&p.s.t===spec.mark?' mark':'')+(spec.hl&&p.s&&cls(p.s.v,t)===spec.hl?' hl hl-'+spec.hl:'')+'">'+cell(p.s,sugarFmt)+cell(p.i,insFmt)+'</div>').join(''):'<div class="dp-empty">'+(spec.emptyText||'нет записей за этот день')+'</div>';
+ const timeline=spec.loading?'<div class="dp-empty busy">'+(spec.loadingText||'Ищу похожие случаи…')+'</div>':pairs.length?pairs.map(p=>'<div class="dp-pair'+(spec.mark&&p.s&&p.s.t===spec.mark?' mark':'')+(spec.hl&&p.s&&cls(p.s.v,t)===spec.hl?' hl hl-'+spec.hl:'')+'">'+cell(p.s,sugarFmt)+cell(p.i,insFmt)+'</div>').join(''):'<div class="dp-empty">'+(spec.emptyText||'нет записей за этот день')+'</div>';
  const night=spec.night;
  const foot=[avg!==null?'ср. сахар '+fs(avg):'',shots.length?'Σ инсулин '+fmtDose(sum)+' ед.':'',night?'🌙 ночной '+(night.approx?'≈':'')+fmtDose(night.value)+' ед.':''].filter(Boolean).join(' · ');
  return '<section class="dp'+(spec.sumHtml?' has-sum':'')+'" role="dialog" aria-modal="true" aria-label="Сахар и инсулин за день">'
@@ -7227,16 +7250,21 @@ window.openDayPager=function(off){
 window.openDayFromCalendar=function(off){
  off=Math.min(0,Math.trunc(Number(off)||0));
  const need=Math.min(365,-off+15); /* выбранный день и запас, чтобы листать назад */
- if(DAYS<need){
-  if(!dpState.calDays)dpState.calDays=DAYS;
-  DAYS=need;
-  getHistory(true).then(h=>h&&h.days>=need?h:fetchHist()).then(()=>openDayPager(off)).catch(error=>{
-   if(dpState.calDays){DAYS=dpState.calDays;dpState.calDays=0;}
-   console.error('Не удалось загрузить день:',error);
-  });
-  return;
- }
- openDayPager(off);
+ if(DAYS<need){if(!dpState.calDays)dpState.calDays=DAYS;DAYS=need;}
+ if(hist&&hist.days>=need){openDayPager(off);return;} /* данные уже есть — окно сразу */
+ /* данных нет: окно открываем сразу, внутри идёт загрузка, затем день подставляется на месте (без пустой паузы) */
+ const d=dayInfo(off),dt=new Date();dt.setHours(12,0,0,0);dt.setDate(dt.getDate()+off);
+ const dm=dt.getFullYear()===new Date().getFullYear()?d.dm:d.dm+'.'+dt.getFullYear();
+ dpOpen([()=>({name:d.name,sub:d.name.toLowerCase()===d.wd?dm:dm+' · '+d.wd,sugars:[],shots:[],night:null,sumHtml:'',loading:true,loadingText:'Загружаю день…'})],0);
+ const el=$('dayPopup');
+ getHistory(true).then(h=>h&&h.days>=need?h:fetchHist()).then(()=>{
+  if($('dayPopup')!==el||!el.classList.contains('visible'))return; /* пока грузили, окно закрыли */
+  dpState.noWrap=true;dpState.pager=true;dpState.extending=false;
+  dpState.specs=pagerSpecs();dpState.idx=DAYS-1+off;dpRender();
+ }).catch(error=>{
+  console.error('Не удалось загрузить день:',error);
+  if($('dayPopup')===el)closeDayPopup();else if(dpState.calDays){DAYS=dpState.calDays;dpState.calDays=0;}
+ });
 };
 
 /* ===== Оборот карточки «Инсулин»: похожие случаи из истории (sema_analytics.py) ===== */
