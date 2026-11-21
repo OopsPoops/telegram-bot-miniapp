@@ -598,7 +598,7 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .range-legend-row b{font-size:16px;font-variant-numeric:tabular-nums}
 .range-legend-row em{min-width:62px;text-align:right;font-style:normal;font-size:11px;color:var(--muted)}
 .range-compare{margin-top:6px;font-size:12px;color:var(--muted);text-align:center;line-height:1.5}
-.range-dot.bf{background:#f0a840}.range-dot.dn{background:#6d63e6}.range-dot.co{background:#1f9d8f}.range-dot.un{background:#a2a8bd}
+.range-dot.bf{background:#f0a840}.range-dot.dn{background:#6d63e6}.range-dot.co{background:#1f9d8f}.range-dot.cb{background:#58c8ba}.range-dot.cm{background:#1f9d8f}.range-dot.ca{background:#0e675f}.range-dot.un{background:#a2a8bd}
 .dose-split{margin-bottom:10px}
 .dose-split .donut-pct{font-size:26px;letter-spacing:-.8px}
 .dose-split .donut-pct small{font-size:13px}
@@ -4179,7 +4179,7 @@ function previousPeriodMeasurements(days){
 const PERIOD_CHARTS={trend:'trend-period',distribution:'distribution-period',daily:'daily-period',range:'range-period',dose:'dose-period',activity:'activity-period',effect:'effect-period'};
 const PERIOD_DEFAULTS={trend:3,distribution:14,daily:14,range:14,dose:14,activity:14,effect:30};
 const CUSTOM_CHARTS=['trend','distribution','daily','activity','effect']; // у ЦД («range», «dose») свой период свой код
-const CUSTOM_MAX_DAYS={trend:45}; // в «Динамике» каждый день — отдельная линия
+const CUSTOM_MAX_DAYS={}; // ограничений по числу дней нет: календарь даёт любой период (до года, столько отдаёт история)
 analyticsState.customPeriods={};
 const CAL_ICON='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>';
 function chartPeriodWindow(chart){
@@ -5278,8 +5278,8 @@ function doseSeries(kind,days){
 //  • всё остальное неоднозначно (вторая крупная доза в тот же приём, крупная доза около 14:00) → «Не отнесено», в категории не входит.
 const SPLIT_MEAL_MIN=14*60,SPLIT_BAND_MIN=60;
 function classifyShortInsulin(rows,threshold){
- const cats={breakfast:[],dinner:[],corr:[],unclear:[]};
- const byDay=new Map();
+ const cats={breakfast:[],dinner:[],corr:[],corrBefore:[],corrBetween:[],corrAfter:[],unclear:[]};
+ const mealAt=new Map(),byDay=new Map(); // mealAt: время дозы на завтрак/ужин по дням — по ним делим подколки
  rows.forEach(row=>{if(!byDay.has(row.dateKey))byDay.set(row.dateKey,[]);byDay.get(row.dateKey).push(row);});
  byDay.forEach(list=>{
   list.sort((a,b)=>a.timeObj.minutes-b.timeObj.minutes);
@@ -5291,7 +5291,18 @@ function classifyShortInsulin(rows,threshold){
    const meal=m<SPLIT_MEAL_MIN?'breakfast':'dinner';
    if(taken[meal]){cats.unclear.push(row);return;}
    taken[meal]=true;cats[meal].push(row);
+   const at=mealAt.get(row.dateKey)||{};at[meal]=m;mealAt.set(row.dateKey,at);
   });
+ });
+ // Подколки делим по времени дозы на завтрак и ужин в тот же день: до завтрака / между завтраком и ужином / после ужина.
+ // Если в какой-то день приёма не было — берём обычное (медианное) время этого приёма за период.
+ const med=a=>{if(!a.length)return null;a=a.slice().sort((x,y)=>x-y);const h=a.length>>1;return a.length%2?a[h]:(a[h-1]+a[h])/2;};
+ const times=meal=>[...mealAt.values()].map(x=>x[meal]).filter(Number.isFinite);
+ const bfDef=med(times('breakfast'))||9*60,dnDef=med(times('dinner'))||17*60;
+ cats.corr.forEach(row=>{
+  const at=mealAt.get(row.dateKey)||{},m=row.timeObj.minutes;
+  const bf=Number.isFinite(at.breakfast)?at.breakfast:bfDef,dn=Number.isFinite(at.dinner)?at.dinner:dnDef;
+  (m<bf?cats.corrBefore:m<dn?cats.corrBetween:cats.corrAfter).push(row);
  });
  return cats;
 }
@@ -5332,7 +5343,9 @@ function renderInsulinSplit(){
  const defs=[
   {k:'bf',list:cats.breakfast,name:'Завтрак',hint:`от ${fmtDose(threshold)} ед., до 14:00`,color:'#f0a840'},
   {k:'dn',list:cats.dinner,name:'Ужин',hint:`от ${fmtDose(threshold)} ед., после 14:00`,color:'#6d63e6'},
-  {k:'co',list:cats.corr,name:'Подколки',hint:`меньше ${fmtDose(threshold)} ед.`,color:'#1f9d8f'}
+  {k:'cb',list:cats.corrBefore,name:'Подколки до завтрака',hint:`меньше ${fmtDose(threshold)} ед.`,color:'#58c8ba'},
+  {k:'cm',list:cats.corrBetween,name:'Подколки между завтраком и ужином',hint:`меньше ${fmtDose(threshold)} ед.`,color:'#1f9d8f'},
+  {k:'ca',list:cats.corrAfter,name:'Подколки после ужина',hint:`меньше ${fmtDose(threshold)} ед.`,color:'#0e675f'}
  ];
  if(cats.unclear.length)defs.push({k:'un',list:cats.unclear,name:'Не отнесено',hint:'неоднозначные записи',color:'#a2a8bd'});
  defs.forEach(def=>{def.sum=sumOf(def.list);def.days=dayCount(def.list);def.n=def.list.length;});
@@ -5354,8 +5367,9 @@ function renderInsulinSplit(){
   const has=def.n>0;
   return `<div class="range-legend-row"><span class="range-dot ${def.k}"></span><div class="range-legend-name">${def.name}<small>${def.hint}</small><small class="rl-mm">${has?`ср. ${fmtDose(def.sum/def.days)} ед./день · ${def.days} дн.`:'нет записей'}</small></div><b>${has?pcts[index]+'%':'—'}</b><em>${has?fmtDose(def.sum)+' ед.':'—'}<small class="rl-med">${has?def.n+' '+ruPlural(def.n,'инъекция','инъекции','инъекций'):''}</small></em></div>`;
  }).join('');
- const unclear=defs.find(def=>def.k==='un');
+ const unclear=defs.find(def=>def.k==='un'),corrSum=sumOf(cats.corr);
  note.innerHTML=`Всего: <b>${totalText} ед.</b> · ${rows.length} ${ruPlural(rows.length,'инъекция','инъекции','инъекций')} · дней с записями: ${allDays}. Дни без записей в средних не учитываются.`
+  +(cats.corr.length?`<br>Подколки: <b>${fmtDose(corrSum)} ед.</b> — делятся по времени дозы на завтрак и ужин в этот день; если приёма в тот день не было, берётся его обычное время за период.`:'')
   +(unclear?`<br><b class="warn">⚠ Не отнесено: ${unclear.n} ${ruPlural(unclear.n,'инъекция','инъекции','инъекций')}, ${fmtDose(unclear.sum)} ед.</b> — вторая крупная доза в тот же приём или доза около 14:00. В завтрак, ужин и подколки они не входят, в общую сумму входят.`:'');
 }
 function renderDoseChart(){
