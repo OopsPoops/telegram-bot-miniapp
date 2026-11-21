@@ -610,6 +610,11 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .range-legend-row.rl-sub .range-dot{width:9px;height:9px}
 .rl-chev{display:inline-block;margin-left:7px;font-style:normal;font-weight:800;color:var(--muted);transition:transform .2s}
 .rl-open .rl-chev{transform:rotate(90deg)}
+@keyframes metricSwipeNext{from{opacity:0;transform:translateX(26px)}to{opacity:1;transform:none}}
+@keyframes metricSwipePrev{from{opacity:0;transform:translateX(-26px)}to{opacity:1;transform:none}}
+#analytics-content.swipe-next{animation:metricSwipeNext .22s ease-out}
+#analytics-content.swipe-prev{animation:metricSwipePrev .22s ease-out}
+@media (prefers-reduced-motion:reduce){#analytics-content.swipe-next,#analytics-content.swipe-prev{animation:none}}
 :root[data-theme="dark"] .dose-split .range-compare b.warn{color:#f0b95a}
 /* ===== Статистика по месяцам / неделям / дням (вкладка «Графики») ===== */
 .ms-card{padding:14px 10px 10px;--ms-c:clamp(46px,15.5vw,60px);--ms-step:clamp(9px,3.5vw,14px)}
@@ -3899,6 +3904,43 @@ function selectMetric(metric){
   syncAnalyticsLayout();
   renderAnalytics();
 }
+/* Свайп вбок на графиках листает «Сахар → Инсулин → Ночной» (по краям не зацикливается; «Ночной» — только там, где он есть) */
+(function metricSwipe(){
+  const root=document.getElementById('screen-graphs');
+  if(!root)return;
+  let sx=0,sy=0,st=0,ok=false;
+  const blocked=el=>{ // не мешаем прокрутке таблиц вбок и полям выбора
+    for(let n=el;n&&n!==root;n=n.parentElement){
+      if(n.matches&&n.matches('select,input,textarea,[data-noswipe]'))return true;
+      const ox=getComputedStyle(n).overflowX;
+      if((ox==='auto'||ox==='scroll')&&n.scrollWidth>n.clientWidth+1)return true;
+    }
+    return false;
+  };
+  root.addEventListener('touchstart',e=>{
+    ok=false;
+    if(e.touches.length!==1||!root.classList.contains('active'))return;
+    const sw=document.querySelector('.metric-switch');
+    if(!sw||sw.style.display==='none')return; // у этой вкладки переключателя показателей нет
+    if(blocked(e.target))return;
+    sx=e.touches[0].clientX;sy=e.touches[0].clientY;st=Date.now();ok=true;
+  },{passive:true});
+  root.addEventListener('touchend',e=>{
+    if(!ok)return;ok=false;
+    const t=e.changedTouches[0];if(!t)return;
+    const dx=t.clientX-sx,dy=t.clientY-sy;
+    if(Math.abs(dx)<60||Math.abs(dx)<Math.abs(dy)*1.5||Date.now()-st>800)return;
+    const order=['sugar','insulin'];
+    if(document.querySelector('[data-metric="night"]')?.style.display!=='none')order.push('night');
+    const i=order.indexOf(analyticsState.metric),next=order[i+(dx<0?1:-1)];
+    if(i<0||!next)return;
+    selectMetric(next);
+    const c=document.getElementById('analytics-content');
+    if(c){c.classList.remove('swipe-next','swipe-prev');void c.offsetWidth;c.classList.add(dx<0?'swipe-next':'swipe-prev');}
+    if(typeof selectionHaptic==='function')selectionHaptic();
+  },{passive:true});
+  root.addEventListener('touchcancel',()=>{ok=false;},{passive:true});
+})();
 function renderAnalytics(){
   syncPeriodBars();
   if(!analyticsState.loaded)return;
