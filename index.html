@@ -810,6 +810,8 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .dn-c b.ok{color:var(--sg-ok)}
 .dn-c b.hi{color:var(--sg-hi)}
 .dn-c b.none{color:var(--muted);font-weight:600}
+.dn-low{font-style:normal;margin-right:2px;font-weight:800;color:var(--sg-lo)}
+.dn-shot{font-style:normal;margin-right:3px;font-size:13px;font-weight:400;vertical-align:0}
 .dn-c span{font-size:10px;color:var(--muted)}
 .dn-dose b{color:#6a5ce0}
 .dn-d{justify-self:end;font-size:12px;font-weight:750;padding:3px 7px;border-radius:99px;font-variant-numeric:tabular-nums;background:rgba(125,135,170,.15);color:var(--muted);white-space:nowrap}
@@ -6388,7 +6390,7 @@ stRefresh();
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const APP_VERSION='v20261120_1';          /* ← менять при каждом обновлении: vГГГГММДД_N */
+const APP_VERSION='v20261121_1';          /* ← менять при каждом обновлении: vГГГГММДД_N */
 const DEV_CHAT='https://t.me/larik_11';
 const CH_IDS=['trend','compare','range','distribution','daily','activity','dynamics','effect','summary','stats'];
 const CH_NAMES={trend:'Динамика по дням',compare:'Сравнение трёх недель',range:'Доля в целевом диапазоне',distribution:'Распределение измерений',daily:'Суточная сводка',activity:'Активность по времени',dynamics:'Тренды',effect:'Укол и сахар',summary:'Итоги',stats:'Статистика по месяцам'};
@@ -6628,6 +6630,7 @@ const $=id=>document.getElementById(id);
 let DAYS=14;const MAX_ROWS=3;const MAX_DAYS=45;
 const EVENING_FROM=18*60;                    /* вечерний сахар — последний замер после 18:00 предыдущего дня */
 const MORNING_FROM=4*60,MORNING_TO=12*60;    /* утренний — первый замер с 4:00 до 12:00 */
+const SHOT_FROM=19*60,SHOT_TO=22*60;          /* подколка около ночного — укол короткого с 19:00 до 22:00 */
 const WD=['вс','пн','вт','ср','чт','пт','сб'];
 const pad=n=>String(n).padStart(2,'0');
 let hist=null,histAt=0,histStart=0,histPromise=null,failed=false;
@@ -6720,8 +6723,14 @@ function insulinRow(off,ix){
 function nightHead(){return '<div class="dn-head"><span>Дата</span><span>Вечер</span><span>Доза</span><span>Утро</span><span>Δ</span></div>';}
 function nightRowHtml(o,t){
  const ev=o.ev,mo=o.mo,dose=o.dose;
- const cell=(x,c)=>x?'<div class="dn-c"><b class="'+c+'">'+fs(x.v)+'</b><span>'+x.t+'</span></div>':'<div class="dn-c"><b class="none">—</b><span>&nbsp;</span></div>';
- const doseCell=dose?'<div class="dn-c dn-dose"><b>'+(dose.approx?'≈':'')+fmtDose(dose.value)+'</b><span>'+(dose.fact?'факт':dose.approx?'расчёт':'')+'&nbsp;</span></div>':'<div class="dn-c dn-dose"><b class="none">—</b><span>&nbsp;</span></div>';
+ const cell=(x,c,pre)=>x?'<div class="dn-c"><b class="'+c+'">'+(pre||'')+fs(x.v)+'</b><span>'+x.t+'</span></div>':'<div class="dn-c"><b class="none">—</b><span>&nbsp;</span></div>';
+ /* ↓ перед утренним сахаром: до утреннего замера (ночью) был сахар ниже цели */
+ const lowText=o.low&&o.low.length?'До утреннего замера был сахар ниже цели: '+o.low.map(x=>fs(x.v)+' в '+x.t).join(', '):'';
+ const lowMark=lowText?'<i class="dn-low" title="'+lowText+'" aria-label="'+lowText+'">↓</i>':'';
+ /* 💉 слева от ночной дозы: с 19:00 до 22:00 была подколка */
+ const shotText=o.late&&o.late.length?'Подколка перед ночным: '+o.late.map(x=>x.t+' · '+fmtDose(x.v)+' ед.').join(', '):'';
+ const shotMark=shotText?'<i class="dn-shot" title="'+shotText+'" aria-label="'+shotText+'">💉</i>':'';
+ const doseCell=dose?'<div class="dn-c dn-dose"><b>'+shotMark+(dose.approx?'≈':'')+fmtDose(dose.value)+'</b><span>'+(dose.fact?'факт':dose.approx?'расчёт':'')+'&nbsp;</span></div>':'<div class="dn-c dn-dose"><b class="none">'+shotMark+'—</b><span>&nbsp;</span></div>';
  let delta='<span class="dn-d">—</span>';
  if(ev&&mo){
   const diff=Math.round((mo.v-ev.v)*10)/10;
@@ -6729,16 +6738,20 @@ function nightRowHtml(o,t){
   delta='<span class="dn-d '+c+'">'+(diff>0?'+':diff<0?'−':'')+fs(Math.abs(diff))+'</span>';
  }
  return '<div class="dn-row'+(o.cls?' '+o.cls:'')+'"'+(o.attr||'')+'><div class="dn-day"><b>'+o.main+'</b><span>'+o.sub+'</span></div>'
-  +cell(ev,ev?cls(ev.v,t):'')+doseCell+cell(mo,mo?cls(mo.v,t):'')+delta+'</div>';
+  +cell(ev,ev?cls(ev.v,t):'')+doseCell+cell(mo,mo?cls(mo.v,t):'',lowMark)+delta+'</div>';
 }
-function nightRow(off,ix,t){
+function nightRow(off,ix,t,keepEmpty){
  const E=dayInfo(off),D=dayInfo(off+1);
  let ev=null;
  (ix.sugar.get(E.key)||[]).forEach(x=>{if(x.m>=EVENING_FROM)ev=x;});
- const mo=(ix.sugar.get(D.key)||[]).find(x=>x.m>=MORNING_FROM&&x.m<MORNING_TO)||null;
+ const next=ix.sugar.get(D.key)||[];
+ const mo=next.find(x=>x.m>=MORNING_FROM&&x.m<MORNING_TO)||null;
  const dose=ix.night.get(E.key)||null;
- if(!ev&&!mo&&!dose)return null;
- return nightRowHtml({main:E.dm,sub:(()=>{const sh=ix.ins.get(E.key)||[];return sh.length?'Σ'+fmtDose(sh.reduce((a,x)=>a+x.v,0)):'';})(),ev,mo,dose,attr:' data-off="'+off+'"'},t);
+ const shots=ix.ins.get(E.key)||[];
+ const late=shots.filter(x=>x.v>0&&x.m>=SHOT_FROM&&x.m<=SHOT_TO);   // подколка около ночного
+ const low=mo?next.filter(x=>x.m<mo.m&&x.v<t.lo):[];               // замеры ниже цели до утреннего значения
+ if(!ev&&!mo&&!dose&&!keepEmpty)return null; // keepEmpty: текущий день показываем сразу — пока с прочерками
+ return nightRowHtml({main:E.dm,sub:shots.length?'Σ'+fmtDose(shots.reduce((a,x)=>a+x.v,0)):'',ev,mo,dose,late,low,attr:' data-off="'+off+'"'},t);
 }
 function nightCaseRow(c,t,attr){
  return nightRowHtml({main:c.date.slice(0,5),sub:'Σ'+nG(c.insulin_day),
@@ -6754,7 +6767,7 @@ function renderNightStats(ix,t){
  const loaded=(hist&&hist.days)||DAYS;
  // строка за день E берёт вечер дня E и утро E+1; за границей загруженного окна данных нет вовсе,
  // поэтому там остался бы «полупустой» ряд только с утренним замером — такие дни не рисуем
- for(let o=0;o>-nightDays&&o>=-(loaded-1);o--){const r=nightRow(o,ix,t);if(r)rows.push(r);}
+ for(let o=0;o>-nightDays&&o>=-(loaded-1);o--){const r=nightRow(o,ix,t,o===0);if(r)rows.push(r);}
  const pending=loaded<Math.min(MAX_DAYS,nightDays+1);
  body.innerHTML=(rows.length?nightHead()+rows.join(''):(pending?'':'<div class="ns-note">Пока нет данных за этот период.</div>'))
   +(pending?'<div class="ns-note">Загружаю остальные дни…</div>':'');
@@ -7337,9 +7350,12 @@ function mount(carId,pages){
 }
 let lastRenderSig='';
 function renderSig(){const t=target();return [histAt,nightDays,t.lo,t.hi,dateKey(new Date())].join('|');}
+let renderedDay=dateKey(new Date());
+setInterval(()=>{if(hist&&dateKey(new Date())!==renderedDay)render();},60000); // наступил новый день — перерисовываем, чтобы появилась строка за него
 function render(){
  if(!hist)return;
  lastRenderSig=renderSig();
+ renderedDay=dateKey(new Date());
  const ix=index(hist),t=target();
  ['sugarCar','insulinCar'].forEach(id=>{const car=$(id);if(car)car.querySelectorAll('.dc-info').forEach(e=>e.remove());});
  selectedMetricDay=0;
