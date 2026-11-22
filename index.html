@@ -4472,12 +4472,15 @@ function openRangeDayPopup(k){
   if(!group||analyticsState.metric!=='sugar'||typeof window.openDayHighlight!=='function')return;
   const hit=rangeSelection().rows.filter(r=>rangeClass(r.value)===k);
   if(!hit.length)return;
-  const keys=[...new Set(hit.map(r=>r.dateKey))].sort(); // от старых дней к новым
+  let keys=[...new Set(hit.map(r=>r.dateKey))].sort(); // от старых дней к новым
   const days=new Map(keys.map(key=>[key,{sugars:[],shots:[]}]));
   analyticsState.measurements.forEach(r=>{ // в окне показываем весь день целиком: сахар и инсулин
     const d=days.get(r.dateKey);
     if(d)(r.type==='sugar'?d.sugars:d.shots).push({m:r.timeObj.minutes,t:r.timeObj.text,v:r.value});
   });
+  // «В цели»: только дни, где весь сахар за день был в целевом диапазоне
+  if(k==='in')keys=keys.filter(key=>days.get(key).sugars.every(s=>rangeClass(s.v)==='in'));
+  if(!keys.length)return;
   const nightMap=analyticsState.doses&&analyticsState.doses.night;
   const today=new Date();today.setHours(12,0,0,0);
   const items=keys.map(key=>{
