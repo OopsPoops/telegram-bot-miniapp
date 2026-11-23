@@ -1158,6 +1158,13 @@ button.st-ico:active{transform:scale(.88)}
 .food-dot.mk[data-m="d"][aria-pressed="true"]{background:#1d2c63;border-color:#1d2c63;color:#fff}
 :root[data-theme="dark"] .food-dot.mk[data-m="d"][aria-pressed="true"]{background:#26397f;border-color:#5a70d6}
 .food-item{gap:10px}
+.food-sugg{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:2px 15px 12px}
+.food-sugg[hidden]{display:none}
+.food-sugg small{width:100%;font-size:12px;color:var(--st-sub)}
+.food-sg{border:0;border-radius:999px;background:var(--close-bg);color:var(--close-text);padding:6px 12px;font:inherit;font-size:13.5px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.food-sg:active{opacity:.7}
+.food-item.flash{animation:foodflash 1.6s ease}
+@keyframes foodflash{0%,55%{background:rgba(255,201,40,.30)}100%{background:transparent}}
 
 /* ===== Карточка «Инсулин»: оборот с похожими случаями из истории ===== */
 .ins-flip{position:relative}
@@ -1885,7 +1892,13 @@ button.st-ico:active{transform:scale(.88)}
 <div class="st-row"><span class="st-t">Ужин</span><span class="food-range"><input class="st-in" id="foodDinnerStart" type="time" onchange="saveFoodTime('dinner')" aria-label="Начало ужина"><i>–</i><input class="st-in" id="foodDinnerEnd" type="time" onchange="saveFoodTime('dinner')" aria-label="Конец ужина"></span></div>
 </div>
 <div class="st-sec">Блюда</div>
-<div class="st-card"><div id="foodList"></div><div class="st-row"><input class="st-in food-new" id="foodNew" type="text" maxlength="40" autocomplete="off" placeholder="Новое блюдо" enterkeyhint="done" onkeydown="if(event.key==='Enter'){event.preventDefault();foodDishAdd();}" aria-label="Новое блюдо"><button class="food-plus" type="button" onclick="foodDishAdd()" aria-label="Добавить блюдо"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div></div>
+<div class="st-card">
+<div class="st-row"><input class="st-in food-new" id="foodNewTop" type="text" maxlength="40" autocomplete="off" placeholder="Новое блюдо" enterkeyhint="done" oninput="foodSuggest('foodNewTop')" onkeydown="if(event.key==='Enter'){event.preventDefault();foodDishAdd('foodNewTop');}" aria-label="Новое блюдо"><button class="food-plus" type="button" onclick="foodDishAdd('foodNewTop')" aria-label="Добавить блюдо"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div>
+<div class="food-sugg" id="foodSuggTop" hidden></div>
+<div id="foodList"></div>
+<div class="food-sugg" id="foodSuggBottom" hidden></div>
+<div class="st-row"><input class="st-in food-new" id="foodNew" type="text" maxlength="40" autocomplete="off" placeholder="Новое блюдо" enterkeyhint="done" oninput="foodSuggest('foodNew')" onkeydown="if(event.key==='Enter'){event.preventDefault();foodDishAdd('foodNew');}" aria-label="Новое блюдо"><button class="food-plus" type="button" onclick="foodDishAdd('foodNew')" aria-label="Добавить блюдо"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div>
+</div>
 </div>
 <div class="toast st-toast" id="foodSettingsToast"></div>
 </div>
@@ -3209,9 +3222,40 @@ function foodDishRenameCommit(key,raw){
  });
  saveFoodSettings(change);
 }
-/* Новое блюдо появляется в списке обоих приёмов пищи, не выбранным заранее — кружки закрашиваются вручную */
-function foodDishAdd(){
- const input=document.getElementById('foodNew');
+/* Подсказки при вводе нового блюда: показываем уже существующие, чтобы не добавлять похожее или такое же */
+const FOOD_SUGG={foodNewTop:'foodSuggTop',foodNew:'foodSuggBottom'};
+function foodSuggest(id){
+ const input=document.getElementById(id),box=document.getElementById(FOOD_SUGG[id]);
+ if(!input||!box)return;
+ if(!foodSettings){box.hidden=true;return;}
+ const q=foodNorm(String(input.value).split(/[,;]/).pop());
+ if(!q){box.hidden=true;box.innerHTML='';return;}
+ const found=foodDishes().filter(d=>d.key.includes(q))
+  .sort((a,b)=>(a.key.startsWith(q)?0:1)-(b.key.startsWith(q)?0:1)||a.key.localeCompare(b.key,'ru')).slice(0,8);
+ if(!found.length){box.hidden=true;box.innerHTML='';return;}
+ box.innerHTML='<small>Уже есть в списке — нажми, чтобы найти</small>'
+  +found.map(d=>'<button class="food-sg" type="button" data-k="'+escapeHtml(d.key)+'" onclick="foodSuggPick(this)">'+escapeHtml(d.text)+'</button>').join('');
+ box.hidden=false;
+}
+function foodSuggPick(button){
+ const key=button.dataset.k;
+ Object.keys(FOOD_SUGG).forEach(id=>{
+  const input=document.getElementById(id),box=document.getElementById(FOOD_SUGG[id]);
+  if(input){input.value='';input.blur();}
+  if(box){box.hidden=true;box.innerHTML='';}
+ });
+ const row=[...document.querySelectorAll('#foodList .food-item')].find(r=>r.dataset.k===key);
+ if(!row)return;
+ if(typeof selectionHaptic==='function')selectionHaptic();
+ row.classList.remove('flash');
+ void row.offsetWidth;
+ row.classList.add('flash');
+ row.scrollIntoView({block:'center',behavior:'smooth'});
+}
+/* Новое блюдо появляется в списке обоих приёмов пищи, не выбранным заранее — кружки закрашиваются вручную.
+   Два поля ввода (сверху и снизу списка) делают одно и то же. */
+function foodDishAdd(id){
+ const input=document.getElementById(id||'foodNew');
  if(!foodSettings||!input)return;
  const added=foodSplit(input.value);
  if(!added.length)return;
@@ -3223,7 +3267,11 @@ function foodDishAdd(){
   known.add(key);
   FOOD_BOTH.forEach(period=>change[period].items.push({text,selected:false}));
  }
- input.value='';
+ Object.keys(FOOD_SUGG).forEach(i=>{
+  const field=document.getElementById(i),box=document.getElementById(FOOD_SUGG[i]);
+  if(field)field.value='';
+  if(box){box.hidden=true;box.innerHTML='';}
+ });
  saveFoodSettings(change);
 }
 
