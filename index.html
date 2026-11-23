@@ -1378,6 +1378,29 @@ button.st-ico:active{transform:scale(.88)}
 .quick-icon svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .quick-button .quick-label{letter-spacing:-.1px}
 @media(max-width:360px){.quick-button{padding:9px 10px;gap:8px}}
+
+/* Поиск блюд */
+.fs-backdrop{align-items:flex-start;padding-top:calc(22px + env(safe-area-inset-top))}
+.fs-modal{max-width:460px;max-height:calc(100vh - 44px - env(safe-area-inset-top));max-height:calc(100dvh - 44px - env(safe-area-inset-top));padding-bottom:14px}
+.fs-ico{width:22px;height:22px;stroke:var(--text);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.fs-input{flex:none;width:100%;font-size:16px;margin-bottom:12px}
+.fs-body{overflow:auto;-webkit-overflow-scrolling:touch;min-height:130px;max-height:min(52vh,430px);max-height:min(52dvh,430px)}
+.fs-hint{padding:30px 10px;text-align:center;color:var(--muted);font-size:13.5px;line-height:1.5}
+.fs-retry{margin-top:10px;border:0;border-radius:12px;background:var(--close-bg);color:var(--close-text);padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+.fs-row{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:1px solid var(--card-border);border-radius:14px;background:var(--card-grad);color:var(--text);padding:11px 12px;margin-bottom:8px;cursor:pointer;font-family:inherit;transition:transform .12s ease}
+.fs-row:active{transform:scale(.985)}
+.fs-name{flex:1;min-width:0;font-weight:700;font-size:14px;line-height:1.3;overflow-wrap:anywhere}
+.fs-cnt{flex-shrink:0;font-size:12px;color:var(--muted)}
+.fs-go{flex-shrink:0;font-style:normal;color:var(--muted);font-size:19px;line-height:1}
+.fs-name mark,.fs-txt mark{background:none;color:var(--blue);font-weight:800}
+.fs-back{display:block;border:0;background:none;color:var(--blue);font-size:14px;font-weight:700;padding:0 0 8px;cursor:pointer;font-family:inherit}
+.fs-head{font-size:13px;color:var(--muted);margin:0 0 10px}
+.fs-day{align-items:flex-start}
+.fs-date{flex-shrink:0;width:82px;font-weight:750;font-size:13.5px;line-height:1.25}
+.fs-date small{display:block;margin-top:2px;font-size:11px;font-weight:600;color:var(--muted)}
+.fs-txt{flex:1;min-width:0;font-size:12.5px;line-height:1.4;color:var(--muted);overflow-wrap:anywhere}
+.fs-meal+.fs-meal{margin-top:5px}
+.fs-meal b{color:var(--text);font-weight:700}
 </style>
 </head>
 <body class="app-intro">
@@ -1478,7 +1501,7 @@ button.st-ico:active{transform:scale(.88)}
 <!-- --- Быстрые кнопки --- -->
 <section class="quick-grid">
 <button class="quick-button quick-chip c-orange q-yest" onclick="openRangeCalendar('day')"><span class="quick-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span><span class="quick-label">Календарь</span></button>
-<button class="quick-button quick-chip c-blue q-today" onclick="openDayPager(0)"><span class="quick-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4m11.4-11.4 1.4-1.4"/></svg></span><span class="quick-label">Сегодня</span></button>
+<button class="quick-button quick-chip c-blue q-search" onclick="openFoodSearch()"><span class="quick-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></span><span class="quick-label">Поиск</span></button>
 <button class="quick-button quick-chip c-violet" onclick="openAction('week')"><span class="quick-icon"><svg viewBox="0 0 24 24"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M8 17v-3M13 17V7M18 17v-6"/></svg></span><span class="quick-label">Среднее за неделю</span></button>
 <button class="quick-button quick-chip c-teal" onclick="openAction('month')"><span class="quick-icon"><svg viewBox="0 0 24 24"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M7 15l3-4 3 3 5-7"/></svg></span><span class="quick-label">Среднее за месяц</span></button>
 <button class="quick-button quick-chip c-green" onclick="openAction('excel')"><span class="quick-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg></span><span class="quick-label">Excel</span></button>
@@ -1987,6 +2010,18 @@ button.st-ico:active{transform:scale(.88)}
 <div class="modal-content" id="modalContent"><div class="loader-wrap"><div class="spinner"></div><div>Загружаю данные…</div></div></div>
 <div id="modalLink"></div>
 <button class="modal-close" onclick="closeModal()" aria-label="Закрыть">×</button>
+</section>
+</div>
+<!-- === ПОИСК БЛЮД === -->
+<div class="modal-backdrop fs-backdrop" id="foodSearchBackdrop" onclick="if(event.target===this)closeFoodSearch()">
+<section class="modal fs-modal" role="dialog" aria-modal="true" aria-labelledby="fsTitle">
+<div class="modal-top">
+<div class="modal-icon"><svg class="fs-ico" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div>
+<div><div class="modal-title" id="fsTitle">Поиск блюд</div><div class="modal-subtitle">Что и когда ел — за последний год</div></div>
+</div>
+<input class="value-input fs-input" id="fsInput" type="search" placeholder="Например, картошка" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="search" aria-label="Название блюда">
+<div class="fs-body" id="fsBody"></div>
+<button class="modal-close" onclick="closeFoodSearch()" aria-label="Закрыть">×</button>
 </section>
 </div>
 <!-- === ФОРМА «К ВРАЧУ: ДОБАВИТЬ» === -->
@@ -8043,6 +8078,171 @@ window.refreshDigest=function(){
  if(typeof selectionHaptic==='function')selectionHaptic();
  load(true);
 };
+})();
+</script>
+<script>
+/* ===== Поиск блюд: лист total, столбец G (через API food_search) → список блюд → дни → окно дня ===== */
+(function(){
+ const $=id=>document.getElementById(id);
+ const esc=s=>escapeHtml(s);
+ const MONTHS=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+ const WDS=['вс','пн','вт','ср','чт','пт','сб'];
+ const fs={entries:null,dishes:[],byKey:new Map(),loadedAt:0,loading:false,error:'',view:'list',sel:null};
+ const norm=s=>String(s).toLowerCase().replace(/ё/g,'е').replace(/\s+/g,' ').trim();
+ const plural=(n,a,b,c)=>{const m=n%100,k=n%10;return m>10&&m<15?c:k===1?a:k>1&&k<5?b:c;};
+ const haptic=()=>{if(typeof selectionHaptic==='function')selectionHaptic();};
+
+ /* «чай, хлеб х2, картошка пюре» → блюда; «х2» в конце не входит в название */
+ function parseItems(text){
+  return String(text||'').split(/[,;\n]+/).map(p=>p.trim()).filter(Boolean).map(raw=>{
+   const name=raw.replace(/\s*[xх×*]\s*\d+(?:[.,]\d+)?\s*$/i,'').trim()||raw;
+   return {raw,name,key:norm(name)};
+  });
+ }
+ function build(raw){
+  const list=[],today=new Date();today.setHours(12,0,0,0);
+  (raw||[]).forEach(e=>{
+   const m=String(e.date||'').match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+   if(!m)return;
+   const dt=new Date(+m[3],+m[2]-1,+m[1],12),off=Math.round((dt-today)/864e5);
+   if(off>0||off<-364)return; /* окно дня доступно за последний год */
+   list.push({off,dt,time:e.time||'',items:parseItems(e.text)});
+  });
+  list.sort((a,b)=>b.off-a.off||String(b.time).localeCompare(String(a.time)));
+  const dishes=new Map();
+  list.forEach(e=>e.items.forEach(it=>{
+   let d=dishes.get(it.key);
+   if(!d){d={key:it.key,name:it.name,days:new Set()};dishes.set(it.key,d);}
+   d.days.add(e.off);
+  }));
+  fs.entries=list;fs.dishes=[...dishes.values()];fs.byKey=dishes;
+ }
+ function suggestions(q){
+  const nq=norm(q);
+  if(!nq)return [];
+  return fs.dishes.filter(d=>d.key.includes(nq)).sort((a,b)=>
+   (a.key.startsWith(nq)?0:1)-(b.key.startsWith(nq)?0:1)||b.days.size-a.days.size||a.key.localeCompare(b.key,'ru')
+  ).slice(0,40);
+ }
+ function markName(name,nq){
+  const low=name.toLowerCase().replace(/ё/g,'е'),i=low.indexOf(nq);
+  if(i<0||low.length!==name.length)return esc(name);
+  return esc(name.slice(0,i))+'<mark>'+esc(name.slice(i,i+nq.length))+'</mark>'+esc(name.slice(i+nq.length));
+ }
+ function daysFor(sel){
+  const nq=sel.type==='all'?norm(sel.q):'';
+  const test=it=>sel.type==='dish'?it.key===sel.key:it.key.includes(nq);
+  const groups=new Map();
+  fs.entries.forEach(e=>{
+   if(!e.items.some(test))return;
+   let g=groups.get(e.off);
+   if(!g){g={off:e.off,dt:e.dt,meals:[]};groups.set(e.off,g);}
+   g.meals.push({time:e.time,html:e.items.map(it=>test(it)?'<mark>'+esc(it.raw)+'</mark>':esc(it.raw)).join(', ')});
+  });
+  const res=[...groups.values()];
+  res.forEach(g=>g.meals.reverse()); /* внутри дня — по времени, от раннего к позднему */
+  return res;
+ }
+ function render(){
+  const body=$('fsBody'),input=$('fsInput');
+  if(!body||!input)return;
+  const q=input.value;
+  if(!fs.entries){
+   body.innerHTML=fs.error
+    ?'<div class="fs-hint">'+esc(fs.error)+'<br><button class="fs-retry" type="button" data-retry>Повторить</button></div>'
+    :'<div class="loader-wrap"><div class="spinner"></div><div>Загружаю записи…</div></div>';
+   return;
+  }
+  if(fs.view==='days'&&fs.sel){
+   const sel=fs.sel,days=daysFor(sel);
+   const title=sel.type==='dish'?sel.name:'«'+sel.q.trim()+'»';
+   let html='<button class="fs-back" type="button" data-back>‹ Назад</button><div class="fs-head">'+esc(title)+' · '+days.length+' '+plural(days.length,'день','дня','дней')+'</div>';
+   days.forEach(g=>{
+    html+='<button class="fs-row fs-day" type="button" data-off="'+g.off+'"><span class="fs-date">'+g.dt.getDate()+' '+MONTHS[g.dt.getMonth()]
+     +'<small>'+WDS[g.dt.getDay()]+' · '+g.dt.getFullYear()+'</small></span><span class="fs-txt">'
+     +g.meals.map(m=>'<div class="fs-meal">'+(m.time?'<b>'+esc(m.time)+'</b> ':'')+m.html+'</div>').join('')
+     +'</span><i class="fs-go">›</i></button>';
+   });
+   body.innerHTML=html;
+   return;
+  }
+  if(!q.trim()){
+   body.innerHTML='<div class="fs-hint">Начни писать название блюда — например, «картошка»</div>';
+   return;
+  }
+  const list=suggestions(q),nq=norm(q);
+  if(!list.length){body.innerHTML='<div class="fs-hint">Такого блюда в записях нет</div>';return;}
+  let html='';
+  if(list.length>1){
+   const n=daysFor({type:'all',q}).length;
+   html+='<button class="fs-row" type="button" data-all><span class="fs-name">Все со словом «'+esc(q.trim())+'»</span><span class="fs-cnt">'+n+' '+plural(n,'день','дня','дней')+'</span><i class="fs-go">›</i></button>';
+  }
+  list.forEach(d=>{
+   const n=d.days.size;
+   html+='<button class="fs-row" type="button" data-key="'+esc(d.key)+'"><span class="fs-name">'+markName(d.name,nq)+'</span><span class="fs-cnt">'+n+' '+plural(n,'день','дня','дней')+'</span><i class="fs-go">›</i></button>';
+  });
+  body.innerHTML=html;
+ }
+ async function load(force){
+  if(fs.loading)return;
+  if(!force&&fs.entries&&Date.now()-fs.loadedAt<60000)return;
+  fs.loading=true;fs.error='';
+  render();
+  try{
+   const result=await api('food_search');
+   build(result&&result.entries);
+   fs.loadedAt=Date.now();
+  }catch(error){
+   fs.error=error&&error.message?error.message+'.':'Не удалось загрузить записи.';
+   if(typeof handleAccessError==='function')handleAccessError(error);
+  }finally{
+   fs.loading=false;render();
+  }
+ }
+ window.openFoodSearch=function(){
+  const el=$('foodSearchBackdrop'),input=$('fsInput');
+  if(!el||!input)return;
+  haptic();
+  fs.view='list';fs.sel=null;input.value='';
+  if(!el.classList.contains('visible'))el._ov=document.body.style.overflow;
+  el.classList.add('visible');
+  document.body.style.overflow='hidden';
+  render();
+  load(false);
+  setTimeout(()=>input.focus(),150);
+ };
+ window.closeFoodSearch=function(){
+  const el=$('foodSearchBackdrop');
+  if(!el||!el.classList.contains('visible'))return;
+  el.classList.remove('visible');
+  document.body.style.overflow=el._ov||'';
+  const input=$('fsInput');if(input)input.blur();
+ };
+ const input=$('fsInput'),body=$('fsBody');
+ if(input)input.addEventListener('input',()=>{fs.view='list';fs.sel=null;render();});
+ if(body)body.addEventListener('click',e=>{
+  if(e.target.closest('[data-retry]')){load(true);return;}
+  if(e.target.closest('[data-back]')){haptic();fs.view='list';fs.sel=null;render();return;}
+  if(e.target.closest('[data-all]')){
+   haptic();fs.sel={type:'all',q:input.value};fs.view='days';render();body.scrollTop=0;return;
+  }
+  const dish=e.target.closest('[data-key]');
+  if(dish){
+   const d=fs.byKey.get(dish.dataset.key);
+   if(d){haptic();fs.sel={type:'dish',key:d.key,name:d.name};fs.view='days';render();body.scrollTop=0;}
+   return;
+  }
+  const day=e.target.closest('[data-off]');
+  if(day&&typeof window.openDayFromCalendar==='function'){
+   haptic();
+   window.openDayFromCalendar(Number(day.dataset.off)); /* то же окно дня, что у «Календаря»: сахар и инсулин за день */
+  }
+ });
+ document.addEventListener('keydown',e=>{
+  if(e.key!=='Escape')return;
+  const el=$('foodSearchBackdrop');
+  if(el&&el.classList.contains('visible')&&!$('dayPopup'))closeFoodSearch();
+ });
 })();
 </script>
 </body>
