@@ -1150,6 +1150,13 @@ button.st-ico:active{transform:scale(.88)}
 #screen-settings .food-plus{width:34px;height:34px;border-radius:10px;background:var(--st-fill)}
 #screen-settings .food-plus svg{width:16px;height:16px}
 .food-empty{padding:14px 15px;font-size:15px;color:var(--st-sub)}
+.food-range{margin-left:auto;display:flex;align-items:center;gap:8px;color:var(--st-sub)}
+.food-range .st-in[type="time"]{width:100px}
+.food-mks{flex:none;display:flex;gap:6px}
+.food-dot.mk{width:28px;height:28px;font:inherit;font-size:13px;font-weight:800;line-height:1;color:var(--st-sub)}
+.food-dot.mk[data-m="b"][aria-pressed="true"]{background:#f0a840;border-color:#f0a840;color:#fff}
+.food-dot.mk[data-m="d"][aria-pressed="true"]{background:#6d63e6;border-color:#6d63e6;color:#fff}
+.food-item{gap:10px}
 
 /* ===== Карточка «Инсулин»: оборот с похожими случаями из истории ===== */
 .ins-flip{position:relative}
@@ -1873,19 +1880,13 @@ button.st-ico:active{transform:scale(.88)}
 <div class="st-card">
 <label class="st-row"><span class="st-t">От дозы, ед.</span><input class="st-in" id="foodMinDose" type="number" inputmode="numeric" min="1" max="50" step="1" onchange="saveFoodMinDose()" aria-label="Минимальная доза инсулина, от которой спрашивать еду"></label>
 </div>
-<div class="st-sec">Завтрак</div>
 <div class="st-card">
-<label class="st-row"><span class="st-t">С</span><input class="st-in" id="foodBreakfastStart" type="time" onchange="saveFoodTime('breakfast')" aria-label="Начало завтрака"></label>
-<label class="st-row"><span class="st-t">До</span><input class="st-in" id="foodBreakfastEnd" type="time" onchange="saveFoodTime('breakfast')" aria-label="Конец завтрака"></label>
+<div class="st-row"><span class="st-t">Завтрак</span><span class="food-range"><input class="st-in" id="foodBreakfastStart" type="time" onchange="saveFoodTime('breakfast')" aria-label="Начало завтрака"><i>–</i><input class="st-in" id="foodBreakfastEnd" type="time" onchange="saveFoodTime('breakfast')" aria-label="Конец завтрака"></span></div>
+<div class="st-row"><span class="st-t">Ужин</span><span class="food-range"><input class="st-in" id="foodDinnerStart" type="time" onchange="saveFoodTime('dinner')" aria-label="Начало ужина"><i>–</i><input class="st-in" id="foodDinnerEnd" type="time" onchange="saveFoodTime('dinner')" aria-label="Конец ужина"></span></div>
 </div>
-<div class="st-card"><div id="foodBreakfastList"></div><div class="st-row"><input class="st-in food-new" id="foodBreakfastNew" type="text" maxlength="40" autocomplete="off" placeholder="Новое слово" enterkeyhint="done" onkeydown="if(event.key==='Enter'){event.preventDefault();foodItemAdd('breakfast');}" aria-label="Новое слово для завтрака"><button class="food-plus" type="button" onclick="foodItemAdd('breakfast')" aria-label="Добавить слово"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div></div>
-<div class="st-sec">Ужин</div>
-<div class="st-card">
-<label class="st-row"><span class="st-t">С</span><input class="st-in" id="foodDinnerStart" type="time" onchange="saveFoodTime('dinner')" aria-label="Начало ужина"></label>
-<label class="st-row"><span class="st-t">До</span><input class="st-in" id="foodDinnerEnd" type="time" onchange="saveFoodTime('dinner')" aria-label="Конец ужина"></label>
-</div>
-<div class="st-card"><div id="foodDinnerList"></div><div class="st-row"><input class="st-in food-new" id="foodDinnerNew" type="text" maxlength="40" autocomplete="off" placeholder="Новое слово" enterkeyhint="done" onkeydown="if(event.key==='Enter'){event.preventDefault();foodItemAdd('dinner');}" aria-label="Новое слово для ужина"><button class="food-plus" type="button" onclick="foodItemAdd('dinner')" aria-label="Добавить слово"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div></div>
-<div class="st-foot">Еда спрашивается, только если доза не меньше порога. Кружок слева — слово будет выбрано заранее, пустой — только предложено. В остальное время слова не предлагаются, можно вписать своё. Время московское, настройки общие для всех пользователей бота.</div>
+<div class="st-sec">Блюда</div>
+<div class="st-card"><div id="foodList"></div><div class="st-row"><input class="st-in food-new" id="foodNew" type="text" maxlength="40" autocomplete="off" placeholder="Новое блюдо" enterkeyhint="done" onkeydown="if(event.key==='Enter'){event.preventDefault();foodDishAdd();}" aria-label="Новое блюдо"><button class="food-plus" type="button" onclick="foodDishAdd()" aria-label="Добавить блюдо"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div></div>
+<div class="st-foot">Еда спрашивается, только если доза не меньше порога. Кружки «з» (завтрак) и «у» (ужин): закрашенный — блюдо будет выбрано заранее, пустой — только предложено. В остальное время блюда не предлагаются, можно вписать своё. Время московское, настройки общие для всех пользователей бота.</div>
 </div>
 <div class="toast st-toast" id="foodSettingsToast"></div>
 </div>
@@ -3051,19 +3052,22 @@ function renderFoodSettings(){
    const input=document.getElementById('food'+name+suffix);
    if(input&&document.activeElement!==input)input.value=block[key];
   }
-  const list=document.getElementById('food'+name+'List');
-  /* Выбранные заранее — сверху, дальше всё по алфавиту (внутри каждой группы). Кнопки получают исходный индекс
-     блюда в сохранённом списке, поэтому порядок на экране не влияет на то, что переключается и удаляется. */
-  const order=block.items.map((item,i)=>({item,i})).sort((a,b)=>
-   (b.item.selected?1:0)-(a.item.selected?1:0)||foodSortKey(a.item.text).localeCompare(foodSortKey(b.item.text),'ru',{numeric:true})
-  );
-  list.innerHTML=order.length?order.map(({item,i})=>
-   '<div class="st-row food-item" data-period="'+period+'" data-i="'+i+'"><button class="food-dot" type="button" aria-pressed="'+item.selected+'" aria-label="Выбрано заранее: '+escapeHtml(item.text)+'" onclick="foodItemToggle(\''+period+'\','+i+')">'+FOOD_CHECK+'</button>'
-   +'<div class="st-t">'+escapeHtml(item.text)+'</div>'
-   +'<button class="food-edit" type="button" aria-label="Переименовать: '+escapeHtml(item.text)+'" onclick="foodItemRename(\''+period+'\','+i+')">'+FOOD_PENCIL+'</button>'
-   +'<button class="food-del" type="button" aria-label="Убрать: '+escapeHtml(item.text)+'" onclick="foodItemRemove(\''+period+'\','+i+')">×</button></div>'
-  ).join(''):'<div class="food-empty">Список пуст — добавь слово ниже</div>';
  }
+ /* Общий список блюд: сначала выбранные заранее (на завтрак и/или ужин), потом остальные; внутри групп — по алфавиту.
+    Кружки «з» и «у» — предвыбор на завтрак и на ужин. */
+ const list=document.getElementById('foodList');
+ const picked=d=>(d.breakfast||d.dinner)?1:0;
+ const dishes=foodDishes().sort((a,b)=>picked(b)-picked(a)||foodSortKey(a.text).localeCompare(foodSortKey(b.text),'ru',{numeric:true}));
+ list.innerHTML=dishes.length?dishes.map(d=>
+  '<div class="st-row food-item" data-k="'+escapeHtml(d.key)+'">'
+  +'<div class="food-mks">'
+  +'<button class="food-dot mk" data-m="b" type="button" aria-pressed="'+d.breakfast+'" aria-label="Выбрано заранее на завтрак: '+escapeHtml(d.text)+'" onclick="foodDishToggle(\'breakfast\',this)">з</button>'
+  +'<button class="food-dot mk" data-m="d" type="button" aria-pressed="'+d.dinner+'" aria-label="Выбрано заранее на ужин: '+escapeHtml(d.text)+'" onclick="foodDishToggle(\'dinner\',this)">у</button>'
+  +'</div>'
+  +'<div class="st-t">'+escapeHtml(d.text)+'</div>'
+  +'<button class="food-edit" type="button" aria-label="Переименовать: '+escapeHtml(d.text)+'" onclick="foodDishRename(this)">'+FOOD_PENCIL+'</button>'
+  +'<button class="food-del" type="button" aria-label="Убрать: '+escapeHtml(d.text)+'" onclick="foodDishRemove(this)">×</button></div>'
+ ).join(''):'<div class="food-empty">Список пуст — добавь блюдо ниже</div>';
 }
 async function loadFoodSettings(){
  try{
@@ -3112,34 +3116,54 @@ function saveFoodTime(period){
  }
  saveFoodSettings({[period]:{start,end}});
 }
+const FOOD_BOTH=['breakfast','dinner'];
 function foodItems(period){return foodSettings?foodSettings[period].items.map(i=>({text:i.text,selected:i.selected})):null;}
-function foodItemToggle(period,index){
+/* Общий список = объединение блюд завтрака и ужина (в таблице food формат прежний: приём пищи, блюдо, да/нет) */
+function foodDishes(){
+ const map=new Map();
+ FOOD_BOTH.forEach(period=>foodSettings[period].items.forEach(item=>{
+  const key=foodNorm(item.text);
+  let dish=map.get(key);
+  if(!dish){dish={key,text:item.text,breakfast:false,dinner:false};map.set(key,dish);}
+  if(item.selected)dish[period]=true;
+ }));
+ return [...map.values()];
+}
+const foodRowKey=el=>el.closest('.food-item').dataset.k;
+/* кружок «з» / «у»: предвыбор блюда на завтрак / ужин */
+function foodDishToggle(period,button){
+ if(!foodSettings)return;
+ const key=foodRowKey(button);
+ const dish=foodDishes().find(d=>d.key===key);
  const items=foodItems(period);
- if(!items||!items[index])return;
- items[index].selected=!items[index].selected;
+ if(!dish||!items)return;
+ const item=items.find(i=>foodNorm(i.text)===key);
+ if(item)item.selected=!item.selected;
+ else items.push({text:dish.text,selected:true});
  saveFoodSettings({[period]:{items}});
 }
-function foodItemRemove(period,index){
- const items=foodItems(period);
- if(!items||!items[index])return;
- items.splice(index,1);
- saveFoodSettings({[period]:{items}});
+function foodDishRemove(button){
+ if(!foodSettings)return;
+ const key=foodRowKey(button),change={};
+ FOOD_BOTH.forEach(period=>{change[period]={items:foodItems(period).filter(i=>foodNorm(i.text)!==key)};});
+ saveFoodSettings(change);
 }
 /* Переименование блюда: карандаш превращает строку в поле ввода. Enter, галочка или тап мимо — сохранить,
-   Esc — отмена. Меняется только название: «выбрано заранее» и всё остальное остаётся как было. */
-function foodItemRename(period,index){
- if(!foodSettings||!foodSettings[period].items[index])return;
- const row=document.querySelector('.food-item[data-period="'+period+'"][data-i="'+index+'"]');
- if(!row)return;
+   Esc — отмена. Название меняется сразу и на завтраке, и на ужине; предвыбор остаётся как был. */
+function foodDishRename(button){
+ if(!foodSettings)return;
+ const row=button.closest('.food-item'),key=row.dataset.k;
+ const dish=foodDishes().find(d=>d.key===key);
+ if(!dish)return;
  row.classList.add('editing');
- row.innerHTML='<input class="food-rename" type="text" maxlength="40" autocomplete="off" enterkeyhint="done" aria-label="Новое название блюда" value="'+escapeHtml(foodSettings[period].items[index].text)+'">'
+ row.innerHTML='<input class="food-rename" type="text" maxlength="40" autocomplete="off" enterkeyhint="done" aria-label="Новое название блюда" value="'+escapeHtml(dish.text)+'">'
   +'<button class="food-ok" type="button" aria-label="Сохранить название">'+FOOD_CHECK+'</button>';
  const input=row.querySelector('.food-rename'),ok=row.querySelector('.food-ok');
  let finished=false;
  const finish=save=>{
   if(finished)return;
   finished=true;
-  if(save)foodItemRenameCommit(period,index,input.value);else renderFoodSettings();
+  if(save)foodDishRenameCommit(key,input.value);else renderFoodSettings();
  };
  input.addEventListener('keydown',e=>{
   if(e.key==='Enter'){e.preventDefault();finish(true);}
@@ -3151,30 +3175,41 @@ function foodItemRename(period,index){
  input.focus();
  input.select();
 }
-function foodItemRenameCommit(period,index,raw){
- const items=foodItems(period);
+function foodDishRenameCommit(key,raw){
+ const dish=foodSettings&&foodDishes().find(d=>d.key===key);
  const text=String(raw||'').replace(/[,;\n]+/g,' ').replace(/\s+/g,' ').trim().slice(0,40);
- if(!items||!items[index]||!text||text===items[index].text){renderFoodSettings();return;}
- if(items.some((item,i)=>i!==index&&foodNorm(item.text)===foodNorm(text))){
+ if(!dish||!text||text===dish.text){renderFoodSettings();return;}
+ const newKey=foodNorm(text);
+ if(newKey!==key&&foodDishes().some(d=>d.key===newKey)){
   setToast(document.getElementById('foodSettingsToast'),'Блюдо с таким названием уже есть.','error');
   uiHaptic('error');
   renderFoodSettings();
   return;
  }
- items[index].text=text;
- saveFoodSettings({[period]:{items}});
+ const change={};
+ FOOD_BOTH.forEach(period=>{
+  const items=foodItems(period);let hit=false;
+  items.forEach(i=>{if(foodNorm(i.text)===key){i.text=text;hit=true;}});
+  if(hit)change[period]={items};
+ });
+ saveFoodSettings(change);
 }
-function foodItemAdd(period){
- const items=foodItems(period);
- const input=document.getElementById('food'+FOOD_PERIOD_NAMES[period]+'New');
- if(!items||!input)return;
+/* Новое блюдо появляется в списке обоих приёмов пищи, не выбранным заранее — кружки закрашиваются вручную */
+function foodDishAdd(){
+ const input=document.getElementById('foodNew');
+ if(!foodSettings||!input)return;
  const added=foodSplit(input.value);
  if(!added.length)return;
+ const known=new Set(foodDishes().map(d=>d.key)),change={};
+ FOOD_BOTH.forEach(period=>{change[period]={items:foodItems(period)};});
  for(const text of added){
-  if(!items.some(i=>i.text.toLowerCase()===text.toLowerCase()))items.push({text,selected:false});
+  const key=foodNorm(text);
+  if(known.has(key))continue;
+  known.add(key);
+  FOOD_BOTH.forEach(period=>change[period].items.push({text,selected:false}));
  }
  input.value='';
- saveFoodSettings({[period]:{items}});
+ saveFoodSettings(change);
 }
 
 // ============================================================
