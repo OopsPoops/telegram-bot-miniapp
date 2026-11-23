@@ -1353,14 +1353,14 @@ button.st-ico:active{transform:scale(.88)}
 :root[data-theme="dark"]{--qb-line:#262a38}
 .quick-chip.q-today,.quick-chip.q-yest,.quick-chip.q-doctor,.quick-chip.q-digest{background:linear-gradient(180deg,#ffffff 0%,#f6f7fc 100%)}
 :root[data-theme="dark"] .quick-chip.q-today,:root[data-theme="dark"] .quick-chip.q-yest,:root[data-theme="dark"] .quick-chip.q-doctor,:root[data-theme="dark"] .quick-chip.q-digest{background:linear-gradient(180deg,#1b1e2a 0%,#14161f 100%)}
-.c-blue{--qb:#7f95d9;--qbl:#a9b9ec;--qbe:#dfe6ff}
-.c-orange{--qb:#e0a46a;--qbl:#efc596;--qbe:#ffe7cc}
-.c-violet{--qb:#9c88d6;--qbl:#bfb0ea;--qbe:#eae1ff}
-.c-teal{--qb:#6bb5a8;--qbl:#98d0c5;--qbe:#cdf1e9}
-.c-green{--qb:#7dba97;--qbl:#a7d6bb;--qbe:#d2efdf}
-.c-slate{--qb:#8e9ab0;--qbl:#b4bdce;--qbe:#e7eaf2}
-.c-azure{--qb:#7fa3dc;--qbl:#a8c2ee;--qbe:#d9e6ff}
-.c-rose{--qb:#dc90ab;--qbl:#eab4c8;--qbe:#ffdce8}
+.c-blue{--qb:#6a82e6;--qbl:#97aef6;--qbe:#dfe6ff}
+.c-orange{--qb:#e8965a;--qbl:#f4bb8c;--qbe:#ffe7cc}
+.c-violet{--qb:#8f72dc;--qbl:#b7a1f0;--qbe:#eae1ff}
+.c-teal{--qb:#3fb0a0;--qbl:#78d0c2;--qbe:#cdf1e9}
+.c-green{--qb:#56b07f;--qbl:#8fd0aa;--qbe:#d2efdf}
+.c-slate{--qb:#d3a74f;--qbl:#eccb86;--qbe:#f6ecd2}
+.c-azure{--qb:#4da2d6;--qbl:#86c4ea;--qbe:#d9e6ff}
+.c-rose{--qb:#dc7c9c;--qbl:#f0a9c0;--qbe:#ffdce8}
 :root[data-theme="dark"] .c-blue{--qbe:rgba(138,164,255,.30)}
 :root[data-theme="dark"] .c-orange{--qbe:rgba(255,179,92,.28)}
 :root[data-theme="dark"] .c-violet{--qbe:rgba(171,143,255,.30)}
@@ -1398,8 +1398,8 @@ button.st-ico:active{transform:scale(.88)}
 .fs-row:not(.fs-day){padding:7px 11px;margin-bottom:5px;border-radius:12px}
 .fs-row:not(.fs-day) .fs-name{font-size:13.5px;line-height:1.25}
 .fs-row:not(.fs-day) .fs-go{font-size:17px}
-.fs-backdrop{align-items:flex-start;padding-top:calc(env(safe-area-inset-top,0px) + 11vh);padding-bottom:22px}
-.fs-modal{max-height:calc(100vh - 44px - 11vh);max-height:calc(100dvh - 44px - 11vh)}
+.fs-backdrop{align-items:flex-start;padding-top:calc(env(safe-area-inset-top,0px) + var(--fs-top,11vh));padding-bottom:22px}
+.fs-modal{max-height:calc(100vh - 44px - var(--fs-top,11vh));max-height:calc(100dvh - 44px - var(--fs-top,11vh))}
 .fs-name{flex:1;min-width:0;font-weight:700;font-size:14px;line-height:1.3;overflow-wrap:anywhere}
 .fs-cnt{flex-shrink:0;font-size:12px;color:var(--muted)}
 .fs-go{flex-shrink:0;font-style:normal;color:var(--muted);font-size:19px;line-height:1}
@@ -8224,6 +8224,9 @@ window.refreshDigest=function(){
   haptic();
   fs.view='list';fs.sel=null;input.value='';syncClear();
   if(!el.classList.contains('visible'))el._ov=document.body.style.overflow;
+  /* верхний отступ — в пикселях от высоты БЕЗ клавиатуры, чтобы попап не пересчитывал позицию, когда она появляется */
+  const stableH=(typeof tg!=='undefined'&&tg&&tg.viewportStableHeight)||window.innerHeight;
+  el.style.setProperty('--fs-top',Math.round(stableH*0.11)+'px');
   el.classList.add('visible');
   document.body.style.overflow='hidden';
   dimBars(true);
@@ -8236,11 +8239,21 @@ window.refreshDigest=function(){
   const el=$('foodSearchBackdrop');
   if(!el||!el.classList.contains('visible'))return;
   el.classList.remove('visible');
+  el.style.transform='';
   dimBars(false);
   document.body.style.overflow=el._ov||'';
   const input=$('fsInput');if(input)input.blur();
  };
  const input=$('fsInput'),body=$('fsBody'),clear=$('fsClear');
+ /* iOS при появлении клавиатуры сдвигает видимую область — возвращаем попап на место */
+ const vv=window.visualViewport;
+ if(vv){
+  const follow=()=>{
+   const el=$('foodSearchBackdrop');
+   if(el&&el.classList.contains('visible'))el.style.transform=vv.offsetTop>0?'translateY('+Math.round(vv.offsetTop)+'px)':'';
+  };
+  vv.addEventListener('resize',follow);vv.addEventListener('scroll',follow);
+ }
  const syncClear=()=>{if(clear)clear.hidden=!(input&&input.value);};
  if(input)input.addEventListener('input',()=>{fs.view='list';fs.sel=null;syncClear();render();});
  if(clear)clear.addEventListener('click',()=>{
