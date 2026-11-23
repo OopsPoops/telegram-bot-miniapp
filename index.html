@@ -746,6 +746,8 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .doctor-datebtn:active{opacity:.7}
 .doctor-ico.away{position:relative;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .doctor-ico.away::after{content:"↺";position:absolute;top:-5px;right:-5px;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;background:#5267e8;color:#fff;font-size:12px;font-weight:800;line-height:1;box-shadow:0 2px 6px rgba(82,103,232,.5)}
+.doctor-new-card{display:flex;align-items:stretch;padding:8px}
+.doctor-new-card .doctor-newbtn{flex:1;margin:0;min-height:46px}
 .doctor-newbtn{display:block;width:100%;min-height:50px;margin-top:2px;border:0;border-radius:16px;background:linear-gradient(180deg,#36c9b8 0%,#1f9d8f 100%);color:#fff;font-family:inherit;font-size:16px;font-weight:800;cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:0 8px 18px -10px rgba(31,157,143,.7)}
 .doctor-newbtn:active{transform:scale(.98)}
 .doctor-cancel{width:auto;padding:0 16px;font-size:15px;font-weight:700;color:var(--text)}
@@ -5010,7 +5012,7 @@ function doctorPageHtml(visit,dose,current,isNew){
  const hint=(days,warn)=>current?doctorHint(days,warn):'';
  const tap=(value,days)=>current?doctorTapCell(value,hint(days,14)):doctorCell(value,'');
  return '<div class="doctor-page"><div class="doctor-card"><div class="doctor-table">'
-  +'<div class="doctor-th doctor-th-date"><span class="doctor-ico date'+(current?'':' away')+'"'+(current?'':' role="button" tabindex="0" aria-label="Вернуться к текущей записи" onclick="doctorGoCurrent()"')+'>🗓️</span>'+(visit.date?'<small>Данные от</small><b>'+escapeHtml(visit.date)+'</b>':'')+'</div>'
+  +'<div class="doctor-th doctor-th-date"><span class="doctor-ico date'+(current?'':' away')+'"'+(current?'':' role="button" tabindex="0" aria-label="Вернуться к текущей записи" onclick="doctorGoCurrent()"')+'>🗓️</span>'+(visit.date?'<small>Данные от</small><b>'+escapeHtml(visit.date)+'</b>':(isNew?'<small style="visibility:hidden">Данные от</small><b style="visibility:hidden">00.00.0000</b>':''))+'</div>'
   +'<div class="doctor-th"><span class="doctor-ico short">💉</span><small class="doctor-drug">Новорапид</small>Короткий</div>'
   +'<div class="doctor-th"><span class="doctor-ico night">🌙</span><small class="doctor-drug">РинГлар</small>Ночной</div>'
   +doctorRowHtml('Суточная дозировка',doctorCell(dose.short?dose.short+' ед.':dose.short),doctorCell(dose.night?dose.night+' ед.':dose.night))
@@ -5022,7 +5024,7 @@ function doctorPageHtml(visit,dose,current,isNew){
   +doctorRowHtml('Всего ручек',doctorCell(s.total),doctorCell(n.total))
   +doctorRowHtml('Хватит до',doctorCell(s.until_date,hint(s.until_in_days,30),true),doctorCell(n.until_date,hint(n.until_in_days,30),true),true)
   +'</div></div>'
-  +(isNew?'<button class="doctor-newbtn" type="button" onclick="openDoctorForm()">Добавить новую запись</button>'
+  +(isNew?'<div class="doctor-comment-card doctor-new-card"><button class="doctor-newbtn" type="button" onclick="openDoctorForm()">Добавить новую запись</button></div>'
    :'<div class="doctor-comment-card"><div class="doctor-comment-title">Комментарий</div><div class="doctor-comment-text'+(s.comment?'':' none')+'">'+(s.comment?escapeHtml(s.comment):'—')+'</div></div>')
   +'</div>';
 }
@@ -5053,7 +5055,7 @@ function renderDoctor(data){
  doctorCurIdx=cur;
  // слева направо: прошлые записи → текущая → страница «Добавить новую запись»
  const pages=visits.slice().reverse().map((v,i)=>doctorPageHtml(v,dose,i===cur,false));
- pages.push(doctorPageHtml({date:'',short:{},night:{}},{},false,true));
+ pages.push(doctorPageHtml({date:'',short:{},night:{}},{},false,true).replace(/—/g,'&nbsp;')); // та же высота, что у прошлых записей, но без прочерков
  body.innerHTML='<div class="carousel shadowfix" id="doctorCarousel">'+pages.join('')+'</div>'
   +'<div class="carousel-dots" aria-hidden="true">'+pages.map((_,i)=>'<i'+(i===cur?' class="on"':'')+'></i>').join('')+'</div>';
  const car=document.getElementById('doctorCarousel');
