@@ -3032,6 +3032,7 @@ async function submitFood(){
 })();
 
 let foodSettings=null;
+let foodOrder=null; /* порядок блюд на странице «Еда»: сбрасывается при входе на страницу */
 const FOOD_PERIOD_NAMES={breakfast:'Breakfast',dinner:'Dinner'};
 const foodSortKey=text=>foodNorm(text);   /* для алфавита: без регистра, «ё» как «е» */
 function renderFoodSettings(){
@@ -3055,8 +3056,16 @@ function renderFoodSettings(){
  /* Общий список блюд: сначала выбранные заранее (на завтрак и/или ужин), потом остальные; внутри групп — по алфавиту.
     Кружки «з» и «у» — предвыбор на завтрак и на ужин. */
  const list=document.getElementById('foodList');
- const picked=d=>(d.breakfast||d.dinner)?1:0;
- const dishes=foodDishes().sort((a,b)=>picked(b)-picked(a)||foodSortKey(a.text).localeCompare(foodSortKey(b.text),'ru',{numeric:true}));
+ const all=foodDishes();
+ if(!foodOrder){ /* сортировка применяется только при входе на страницу: после нажатия на кружок строка остаётся на месте */
+  const picked=d=>(d.breakfast||d.dinner)?1:0;
+  foodOrder=all.slice().sort((a,b)=>picked(b)-picked(a)||foodSortKey(a.text).localeCompare(foodSortKey(b.text),'ru',{numeric:true})).map(d=>d.key);
+ }else{
+  const known=new Set(foodOrder);
+  all.forEach(d=>{if(!known.has(d.key))foodOrder.push(d.key);}); /* новое блюдо — в конец */
+ }
+ const byKey=new Map(all.map(d=>[d.key,d]));
+ const dishes=foodOrder.map(k=>byKey.get(k)).filter(Boolean);
  list.innerHTML=dishes.length?dishes.map(d=>
   '<div class="st-row food-item" data-k="'+escapeHtml(d.key)+'">'
   +'<div class="food-mks">'
@@ -3139,6 +3148,12 @@ function foodDishToggle(period,button){
  const item=items.find(i=>foodNorm(i.text)===key);
  if(item)item.selected=!item.selected;
  else items.push({text:dish.text,selected:true});
+ /* сразу показываем результат, не дожидаясь сервера; при ошибке saveFoodSettings вернёт то, что сохранено */
+ const live=foodSettings[period].items.find(i=>foodNorm(i.text)===key);
+ if(live)live.selected=item?item.selected:true;
+ else foodSettings[period].items.push({text:dish.text,selected:true});
+ if(typeof selectionHaptic==='function')selectionHaptic();
+ renderFoodSettings();
  saveFoodSettings({[period]:{items}});
 }
 function foodDishRemove(button){
@@ -3186,6 +3201,7 @@ function foodDishRenameCommit(key,raw){
   return;
  }
  const change={};
+ if(foodOrder){const at=foodOrder.indexOf(key);if(at>=0)foodOrder[at]=newKey;} /* строка остаётся на своём месте */
  FOOD_BOTH.forEach(period=>{
   const items=foodItems(period);let hit=false;
   items.forEach(i=>{if(foodNorm(i.text)===key){i.text=text;hit=true;}});
@@ -3210,6 +3226,22 @@ function foodDishAdd(){
  input.value='';
  saveFoodSettings(change);
 }
+
+/* вошли на страницу «Еда» (или вернулись в настройки) — сортируем заново */
+(function(){
+ const page=document.querySelector('#screen-settings .st-page[data-p="food"]'),screen=document.getElementById('screen-settings');
+ if(!page||!screen)return;
+ const shown=()=>page.classList.contains('active')&&screen.classList.contains('active');
+ let was=shown();
+ const check=()=>{
+  const now=shown();
+  if(now&&!was){foodOrder=null;renderFoodSettings();}
+  was=now;
+ };
+ const observer=new MutationObserver(check);
+ observer.observe(page,{attributes:true,attributeFilter:['class']});
+ observer.observe(screen,{attributes:true,attributeFilter:['class']});
+})();
 
 // ============================================================
 // НАСТРОЙКИ ЕЖЕДНЕВНОГО ОТЧЁТА
