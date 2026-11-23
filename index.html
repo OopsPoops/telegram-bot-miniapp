@@ -1158,6 +1158,7 @@ button.st-ico:active{transform:scale(.88)}
 .food-dot.mk[data-m="d"][aria-pressed="true"]{background:#1d2c63;border-color:#1d2c63;color:#fff}
 :root[data-theme="dark"] .food-dot.mk[data-m="d"][aria-pressed="true"]{background:#26397f;border-color:#5a70d6}
 .food-item{gap:10px}
+#screen-settings .st-page[data-p="food"].typing{padding-bottom:65vh}
 .food-sugg{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:2px 15px 12px}
 .food-sugg[hidden]{display:none}
 .food-sugg small{width:100%;font-size:12px;color:var(--st-sub)}
@@ -1893,11 +1894,11 @@ button.st-ico:active{transform:scale(.88)}
 </div>
 <div class="st-sec">Блюда</div>
 <div class="st-card">
-<div class="st-row"><input class="st-in food-new" id="foodNewTop" type="text" maxlength="40" autocomplete="off" placeholder="Новое блюдо" enterkeyhint="done" oninput="foodSuggest('foodNewTop')" onkeydown="if(event.key==='Enter'){event.preventDefault();foodDishAdd('foodNewTop');}" aria-label="Новое блюдо"><button class="food-plus" type="button" onclick="foodDishAdd('foodNewTop')" aria-label="Добавить блюдо"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div>
+<div class="st-row"><input class="st-in food-new" id="foodNewTop" type="text" maxlength="40" autocomplete="off" placeholder="Новое блюдо" onfocus="foodInputFocus('foodNewTop')" onblur="foodInputBlur()" enterkeyhint="done" oninput="foodSuggest('foodNewTop')" onkeydown="if(event.key==='Enter'){event.preventDefault();foodDishAdd('foodNewTop');}" aria-label="Новое блюдо"><button class="food-plus" type="button" onclick="foodDishAdd('foodNewTop')" aria-label="Добавить блюдо"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div>
 <div class="food-sugg" id="foodSuggTop" hidden></div>
 <div id="foodList"></div>
 <div class="food-sugg" id="foodSuggBottom" hidden></div>
-<div class="st-row"><input class="st-in food-new" id="foodNew" type="text" maxlength="40" autocomplete="off" placeholder="Новое блюдо" enterkeyhint="done" oninput="foodSuggest('foodNew')" onkeydown="if(event.key==='Enter'){event.preventDefault();foodDishAdd('foodNew');}" aria-label="Новое блюдо"><button class="food-plus" type="button" onclick="foodDishAdd('foodNew')" aria-label="Добавить блюдо"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div>
+<div class="st-row"><input class="st-in food-new" id="foodNew" type="text" maxlength="40" autocomplete="off" placeholder="Новое блюдо" onfocus="foodInputFocus('foodNew')" onblur="foodInputBlur()" enterkeyhint="done" oninput="foodSuggest('foodNew')" onkeydown="if(event.key==='Enter'){event.preventDefault();foodDishAdd('foodNew');}" aria-label="Новое блюдо"><button class="food-plus" type="button" onclick="foodDishAdd('foodNew')" aria-label="Добавить блюдо"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div>
 </div>
 </div>
 <div class="toast st-toast" id="foodSettingsToast"></div>
@@ -3224,6 +3225,30 @@ function foodDishRenameCommit(key,raw){
 }
 /* Подсказки при вводе нового блюда: показываем уже существующие, чтобы не добавлять похожее или такое же */
 const FOOD_SUGG={foodNewTop:'foodSuggTop',foodNew:'foodSuggBottom'};
+/* Поле ввода поднимаем над клавиатурой, чтобы были видны подсказки: верхнее — в верхней части экрана
+   (подсказки под ним), нижнее — внизу над клавиатурой (подсказки над ним). */
+function foodReveal(id){
+ const input=document.getElementById(id);
+ if(!input)return;
+ const vv=window.visualViewport,vh=vv?vv.height:window.innerHeight,off=vv?vv.offsetTop:0;
+ const target=id==='foodNewTop'?vh*0.2:vh-120;
+ const delta=input.getBoundingClientRect().top-off-target;
+ if(Math.abs(delta)>8)window.scrollBy({top:delta,behavior:'smooth'});
+}
+function foodInputFocus(id){
+ const page=document.querySelector('#screen-settings .st-page[data-p="food"]');
+ if(page)page.classList.add('typing');
+ setTimeout(()=>foodReveal(id),120);
+ setTimeout(()=>foodReveal(id),420); /* клавиатура доезжает — подстраиваемся ещё раз */
+}
+function foodInputBlur(){
+ setTimeout(()=>{
+  const active=document.activeElement;
+  if(active&&(active.id==='foodNew'||active.id==='foodNewTop'))return;
+  const page=document.querySelector('#screen-settings .st-page[data-p="food"]');
+  if(page)page.classList.remove('typing');
+ },450); /* не сразу — иначе страница «прыгнет» до того, как сработает нажатие на подсказку */
+}
 function foodSuggest(id){
  const input=document.getElementById(id),box=document.getElementById(FOOD_SUGG[id]);
  if(!input||!box)return;
@@ -3233,9 +3258,10 @@ function foodSuggest(id){
  const found=foodDishes().filter(d=>d.key.includes(q))
   .sort((a,b)=>(a.key.startsWith(q)?0:1)-(b.key.startsWith(q)?0:1)||a.key.localeCompare(b.key,'ru')).slice(0,8);
  if(!found.length){box.hidden=true;box.innerHTML='';return;}
- box.innerHTML='<small>Уже есть в списке — нажми, чтобы найти</small>'
+ box.innerHTML='<small>Уже есть в списке</small>'
   +found.map(d=>'<button class="food-sg" type="button" data-k="'+escapeHtml(d.key)+'" onclick="foodSuggPick(this)">'+escapeHtml(d.text)+'</button>').join('');
  box.hidden=false;
+ setTimeout(()=>foodReveal(id),30); /* подсказки появились — следим, чтобы они не ушли под клавиатуру */
 }
 function foodSuggPick(button){
  const key=button.dataset.k;
