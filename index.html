@@ -2216,16 +2216,18 @@ function historyWindow(days,force=false){
   if(semaHistoryCache.days===days)return Promise.resolve(r);
  }
  if(!force&&semaHistoryCache.pending&&semaHistoryCache.pendingDays===days)return semaHistoryCache.pending;
+ const gen=semaHistoryCache.gen||0;
  const task=api('history',{days});
  semaHistoryCache.pending=task;semaHistoryCache.pendingDays=days;
  task.then(result=>{
+  if((semaHistoryCache.gen||0)!==gen)return; /* пока шёл запрос, данные изменились (запись сахара/инсулина) — результат устарел */
   semaHistoryCache.result=result;semaHistoryCache.days=days;semaHistoryCache.at=Date.now();
   if(semaHistoryCache.pending===task)semaHistoryCache.pending=null;
  },()=>{if(semaHistoryCache.pending===task)semaHistoryCache.pending=null;});
  return task;
 }
-function invalidateHistoryWindow(){semaHistoryCache.result=null;semaHistoryCache.at=0;msState.stale=true;}
-const analyticsState={loaded:false,loading:false,measurements:[],doses:{limitInsulin:null,limitNight:null,night:new Map()},chart:'trend',metric:'sugar',trendDays:3,historyDays:0,selectedDates:null,visibleWeeks:[true,true,true]};
+function invalidateHistoryWindow(){semaHistoryCache.result=null;semaHistoryCache.at=0;semaHistoryCache.pending=null;semaHistoryCache.gen=(semaHistoryCache.gen||0)+1;msState.stale=true;analyticsState.stale=true;}
+const analyticsState={loaded:false,loading:false,stale:false,measurements:[],doses:{limitInsulin:null,limitNight:null,night:new Map()},chart:'trend',metric:'sugar',trendDays:3,historyDays:0,selectedDates:null,visibleWeeks:[true,true,true]};
 const weekColors=['#5267e8','#ec9438','#31a66d'];
 const labels={
 today:{title:'Сегодня',subtitle:'Данные за текущий день',icon:'☀️',loading:'Собираю данные за сегодня…'},
@@ -2264,7 +2266,7 @@ function switchTab(name){
  document.querySelectorAll('.screen').forEach(screen=>screen.classList.toggle('active',screen.id==='screen-'+name));
  window.scrollTo(0,0); // мгновенно: плавная прокрутка во время смены экрана и давала «подвисание»
  selectionHaptic();
- if(name==='graphs')loadAnalytics(false);
+ if(name==='graphs')loadAnalytics(false); /* если после прошлой загрузки записали сахар/инсулин, данные перечитаются */
  if(name==='night'&&typeof window.nightTabOpen==='function')window.nightTabOpen();
  if(name==='settings')setTimeout(refreshSettingsLazy,350); // после отрисовки экрана
 }
@@ -2813,6 +2815,7 @@ async function saveValue(type){
  let saved=false;
  try{
   const result=await api(type,{value});
+  invalidateHistoryWindow(); /* данные изменились — графики при открытии перечитают их, а не покажут старые */
   setToast(toast,'✓ '+(type==='sugar'||type==='insulin'?result.message:result),'success');
   saved=true;
   showSaveSuccess(button);
@@ -3409,6 +3412,7 @@ async function undoValue(type){
  setToast(toast,'');
  try{
   const result=await api('undo_'+type);
+  invalidateHistoryWindow(); /* значение удалено — графики перечитают данные */
   setAccess(true,'Сервер подтвердил доступ');
   uiHaptic('success');
   const value=String(result.value).replace('.',',');
@@ -3773,15 +3777,20 @@ function onChartPeriodChange(){
 async function loadAnalytics(force=false,requestedDays=null){
  if(analyticsState.loading)return;
  const days=Math.max(DEFAULT_GRAPH_HISTORY_DAYS,requestedDays||requiredGraphHistoryDays());
- if(analyticsState.loaded&&analyticsState.historyDays>=days&&!force){renderAnalytics();return;}
+ const refresh=analyticsState.stale; /* после записи/отмены значения данные устарели — перечитываем, даже если период тот же */
+ if(analyticsState.loaded&&analyticsState.historyDays>=days&&!force&&!refresh){renderAnalytics();return;}
  // Не перечитываем меньший период, когда более длинное окно уже загружено.
- if(analyticsState.loaded&&analyticsState.historyDays>=days){renderAnalytics();return;}
+ if(analyticsState.loaded&&analyticsState.historyDays>=days&&!refresh){renderAnalytics();return;}
+ analyticsState.stale=false;
  analyticsState.loading=true;
+ const silent=analyticsState.loaded; /* графики уже на экране — обновляем их на месте, без экрана «Загружаю…» */
  const loading=document.getElementById('analytics-loading');
  const content=document.getElementById('analytics-content');
- loading.hidden=false;
- loading.textContent=mw('Загружаю измерения…');
- content.hidden=true;
+ if(!silent){
+  loading.hidden=false;
+  loading.textContent=mw('Загружаю измерения…');
+  content.hidden=true;
+ }
  try{
   const result=await historyWindow(days);
   analyticsState.measurements=normalizeHistory(result);
@@ -3798,8 +3807,11 @@ async function loadAnalytics(force=false,requestedDays=null){
   if(newerDays>days)queueMicrotask(()=>loadAnalytics(true,newerDays));
  }catch(error){
   handleAccessError(error);
-  loading.innerHTML=escapeHtml(error.message)+'<br><button class="analytics-retry" type="button" onclick="loadAnalytics(true)">Повторить</button>';
-  loading.hidden=false;
+  analyticsState.stale=true; /* не вышло — в следующий раз попробуем снова */
+  if(!silent){
+   loading.innerHTML=escapeHtml(error.message)+'<br><button class="analytics-retry" type="button" onclick="loadAnalytics(true)">Повторить</button>';
+   loading.hidden=false;
+  }
  }finally{
   analyticsState.loading=false;
  }
@@ -7526,6 +7538,33 @@ window.openDayFromCalendar=function(off){
  });
 };
 
+/* Окно дня для заданного набора дней (поиск блюд): стрелки листают только эти дни, от старых к новым. */
+window.openDayList=function(offs,startOff){
+ offs=[...new Set((offs||[]).map(o=>Math.min(0,Math.trunc(Number(o)||0))))].sort((a,b)=>a-b);
+ if(!offs.length)return;
+ const start=Math.max(0,offs.indexOf(Math.min(0,Math.trunc(Number(startOff)||0))));
+ const need=Math.min(365,-offs[0]+15);
+ if(DAYS<need){if(!dpState.calDays)dpState.calDays=DAYS;DAYS=need;}
+ const specs=()=>offs.map(off=>()=>daySpec(off));
+ if(hist&&hist.days>=need){
+  dpOpen(specs(),start,{noWrap:true});
+  getHistory(false).then(()=>{if($('dayPopup')&&!dpState.pager)dpRender();}).catch(()=>{});
+  return;
+ }
+ const off0=offs[start],d=dayInfo(off0),dt=new Date();dt.setHours(12,0,0,0);dt.setDate(dt.getDate()+off0);
+ const dm=dt.getFullYear()===new Date().getFullYear()?d.dm:d.dm+'.'+dt.getFullYear();
+ dpOpen([()=>({name:d.name,sub:d.name.toLowerCase()===d.wd?dm:dm+' · '+d.wd,sugars:[],shots:[],night:null,sumHtml:'',loading:true,loadingText:'Загружаю день…'})],0);
+ const el=$('dayPopup');
+ getHistory(true).then(h=>h&&h.days>=need?h:fetchHist()).then(()=>{
+  if($('dayPopup')!==el||!el.classList.contains('visible'))return;
+  dpState.noWrap=true;dpState.pager=false;dpState.extending=false;
+  dpState.specs=specs();dpState.idx=start;dpRender();
+ }).catch(error=>{
+  console.error('Не удалось загрузить день:',error);
+  if($('dayPopup')===el)closeDayPopup();else if(dpState.calDays){DAYS=dpState.calDays;dpState.calDays=0;}
+ });
+};
+
 /* ===== Оборот карточки «Инсулин»: похожие случаи из истории (sema_analytics.py) ===== */
 const insSim={data:null,loading:false,error:'',loadedAt:0,stale:true,idx:0,seq:0};
 const insFlipEl=()=>$('insFlip');
@@ -8406,9 +8445,10 @@ window.refreshDigest=function(){
    return;
   }
   const day=e.target.closest('[data-off]');
-  if(day&&typeof window.openDayFromCalendar==='function'){
+  if(day&&typeof window.openDayList==='function'){
    haptic();
-   window.openDayFromCalendar(Number(day.dataset.off)); /* то же окно дня, что у «Календаря»: сахар и инсулин за день */
+   /* окно дня как у «Календаря», но стрелки листают только дни, где найдено это блюдо */
+   window.openDayList(fs.sel?daysFor(fs.sel).map(g=>g.off):[Number(day.dataset.off)],Number(day.dataset.off));
   }
  });
  document.addEventListener('keydown',e=>{
