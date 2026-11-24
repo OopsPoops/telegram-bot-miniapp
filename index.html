@@ -3227,13 +3227,15 @@ function foodDishRenameCommit(key,raw){
 const FOOD_SUGG={foodNewTop:'foodSuggTop',foodNew:'foodSuggBottom'};
 /* Поле ввода поднимаем над клавиатурой, чтобы были видны подсказки: верхнее — в верхней части экрана
    (подсказки под ним), нижнее — внизу над клавиатурой (подсказки над ним). */
-function foodReveal(id){
+function foodReveal(id,instant){
  const input=document.getElementById(id);
  if(!input)return;
  const vv=window.visualViewport,vh=vv?vv.height:window.innerHeight,off=vv?vv.offsetTop:0;
- const target=id==='foodNewTop'?vh*0.2:vh-120;
+ const box=document.getElementById(FOOD_SUGG[id]),bh=box&&!box.hidden?box.offsetHeight:0;
+ /* верхнее поле: ниже шапки Telegram (не меньше 130px от верха), но так, чтобы подсказки под ним влезли над клавиатурой */
+ const target=id==='foodNewTop'?Math.max(130,Math.min(vh*0.3,vh-62-bh)):vh-120;
  const delta=input.getBoundingClientRect().top-off-target;
- if(Math.abs(delta)>8)window.scrollBy({top:delta,behavior:'smooth'});
+ if(Math.abs(delta)>8)window.scrollBy({top:delta,behavior:instant?'auto':'smooth'});
 }
 function foodInputFocus(id){
  const page=document.querySelector('#screen-settings .st-page[data-p="food"]');
@@ -3261,7 +3263,7 @@ function foodSuggest(id){
  box.innerHTML='<small>Уже есть в списке</small>'
   +found.map(d=>'<button class="food-sg" type="button" data-k="'+escapeHtml(d.key)+'" onclick="foodSuggPick(this)">'+escapeHtml(d.text)+'</button>').join('');
  box.hidden=false;
- setTimeout(()=>foodReveal(id),30); /* подсказки появились — следим, чтобы они не ушли под клавиатуру */
+ setTimeout(()=>foodReveal(id,true),30); /* подсказки появились — следим, чтобы они не ушли под клавиатуру */
 }
 function foodSuggPick(button){
  const key=button.dataset.k;
