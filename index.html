@@ -1600,7 +1600,7 @@ button.st-ico:active{transform:scale(.88)}
 <div class="ns-range" id="nightRange" role="tablist" aria-label="Период"><button type="button" data-n="10" class="active">10</button><button type="button" data-n="20">20</button><button type="button" data-n="30">30</button></div></div>
 <div id="nightStatsBody"></div>
 </section>
-<!-- Похожие вечера: тот же сахар в то же время, удачное утро (4–9) -->
+<!-- Похожие вечера: за 30 дней — та же сумма короткого за день, ночью без низких, утром сахар в цели -->
 <section class="metric ns-card" id="nightSim" aria-live="polite">
 <div class="ns-head"><button class="ns-ico ns-refresh" type="button" id="nightSimRefresh" aria-label="Пересчитать похожие вечера" title="Пересчитать">🔎</button><div class="ns-hcopy"><div class="ns-title">Похожие вечера</div><div class="ns-sub" id="nightSimSub"></div></div></div>
 <div id="nightSimBody"><div class="ns-note busy">Ищу похожие вечера…</div></div>
@@ -7100,7 +7100,8 @@ function nightRow(off,ix,t,keepEmpty){
 }
 function nightCaseRow(c,t,attr){
  return nightRowHtml({main:c.date.slice(0,5),sub:'Σ'+nG(c.insulin_day),
-  ev:{v:c.sugar.value,t:c.sugar.time},mo:{v:c.morning.value,t:c.morning.time},dose:{value:c.basal,fact:true},attr},t);
+  ev:{v:c.sugar.value,t:c.sugar.time},mo:{v:c.morning.value,t:c.morning.time},dose:{value:c.basal,fact:true},
+  late:(c.late||[]).map(x=>({t:x.time,v:x.value})),attr},t); /* 💉 — подколка перед ночным, как в статистике */
 }
 let nightDays=10;
 try{const saved=Number(localStorage.getItem('sema-night-days'));if([10,20,30].includes(saved))nightDays=saved;}catch(e){}
@@ -7801,7 +7802,8 @@ function renderNightSim(){
  html+=nightHead();
  const cur=data.current;
  if(cur){
-  html+=nightRowHtml({main:'Сейчас',sub:'Σ'+nG(cur.insulin_day),ev:{v:cur.sugar,t:cur.time},mo:null,dose:null,cls:'ns-now'},t);
+  html+=nightRowHtml({main:'Сейчас',sub:'Σ'+nG(cur.insulin_day),ev:{v:cur.sugar,t:cur.time},mo:null,dose:null,
+   late:(cur.late||[]).map(x=>({t:x.time,v:x.value})),cls:'ns-now'},t);
  }
  data.cases.forEach((c,i)=>{html+=nightCaseRow(c,t,' data-case="'+i+'"');});
  body.innerHTML=html;
